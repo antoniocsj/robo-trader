@@ -15,6 +15,8 @@ class TraderSim:
         self.num_buys = 0  # número de negociações de compra
         self.num_sells = 0  # número de negociações de venda
         self.num_trades = 0  # número de negociações de compra ou venda
+        self.current_price = 0.0  # preço atual ou o preço de fechamento atual
+        self.previous_price = 0.0  # preço anterior ou o preço de fechamento da vela anterior
         self.starting_price = 0.0
         self.final_price = 0.0
         self.balance = balance  # saldo
@@ -22,55 +24,53 @@ class TraderSim:
         self.profit = 0.0  # lucro (ou prejuízo) na negociação
         self.hist.get_hist_data(symbol, timeframe)
 
-    def buy(self, current_price):
+    def buy(self):
         if self.open_position is None:
             self.candlestick_count = 0
             self.profit = 0.0
-            print(f'iniciando operação de compra a {current_price}')
+            print(f'iniciando operação de compra a {self.current_price}')
             self.open_position = 'buying'
-            self.starting_price = current_price
+            self.starting_price = self.current_price
             self.num_buys += 1
         elif self.open_position == 'selling':
             self.candlestick_count = 0
             self.profit = 0.0
-            self.close_position(current_price)
-            print(f'iniciando operação de compra a {current_price}')
+            self.close_position()
+            print(f'iniciando operação de compra a {self.current_price}')
             self.open_position = 'buying'
-            self.starting_price = current_price
+            self.starting_price = self.current_price
             self.num_buys += 1
         elif self.open_position == 'buying':
             print('proibido comprar com uma compra já aberta')
 
-    def sell(self, current_price):
+    def sell(self):
         if self.open_position is None:
             self.candlestick_count = 0
             self.profit = 0.0
-            print(f'iniciando operação de venda a {current_price}')
+            print(f'iniciando operação de venda a {self.current_price}')
             self.open_position = 'selling'
-            self.starting_price = current_price
+            self.starting_price = self.current_price
             self.num_sells += 1
         elif self.open_position == 'buying':
             self.candlestick_count = 0
             self.profit = 0.0
-            self.close_position(current_price)
-            print(f'iniciando operação de venda a {current_price}')
+            self.close_position()
+            print(f'iniciando operação de venda a {self.current_price}')
             self.open_position = 'selling'
-            self.starting_price = current_price
+            self.starting_price = self.current_price
             self.num_sells += 1
         elif self.open_position == 'selling':
             print('proibido vender com uma venda já aberta')
 
-    def update_profit(self, current_price):
+    def update_profit(self):
         if self.open_position == 'buying':
-            self.profit = current_price - self.starting_price
+            self.profit = self.current_price - self.starting_price
         elif self.open_position == 'selling':
-            self.profit = self.starting_price - current_price
+            self.profit = self.starting_price - self.current_price
 
         self.equity = self.balance + self.profit
 
-    def close_position(self, current_price):
-        self.final_price = current_price
-
+    def close_position(self):
         if self.open_position == 'buying':
             print('fechando operação de compra aberta')
             self.num_sells += 1
@@ -78,7 +78,7 @@ class TraderSim:
             print('fechando operação de venda aberta')
             self.num_buys += 1
 
-        self.update_profit(self.final_price)
+        self.update_profit()
         self.open_position = None
 
         if self.profit > 0:
@@ -88,6 +88,28 @@ class TraderSim:
 
         self.profit = 0.0
         self.balance = self.equity
+
+    def interact_with_user(self) -> str:
+        print('menu commands: ')
+        cmd = input('quit(q) buy(b) sell(s) close(c) next(n) <-- ')
+        cmd = cmd.lower()
+
+        return_msg = 'continue'
+
+        if cmd == 'q':
+            return_msg = 'break'
+        elif cmd == 'b':
+            self.buy()
+        elif cmd == 's':
+            self.sell()
+        elif cmd == 'c':
+            self.close_position()
+        elif cmd == 'n':
+            pass
+        else:
+            pass
+
+        return return_msg
 
 
 def main():
@@ -103,27 +125,28 @@ def main():
 
     # fazer um sistema interativo, no qual o usuário pode operar como se estivesse no MT5.
     close_price_col = 5
-    previous_price = hist.arr[0, close_price_col]
+    trader.previous_price = hist.arr[0, close_price_col]
     candlesticks_quantity = 10  # quantidade de velas que serão usadas na simulação
 
     for i in range(0, candlesticks_quantity):
-        current_price = hist.arr[i, close_price_col]
+        trader.current_price = hist.arr[i, close_price_col]
         print(f'i = {i}, ', end='')
         print(f'OHLCV = {hist.arr[i]}, ', end='')
-        print(f'current_price = {current_price}')
+        print(f'current_price = {trader.current_price}')
 
-        if current_price > previous_price:
-            trader.buy(current_price)
+        # if trader.current_price > trader.previous_price:
+        #     trader.buy()
+        #
+        # if trader.current_price < trader.previous_price:
+        #     trader.sell()
 
-        if current_price < previous_price:
-            trader.sell(current_price)
-
-        trader.update_profit(current_price)
+        trader.update_profit()
 
         # fecha a posição quando acabarem as bnovas barras (velas ou candlesticks)
         if i == candlesticks_quantity - 1:
-            trader.close_position(current_price)
+            trader.close_position()
             trader.candlestick_count = 0
+            print('última vela concluída. simulação chegou ao fim.')
 
         print(f'candlestick_count = {trader.candlestick_count}, ', end='')
         print(f'open_position = {trader.open_position}, ', end='')
@@ -134,7 +157,14 @@ def main():
         print(f'num_misses = {trader.num_misses}')
 
         trader.candlestick_count += 1
-        previous_price = current_price
+        trader.previous_price = trader.current_price
+
+        ret_msg = trader.interact_with_user()
+
+        if ret_msg == 'break':
+            print('usuário decidiu encerrar a simulação')
+            trader.close_position()
+            break
 
 
 # --------------------------------------------------------
