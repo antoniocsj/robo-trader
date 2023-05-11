@@ -90,6 +90,8 @@ def main():
     # teste do TraderSim
     trader = TraderSim(symbol, timeframe, 1000.0)
 
+    # fazer um sistema interativo, no qual o usuário pode operar como se estivesse no MT5.
+
     previous_price = hist.arr[0, 5]
     n = 10
     for i in range(1, n):
