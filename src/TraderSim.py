@@ -10,6 +10,7 @@ class TraderSim:
         self.candlestick_count = 0  # contagem de velas desde a abertura da posição
         self.symbol = ''
         self.timeframe = ''
+        self.simulation_is_running = False
         self.num_hits = 0  # número de acertos
         self.num_misses = 0  # número de erros
         self.num_buys = 0  # número de negociações de compra
@@ -24,7 +25,17 @@ class TraderSim:
         self.profit = 0.0  # lucro (ou prejuízo) na negociação
         self.hist.get_hist_data(symbol, timeframe)
 
+    def start_simulation(self):
+        self.simulation_is_running = True
+
+    def finish_simulation(self):
+        self.simulation_is_running = False
+
     def buy(self):
+        if not self.simulation_is_running:
+            print('simulação não está executando')
+            return
+
         if self.open_position is None:
             self.candlestick_count = 0
             self.profit = 0.0
@@ -44,6 +55,10 @@ class TraderSim:
             print('proibido comprar com uma compra já aberta')
 
     def sell(self):
+        if not self.simulation_is_running:
+            print('simulação não está executando')
+            return
+
         if self.open_position is None:
             self.candlestick_count = 0
             self.profit = 0.0
@@ -63,6 +78,10 @@ class TraderSim:
             print('proibido vender com uma venda já aberta')
 
     def update_profit(self):
+        if not self.simulation_is_running:
+            print('simulação não está executando')
+            return
+
         if self.open_position == 'buying':
             self.profit = self.current_price - self.starting_price
         elif self.open_position == 'selling':
@@ -71,6 +90,13 @@ class TraderSim:
         self.equity = self.balance + self.profit
 
     def close_position(self):
+        if not self.simulation_is_running:
+            print('simulação não está executando')
+            return
+
+        if self.open_position is None:
+            return
+
         if self.open_position == 'buying':
             print('fechando operação de compra aberta')
             self.num_sells += 1
@@ -122,11 +148,12 @@ def main():
 
     # teste do TraderSim
     trader = TraderSim(symbol, timeframe, 1000.0)
+    trader.start_simulation()
 
     # fazer um sistema interativo, no qual o usuário pode operar como se estivesse no MT5.
     close_price_col = 5
     trader.previous_price = hist.arr[0, close_price_col]
-    candlesticks_quantity = 10  # quantidade de velas que serão usadas na simulação
+    candlesticks_quantity = 5  # quantidade de velas que serão usadas na simulação
 
     for i in range(0, candlesticks_quantity):
         trader.current_price = hist.arr[i, close_price_col]
@@ -134,18 +161,13 @@ def main():
         print(f'OHLCV = {hist.arr[i]}, ', end='')
         print(f'current_price = {trader.current_price}')
 
-        # if trader.current_price > trader.previous_price:
-        #     trader.buy()
-        #
-        # if trader.current_price < trader.previous_price:
-        #     trader.sell()
-
         trader.update_profit()
 
         # fecha a posição quando acabarem as bnovas barras (velas ou candlesticks)
         if i == candlesticks_quantity - 1:
             trader.close_position()
             trader.candlestick_count = 0
+            trader.finish_simulation()
             print('última vela concluída. simulação chegou ao fim.')
 
         print(f'candlestick_count = {trader.candlestick_count}, ', end='')
@@ -156,14 +178,16 @@ def main():
         print(f'num_hits = {trader.num_hits}, ', end='')
         print(f'num_misses = {trader.num_misses}')
 
-        trader.candlestick_count += 1
-        trader.previous_price = trader.current_price
+        if trader.open_position is not None:
+            trader.candlestick_count += 1
 
+        trader.previous_price = trader.current_price
         ret_msg = trader.interact_with_user()
 
         if ret_msg == 'break':
             print('usuário decidiu encerrar a simulação')
             trader.close_position()
+            trader.finish_simulation()
             break
 
 
