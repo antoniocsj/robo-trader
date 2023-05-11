@@ -2,80 +2,81 @@ from Hist import Hist
 
 
 class TraderSim:
-    def __init__(self, symbol, timeframe):
-        self.symbol = symbol
+    def __init__(self, symbol: str, timeframe: str, balance: float) -> None:
+        self.symbol = symbol  # financial asset, security or contract etc.
         self.timeframe = timeframe
         self.hist = Hist()
-        self.posicao = None
-        self.bar = 0
+        self.open_position = None
+        self.candlestick_count = 0
         self.symbol = ''
         self.timeframe = ''
-        self.num_acertos = 0
-        self.num_erros = 0
-        self.num_compras = 0
-        self.num_vendas = 0
-        self.num_operacoes = 0
-        self.preco_comeco = 0.0
-        self.preco_fim = 0.0
-        self.saldo_total = 0.0
-        self.hist.obter_historico(symbol, timeframe)
+        self.num_hits = 0  # número de acertos
+        self.num_misses = 0  # número de erros
+        self.num_buys = 0  # número de negociações de compra
+        self.num_sells = 0  # número de negociações de venda
+        self.num_trades = 0  # número de negociações de compra ou venda
+        self.starting_price = 0.0
+        self.final_price = 0.0
+        self.balance = balance  # saldo
+        self.equity = 0.0  # patrimônio líquido
+        self.profit = 0.0  # lucro (ou prejuízo) na negociação
+        self.hist.get_hist_data(symbol, timeframe)
 
-    def comprar(self, preco_atual):
-        if self.posicao is None:
-            self.bar = 0
-            print(f'iniciando operação de compra a {preco_atual}')
-            self.posicao = 'comprado'
-            self.preco_comeco = preco_atual
-            self.num_compras += 1
-        elif self.posicao == 'vendido':
-            self.bar = 0
-            self.fechar_posicao(preco_atual)
-            print(f'iniciando operação de compra a {preco_atual}')
-            self.posicao = 'comprado'
-            self.preco_comeco = preco_atual
-            self.num_compras += 1
-        elif self.posicao == 'comprado':
-            print('proibido comprar com uma compra pendente')
+    def buy(self, current_price):
+        if self.open_position is None:
+            self.candlestick_count = 0
+            print(f'iniciando operação de compra a {current_price}')
+            self.open_position = 'buying'
+            self.starting_price = current_price
+            self.num_buys += 1
+        elif self.open_position == 'selling':
+            self.candlestick_count = 0
+            self.close_position(current_price)
+            print(f'iniciando operação de compra a {current_price}')
+            self.open_position = 'buying'
+            self.starting_price = current_price
+            self.num_buys += 1
+        elif self.open_position == 'buying':
+            print('proibido comprar com uma compra já aberta')
 
-    def vender(self, preco_atual):
-        if self.posicao is None:
-            self.bar = 0
-            print(f'iniciando operação de venda a {preco_atual}')
-            self.posicao = 'vendido'
-            self.preco_comeco = preco_atual
-            self.num_vendas += 1
-        elif self.posicao == 'comprado':
-            self.bar = 0
-            self.fechar_posicao(preco_atual)
-            print(f'iniciando operação de venda a {preco_atual}')
-            self.posicao = 'vendido'
-            self.preco_comeco = preco_atual
-            self.num_vendas += 1
-        elif self.posicao == 'vendido':
-            print('proibido vender com uma venda pendente')
+    def sell(self, current_price):
+        if self.open_position is None:
+            self.candlestick_count = 0
+            print(f'iniciando operação de venda a {current_price}')
+            self.open_position = 'selling'
+            self.starting_price = current_price
+            self.num_sells += 1
+        elif self.open_position == 'buying':
+            self.candlestick_count = 0
+            self.close_position(current_price)
+            print(f'iniciando operação de venda a {current_price}')
+            self.open_position = 'selling'
+            self.starting_price = current_price
+            self.num_sells += 1
+        elif self.open_position == 'selling':
+            print('proibido vender com uma venda já aberta')
 
-    def fechar_posicao(self, preco_atual):
-        self.preco_fim = preco_atual
-        saldo_operacao = 0
+    def close_position(self, current_price):
+        self.final_price = current_price
 
-        if self.posicao == 'comprado':
-            print('fechando operação de compra pendente')
-            self.num_vendas += 1
-            saldo_operacao = self.preco_fim - self.preco_comeco
-            print(f'saldo_operacao = {saldo_operacao}')
-        elif self.posicao == 'vendido':
-            print('fechando operação de venda pendende')
-            self.num_compras += 1
-            saldo_operacao = self.preco_comeco - self.preco_fim
-            print(f'saldo_operacao = {saldo_operacao}')
+        if self.open_position == 'buying':
+            print('fechando operação de compra aberta')
+            self.num_sells += 1
+            self.profit = self.final_price - self.starting_price
+            print(f'profit = {self.profit}')
+        elif self.open_position == 'selling':
+            print('fechando operação de venda aberta')
+            self.num_buys += 1
+            self.profit = self.starting_price - self.final_price
+            print(f'profit = {self.profit}')
 
-        self.saldo_total += saldo_operacao
-        self.posicao = None
+        self.balance += self.profit
+        self.open_position = None
 
-        if saldo_operacao > 0:
-            self.num_acertos += 1
+        if self.profit > 0:
+            self.num_hits += 1
         else:
-            self.num_erros += 1
+            self.num_misses += 1
 
 
 def main():
@@ -83,38 +84,40 @@ def main():
     timeframe = 'H1'
 
     hist = Hist()
-    hist.obter_historico(symbol, timeframe)
-    hist.mostrar_historico()
+    hist.get_hist_data(symbol, timeframe)
+    hist.print_hist()
 
     # teste do TraderSim
-    trader = TraderSim(symbol, timeframe)
+    trader = TraderSim(symbol, timeframe, 1000.0)
 
-    preco_anterior = hist.arr[0, 5]
+    previous_price = hist.arr[0, 5]
     n = 10
     for i in range(1, n):
-        preco_atual = hist.arr[i, 5]
+        current_price = hist.arr[i, 5]
         print(f'i = {i}')
-        print(f'preco_atual = {preco_atual}')
+        print(f'current_price = {current_price}')
 
-        if preco_atual > preco_anterior:
-            trader.comprar(preco_atual)
+        if current_price > previous_price:
+            trader.buy(current_price)
 
-        if preco_atual < preco_anterior:
-            trader.vender(preco_atual)
+        if current_price < previous_price:
+            trader.sell(current_price)
 
-        # fecha a posição quando acabar os novos valores
+        # fecha a posição quando acabarem as bnovas barras (velas ou candlesticks)
         if i == n - 1:
-            trader.fechar_posicao(preco_atual)
-            trader.bar = 0
+            trader.close_position(current_price)
+            trader.candlestick_count = 0
 
-        print(f'barra = {trader.bar}')
-        print(f'posicao = {trader.posicao}')
-        print(f'saldo_total = {trader.saldo_total}')
-        print(f'num_acertos = {trader.num_acertos}')
-        print(f'num_erros = {trader.num_erros}')
+        print(f'candlestick = {trader.candlestick_count}')
+        print(f'open_position = {trader.open_position}')
+        print(f'balance = {trader.balance}')
+        print(f'equity = {trader.equity}')
+        print(f'profit = {trader.profit}')
+        print(f'num_hits = {trader.num_hits}')
+        print(f'num_misses = {trader.num_misses}')
 
-        trader.bar += 1
-        preco_anterior = preco_atual
+        trader.candlestick_count += 1
+        previous_price = current_price
 
 
 # --------------------------------------------------------

@@ -13,21 +13,21 @@ class Hist:
         self.arr = None
 
         # Obtendo a lista de arquivos no diretório CSV
-        self.arquivos_csv = os.listdir(Hist.dir_csv)
-        self.procurar_simbolos()
+        self.files_csv = os.listdir(Hist.dir_csv)
+        self.search_symbols()
 
-    def procurar_simbolos(self):
+    def search_symbols(self):
         """
         Procurando pelos arquivos csv correspondentes ao 'simbolo' e ao 'timeframe'
         :return:
         """
-        for arquivo in self.arquivos_csv:
+        for arquivo in self.files_csv:
             if arquivo.endswith('.csv'):
                 _simbolo = arquivo.split('_')[0]
                 _timeframe = arquivo.split('_')[1]
                 self.hist_csv[f'{_simbolo}_{_timeframe}'] = arquivo
 
-    def obter_historico(self, _simbolo: str, _timeframe: str):
+    def get_hist_data(self, _simbolo: str, _timeframe: str):
         arquivo = Hist.dir_csv + '/' + self.hist_csv[f'{_simbolo}_{_timeframe}']
         self.df = pd.read_csv(arquivo, delimiter='\t')
         self.df.drop(columns=['<VOL>', '<SPREAD>'], inplace=True)
@@ -38,7 +38,7 @@ class Hist:
             print(f'Há dados faltando no arquivo {arquivo}')
             exit(-1)
 
-    def mostrar_historico(self):
+    def print_hist(self):
         if self.df is None:
             print('o histórico não foi carregado ainda.')
         else:
@@ -47,6 +47,6 @@ class Hist:
 
 if __name__ == '__main__':
     hist = Hist()
-    hist.obter_historico('XAUUSD', 'H1')
-    hist.mostrar_historico()
+    hist.get_hist_data('XAUUSD', 'H1')
+    hist.print_hist()
 
