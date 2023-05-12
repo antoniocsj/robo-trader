@@ -190,7 +190,6 @@ def main():
     trader = TraderSimInteractive(symbol, timeframe, initial_deposit)
     trader.start_simulation()
 
-    # fazer um sistema interativo, no qual o usuário pode operar como se estivesse no MT5.
     close_price_col = 5
     trader.previous_price = trader.hist.arr[0, close_price_col]
     candlesticks_quantity = 50  # quantidade de velas que serão usadas na simulação
