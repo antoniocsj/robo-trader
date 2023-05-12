@@ -171,6 +171,7 @@ class TraderSim:
     def print_trade_stats(self):
         print(f'candlestick_count = {self.candlestick_count}, ', end='')
         print(f'open_position = {self.open_position}, ', end='')
+        print(f'initial_balance = {self.initial_balance:.2f}, ', end='')
         print(f'balance = {self.balance:.2f}, ', end='')
         print(f'equity = {self.equity:.2f}')
         print(f'profit = {self.profit:.2f}, ', end='')
