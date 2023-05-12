@@ -182,8 +182,10 @@ def main():
 
         trader.print_trade_stats()
 
-        if trader.open_position is not None:
+        if trader.open_position:
             trader.candlestick_count += 1
+        else:
+            trader.candlestick_count = 0
 
         trader.previous_price = trader.current_price
         ret_msg = trader.interact_with_user()
