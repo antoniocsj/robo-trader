@@ -221,7 +221,7 @@ def main():
 
         trader.update_profit()
 
-        if trader.equity < 0.0:
+        if trader.equity <= 0.0:
             trader.close_position()
             trader.candlestick_count = 0
             trader.finish_simulation()
