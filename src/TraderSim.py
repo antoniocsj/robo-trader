@@ -16,6 +16,7 @@ class TraderSim:
         self.num_buys = 0  # número de negociações de compra
         self.num_sells = 0  # número de negociações de venda
         self.num_trades = 0  # número de negociações de compra ou venda
+        self.hit_rate = 0.0  # taxa de acertos
         self.current_price = 0.0  # preço atual ou o preço de fechamento atual
         self.previous_price = 0.0  # preço anterior ou o preço de fechamento da vela anterior
         self.starting_price = 0.0
@@ -32,6 +33,17 @@ class TraderSim:
     @num_trades.setter
     def num_trades(self, value):
         self._num_trades = value
+
+    @property
+    def hit_rate(self):
+        if self.num_trades == 0:
+            return 0.0
+        else:
+            return self.num_hits / self.num_trades
+
+    @hit_rate.setter
+    def hit_rate(self, value):
+        self._hit_rate = value
 
     def start_simulation(self):
         self.simulation_is_running = True
@@ -153,7 +165,8 @@ class TraderSim:
         print(f'profit = {self.profit:.2f}, ', end='')
         print(f'num_hits = {self.num_hits}, ', end='')
         print(f'num_misses = {self.num_misses}, ', end='')
-        print(f'num_trades = {self.num_trades}')
+        print(f'num_trades = {self.num_trades}, ', end='')
+        print(f'hit_rate = {self.hit_rate*100:.2f} %')
 
 
 def main():
