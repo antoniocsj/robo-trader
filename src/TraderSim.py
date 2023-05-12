@@ -174,23 +174,18 @@ def main():
     symbol = 'XAUUSD'
     timeframe = 'H1'
 
-    hist = Hist()
-    hist.get_hist_data(symbol, timeframe)
-    # hist.print_hist()
-
-    # teste do TraderSim
     trader = TraderSim(symbol, timeframe, 1000.0)
     trader.start_simulation()
 
     # fazer um sistema interativo, no qual o usuário pode operar como se estivesse no MT5.
     close_price_col = 5
-    trader.previous_price = hist.arr[0, close_price_col]
+    trader.previous_price = trader.hist.arr[0, close_price_col]
     candlesticks_quantity = 50  # quantidade de velas que serão usadas na simulação
 
     for i in range(0, candlesticks_quantity):
-        trader.current_price = hist.arr[i, close_price_col]
+        trader.current_price = trader.hist.arr[i, close_price_col]
         print(f'i = {i}, ', end='')
-        print(f'OHLCV = {hist.arr[i]}, ', end='')
+        print(f'OHLCV = {trader.hist.arr[i]}, ', end='')
         print(f'current_price = {trader.current_price:.2f}, ', end='')
         print(f'price_delta = {trader.current_price-trader.previous_price:.2f}')
 
@@ -202,8 +197,6 @@ def main():
             trader.candlestick_count = 0
             trader.finish_simulation()
             print('a última vela atingida. a simulação chegou ao fim.')
-
-        # trader.print_trade_stats()
 
         if trader.candlestick_count >= trader.max_candlestick_count:
             print(f'fechamento forçado de negociações abertas. a contagem de velas atingiu o limite.')
