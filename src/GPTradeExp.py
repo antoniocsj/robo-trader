@@ -2,6 +2,7 @@ import operator
 import math
 import random
 import numpy
+import itertools
 
 from deap import algorithms
 from deap import base
@@ -12,7 +13,6 @@ from deap.tools import HallOfFame
 
 import pygraphviz as pgv
 from scoop import futures
-
 
 # -------------------------------------------------------------------
 from TraderSim import TraderSim
@@ -26,10 +26,24 @@ close_price_col = 5
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
 trader.previous_price = trader.hist.arr[0, close_price_col]
-
+trader.max_candlestick_count = 5
 
 # -------------------------------------------------------------------
+num_entradas = 25  # 5 velas OHLCV
+# defined a new primitive set for strongly typed GP
+pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), bool, "IN")
+
 # Definição de funções que serão usadas na Programação Genética
+
+# boolean operators
+pset.addPrimitive(operator.and_, [bool, bool], bool)
+pset.addPrimitive(operator.or_, [bool, bool], bool)
+pset.addPrimitive(operator.not_, [bool], bool)
+
+
+# floating point operators
+
+# Define a protected division function
 def protectedDiv(left, right):
     try:
         return left / right
@@ -37,19 +51,38 @@ def protectedDiv(left, right):
         return 1
 
 
-pset = gp.PrimitiveSet("MAIN", 1)
-pset.addPrimitive(operator.add, 2)
-pset.addPrimitive(operator.sub, 2)
-pset.addPrimitive(operator.mul, 2)
-pset.addPrimitive(protectedDiv, 2)
-pset.addPrimitive(operator.neg, 1)
-pset.addPrimitive(math.cos, 1)
-pset.addPrimitive(math.sin, 1)
-pset.addEphemeralConstant("rand101", lambda: random.randint(-1, 1))
-pset.renameArguments(ARG0='x')
+pset.addPrimitive(operator.add, [float, float], float)
+pset.addPrimitive(operator.sub, [float, float], float)
+pset.addPrimitive(operator.mul, [float, float], float)
+pset.addPrimitive(protectedDiv, [float, float], float)
+
+pset.addPrimitive(operator.neg, [float], float)
+pset.addPrimitive(math.cos, [float], float)
+pset.addPrimitive(math.sin, [float], float)
+
+
+# logic operators
+# Define a new if-then-else function
+def if_then_else(_input, output1, output2):
+    if _input:
+        return output1
+    else:
+        return output2
+
+
+pset.addPrimitive(operator.lt, [float, float], bool)
+pset.addPrimitive(operator.eq, [float, float], bool)
+pset.addPrimitive(if_then_else, [bool, float, float], float)
+
+# terminals
+pset.addTerminal(False, bool)
+pset.addTerminal(True, bool)
+pset.addEphemeralConstant("rand100", lambda: random.random() * 100, float)
+pset.addEphemeralConstant("rand101", lambda: random.randint(-1, 1), float)
+pset.renameArguments(IN='x')
 
 creator.create("FitnessMin", base.Fitness, weights=(1.0,))
-creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMin)
+creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax)
 
 toolbox = base.Toolbox()
 toolbox.register("map", futures.map)
@@ -72,6 +105,16 @@ def eval_trade_sim(individual):
     # sqerrors = ((func(x) - x ** 4 - x ** 3 - x ** 2 - x) ** 2 for x in points)
     sqerrors = [(func(x) - f(x)) ** 2 for x in points]
     return math.fsum(sqerrors) / len(points),
+
+
+def evalSpambase(individual):
+    # Transform the tree expression in a callable function
+    func = toolbox.compile(expr=individual)
+    # Randomly sample 400 mails in the spam database
+    spam_samp = random.sample(spam, 400)
+    # Evaluate the sum of correctly identified mail as spam
+    result = sum(bool(func(*mail[:57])) is bool(mail[57]) for mail in spam_samp)
+    return result,
 
 
 toolbox.register("evaluate", eval_trade_sim)
