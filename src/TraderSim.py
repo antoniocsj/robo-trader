@@ -8,6 +8,7 @@ class TraderSim:
         self.hist = Hist()
         self.open_position = None
         self.candlestick_count = 0  # contagem de velas desde a abertura da posição
+        self.max_candlestick_count = 5  # contagem máxima permitida de velas desde a abertura da posição
         self.symbol = ''
         self.timeframe = ''
         self.simulation_is_running = False
@@ -59,7 +60,7 @@ class TraderSim:
         if self.open_position is None:
             self.candlestick_count = 0
             self.profit = 0.0
-            print(f'iniciando operação de compra a {self.current_price}')
+            print(f'iniciando negociação de compra a {self.current_price}')
             self.open_position = 'buying'
             self.starting_price = self.current_price
             self.num_buys += 1
@@ -67,12 +68,12 @@ class TraderSim:
             self.candlestick_count = 0
             self.profit = 0.0
             self.close_position()
-            print(f'iniciando operação de compra a {self.current_price}')
+            print(f'iniciando negociação de compra a {self.current_price}')
             self.open_position = 'buying'
             self.starting_price = self.current_price
             self.num_buys += 1
         elif self.open_position == 'buying':
-            print('proibido comprar com uma compra já aberta')
+            print('proibido comprar com uma negociação de compra pendente.')
 
     def sell(self):
         if not self.simulation_is_running:
@@ -82,7 +83,7 @@ class TraderSim:
         if self.open_position is None:
             self.candlestick_count = 0
             self.profit = 0.0
-            print(f'iniciando operação de venda a {self.current_price}')
+            print(f'iniciando negociação de venda a {self.current_price}')
             self.open_position = 'selling'
             self.starting_price = self.current_price
             self.num_sells += 1
@@ -90,16 +91,16 @@ class TraderSim:
             self.candlestick_count = 0
             self.profit = 0.0
             self.close_position()
-            print(f'iniciando operação de venda a {self.current_price}')
+            print(f'iniciando negociação de venda a {self.current_price}')
             self.open_position = 'selling'
             self.starting_price = self.current_price
             self.num_sells += 1
         elif self.open_position == 'selling':
-            print('proibido vender com uma venda já aberta')
+            print('proibido vender com uma negociação de venda pendente.')
 
     def update_profit(self):
         if not self.simulation_is_running:
-            print('simulação não está executando')
+            print('a simulação não está executando.')
             return
 
         if self.open_position == 'buying':
@@ -111,17 +112,17 @@ class TraderSim:
 
     def close_position(self):
         if not self.simulation_is_running:
-            print('simulação não está executando')
+            print('a simulação não está executando.')
             return
 
         if self.open_position is None:
             return
 
         if self.open_position == 'buying':
-            print('fechando operação de compra aberta')
+            print('fechando negociação de compra aberta.')
             self.num_sells += 1
         elif self.open_position == 'selling':
-            print('fechando operação de venda aberta')
+            print('fechando negociação de venda aberta.')
             self.num_buys += 1
 
         self.update_profit()
@@ -200,20 +201,26 @@ def main():
             trader.close_position()
             trader.candlestick_count = 0
             trader.finish_simulation()
-            print('última vela concluída. simulação chegou ao fim.')
+            print('a última vela atingida. a simulação chegou ao fim.')
 
-        trader.print_trade_stats()
+        # trader.print_trade_stats()
+
+        if trader.candlestick_count >= trader.max_candlestick_count:
+            print(f'fechamento forçado de negociações abertas. a contagem de velas atingiu o limite.')
+            trader.close_position()
 
         if trader.open_position:
             trader.candlestick_count += 1
         else:
             trader.candlestick_count = 0
 
+        trader.print_trade_stats()
+
         trader.previous_price = trader.current_price
         ret_msg = trader.interact_with_user()
 
         if ret_msg == 'break':
-            print('usuário decidiu encerrar a simulação')
+            print('o usuário decidiu encerrar a simulação.')
             trader.close_position()
             trader.finish_simulation()
             break
