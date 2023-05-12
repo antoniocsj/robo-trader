@@ -2,7 +2,7 @@ from Hist import Hist
 
 
 class TraderSim:
-    def __init__(self, symbol: str, timeframe: str, initial_balance: float) -> None:
+    def __init__(self, symbol: str, timeframe: str, initial_deposit: float) -> None:
         self.symbol = symbol  # financial asset, security or contract etc.
         self.timeframe = timeframe
         self.hist = Hist()
@@ -22,8 +22,8 @@ class TraderSim:
         self.previous_price = 0.0  # preço anterior ou o preço de fechamento da vela anterior
         self.starting_price = 0.0
         self.final_price = 0.0
-        self.initial_balance = initial_balance  # saldo inicial
-        self.balance = initial_balance  # saldo atual
+        self.initial_balance = initial_deposit  # saldo inicial
+        self.balance = initial_deposit  # saldo atual
         self.equity = 0.0  # patrimônio líquido
         self.profit = 0.0  # lucro (ou prejuízo) na negociação
         self.roi = 0.0  # Return on Investment ou Retorno de Investmento
@@ -185,8 +185,9 @@ class TraderSim:
 def main():
     symbol = 'XAUUSD'
     timeframe = 'H1'
+    initial_deposit = 1000.0
 
-    trader = TraderSim(symbol, timeframe, 1000.0)
+    trader = TraderSim(symbol, timeframe, initial_deposit)
     trader.start_simulation()
 
     # fazer um sistema interativo, no qual o usuário pode operar como se estivesse no MT5.
