@@ -25,6 +25,14 @@ class TraderSim:
         self.profit = 0.0  # lucro (ou prejuízo) na negociação
         self.hist.get_hist_data(symbol, timeframe)
 
+    @property
+    def num_trades(self):
+        return self.num_hits + self.num_misses
+
+    @num_trades.setter
+    def num_trades(self, value):
+        self._num_trades = value
+
     def start_simulation(self):
         self.simulation_is_running = True
 
@@ -144,7 +152,8 @@ class TraderSim:
         print(f'equity = {self.equity:.2f}')
         print(f'profit = {self.profit:.2f}, ', end='')
         print(f'num_hits = {self.num_hits}, ', end='')
-        print(f'num_misses = {self.num_misses}')
+        print(f'num_misses = {self.num_misses}, ', end='')
+        print(f'num_trades = {self.num_trades}')
 
 
 def main():
