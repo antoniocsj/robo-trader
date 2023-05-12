@@ -137,6 +137,15 @@ class TraderSim:
 
         return return_msg
 
+    def print_trade_stats(self):
+        print(f'candlestick_count = {self.candlestick_count}, ', end='')
+        print(f'open_position = {self.open_position}, ', end='')
+        print(f'balance = {self.balance:.2f}, ', end='')
+        print(f'equity = {self.equity:.2f}')
+        print(f'profit = {self.profit:.2f}, ', end='')
+        print(f'num_hits = {self.num_hits}, ', end='')
+        print(f'num_misses = {self.num_misses}')
+
 
 def main():
     symbol = 'XAUUSD'
@@ -153,13 +162,14 @@ def main():
     # fazer um sistema interativo, no qual o usuário pode operar como se estivesse no MT5.
     close_price_col = 5
     trader.previous_price = hist.arr[0, close_price_col]
-    candlesticks_quantity = 5  # quantidade de velas que serão usadas na simulação
+    candlesticks_quantity = 50  # quantidade de velas que serão usadas na simulação
 
     for i in range(0, candlesticks_quantity):
         trader.current_price = hist.arr[i, close_price_col]
         print(f'i = {i}, ', end='')
         print(f'OHLCV = {hist.arr[i]}, ', end='')
-        print(f'current_price = {trader.current_price}')
+        print(f'current_price = {trader.current_price:.2f}, ', end='')
+        print(f'price_delta = {trader.current_price-trader.previous_price:.2f}')
 
         trader.update_profit()
 
@@ -170,13 +180,7 @@ def main():
             trader.finish_simulation()
             print('última vela concluída. simulação chegou ao fim.')
 
-        print(f'candlestick_count = {trader.candlestick_count}, ', end='')
-        print(f'open_position = {trader.open_position}, ', end='')
-        print(f'balance = {trader.balance}, ', end='')
-        print(f'equity = {trader.equity}')
-        print(f'profit = {trader.profit:+}, ', end='')
-        print(f'num_hits = {trader.num_hits}, ', end='')
-        print(f'num_misses = {trader.num_misses}')
+        trader.print_trade_stats()
 
         if trader.open_position is not None:
             trader.candlestick_count += 1
