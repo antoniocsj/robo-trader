@@ -1,7 +1,7 @@
 from Hist import Hist
 
 
-class TraderSim:
+class TraderSimInteractive:
     def __init__(self, symbol: str, timeframe: str, initial_deposit: float) -> None:
         self.symbol = symbol  # financial asset, security or contract etc.
         self.timeframe = timeframe
@@ -185,9 +185,9 @@ class TraderSim:
 def main():
     symbol = 'XAUUSD'
     timeframe = 'H1'
-    initial_deposit = 1000.0
+    initial_deposit = 10.0
 
-    trader = TraderSim(symbol, timeframe, initial_deposit)
+    trader = TraderSimInteractive(symbol, timeframe, initial_deposit)
     trader.start_simulation()
 
     # fazer um sistema interativo, no qual o usuário pode operar como se estivesse no MT5.
@@ -204,7 +204,14 @@ def main():
 
         trader.update_profit()
 
-        # fecha a posição quando acabarem as bnovas barras (velas ou candlesticks)
+        if trader.equity <= 0.0:
+            trader.close_position()
+            trader.candlestick_count = 0
+            trader.finish_simulation()
+            print('equity <= 0. a simulação será encerrada.')
+            break
+
+        # fecha a posição quando acabarem as novas barras (velas ou candlesticks)
         if i == candlesticks_quantity - 1:
             trader.close_position()
             trader.candlestick_count = 0
