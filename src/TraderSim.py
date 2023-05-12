@@ -2,7 +2,7 @@ from Hist import Hist
 
 
 class TraderSim:
-    def __init__(self, symbol: str, timeframe: str, balance: float) -> None:
+    def __init__(self, symbol: str, timeframe: str, initial_balance: float) -> None:
         self.symbol = symbol  # financial asset, security or contract etc.
         self.timeframe = timeframe
         self.hist = Hist()
@@ -22,9 +22,11 @@ class TraderSim:
         self.previous_price = 0.0  # preço anterior ou o preço de fechamento da vela anterior
         self.starting_price = 0.0
         self.final_price = 0.0
-        self.balance = balance  # saldo
+        self.initial_balance = initial_balance  # saldo inicial
+        self.balance = initial_balance  # saldo atual
         self.equity = 0.0  # patrimônio líquido
         self.profit = 0.0  # lucro (ou prejuízo) na negociação
+        self.roi = 0.0  # Return on Investment ou Retorno de Investmento
         self.hist.get_hist_data(symbol, timeframe)
 
     @property
@@ -45,6 +47,14 @@ class TraderSim:
     @hit_rate.setter
     def hit_rate(self, value):
         self._hit_rate = value
+
+    @property
+    def roi(self):
+        return (self.balance - self.initial_balance) / self.initial_balance
+
+    @roi.setter
+    def roi(self, value):
+        self._roi = value
 
     def start_simulation(self):
         self.simulation_is_running = True
@@ -167,7 +177,8 @@ class TraderSim:
         print(f'num_hits = {self.num_hits}, ', end='')
         print(f'num_misses = {self.num_misses}, ', end='')
         print(f'num_trades = {self.num_trades}, ', end='')
-        print(f'hit_rate = {self.hit_rate*100:.2f} %')
+        print(f'hit_rate = {self.hit_rate*100:.2f} %, ', end='')
+        print(f'roi = {self.roi * 100:.2f} %')
 
 
 def main():
@@ -217,6 +228,9 @@ def main():
             trader.close_position()
             trader.finish_simulation()
             break
+
+    print('\nresultados finais da simulação')
+    trader.print_trade_stats()
 
 
 # --------------------------------------------------------
