@@ -1,7 +1,6 @@
 import operator
 import math
 import random
-
 import numpy
 
 from deap import algorithms
@@ -9,12 +8,28 @@ from deap import base
 from deap import creator
 from deap import tools
 from deap import gp
-import pygraphviz as pgv
 from deap.tools import HallOfFame
+
+import pygraphviz as pgv
 from scoop import futures
 
 
-# Define new functions
+# -------------------------------------------------------------------
+from TraderSim import TraderSim
+
+# configurações para o TraderSim
+symbol = 'XAUUSD'
+timeframe = 'H1'
+initial_deposit = 1000.0
+candlesticks_quantity = 50  # quantidade de velas que serão usadas na simulação
+close_price_col = 5
+trader = TraderSim(symbol, timeframe, initial_deposit)
+trader.start_simulation()
+trader.previous_price = trader.hist.arr[0, close_price_col]
+
+
+# -------------------------------------------------------------------
+# Definição de funções que serão usadas na Programação Genética
 def protectedDiv(left, right):
     try:
         return left / right
@@ -33,7 +48,7 @@ pset.addPrimitive(math.sin, 1)
 pset.addEphemeralConstant("rand101", lambda: random.randint(-1, 1))
 pset.renameArguments(ARG0='x')
 
-creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
+creator.create("FitnessMin", base.Fitness, weights=(1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMin)
 
 toolbox = base.Toolbox()
@@ -48,7 +63,7 @@ def f(x):
     return x ** 4 + x ** 3 + x ** 2 + x
 
 
-def evalSymbReg(individual):
+def eval_trade_sim(individual):
     points = [x / 10. for x in range(-10, 10)]
     # Transform the tree expression in a callable function
     func = toolbox.compile(expr=individual)
@@ -59,8 +74,7 @@ def evalSymbReg(individual):
     return math.fsum(sqerrors) / len(points),
 
 
-# toolbox.register("evaluate", evalSymbReg, points=[x / 10. for x in range(-10, 10)])
-toolbox.register("evaluate", evalSymbReg)
+toolbox.register("evaluate", eval_trade_sim)
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)

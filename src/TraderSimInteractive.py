@@ -9,8 +9,6 @@ class TraderSimInteractive:
         self.open_position = None
         self.candlestick_count = 0  # contagem de velas desde a abertura da posição
         self.max_candlestick_count = 5  # contagem máxima permitida de velas desde a abertura da posição
-        self.symbol = ''
-        self.timeframe = ''
         self.simulation_is_running = False
         self.num_hits = 0  # número de acertos
         self.num_misses = 0  # número de erros
@@ -23,11 +21,31 @@ class TraderSimInteractive:
         self.starting_price = 0.0
         self.final_price = 0.0
         self.initial_balance = initial_deposit  # saldo inicial
-        self.balance = initial_deposit  # saldo atual
-        self.equity = 0.0  # patrimônio líquido
+        self.balance = self.initial_balance  # saldo atual
+        self.equity = self.initial_balance  # patrimônio líquido
         self.profit = 0.0  # lucro (ou prejuízo) na negociação
         self.roi = 0.0  # Return on Investment ou Retorno de Investmento
         self.hist.get_hist_data(symbol, timeframe)
+
+    def reset(self):
+        self.open_position = None
+        self.candlestick_count = 0
+        self.simulation_is_running = False
+        self.num_hits = 0
+        self.num_misses = 0
+        self.num_buys = 0
+        self.num_sells = 0
+        self.num_trades = 0
+        self.hit_rate = 0.0
+        self.current_price = 0.0
+        self.previous_price = 0.0
+        self.starting_price = 0.0
+        self.final_price = 0.0
+        self.balance = self.initial_balance
+        self.equity = self.initial_balance
+        self.profit = 0.0
+        self.roi = 0.0
+        self.start_simulation()
 
     @property
     def num_trades(self):
