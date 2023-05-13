@@ -5,14 +5,11 @@ import numpy
 import itertools
 import pickle
 
-from deap import algorithms
 from deap import base
 from deap import creator
 from deap import tools
 from deap import gp
-from deap.tools import HallOfFame
 
-import pygraphviz as pgv
 from scoop import futures
 
 # -------------------------------------------------------------------
@@ -36,6 +33,7 @@ trader.max_candlestick_count = max_candlestick_count
 candlesticks_quantity = 50
 
 num_entradas = num_velas_anteriores * len(tipo_vela)
+
 # defined a new primitive set for strongly typed GP
 pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), bool, "X")
 
@@ -93,7 +91,6 @@ toolbox = base.Toolbox()
 toolbox.register("map", futures.map)
 toolbox.register("expr", gp.genHalfAndHalf, pset=pset, min_=1, max_=2)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
-toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
 
@@ -161,12 +158,6 @@ def eval_trade_sim_withprints(individual):
 
 
 toolbox.register("evaluate", eval_trade_sim_withprints)
-toolbox.register("select", tools.selTournament, tournsize=3)
-toolbox.register("mate", gp.cxOnePoint)
-toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
-toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
-toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
-toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
 
 def read_halloffame():
