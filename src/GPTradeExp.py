@@ -82,7 +82,7 @@ pset.addEphemeralConstant("rand100", lambda: random.random() * 100, float)
 pset.addEphemeralConstant("rand101", lambda: random.randint(-1, 1), float)
 # pset.renameArguments(X='x')
 
-creator.create("FitnessMin", base.Fitness, weights=(1.0,))
+creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax)
 
 toolbox = base.Toolbox()
@@ -99,8 +99,11 @@ def eval_trade_sim(individual):
 
     trader.reset()
 
-    for i in range(0, candlesticks_quantity):
-        # trader.current_price = trader.hist.arr[i, close_price_col]
+    index_inicio = num_velas_anteriores
+    index_final = index_inicio + candlesticks_quantity
+
+    for i in range(index_inicio, index_final):
+        trader.current_price = trader.hist.arr[i, close_price_col]
         trader.update_profit()
 
         if trader.equity <= 0.0:
@@ -133,16 +136,6 @@ def eval_trade_sim(individual):
             trader.sell()
 
     return trader.roi,
-
-
-def evalSpambase(individual):
-    # Transform the tree expression in a callable function
-    func = toolbox.compile(expr=individual)
-    # Randomly sample 400 mails in the spam database
-    spam_samp = random.sample(spam, 400)
-    # Evaluate the sum of correctly identified mail as spam
-    result = sum(bool(func(*mail[:57])) is bool(mail[57]) for mail in spam_samp)
-    return result,
 
 
 toolbox.register("evaluate", eval_trade_sim)
