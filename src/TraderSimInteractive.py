@@ -214,6 +214,7 @@ def main():
 
     for i in range(0, candlesticks_quantity):
         trader.current_price = trader.hist.arr[i, close_price_col]
+
         print(f'i = {i}, ', end='')
         print(f'OHLCV = {trader.hist.arr[i]}, ', end='')
         print(f'current_price = {trader.current_price:.2f}, ', end='')

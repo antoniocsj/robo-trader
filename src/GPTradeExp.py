@@ -104,12 +104,19 @@ def eval_trade_sim(individual):
 
     for i in range(index_inicio, index_final):
         trader.current_price = trader.hist.arr[i, close_price_col]
+
+        print(f'i = {i}, ', end='')
+        print(f'OHLCV = {trader.hist.arr[i]}, ', end='')
+        print(f'current_price = {trader.current_price:.2f}, ', end='')
+        print(f'price_delta = {trader.current_price-trader.previous_price:.2f}')
+
         trader.update_profit()
 
         if trader.equity <= 0.0:
             trader.close_position()
             trader.candlestick_count = 0
             trader.finish_simulation()
+            print('equity <= 0. a simulação será encerrada.')
             break
 
         # fecha a posição quando acabarem as novas velas
@@ -117,8 +124,10 @@ def eval_trade_sim(individual):
             trader.close_position()
             trader.candlestick_count = 0
             trader.finish_simulation()
+            print('a última vela atingida. a simulação chegou ao fim.')
 
         if trader.candlestick_count >= trader.max_candlestick_count:
+            print(f'fechamento forçado de negociações abertas. a contagem de velas atingiu o limite.')
             trader.close_position()
 
         if trader.open_position:
@@ -126,14 +135,20 @@ def eval_trade_sim(individual):
         else:
             trader.candlestick_count = 0
 
+        trader.print_trade_stats()
+        trader.previous_price = trader.current_price
+
         # ret_msg = trader.interact_with_user()
         entradas = formar_entradas(trader.hist.arr, i, num_velas_anteriores, tipo_vela)
-        saida = func(*entradas)
+        comando = func(*entradas)
 
-        if saida:
+        if comando:
             trader.buy()
         else:
             trader.sell()
+
+    print('\nresultados finais da simulação')
+    trader.print_trade_stats()
 
     return trader.roi,
 
