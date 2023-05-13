@@ -16,6 +16,7 @@ from scoop import futures
 
 # -------------------------------------------------------------------
 from TraderSim import TraderSim
+from utils import formar_entradas
 
 # configurações para o TraderSim
 symbol = 'XAUUSD'
@@ -29,9 +30,11 @@ trader.previous_price = trader.hist.arr[0, close_price_col]
 trader.max_candlestick_count = 5
 
 # -------------------------------------------------------------------
-num_entradas = 25  # 5 velas OHLCV
+num_velas_anteriores = 5
+tipo_vela = 'OHLC'
+num_entradas = num_velas_anteriores * len(tipo_vela)
 # defined a new primitive set for strongly typed GP
-pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), bool, "IN")
+pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), bool, "X")
 
 # Definição de funções que serão usadas na Programação Genética
 
@@ -42,7 +45,6 @@ pset.addPrimitive(operator.not_, [bool], bool)
 
 
 # floating point operators
-
 # Define a protected division function
 def protectedDiv(left, right):
     try:
@@ -55,7 +57,6 @@ pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
 pset.addPrimitive(operator.mul, [float, float], float)
 pset.addPrimitive(protectedDiv, [float, float], float)
-
 pset.addPrimitive(operator.neg, [float], float)
 pset.addPrimitive(math.cos, [float], float)
 pset.addPrimitive(math.sin, [float], float)
@@ -79,7 +80,7 @@ pset.addTerminal(False, bool)
 pset.addTerminal(True, bool)
 pset.addEphemeralConstant("rand100", lambda: random.random() * 100, float)
 pset.addEphemeralConstant("rand101", lambda: random.randint(-1, 1), float)
-pset.renameArguments(IN='x')
+# pset.renameArguments(X='x')
 
 creator.create("FitnessMin", base.Fitness, weights=(1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax)
@@ -92,19 +93,46 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
 
-def f(x):
-    return x ** 4 + x ** 3 + x ** 2 + x
-
-
 def eval_trade_sim(individual):
-    points = [x / 10. for x in range(-10, 10)]
     # Transform the tree expression in a callable function
     func = toolbox.compile(expr=individual)
-    # Evaluate the mean squared error between the expression
-    # and the real function : x**4 + x**3 + x**2 + x
-    # sqerrors = ((func(x) - x ** 4 - x ** 3 - x ** 2 - x) ** 2 for x in points)
-    sqerrors = [(func(x) - f(x)) ** 2 for x in points]
-    return math.fsum(sqerrors) / len(points),
+
+    trader.reset()
+
+    for i in range(0, candlesticks_quantity):
+        # trader.current_price = trader.hist.arr[i, close_price_col]
+        trader.update_profit()
+
+        if trader.equity <= 0.0:
+            trader.close_position()
+            trader.candlestick_count = 0
+            trader.finish_simulation()
+            break
+
+        # fecha a posição quando acabarem as novas velas
+        if i == candlesticks_quantity - 1:
+            trader.close_position()
+            trader.candlestick_count = 0
+            trader.finish_simulation()
+
+        if trader.candlestick_count >= trader.max_candlestick_count:
+            trader.close_position()
+
+        if trader.open_position:
+            trader.candlestick_count += 1
+        else:
+            trader.candlestick_count = 0
+
+        # ret_msg = trader.interact_with_user()
+        entradas = formar_entradas(trader.hist.arr, i, num_velas_anteriores, tipo_vela)
+        saida = func(*entradas)
+
+        if saida:
+            trader.buy()
+        else:
+            trader.sell()
+
+    return trader.roi,
 
 
 def evalSpambase(individual):
@@ -122,7 +150,6 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
-
 toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
