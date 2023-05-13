@@ -93,7 +93,7 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
 
-def eval_trade_sim(individual):
+def eval_trade_sim_withprints(individual):
     # Transform the tree expression in a callable function
     func = toolbox.compile(expr=individual)
 
@@ -120,7 +120,7 @@ def eval_trade_sim(individual):
             break
 
         # fecha a posição quando acabarem as novas velas
-        if i == candlesticks_quantity - 1:
+        if i == index_final - 1:
             trader.close_position()
             trader.candlestick_count = 0
             trader.finish_simulation()
@@ -153,7 +153,67 @@ def eval_trade_sim(individual):
     return trader.roi,
 
 
-toolbox.register("evaluate", eval_trade_sim)
+def eval_trade_sim_noprints(individual):
+    # Transform the tree expression in a callable function
+    func = toolbox.compile(expr=individual)
+
+    trader.reset()
+
+    index_inicio = num_velas_anteriores
+    index_final = index_inicio + candlesticks_quantity
+
+    for i in range(index_inicio, index_final):
+        trader.current_price = trader.hist.arr[i, close_price_col]
+
+        # print(f'i = {i}, ', end='')
+        # print(f'OHLCV = {trader.hist.arr[i]}, ', end='')
+        # print(f'current_price = {trader.current_price:.2f}, ', end='')
+        # print(f'price_delta = {trader.current_price-trader.previous_price:.2f}')
+
+        trader.update_profit()
+
+        if trader.equity <= 0.0:
+            trader.close_position()
+            trader.candlestick_count = 0
+            trader.finish_simulation()
+            # print('equity <= 0. a simulação será encerrada.')
+            break
+
+        # fecha a posição quando acabarem as novas velas
+        if i == index_final - 1:
+            trader.close_position()
+            trader.candlestick_count = 0
+            trader.finish_simulation()
+            # print('a última vela atingida. a simulação chegou ao fim.')
+
+        if trader.candlestick_count >= trader.max_candlestick_count:
+            # print(f'fechamento forçado de negociações abertas. a contagem de velas atingiu o limite.')
+            trader.close_position()
+
+        if trader.open_position:
+            trader.candlestick_count += 1
+        else:
+            trader.candlestick_count = 0
+
+        # trader.print_trade_stats()
+        trader.previous_price = trader.current_price
+
+        # ret_msg = trader.interact_with_user()
+        entradas = formar_entradas(trader.hist.arr, i, num_velas_anteriores, tipo_vela)
+        comando = func(*entradas)
+
+        if comando:
+            trader.buy()
+        else:
+            trader.sell()
+
+    # print('\nresultados finais da simulação')
+    # trader.print_trade_stats()
+
+    return trader.roi,
+
+
+toolbox.register("evaluate", eval_trade_sim_noprints)
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
@@ -171,10 +231,10 @@ def main():
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
     stats_size = tools.Statistics(len)
     mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
-    # mstats.register("avg", numpy.mean)
-    # mstats.register("std", numpy.std)
+    mstats.register("avg", numpy.mean)
+    mstats.register("std", numpy.std)
     mstats.register("min", numpy.min)
-    # mstats.register("max", numpy.max)
+    mstats.register("max", numpy.max)
 
     pop, log = algorithms.eaSimple(pop, toolbox, 0.5, 0.1, 40, stats=mstats,
                                    halloffame=hof, verbose=True)
@@ -183,6 +243,8 @@ def main():
     # print(str(gp.PrimitiveTree(hof[0])))
     print(hof[0])
     print_graph(hof)
+    print('rodando o TraderSim com o melhor indivíduo:')
+    eval_trade_sim_withprints(hof[0])
 
     return pop, log, hof
 
