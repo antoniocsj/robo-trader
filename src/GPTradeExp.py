@@ -18,6 +18,10 @@ from scoop import futures
 from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
+# configurações para a programação genética
+n_population = 300
+n_generations = 40
+
 # configurações para o TraderSim
 symbol = 'XAUUSD'
 timeframe = 'H1'
@@ -25,11 +29,12 @@ initial_deposit = 1000.0
 num_velas_anteriores = 5
 tipo_vela = 'OHLC'
 max_candlestick_count = 5
-candlesticks_quantity = 50  # quantidade de velas que serão usadas na simulação
 close_price_col = 5
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
 trader.previous_price = trader.hist.arr[0, close_price_col]
+# candlesticks_quantity é a quantidade de velas que serão usadas na simulação
+candlesticks_quantity = len(trader.hist.arr) - num_velas_anteriores
 trader.max_candlestick_count = max_candlestick_count
 
 num_entradas = num_velas_anteriores * len(tipo_vela)
@@ -223,7 +228,7 @@ toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max
 
 
 def main():
-    pop = toolbox.population(n=3000)
+    pop = toolbox.population(n=n_population)
     hof = tools.HallOfFame(1)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -235,8 +240,8 @@ def main():
     mstats.register("max", numpy.max)
 
     pop, log = algorithms.eaSimple(population=pop, toolbox=toolbox,
-                                   cxpb=0.5, mutpb=0.1, ngen=40, stats=mstats,
-                                   halloffame=hof, verbose=True)
+                                   cxpb=0.5, mutpb=0.1, ngen=n_generations,
+                                   stats=mstats, halloffame=hof, verbose=True)
     print()
     print(log)
     print()

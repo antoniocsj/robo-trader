@@ -163,3 +163,4 @@ cython_debug/
 *.csv
 *.pdf
 /src/log.txt
+/src/logs.txt
