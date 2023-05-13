@@ -22,16 +22,16 @@ from utils import formar_entradas
 symbol = 'XAUUSD'
 timeframe = 'H1'
 initial_deposit = 1000.0
+num_velas_anteriores = 5
+tipo_vela = 'OHLC'
+max_candlestick_count = 5
 candlesticks_quantity = 50  # quantidade de velas que serão usadas na simulação
 close_price_col = 5
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
 trader.previous_price = trader.hist.arr[0, close_price_col]
-trader.max_candlestick_count = 5
+trader.max_candlestick_count = max_candlestick_count
 
-# -------------------------------------------------------------------
-num_velas_anteriores = 5
-tipo_vela = 'OHLC'
 num_entradas = num_velas_anteriores * len(tipo_vela)
 # defined a new primitive set for strongly typed GP
 pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), bool, "X")
@@ -223,8 +223,6 @@ toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max
 
 
 def main():
-    # random.seed(318)
-
     pop = toolbox.population(n=3000)
     hof = tools.HallOfFame(1)
 
@@ -237,7 +235,7 @@ def main():
     mstats.register("max", numpy.max)
 
     pop, log = algorithms.eaSimple(population=pop, toolbox=toolbox,
-                                   cxpb=0.5, mutpb=0.1, ngen=400, stats=mstats,
+                                   cxpb=0.5, mutpb=0.1, ngen=40, stats=mstats,
                                    halloffame=hof, verbose=True)
     print()
     print(log)
