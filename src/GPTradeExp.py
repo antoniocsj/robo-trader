@@ -3,6 +3,7 @@ import math
 import random
 import numpy
 import itertools
+import pickle
 
 from deap import algorithms
 from deap import base
@@ -19,8 +20,8 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 300
-n_generations = 40
+n_population = 100
+n_generations = 20
 
 # configurações para o TraderSim
 symbol = 'XAUUSD'
@@ -29,15 +30,14 @@ initial_deposit = 1000.0
 num_velas_anteriores = 5
 tipo_vela = 'OHLC'
 max_candlestick_count = 2
-close_price_col = 5
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
+close_price_col = 5
 trader.previous_price = trader.hist.arr[0, close_price_col]
 trader.max_candlestick_count = max_candlestick_count
 # candlesticks_quantity é a quantidade de velas que serão usadas na simulação
 # candlesticks_quantity = len(trader.hist.arr) - num_velas_anteriores
-candlesticks_quantity = 500
-
+candlesticks_quantity = 50
 
 num_entradas = num_velas_anteriores * len(tipo_vela)
 # defined a new primitive set for strongly typed GP
@@ -255,6 +255,9 @@ def main():
     print()
     print('rodando o TraderSim com o melhor indivíduo:')
     eval_trade_sim_withprints(hof[0])
+    hof_ = read_hof()
+    print('hof lido de arquivo:')
+    print(hof_[0])
 
     return pop, log, hof
 
@@ -273,6 +276,21 @@ def print_graph(hof: HallOfFame):
         n.attr["label"] = labels[i]
 
     g.draw("tree.pdf")
+    write_hof(hof)
+
+
+def write_hof(hof: HallOfFame):
+    cp = dict(halloffame=hof)
+
+    with open("halloffame.pkl", "wb") as hof_file:
+        pickle.dump(cp, hof_file)
+
+
+def read_hof():
+    with open("halloffame.pkl", "rb") as hof_file:
+        cp = pickle.load(hof_file)
+        halloffame = cp["halloffame"]
+        return halloffame
 
 
 if __name__ == "__main__":
