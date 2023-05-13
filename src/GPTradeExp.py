@@ -193,7 +193,7 @@ def eval_trade_sim_noprints(individual):
             trader.sell()
 
         trader.update_profit()
-        trader.print_trade_stats()
+        # trader.print_trade_stats()
 
         if trader.equity <= 0.0:
             trader.close_position()
