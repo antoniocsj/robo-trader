@@ -63,7 +63,7 @@ def protectedDiv(left, right):
 pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
 pset.addPrimitive(operator.mul, [float, float], float)
-pset.addPrimitive(protectedDiv, [float, float], float)
+pset.addPrimitive(protectedDiv, [float, float], float, 'div')
 pset.addPrimitive(operator.neg, [float], float)
 pset.addPrimitive(math.cos, [float], float)
 pset.addPrimitive(math.sin, [float], float)
@@ -246,11 +246,13 @@ def main():
     print()
     print(hof[0])
     print_graph(hof)
-    print()
-    print('rodando o TraderSim com o melhor indivíduo:')
-    eval_trade_sim_withprints(hof[0])
+    print('\nrodando o TraderSim com o melhor indivíduo:')
+    eval_trade_sim_noprints(hof[0])
+    print('\nresultados finais da simulação')
+    trader.print_trade_stats()
+
     hof_ = read_hof()
-    print('hof lido de arquivo:')
+    print('\nhof lido de arquivo:')
     print(hof_[0])
 
     return pop, log, hof
