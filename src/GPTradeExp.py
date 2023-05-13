@@ -101,64 +101,6 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
 
-def eval_trade_sim_withprints(individual):
-    # Transform the tree expression in a callable function
-    func = toolbox.compile(expr=individual)
-
-    trader.reset()
-
-    index_inicio = num_velas_anteriores
-    index_final = index_inicio + candlesticks_quantity
-
-    for i in range(index_inicio, index_final):
-        trader.current_price = trader.hist.arr[i, close_price_col]
-        trader.previous_price = trader.hist.arr[i-1, close_price_col]
-
-        print(f'\ni = {i}, ', end='')
-        print(f'OHLCV = {trader.hist.arr[i]}, ', end='')
-        print(f'current_price = {trader.current_price:.2f}, ', end='')
-        print(f'price_delta = {trader.current_price - trader.previous_price:.2f}')
-
-        # fecha a posição quando acabarem as novas velas
-        if i == index_final - 1:
-            trader.close_position()
-            trader.candlestick_count = 0
-            trader.finish_simulation()
-            print('a última vela foi atingida. a simulação chegou ao fim.')
-            break
-
-        entradas = formar_entradas(trader.hist.arr, i, num_velas_anteriores, tipo_vela)
-        comando = func(*entradas)
-        if comando:
-            trader.buy()
-        else:
-            trader.sell()
-
-        trader.update_profit()
-        trader.print_trade_stats()
-
-        if trader.equity <= 0.0:
-            trader.close_position()
-            trader.candlestick_count = 0
-            trader.finish_simulation()
-            print('equity <= 0. a simulação será encerrada.')
-            break
-
-        if trader.candlestick_count >= trader.max_candlestick_count:
-            print(f'fechamento forçado de negociações abertas. a contagem de velas atingiu o limite.')
-            trader.close_position()
-
-        if trader.open_position:
-            trader.candlestick_count += 1
-        else:
-            trader.candlestick_count = 0
-
-    print('\nresultados finais da simulação')
-    trader.print_trade_stats()
-
-    return trader.roi,
-
-
 def eval_trade_sim_noprints(individual):
     # Transform the tree expression in a callable function
     func = toolbox.compile(expr=individual)
