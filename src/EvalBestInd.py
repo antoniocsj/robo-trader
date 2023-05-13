@@ -32,7 +32,8 @@ trader.max_candlestick_count = max_candlestick_count
 # candlesticks_quantity é a quantidade de velas que serão usadas na simulação
 # candlesticks_quantity = len(trader.hist.arr) - num_velas_anteriores
 candlesticks_quantity = 50
-
+index_inicio = num_velas_anteriores
+index_final = index_inicio + candlesticks_quantity
 num_entradas = num_velas_anteriores * len(tipo_vela)
 
 # defined a new primitive set for strongly typed GP
@@ -101,9 +102,6 @@ def eval_trade_sim_withprints(individual):
 
     trader.reset()
 
-    index_inicio = num_velas_anteriores
-    index_final = index_inicio + candlesticks_quantity
-
     for i in range(index_inicio, index_final):
         trader.current_price = trader.hist.arr[i, close_price_col]
         trader.previous_price = trader.hist.arr[i-1, close_price_col]
@@ -158,9 +156,6 @@ def eval_trade_sim_noprints(individual):
     func = toolbox.compile(expr=individual)
 
     trader.reset()
-
-    index_inicio = num_velas_anteriores
-    index_final = index_inicio + candlesticks_quantity
 
     for i in range(index_inicio, index_final):
         trader.current_price = trader.hist.arr[i, close_price_col]
