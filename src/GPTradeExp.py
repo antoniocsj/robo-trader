@@ -15,7 +15,7 @@ import pygraphviz as pgv
 from scoop import futures
 
 # -------------------------------------------------------------------
-from TraderSim import TraderSim
+from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para o TraderSim
@@ -225,7 +225,7 @@ toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max
 def main():
     # random.seed(318)
 
-    pop = toolbox.population(n=300)
+    pop = toolbox.population(n=3000)
     hof = tools.HallOfFame(1)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -236,13 +236,15 @@ def main():
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
 
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.5, 0.1, 40, stats=mstats,
+    pop, log = algorithms.eaSimple(population=pop, toolbox=toolbox,
+                                   cxpb=0.5, mutpb=0.1, ngen=400, stats=mstats,
                                    halloffame=hof, verbose=True)
-    # print log
-    # print(hof)
-    # print(str(gp.PrimitiveTree(hof[0])))
+    print()
+    print(log)
+    print()
     print(hof[0])
     print_graph(hof)
+    print()
     print('rodando o TraderSim com o melhor indivíduo:')
     eval_trade_sim_withprints(hof[0])
 
