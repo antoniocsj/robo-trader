@@ -24,11 +24,11 @@ n_generations = 40
 
 # configurações para o TraderSim
 symbol = 'XAUUSD'
-timeframe = 'H1'
+timeframe = 'M5'
 initial_deposit = 1000.0
 num_velas_anteriores = 5
-tipo_vela = 'OHLCV'
-max_candlestick_count = 5
+tipo_vela = 'OHLC'
+max_candlestick_count = 2
 close_price_col = 5
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
@@ -36,7 +36,7 @@ trader.previous_price = trader.hist.arr[0, close_price_col]
 trader.max_candlestick_count = max_candlestick_count
 # candlesticks_quantity é a quantidade de velas que serão usadas na simulação
 # candlesticks_quantity = len(trader.hist.arr) - num_velas_anteriores
-candlesticks_quantity = 50
+candlesticks_quantity = 500
 
 
 num_entradas = num_velas_anteriores * len(tipo_vela)
