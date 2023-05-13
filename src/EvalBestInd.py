@@ -223,12 +223,11 @@ def main():
     print('obtendo o melhor indivíduo a partir do arquivo halloffame.pkl\n')
     best_ind = hof[0]
     print(best_ind)
-    print()
 
-    print('rodando o TraderSim com o melhor indivíduo.\n')
+    print('\nrodando o TraderSim com o melhor indivíduo.')
     # eval_trade_sim_withprints(best_ind)
     eval_trade_sim_noprints(best_ind)
-    print('\nresultados finais da simulação')
+    print('resultados finais da simulação:\n')
     trader.print_trade_stats()
 
 
