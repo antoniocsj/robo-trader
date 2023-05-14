@@ -19,3 +19,13 @@ def formar_entradas(arr: np.ndarray, index: int, _num_velas: int, _tipo_vela: st
         _entradas += vela[2:col_final].tolist()
 
     return _entradas
+
+
+# escrever uma função que cria um arquivo csv que represente um histórico fictício de um par de moeda fictício.
+# as velas devem seguir um padrão simples definido por alguma função matemática (do tipo senoidal, por exemplo).
+# o objetivo destes dados históricos é facilitar o estudo da aplicação da programação genética no day trading.
+# os dados históricos reais produzidos pelos pares de moeda do forex são muito complexos e ruidosos, e isso complica
+# a busca de padrões que possam auxiliar nas operações de day trade guiadas por algorítimos gerados por programação
+# genética.
+def criar_hist_csv():
+    pass
