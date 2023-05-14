@@ -18,7 +18,7 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para o TraderSim
-symbol = 'XAUUSD'
+symbol = 'XAUUSD-SENO'
 timeframe = 'M5'
 initial_deposit = 1000.0
 num_velas_anteriores = 5
@@ -32,7 +32,7 @@ trader.max_candlestick_count = max_candlestick_count
 # candlesticks_quantity é a quantidade de velas que serão usadas na simulação
 # candlesticks_quantity = len(trader.hist.arr) - num_velas_anteriores
 candlesticks_quantity = 50
-index_inicio = num_velas_anteriores + 0
+index_inicio = num_velas_anteriores + 50
 index_final = index_inicio + candlesticks_quantity
 num_entradas = num_velas_anteriores * len(tipo_vela)
 

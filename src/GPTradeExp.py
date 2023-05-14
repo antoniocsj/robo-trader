@@ -24,7 +24,7 @@ n_population = 100
 n_generations = 20
 
 # configurações para o TraderSim
-symbol = 'XAUUSD'
+symbol = 'XAUUSD-SENO'
 timeframe = 'M5'
 initial_deposit = 1000.0
 num_velas_anteriores = 5
