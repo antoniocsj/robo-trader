@@ -39,11 +39,32 @@ def criar_hist_csv():
     hist.get_hist_data(symbol1, timeframe)
 
     df2: DataFrame = hist.df.copy()
-    # print(hist.df)
-    # print(df2)
 
     filepath1 = hist.get_csv_filepath(symbol1, timeframe)
     filepath2 = filepath1.replace(symbol1, symbol2)
+
+    t = 360
+    p = 12
+    d = t / p
+    time = np.linspace(0, t-d, p)
+    data = np.sin(time*np.pi/180)
+    valor_central = 1000.0
+    print(time)
+    print(data)
+
+    len_df2 = len(df2)
+    for i in range(len_df2):
+        y = data[i % p] + valor_central
+
+        df2.at[i, '<HIGH>'] = y + 1
+        df2.at[i, '<CLOSE>'] = y
+        df2.at[i, '<OPEN>'] = y - 1
+        df2.at[i, '<LOW>'] = y - 2
+        df2.at[i, '<TICKVOL>'] = 0
+        df2.at[i, '<VOL>'] = 0
+        df2.at[i, '<SPREAD>'] = 0
+
+    print(df2)
     df2.to_csv(filepath2, sep='\t', index=False)
 
 
