@@ -1,4 +1,5 @@
 import numpy as np
+from Hist import Hist
 
 
 def formar_entradas(arr: np.ndarray, index: int, _num_velas: int, _tipo_vela: str) -> list[float]:
@@ -28,4 +29,23 @@ def formar_entradas(arr: np.ndarray, index: int, _num_velas: int, _tipo_vela: st
 # a busca de padrões que possam auxiliar nas operações de day trade guiadas por algorítimos gerados por programação
 # genética.
 def criar_hist_csv():
-    pass
+    from pandas import DataFrame
+    # primeiro, pegue um csv contendo um histórico real e, a partir dele, gere o fictício.
+    # a vantagem de começar usando um csv com dados reais é porque já contém as colunas <DATE> e <TIME>.
+    symbol1 = 'XAUUSD'
+    symbol2 = 'XAUUSD-SENO'
+    timeframe = 'M5'
+    hist = Hist()
+    hist.get_hist_data(symbol1, timeframe)
+
+    df2: DataFrame = hist.df.copy()
+    # print(hist.df)
+    # print(df2)
+
+    filepath1 = hist.get_csv_filepath(symbol1, timeframe)
+    filepath2 = filepath1.replace(symbol1, symbol2)
+    df2.to_csv(filepath2, sep='\t', index=False)
+
+
+if __name__ == '__main__':
+    criar_hist_csv()

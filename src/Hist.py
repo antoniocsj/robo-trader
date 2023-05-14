@@ -27,15 +27,19 @@ class Hist:
                 _timeframe = arquivo.split('_')[1]
                 self.hist_csv[f'{_simbolo}_{_timeframe}'] = arquivo
 
+    def get_csv_filepath(self, _simbolo: str, _timeframe: str) -> str:
+        _filepath = Hist.dir_csv + '/' + self.hist_csv[f'{_simbolo}_{_timeframe}']
+        return _filepath
+
     def get_hist_data(self, _simbolo: str, _timeframe: str):
-        arquivo = Hist.dir_csv + '/' + self.hist_csv[f'{_simbolo}_{_timeframe}']
-        self.df = pd.read_csv(arquivo, delimiter='\t')
-        self.df.drop(columns=['<VOL>', '<SPREAD>'], inplace=True)
-        self.df.columns = ['DATE', 'TIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'TICKVOL']
+        _filepath = self.get_csv_filepath(_simbolo, _timeframe)
+        self.df = pd.read_csv(_filepath, delimiter='\t')
+        # self.df.drop(columns=['<VOL>', '<SPREAD>'], inplace=True)
+        # self.df.columns = ['DATE', 'TIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'TICKVOL']
         self.arr = self.df.values
 
         if self.df.isnull().sum().values.sum() != 0:
-            print(f'Há dados faltando no arquivo {arquivo}')
+            print(f'Há dados faltando no arquivo {_filepath}')
             exit(-1)
 
     def print_hist(self):
