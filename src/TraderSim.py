@@ -25,6 +25,7 @@ class TraderSim:
         self.equity = self.initial_balance  # patrimônio líquido
         self.profit = 0.0  # lucro (ou prejuízo) na negociação
         self.roi = 0.0  # Return on Investment ou Retorno de Investmento
+        self.stop_loss = 0.01  # limiar de percentual de perda máxima por negociação
         self.hist.get_hist_data(symbol, timeframe)
 
     def reset(self):
@@ -93,8 +94,6 @@ class TraderSim:
             self.starting_price = self.current_price
             self.num_buys += 1
         elif self.open_position == 'selling':
-            self.candlestick_count = 0
-            self.profit = 0.0
             self.close_position()
             print(f'iniciando negociação de compra a {self.current_price}')
             self.open_position = 'buying'
@@ -116,8 +115,6 @@ class TraderSim:
             self.starting_price = self.current_price
             self.num_sells += 1
         elif self.open_position == 'buying':
-            self.candlestick_count = 0
-            self.profit = 0.0
             self.close_position()
             print(f'iniciando negociação de venda a {self.current_price}')
             self.open_position = 'selling'
@@ -147,14 +144,14 @@ class TraderSim:
             return
 
         if self.open_position == 'buying':
-            print('fechando negociação de compra aberta.')
+            print(f'fechando negociação de compra aberta. profit = {self.profit:.2f}')
             self.num_sells += 1
         elif self.open_position == 'selling':
-            print('fechando negociação de venda aberta.')
+            print(f'fechando negociação de venda aberta. profit = {self.profit:.2f}')
             self.num_buys += 1
 
-        self.update_profit()
         self.open_position = None
+        self.candlestick_count = 0
 
         if self.profit > 0:
             self.num_hits += 1
@@ -222,9 +219,12 @@ def main():
 
         trader.update_profit()
 
+        if trader.profit < 0 and abs(trader.profit)/trader.balance >= trader.stop_loss:
+            print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')
+            trader.close_position()
+
         if trader.equity <= 0.0:
             trader.close_position()
-            trader.candlestick_count = 0
             trader.finish_simulation()
             print('equity <= 0. a simulação será encerrada.')
             break
@@ -232,7 +232,6 @@ def main():
         # fecha a posição quando acabarem as novas barras (velas ou candlesticks)
         if i == candlesticks_quantity - 1:
             trader.close_position()
-            trader.candlestick_count = 0
             trader.finish_simulation()
             print('a última vela atingida. a simulação chegou ao fim.')
 
