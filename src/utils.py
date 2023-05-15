@@ -64,8 +64,11 @@ def criar_hist_csv():
         df2.at[i, '<VOL>'] = 0
         df2.at[i, '<SPREAD>'] = 0
 
+        if i % 5000 == 0:
+            print(f'{100*i/len_df2:.2f} %')
+
     print(df2)
-    df2.to_csv(filepath2, sep='\t', index=False)
+    df2.to_csv(filepath2, sep='\t', index=False, float_format='%.2f')
 
 
 if __name__ == '__main__':
