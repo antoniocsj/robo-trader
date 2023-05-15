@@ -199,8 +199,8 @@ class TraderSim:
 
 def main():
     symbol = 'XAUUSD'
-    timeframe = 'H1'
-    initial_deposit = 10.0
+    timeframe = 'M5'
+    initial_deposit = 100.0
 
     trader = TraderSim(symbol, timeframe, initial_deposit)
     trader.start_simulation()
