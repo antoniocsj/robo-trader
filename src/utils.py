@@ -49,23 +49,38 @@ def criar_hist_csv():
     time = np.linspace(0, t-d, p)
     data = np.sin(time*np.pi/180)
     valor_central = 1000.0
+    upper_shadow_height = 0.1
+    lower_shadow_height = 0.1
     print(time)
     print(data)
 
+    _close_ant = valor_central
     len_df2 = len(df2)
     for i in range(len_df2):
-        y = data[i % p] + valor_central
+        _close = data[i % p] + valor_central
+        _open = _close_ant
 
-        df2.at[i, '<HIGH>'] = y + 1
-        df2.at[i, '<CLOSE>'] = y
-        df2.at[i, '<OPEN>'] = y - 1
-        df2.at[i, '<LOW>'] = y - 2
+        if _close >= _open:
+            # vela/candlestick de alta (positivo)
+            _low = _open - lower_shadow_height
+            _high = _close + upper_shadow_height
+        else:
+            # vela/candlestick de baixa (negativo)
+            _low = _close - lower_shadow_height
+            _high = _open + upper_shadow_height
+
+        df2.at[i, '<HIGH>'] = _high
+        df2.at[i, '<CLOSE>'] = _close
+        df2.at[i, '<OPEN>'] = _open
+        df2.at[i, '<LOW>'] = _low
         df2.at[i, '<TICKVOL>'] = 0
         df2.at[i, '<VOL>'] = 0
         df2.at[i, '<SPREAD>'] = 0
 
         if i % 5000 == 0:
             print(f'{100*i/len_df2:.2f} %')
+
+        _close_ant = _close
 
     print(df2)
     df2.to_csv(filepath2, sep='\t', index=False, float_format='%.2f')
