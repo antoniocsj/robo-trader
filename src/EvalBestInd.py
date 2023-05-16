@@ -79,7 +79,7 @@ def if_then_else(_input, output1, output2):
 pset.addPrimitive(operator.lt, [float, float], bool)
 pset.addPrimitive(operator.gt, [float, float], bool)
 # pset.addPrimitive(operator.eq, [float, float], bool)
-# pset.addPrimitive(if_then_else, [bool, float, float], float)
+pset.addPrimitive(if_then_else, [bool, float, float], float)
 
 # terminals
 pset.addTerminal(False, bool)

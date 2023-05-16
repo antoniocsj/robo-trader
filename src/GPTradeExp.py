@@ -21,8 +21,8 @@ from utils import formar_entradas
 
 # configurações para a programação genética
 n_population = 500
-n_generations = 50
-max_height = 25
+n_generations = 250
+max_height = 30
 
 # configurações para o TraderSim
 symbol = 'XAUUSD'
@@ -86,7 +86,7 @@ def if_then_else(_input, output1, output2):
 pset.addPrimitive(operator.lt, [float, float], bool)
 pset.addPrimitive(operator.gt, [float, float], bool)
 # pset.addPrimitive(operator.eq, [float, float], bool)
-# pset.addPrimitive(if_then_else, [bool, float, float], float)
+pset.addPrimitive(if_then_else, [bool, float, float], float)
 
 # terminals
 pset.addTerminal(False, bool)
