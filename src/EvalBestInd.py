@@ -21,9 +21,9 @@ from utils import formar_entradas
 symbol = 'XAUUSD'
 timeframe = 'M5'
 initial_deposit = 1000.0
-num_velas_anteriores = 8
+num_velas_anteriores = 4
 tipo_vela = 'OHLC'
-max_candlestick_count = 10
+max_candlestick_count = 5
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
 close_price_col = 5
