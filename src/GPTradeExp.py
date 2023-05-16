@@ -165,8 +165,10 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
-toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
-toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+# toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+# toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=25))
+toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=25))
 
 
 def main():
