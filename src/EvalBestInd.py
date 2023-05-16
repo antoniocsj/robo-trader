@@ -21,9 +21,9 @@ from utils import formar_entradas
 symbol = 'XAUUSD'
 timeframe = 'M5'
 initial_deposit = 1000.0
-num_velas_anteriores = 2
+num_velas_anteriores = 8
 tipo_vela = 'OHLC'
-max_candlestick_count = 5
+max_candlestick_count = 10
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
 close_price_col = 5
@@ -31,8 +31,8 @@ trader.previous_price = trader.hist.arr[0, close_price_col]
 trader.max_candlestick_count = max_candlestick_count
 # candlesticks_quantity é a quantidade de velas que serão usadas na simulação
 # candlesticks_quantity = len(trader.hist.arr) - num_velas_anteriores
-candlesticks_quantity = 5000
-index_inicio = num_velas_anteriores + 50
+candlesticks_quantity = 500000
+index_inicio = num_velas_anteriores + 500
 index_final = index_inicio + candlesticks_quantity
 num_entradas = num_velas_anteriores * len(tipo_vela)
 
@@ -61,8 +61,8 @@ pset.addPrimitive(operator.sub, [float, float], float)
 pset.addPrimitive(operator.mul, [float, float], float)
 pset.addPrimitive(protectedDiv, [float, float], float, 'div')
 pset.addPrimitive(operator.neg, [float], float)
-pset.addPrimitive(math.cos, [float], float)
-pset.addPrimitive(math.sin, [float], float)
+# pset.addPrimitive(math.cos, [float], float)
+# pset.addPrimitive(math.sin, [float], float)
 
 
 # logic operators
@@ -76,14 +76,14 @@ def if_then_else(_input, output1, output2):
 
 pset.addPrimitive(operator.lt, [float, float], bool)
 pset.addPrimitive(operator.gt, [float, float], bool)
-pset.addPrimitive(operator.eq, [float, float], bool)
-pset.addPrimitive(if_then_else, [bool, float, float], float)
+# pset.addPrimitive(operator.eq, [float, float], bool)
+# pset.addPrimitive(if_then_else, [bool, float, float], float)
 
 # terminals
 pset.addTerminal(False, bool)
 pset.addTerminal(True, bool)
-pset.addEphemeralConstant("rand100", lambda: random.random() * 100, float)
-pset.addEphemeralConstant("rand101", lambda: random.randint(-1, 1), float)
+# pset.addEphemeralConstant("rand100", lambda: random.random() * 100, float)
+# pset.addEphemeralConstant("rand101", lambda: random.randint(-1, 1), float)
 # pset.renameArguments(X='x')
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -148,7 +148,7 @@ def eval_trade_sim_withprints(individual):
     print('\nresultados finais da simulação')
     trader.print_trade_stats()
 
-    return trader.roi,
+    return trader.hit_rate,
 
 
 def eval_trade_sim_noprints(individual):
@@ -203,7 +203,7 @@ def eval_trade_sim_noprints(individual):
     # print('\nresultados finais da simulação')
     # trader.print_trade_stats()
 
-    return trader.roi,
+    return trader.hit_rate
 
 
 def read_halloffame():

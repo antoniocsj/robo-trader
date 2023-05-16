@@ -27,9 +27,9 @@ n_generations = 50
 symbol = 'XAUUSD'
 timeframe = 'M5'
 initial_deposit = 1000.0
-num_velas_anteriores = 2
+num_velas_anteriores = 8
 tipo_vela = 'OHLC'
-max_candlestick_count = 5
+max_candlestick_count = 10
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
 close_price_col = 5
@@ -37,7 +37,7 @@ trader.previous_price = trader.hist.arr[0, close_price_col]
 trader.max_candlestick_count = max_candlestick_count
 # candlesticks_quantity é a quantidade de velas que serão usadas na simulação
 # candlesticks_quantity = len(trader.hist.arr) - num_velas_anteriores
-candlesticks_quantity = 50
+candlesticks_quantity = 500
 index_inicio = num_velas_anteriores
 index_final = index_inicio + candlesticks_quantity
 num_entradas = num_velas_anteriores * len(tipo_vela)
@@ -67,8 +67,8 @@ pset.addPrimitive(operator.sub, [float, float], float)
 pset.addPrimitive(operator.mul, [float, float], float)
 pset.addPrimitive(protectedDiv, [float, float], float, 'div')
 pset.addPrimitive(operator.neg, [float], float)
-pset.addPrimitive(math.cos, [float], float)
-pset.addPrimitive(math.sin, [float], float)
+# pset.addPrimitive(math.cos, [float], float)
+# pset.addPrimitive(math.sin, [float], float)
 
 
 # logic operators
@@ -82,18 +82,20 @@ def if_then_else(_input, output1, output2):
 
 pset.addPrimitive(operator.lt, [float, float], bool)
 pset.addPrimitive(operator.gt, [float, float], bool)
-pset.addPrimitive(operator.eq, [float, float], bool)
-pset.addPrimitive(if_then_else, [bool, float, float], float)
+# pset.addPrimitive(operator.eq, [float, float], bool)
+# pset.addPrimitive(if_then_else, [bool, float, float], float)
 
 # terminals
 pset.addTerminal(False, bool)
 pset.addTerminal(True, bool)
-pset.addEphemeralConstant("rand100", lambda: random.random() * 100, float)
-pset.addEphemeralConstant("rand101", lambda: random.randint(-1, 1), float)
+# pset.addEphemeralConstant("rand100", lambda: random.random() * 100, float)
+# pset.addEphemeralConstant("rand101", lambda: random.randint(-1, 1), float)
 # pset.renameArguments(X='x')
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax)
+# creator.create("FitnessMaxMin", base.Fitness, weights=(1.0, -1.0))
+# creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMaxMin)
 
 toolbox = base.Toolbox()
 toolbox.register("map", futures.map)
@@ -155,7 +157,7 @@ def eval_trade_sim_noprints(individual):
     # print('\nresultados finais da simulação')
     # trader.print_trade_stats()
 
-    return trader.roi,
+    return trader.hit_rate,
 
 
 toolbox.register("evaluate", eval_trade_sim_noprints)
@@ -163,8 +165,8 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
-toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
-toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+# toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+# toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
 
 def main():
