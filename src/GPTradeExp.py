@@ -21,8 +21,9 @@ from utils import formar_entradas
 
 # configurações para a programação genética
 n_population = 500
-n_generations = 250
+n_generations = 50
 max_height = 30
+mutpb = 0.1
 
 # configurações para o TraderSim
 symbol = 'XAUUSD'
@@ -187,7 +188,7 @@ def main():
     mstats.register("max", numpy.max)
 
     pop, log = algorithms.eaSimple(population=pop, toolbox=toolbox,
-                                   cxpb=0.5, mutpb=0.1, ngen=n_generations,
+                                   cxpb=0.5, mutpb=mutpb, ngen=n_generations,
                                    stats=mstats, halloffame=hof, verbose=True)
     print()
     print(log)
