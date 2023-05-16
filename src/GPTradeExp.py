@@ -20,16 +20,16 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 500
-n_generations = 50
-max_height = 30
-mutpb = 0.1
+n_population = 20000
+n_generations = 100
+max_height = 35
+mutpb = 0.01
 
 # configurações para o TraderSim
 symbol = 'XAUUSD'
 timeframe = 'M5'
 initial_deposit = 1000.0
-num_velas_anteriores = 4
+num_velas_anteriores = 16
 tipo_vela = 'OHLCV'
 # max_candlestick_count = 1
 trader = TraderSim(symbol, timeframe, initial_deposit)
