@@ -8,7 +8,7 @@ class TraderSim:
         self.hist = Hist()
         self.open_position = None
         self.candlestick_count = 0  # contagem de velas desde a abertura da posição
-        self.max_candlestick_count = 5  # contagem máxima permitida de velas desde a abertura da posição
+        self.max_candlestick_count = 1  # contagem máxima permitida de velas desde a abertura da posição
         self.simulation_is_running = False
         self.num_hits = 0  # número de acertos
         self.num_misses = 0  # número de erros
