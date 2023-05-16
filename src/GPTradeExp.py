@@ -21,14 +21,14 @@ from utils import formar_entradas
 
 # configurações para a programação genética
 n_population = 500
-n_generations = 50
+n_generations = 250
 
 # configurações para o TraderSim
 symbol = 'XAUUSD'
 timeframe = 'M5'
 initial_deposit = 1000.0
 num_velas_anteriores = 4
-tipo_vela = 'OHLC'
+tipo_vela = 'OHLCV'
 # max_candlestick_count = 1
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
@@ -165,8 +165,8 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("mate", gp.cxOnePoint)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
-# toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
-# toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
 
 def main():
