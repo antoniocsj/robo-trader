@@ -21,7 +21,8 @@ from utils import formar_entradas
 
 # configurações para a programação genética
 n_population = 500
-n_generations = 250
+n_generations = 50
+max_height = 25
 
 # configurações para o TraderSim
 symbol = 'XAUUSD'
@@ -67,6 +68,8 @@ pset.addPrimitive(operator.sub, [float, float], float)
 pset.addPrimitive(operator.mul, [float, float], float)
 pset.addPrimitive(protectedDiv, [float, float], float, 'div')
 pset.addPrimitive(operator.neg, [float], float)
+pset.addPrimitive(max, [float, float], float, 'max')
+pset.addPrimitive(min, [float, float], float, 'min')
 # pset.addPrimitive(math.cos, [float], float)
 # pset.addPrimitive(math.sin, [float], float)
 
@@ -167,8 +170,8 @@ toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 # toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 # toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
-toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=25))
-toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=25))
+toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=max_height))
+toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=max_height))
 
 
 def main():
