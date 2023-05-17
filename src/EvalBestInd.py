@@ -217,7 +217,7 @@ def read_halloffame():
 
 def main():
     hof = read_halloffame()
-    print('obtendo o melhor indivíduo a partir do arquivo halloffame.pkl\n')
+    print('avaliação do melhor indivíduo obtido de halloffame.pkl\n')
     best_ind = hof[0]
     print(best_ind)
 
