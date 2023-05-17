@@ -24,7 +24,7 @@ initial_deposit = 1000.0
 num_velas_anteriores = 16
 tipo_vela = 'OHLCV'
 candlesticks_quantity = 50000  # quantidade de velas usadas na avaliação
-max_candlestick_count = 5
+max_candlestick_count = 1
 
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
@@ -225,7 +225,8 @@ def main():
     # eval_trade_sim_withprints(best_ind)
     eval_trade_sim_noprints(best_ind)
     print('resultados finais da simulação:\n')
-    print(f'quantidade de velas usadas na avaliação = {candlesticks_quantity}')
+    print(f'quantidade de velas usadas na avaliação = {candlesticks_quantity}, '
+          f'max_candlestick_count = {max_candlestick_count}')
     trader.print_trade_stats()
 
 
