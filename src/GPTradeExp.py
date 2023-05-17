@@ -6,6 +6,7 @@ import itertools
 import pickle
 
 from deap import algorithms
+import my_algorithms
 from deap import base
 from deap import creator
 from deap import tools
@@ -20,7 +21,7 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 20000
+n_population = 500
 n_generations = 100
 max_height = 35
 mutpb = 0.01
@@ -71,6 +72,8 @@ pset.addPrimitive(protectedDiv, [float, float], float, 'div')
 pset.addPrimitive(operator.neg, [float], float)
 pset.addPrimitive(max, [float, float], float, 'max')
 pset.addPrimitive(min, [float, float], float, 'min')
+
+
 # pset.addPrimitive(math.cos, [float], float)
 # pset.addPrimitive(math.sin, [float], float)
 
@@ -117,7 +120,7 @@ def eval_trade_sim_noprints(individual):
 
     for i in range(index_inicio, index_final):
         trader.current_price = trader.hist.arr[i, close_price_col]
-        trader.previous_price = trader.hist.arr[i-1, close_price_col]
+        trader.previous_price = trader.hist.arr[i - 1, close_price_col]
 
         # print(f'\ni = {i}, ', end='')
         # print(f'OHLCV = {trader.hist.arr[i]}, ', end='')
@@ -187,22 +190,27 @@ def main():
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
 
-    pop, log = algorithms.eaSimple(population=pop, toolbox=toolbox,
-                                   cxpb=0.5, mutpb=mutpb, ngen=n_generations,
-                                   stats=mstats, halloffame=hof, verbose=True)
+    # pop, log = algorithms.eaSimple(population=pop, toolbox=toolbox,
+    #                                cxpb=0.5, mutpb=mutpb, ngen=n_generations,
+    #                                stats=mstats, halloffame=hof, verbose=True)
+
+    pop, log, hof = my_algorithms.eaSimpleWithCheckpoints(population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl',
+                                                          cxpb=0.5, mutpb=mutpb, ngen=n_generations,
+                                                          stats=mstats, halloffame=hof, verbose=True)
     print()
     print(log)
     print()
-    print(hof[0])
-    print_graph(hof)
-    print('\nrodando o TraderSim com o melhor indivíduo:')
-    eval_trade_sim_noprints(hof[0])
-    print('\nresultados finais da simulação')
-    trader.print_trade_stats()
+    if len(hof) > 0:
+        print(hof[0])
+        print_graph(hof)
+        print('\nrodando o TraderSim com o melhor indivíduo:')
+        eval_trade_sim_noprints(hof[0])
+        print('\nresultados finais da simulação')
+        trader.print_trade_stats()
 
-    hof_ = read_hof()
-    print('\nhof lido de arquivo:')
-    print(hof_[0])
+        hof_ = read_hof()
+        print('\nhof lido de arquivo:')
+        print(hof_[0])
 
     return pop, log, hof
 
