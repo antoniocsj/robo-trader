@@ -1,7 +1,9 @@
 import random
 import pickle
 import os.path
+import pygraphviz as pgv
 from deap import tools
+from deap import gp
 from deap.algorithms import varAnd
 from deap.tools import HallOfFame
 
@@ -11,6 +13,23 @@ def write_hof(hof: HallOfFame):
 
     with open("halloffame.pkl", "wb") as hof_file:
         pickle.dump(cp, hof_file)
+
+
+def print_graph(hof: HallOfFame):
+    expr = hof[0]
+    nodes, edges, labels = gp.graph(expr)
+
+    g = pgv.AGraph()
+    g.add_nodes_from(nodes)
+    g.add_edges_from(edges)
+    g.layout(prog="dot")
+
+    for i in nodes:
+        n = g.get_node(i)
+        n.attr["label"] = labels[i]
+
+    g.draw("tree.pdf")
+    write_hof(hof)
 
 
 def eaSimple_WithCP(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpoint=None,
@@ -141,6 +160,6 @@ def eaSimple_WithCP(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpoi
             with open("checkpoint.pkl", "wb") as cp_file:
                 pickle.dump(cp, cp_file)
 
-            write_hof(halloffame)
+            print_graph(halloffame)
 
     return population, logbook, halloffame
