@@ -32,12 +32,13 @@ def print_graph(hof: HallOfFame):
     write_hof(hof)
 
 
-def eaSimple_WithCP(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpoint=None,
+def eaSimple_WithCP(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpoint=None, freq=5,
                     halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
 
-    :param checkpoint:
+    :param checkpoint: caminho ou nome do arquivo de checkpoint.
+    :param freq: frequência gravação de checkpoints.
     :param population: A list of individuals.
     :param toolbox: A :class:`~deap.base.Toolbox` that contains the evolution
                     operators.
@@ -93,8 +94,6 @@ def eaSimple_WithCP(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpoi
     .. [Back2000] Back, Fogel and Michalewicz, "Evolutionary Computation 1 :
        Basic Algorithms and Operators", 2000.
     """
-    FREQ = 5
-
     if checkpoint and os.path.exists(checkpoint):
         # A file name has been given, then load the data from the file
         with open(checkpoint, "rb") as cp_file:
@@ -152,7 +151,7 @@ def eaSimple_WithCP(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpoi
         if verbose:
             print(logbook.stream)
 
-        if gen % FREQ == 0:
+        if gen % freq == 0:
             # Fill the dictionary using the dict(key=value[, ...]) constructor
             cp = dict(population=population, generation=gen, halloffame=halloffame,
                       logbook=logbook, rndstate=random.getstate())
@@ -161,5 +160,6 @@ def eaSimple_WithCP(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpoi
                 pickle.dump(cp, cp_file)
 
             print_graph(halloffame)
+            print('checkpoint gravado.')
 
     return population, logbook, halloffame

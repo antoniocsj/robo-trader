@@ -21,9 +21,9 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 50000
+n_population = 100000
 n_generations = 500
-max_height = 35
+max_height = 40
 mutpb = 0.01
 
 # configurações para o TraderSim
@@ -32,15 +32,13 @@ timeframe = 'M5'
 initial_deposit = 1000.0
 num_velas_anteriores = 16
 tipo_vela = 'OHLCV'
-# max_candlestick_count = 1
+candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
+
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
 close_price_col = 5
 trader.previous_price = trader.hist.arr[0, close_price_col]
-# trader.max_candlestick_count = max_candlestick_count
-# candlesticks_quantity é a quantidade de velas que serão usadas na simulação
-# candlesticks_quantity = len(trader.hist.arr) - num_velas_anteriores
-candlesticks_quantity = 500
+
 index_inicio = num_velas_anteriores
 index_final = index_inicio + candlesticks_quantity
 num_entradas = num_velas_anteriores * len(tipo_vela)
@@ -194,9 +192,11 @@ def main():
     #                                cxpb=0.5, mutpb=mutpb, ngen=n_generations,
     #                                stats=mstats, halloffame=hof, verbose=True)
 
-    pop, log, hof = my_algorithms.eaSimple_WithCP(population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl',
-                                                          cxpb=0.5, mutpb=mutpb, ngen=n_generations,
-                                                          stats=mstats, halloffame=hof, verbose=True)
+    pop, log, hof = my_algorithms.eaSimple_WithCP(
+        population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl', freq=2,
+        cxpb=0.5, mutpb=mutpb, ngen=n_generations,
+        stats=mstats, halloffame=hof, verbose=True)
+
     print()
     print(log)
     print()

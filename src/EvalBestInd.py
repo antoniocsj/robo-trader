@@ -23,16 +23,16 @@ timeframe = 'M5'
 initial_deposit = 1000.0
 num_velas_anteriores = 16
 tipo_vela = 'OHLCV'
+candlesticks_quantity = 50000  # quantidade de velas usadas na avaliação
 max_candlestick_count = 5
+
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
 close_price_col = 5
 trader.previous_price = trader.hist.arr[0, close_price_col]
 trader.max_candlestick_count = max_candlestick_count
-# candlesticks_quantity é a quantidade de velas que serão usadas na simulação
-# candlesticks_quantity = len(trader.hist.arr) - num_velas_anteriores
-candlesticks_quantity = 5000
-index_inicio = num_velas_anteriores + 500
+
+index_inicio = num_velas_anteriores + 5000
 index_final = index_inicio + candlesticks_quantity
 num_entradas = num_velas_anteriores * len(tipo_vela)
 
