@@ -160,6 +160,6 @@ def eaSimple_WithCP(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpoi
                 pickle.dump(cp, cp_file)
 
             print_graph(halloffame)
-            print('checkpoint gravado.')
+            print(f'checkpoint gravado. geração = {gen}')
 
     return population, logbook, halloffame
