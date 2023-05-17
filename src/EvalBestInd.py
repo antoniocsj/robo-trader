@@ -225,6 +225,7 @@ def main():
     # eval_trade_sim_withprints(best_ind)
     eval_trade_sim_noprints(best_ind)
     print('resultados finais da simulação:\n')
+    print(f'quantidade de velas usadas na avaliação = {candlesticks_quantity}')
     trader.print_trade_stats()
 
 
