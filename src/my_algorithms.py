@@ -3,10 +3,18 @@ import pickle
 import os.path
 from deap import tools
 from deap.algorithms import varAnd
+from deap.tools import HallOfFame
 
 
-def eaSimpleWithCheckpoints(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpoint=None,
-                            halloffame=None, verbose=__debug__):
+def write_hof(hof: HallOfFame):
+    cp = dict(halloffame=hof)
+
+    with open("halloffame.pkl", "wb") as hof_file:
+        pickle.dump(cp, hof_file)
+
+
+def eaSimple_WithCP(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpoint=None,
+                    halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
 
@@ -132,5 +140,7 @@ def eaSimpleWithCheckpoints(population, toolbox, cxpb, mutpb, ngen, stats=None, 
 
             with open("checkpoint.pkl", "wb") as cp_file:
                 pickle.dump(cp, cp_file)
+
+            write_hof(halloffame)
 
     return population, logbook, halloffame

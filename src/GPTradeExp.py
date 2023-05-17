@@ -21,8 +21,8 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 500
-n_generations = 100
+n_population = 50000
+n_generations = 500
 max_height = 35
 mutpb = 0.01
 
@@ -194,7 +194,7 @@ def main():
     #                                cxpb=0.5, mutpb=mutpb, ngen=n_generations,
     #                                stats=mstats, halloffame=hof, verbose=True)
 
-    pop, log, hof = my_algorithms.eaSimpleWithCheckpoints(population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl',
+    pop, log, hof = my_algorithms.eaSimple_WithCP(population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl',
                                                           cxpb=0.5, mutpb=mutpb, ngen=n_generations,
                                                           stats=mstats, halloffame=hof, verbose=True)
     print()
