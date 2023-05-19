@@ -22,16 +22,16 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 1000
+n_population = 10000
 n_generations = 100
 max_height = 40
 mutpb = 0.1
 
 # configurações para o TraderSim
-symbol = 'XAUUSD'
+symbol = 'XAUUSD-SENO'
 timeframe = 'M5'
 initial_deposit = 1000.0
-num_velas_anteriores = 16
+num_velas_anteriores = 32
 tipo_vela = 'OHLCV'
 candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
 

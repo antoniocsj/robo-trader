@@ -18,10 +18,10 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para o TraderSim
-symbol = 'XAUUSD'
+symbol = 'XAUUSD-SENO'
 timeframe = 'M5'
 initial_deposit = 1000.0
-num_velas_anteriores = 16
+num_velas_anteriores = 32
 tipo_vela = 'OHLCV'
 candlesticks_quantity = 50000  # quantidade de velas usadas na avaliação
 max_candlestick_count = 1
