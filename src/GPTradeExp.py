@@ -22,7 +22,7 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 500
+n_population = 5000
 n_generations = 100
 max_height = 40
 mutpb = 0.1
@@ -82,6 +82,22 @@ def protectedExp(x):
         return 1
 
 
+# Define a protected sin function
+def protectedSin(x):
+    try:
+        return math.sin(x)
+    except ValueError:
+        return 1
+
+
+# Define a protected cos function
+def protectedCos(x):
+    try:
+        return math.cos(x)
+    except ValueError:
+        return 1
+
+
 pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
 pset.addPrimitive(operator.mul, [float, float], float)
@@ -91,8 +107,10 @@ pset.addPrimitive(protectedLog, [float], float, 'log')
 pset.addPrimitive(protectedExp, [float], float, 'exp')
 pset.addPrimitive(max, [float, float], float, 'max')
 pset.addPrimitive(min, [float, float], float, 'min')
-pset.addPrimitive(math.cos, [float], float)
-pset.addPrimitive(math.sin, [float], float)
+# pset.addPrimitive(math.cos, [float], float)
+# pset.addPrimitive(math.sin, [float], float)
+pset.addPrimitive(protectedCos, [float], float, 'cos')
+pset.addPrimitive(protectedSin, [float], float, 'sin')
 
 
 # logic operators

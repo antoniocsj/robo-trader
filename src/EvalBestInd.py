@@ -75,6 +75,22 @@ def protectedExp(x):
         return 1
 
 
+# Define a protected sin function
+def protectedSin(x):
+    try:
+        return math.sin(x)
+    except ValueError:
+        return 1
+
+
+# Define a protected cos function
+def protectedCos(x):
+    try:
+        return math.cos(x)
+    except ValueError:
+        return 1
+
+
 pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
 pset.addPrimitive(operator.mul, [float, float], float)
@@ -84,8 +100,10 @@ pset.addPrimitive(protectedLog, [float], float, 'log')
 pset.addPrimitive(protectedExp, [float], float, 'exp')
 pset.addPrimitive(max, [float, float], float, 'max')
 pset.addPrimitive(min, [float, float], float, 'min')
-pset.addPrimitive(math.cos, [float], float)
-pset.addPrimitive(math.sin, [float], float)
+# pset.addPrimitive(math.cos, [float], float)
+# pset.addPrimitive(math.sin, [float], float)
+pset.addPrimitive(protectedCos, [float], float, 'cos')
+pset.addPrimitive(protectedSin, [float], float, 'sin')
 
 
 # logic operators
@@ -129,7 +147,7 @@ def eval_trade_sim_withprints(individual):
 
     for i in range(index_inicio, index_final):
         trader.current_price = trader.hist.arr[i, close_price_col]
-        trader.previous_price = trader.hist.arr[i-1, close_price_col]
+        trader.previous_price = trader.hist.arr[i - 1, close_price_col]
 
         print(f'\ni = {i}, ', end='')
         print(f'OHLCV = {trader.hist.arr[i]}, ', end='')
@@ -184,7 +202,7 @@ def eval_trade_sim_noprints(individual):
 
     for i in range(index_inicio, index_final):
         trader.current_price = trader.hist.arr[i, close_price_col]
-        trader.previous_price = trader.hist.arr[i-1, close_price_col]
+        trader.previous_price = trader.hist.arr[i - 1, close_price_col]
 
         # print(f'\ni = {i}, ', end='')
         # print(f'OHLCV = {trader.hist.arr[i]}, ', end='')
