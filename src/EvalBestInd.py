@@ -1,7 +1,7 @@
 import operator
 import math
 import random
-import numpy
+import numpy as np
 import itertools
 import pickle
 
@@ -84,6 +84,7 @@ pset.addPrimitive(if_then_else, [bool, float, float], float)
 # terminals
 pset.addTerminal(False, bool)
 pset.addTerminal(True, bool)
+pset.addEphemeralConstant("pi", np.pi, float)
 pset.addEphemeralConstant("rand", lambda: random.random(), float)
 # pset.renameArguments(X='x')
 
