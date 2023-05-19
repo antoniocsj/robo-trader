@@ -44,10 +44,13 @@ def criar_hist_csv():
     filepath2 = filepath1.replace(symbol1, symbol2)
 
     t = 360
-    p = 12
+    # p = 12
+    p = 32
     d = t / p
     time = np.linspace(0, t-d, p)
-    data = np.sin(time*np.pi/180)
+    # data = np.sin(time*np.pi/180)
+    data = np.sin(0.5 * np.pi * time * np.pi / 180) + np.cos(2 * np.pi * time * np.pi / 180) * np.cos(
+        0.5 * np.pi * time * np.pi / 180)
     valor_central = 1000.0
     upper_shadow_height = 0.1
     lower_shadow_height = 0.1
