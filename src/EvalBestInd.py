@@ -56,11 +56,29 @@ def protectedDiv(left, right):
         return 1
 
 
+# Define a protected log function
+def protectedLog(x):
+    try:
+        return math.log(x)
+    except ValueError:
+        return 1
+
+
+# Define a protected exp function
+def protectedExp(x):
+    try:
+        return math.exp(x)
+    except OverflowError:
+        return 1
+
+
 pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
 pset.addPrimitive(operator.mul, [float, float], float)
-pset.addPrimitive(protectedDiv, [float, float], float, 'div')
 pset.addPrimitive(operator.neg, [float], float)
+pset.addPrimitive(protectedDiv, [float, float], float, 'div')
+pset.addPrimitive(protectedLog, [float], float, 'log')
+pset.addPrimitive(protectedExp, [float], float, 'exp')
 pset.addPrimitive(max, [float, float], float, 'max')
 pset.addPrimitive(min, [float, float], float, 'min')
 pset.addPrimitive(math.cos, [float], float)
