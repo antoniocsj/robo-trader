@@ -33,7 +33,7 @@ timeframe = 'M5'
 initial_deposit = 1000.0
 num_velas_anteriores = 4
 tipo_vela = 'OHLCV'
-candlesticks_quantity = 1000  # quantidade de velas usadas no treinamento
+candlesticks_quantity = 500  # quantidade de velas usadas no treinamento
 
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
@@ -77,6 +77,8 @@ def protectedExp(x):
     try:
         return math.exp(x)
     except OverflowError:
+        return 1
+    except ValueError:
         return 1
 
 

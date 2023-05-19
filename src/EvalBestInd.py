@@ -71,6 +71,8 @@ def protectedExp(x):
         return math.exp(x)
     except OverflowError:
         return 1
+    except ValueError:
+        return 1
 
 
 pset.addPrimitive(operator.add, [float, float], float)
