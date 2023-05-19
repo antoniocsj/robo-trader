@@ -33,7 +33,7 @@ timeframe = 'M5'
 initial_deposit = 1000.0
 num_velas_anteriores = 4
 tipo_vela = 'OHLCV'
-candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
+candlesticks_quantity = 1000  # quantidade de velas usadas no treinamento
 
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
@@ -110,10 +110,10 @@ pset.addPrimitive(if_then_else, [bool, float, float], float)
 # terminals
 pset.addTerminal(False, bool)
 pset.addTerminal(True, bool)
-pset.addEphemeralConstant("pi", lambda: np.pi, float)
-pset.addEphemeralConstant("e", lambda: np.e, float)
-pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5))/2, float)
-pset.addEphemeralConstant("rand", lambda: random.random(), float)
+# pset.addEphemeralConstant("pi", lambda: np.pi, float)
+# pset.addEphemeralConstant("e", lambda: np.e, float)
+# pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5))/2, float)
+# pset.addEphemeralConstant("rand", lambda: random.random(), float)
 # pset.renameArguments(X='x')
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))

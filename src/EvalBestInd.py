@@ -16,6 +16,7 @@ from scoop import futures
 # from TraderSim import TraderSim
 from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
+from GPTradeExp import candlesticks_quantity as candlesticks_quantity_train
 
 # configurações para o TraderSim
 symbol = 'XAUUSD'
@@ -32,7 +33,7 @@ close_price_col = 5
 trader.previous_price = trader.hist.arr[0, close_price_col]
 trader.max_candlestick_count = max_candlestick_count
 
-index_inicio = num_velas_anteriores + 5000
+index_inicio = num_velas_anteriores + candlesticks_quantity_train
 index_final = index_inicio + candlesticks_quantity
 num_entradas = num_velas_anteriores * len(tipo_vela)
 
@@ -102,10 +103,10 @@ pset.addPrimitive(if_then_else, [bool, float, float], float)
 # terminals
 pset.addTerminal(False, bool)
 pset.addTerminal(True, bool)
-pset.addEphemeralConstant("pi", lambda: np.pi, float)
-pset.addEphemeralConstant("e", lambda: np.e, float)
-pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5))/2, float)
-pset.addEphemeralConstant("rand", lambda: random.random(), float)
+# pset.addEphemeralConstant("pi", lambda: np.pi, float)
+# pset.addEphemeralConstant("e", lambda: np.e, float)
+# pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5))/2, float)
+# pset.addEphemeralConstant("rand", lambda: random.random(), float)
 # pset.renameArguments(X='x')
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
