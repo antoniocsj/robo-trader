@@ -21,10 +21,10 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 100000
-n_generations = 500
+n_population = 1000
+n_generations = 100
 max_height = 40
-mutpb = 0.01
+mutpb = 0.1
 
 # configurações para o TraderSim
 symbol = 'XAUUSD'
@@ -72,8 +72,8 @@ pset.addPrimitive(max, [float, float], float, 'max')
 pset.addPrimitive(min, [float, float], float, 'min')
 
 
-# pset.addPrimitive(math.cos, [float], float)
-# pset.addPrimitive(math.sin, [float], float)
+pset.addPrimitive(math.cos, [float], float)
+pset.addPrimitive(math.sin, [float], float)
 
 
 # logic operators
@@ -93,8 +93,7 @@ pset.addPrimitive(if_then_else, [bool, float, float], float)
 # terminals
 pset.addTerminal(False, bool)
 pset.addTerminal(True, bool)
-# pset.addEphemeralConstant("rand100", lambda: random.random() * 100, float)
-# pset.addEphemeralConstant("rand101", lambda: random.randint(-1, 1), float)
+pset.addEphemeralConstant("rand", lambda: random.random(), float)
 # pset.renameArguments(X='x')
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))

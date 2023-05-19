@@ -63,8 +63,8 @@ pset.addPrimitive(protectedDiv, [float, float], float, 'div')
 pset.addPrimitive(operator.neg, [float], float)
 pset.addPrimitive(max, [float, float], float, 'max')
 pset.addPrimitive(min, [float, float], float, 'min')
-# pset.addPrimitive(math.cos, [float], float)
-# pset.addPrimitive(math.sin, [float], float)
+pset.addPrimitive(math.cos, [float], float)
+pset.addPrimitive(math.sin, [float], float)
 
 
 # logic operators
@@ -84,8 +84,7 @@ pset.addPrimitive(if_then_else, [bool, float, float], float)
 # terminals
 pset.addTerminal(False, bool)
 pset.addTerminal(True, bool)
-# pset.addEphemeralConstant("rand100", lambda: random.random() * 100, float)
-# pset.addEphemeralConstant("rand101", lambda: random.randint(-1, 1), float)
+pset.addEphemeralConstant("rand", lambda: random.random(), float)
 # pset.renameArguments(X='x')
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
