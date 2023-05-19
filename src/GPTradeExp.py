@@ -22,7 +22,7 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 10000
+n_population = 100
 n_generations = 100
 max_height = 40
 mutpb = 0.1
@@ -95,6 +95,8 @@ pset.addPrimitive(if_then_else, [bool, float, float], float)
 pset.addTerminal(False, bool)
 pset.addTerminal(True, bool)
 pset.addEphemeralConstant("pi", lambda: np.pi, float)
+pset.addEphemeralConstant("e", lambda: np.e, float)
+pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5))/2, float)
 pset.addEphemeralConstant("rand", lambda: random.random(), float)
 # pset.renameArguments(X='x')
 
