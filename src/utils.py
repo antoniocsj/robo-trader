@@ -14,10 +14,22 @@ def formar_entradas(arr: np.ndarray, index: int, _num_velas: int, _tipo_vela: st
     :param _tipo_vela: uma string semelhante a OHLC ou OHLCV, que decidirá se o volume da vela será incluído.
     :return: uma lista do tipo list[floats] comum do python contendo as _num_velas anteriores a vela que está em index.
     """
-    col_final = len(_tipo_vela) + 2
     _entradas = []
-    for vela in arr[index - _num_velas:index]:
-        _entradas += vela[2:col_final].tolist()
+
+    if _tipo_vela == 'OHLCV':
+        col_final = len(_tipo_vela) + 2
+        for vela in arr[index - _num_velas:index]:
+            _entradas += vela[2:col_final].tolist()
+    elif _tipo_vela == 'OHLC':
+        col_final = len(_tipo_vela) + 2
+        for vela in arr[index - _num_velas:index]:
+            _entradas += vela[2:col_final].tolist()
+    elif _tipo_vela == 'CV':
+        for vela in arr[index - _num_velas:index]:
+            _entradas += vela[5:7].tolist()
+    elif _tipo_vela == 'C':
+        for vela in arr[index - _num_velas:index]:
+            _entradas += vela[5:6].tolist()
 
     return _entradas
 

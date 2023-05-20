@@ -32,7 +32,7 @@ symbol = 'XAUUSD'
 timeframe = 'M5'
 initial_deposit = 1000.0
 num_velas_anteriores = 3
-tipo_vela = 'OHLCV'
+tipo_vela = 'C'
 candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
 
 trader = TraderSim(symbol, timeframe, initial_deposit)
