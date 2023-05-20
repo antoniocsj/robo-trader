@@ -21,6 +21,7 @@ from GPTradeExp import timeframe as timeframe_train
 from GPTradeExp import candlesticks_quantity as candlesticks_quantity_train
 from GPTradeExp import num_velas_anteriores as num_velas_anteriores_train
 from GPTradeExp import tipo_vela as tipo_vela_train
+from GPTradeExp import toolbox
 
 # configurações para o TraderSim
 symbol = symbol_train
@@ -40,107 +41,6 @@ trader.max_candlestick_count = max_candlestick_count
 index_inicio = num_velas_anteriores + candlesticks_quantity_train
 index_final = index_inicio + candlesticks_quantity
 num_entradas = num_velas_anteriores * len(tipo_vela)
-
-# defined a new primitive set for strongly typed GP
-pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), bool, "X")
-
-# Definição de funções que serão usadas na Programação Genética
-
-# boolean operators
-pset.addPrimitive(operator.and_, [bool, bool], bool)
-pset.addPrimitive(operator.or_, [bool, bool], bool)
-pset.addPrimitive(operator.not_, [bool], bool)
-
-
-# floating point operators
-# Define a protected division function
-def protectedDiv(left, right):
-    try:
-        return left / right
-    except ZeroDivisionError:
-        return 1
-
-
-# Define a protected log function
-def protectedLog(x):
-    try:
-        return math.log(x)
-    except ValueError:
-        return 1
-
-
-# Define a protected exp function
-def protectedExp(x):
-    try:
-        return math.exp(x)
-    except OverflowError:
-        return 1
-    except ValueError:
-        return 1
-
-
-# Define a protected sin function
-def protectedSin(x):
-    try:
-        return math.sin(x)
-    except ValueError:
-        return 1
-
-
-# Define a protected cos function
-def protectedCos(x):
-    try:
-        return math.cos(x)
-    except ValueError:
-        return 1
-
-
-pset.addPrimitive(operator.add, [float, float], float)
-pset.addPrimitive(operator.sub, [float, float], float)
-pset.addPrimitive(operator.mul, [float, float], float)
-pset.addPrimitive(operator.neg, [float], float)
-pset.addPrimitive(protectedDiv, [float, float], float, 'div')
-pset.addPrimitive(protectedLog, [float], float, 'log')
-pset.addPrimitive(protectedExp, [float], float, 'exp')
-pset.addPrimitive(max, [float, float], float, 'max')
-pset.addPrimitive(min, [float, float], float, 'min')
-# pset.addPrimitive(math.cos, [float], float)
-# pset.addPrimitive(math.sin, [float], float)
-pset.addPrimitive(protectedCos, [float], float, 'cos')
-pset.addPrimitive(protectedSin, [float], float, 'sin')
-
-
-# logic operators
-# Define a new if-then-else function
-def if_then_else(_input, output1, output2):
-    if _input:
-        return output1
-    else:
-        return output2
-
-
-pset.addPrimitive(operator.lt, [float, float], bool)
-pset.addPrimitive(operator.gt, [float, float], bool)
-# pset.addPrimitive(operator.eq, [float, float], bool)
-pset.addPrimitive(if_then_else, [bool, float, float], float)
-
-# terminals
-pset.addTerminal(False, bool)
-pset.addTerminal(True, bool)
-# pset.addEphemeralConstant("pi", lambda: np.pi, float)
-# pset.addEphemeralConstant("e", lambda: np.e, float)
-# pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5))/2, float)
-# pset.addEphemeralConstant("rand", lambda: random.random(), float)
-# pset.renameArguments(X='x')
-
-creator.create("FitnessMax", base.Fitness, weights=(1.0,))
-creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax)
-
-toolbox = base.Toolbox()
-toolbox.register("map", futures.map)
-toolbox.register("expr", gp.genHalfAndHalf, pset=pset, min_=1, max_=2)
-toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
-toolbox.register("compile", gp.compile, pset=pset)
 
 
 def eval_trade_sim_withprints(individual):

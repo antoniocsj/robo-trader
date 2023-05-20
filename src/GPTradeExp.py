@@ -1,12 +1,9 @@
 import operator
 import math
-import random
 import numpy
 import itertools
 import pickle
 
-import numpy as np
-from deap import algorithms
 import my_algorithms
 from deap import base
 from deap import creator
@@ -22,7 +19,7 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 1000
+n_population = 10000
 n_generations = 200
 max_height = 17
 mutpb = 0.1
@@ -31,7 +28,7 @@ mutpb = 0.1
 symbol = 'XAUUSD'
 timeframe = 'M5'
 initial_deposit = 1000.0
-num_velas_anteriores = 3
+num_velas_anteriores = 7
 tipo_vela = 'C'
 candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
 
@@ -107,8 +104,6 @@ pset.addPrimitive(protectedLog, [float], float, 'log')
 pset.addPrimitive(protectedExp, [float], float, 'exp')
 pset.addPrimitive(max, [float, float], float, 'max')
 pset.addPrimitive(min, [float, float], float, 'min')
-# pset.addPrimitive(math.cos, [float], float)
-# pset.addPrimitive(math.sin, [float], float)
 pset.addPrimitive(protectedCos, [float], float, 'cos')
 pset.addPrimitive(protectedSin, [float], float, 'sin')
 
