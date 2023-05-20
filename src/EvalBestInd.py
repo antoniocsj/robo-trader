@@ -16,14 +16,18 @@ from scoop import futures
 # from TraderSim import TraderSim
 from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
+from GPTradeExp import symbol as symbol_train
+from GPTradeExp import timeframe as timeframe_train
 from GPTradeExp import candlesticks_quantity as candlesticks_quantity_train
+from GPTradeExp import num_velas_anteriores as num_velas_anteriores_train
+from GPTradeExp import tipo_vela as tipo_vela_train
 
 # configurações para o TraderSim
-symbol = 'XAUUSD'
-timeframe = 'M5'
+symbol = symbol_train
+timeframe = timeframe_train
 initial_deposit = 1000.0
-num_velas_anteriores = 4
-tipo_vela = 'OHLCV'
+num_velas_anteriores = num_velas_anteriores_train
+tipo_vela = tipo_vela_train
 candlesticks_quantity = 50000  # quantidade de velas usadas na avaliação
 max_candlestick_count = 1
 

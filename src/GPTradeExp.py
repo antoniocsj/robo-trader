@@ -22,8 +22,8 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 5000
-n_generations = 100
+n_population = 50000
+n_generations = 200
 max_height = 40
 mutpb = 0.1
 
@@ -31,9 +31,9 @@ mutpb = 0.1
 symbol = 'XAUUSD'
 timeframe = 'M5'
 initial_deposit = 1000.0
-num_velas_anteriores = 4
+num_velas_anteriores = 3
 tipo_vela = 'OHLCV'
-candlesticks_quantity = 500  # quantidade de velas usadas no treinamento
+candlesticks_quantity = 50  # quantidade de velas usadas no treinamento
 
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
@@ -232,7 +232,7 @@ def main():
     #                                stats=mstats, halloffame=hof, verbose=True)
 
     pop, log, hof = my_algorithms.eaSimple_WithCP(
-        population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl', freq=2,
+        population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl', freq=1,
         cxpb=0.5, mutpb=mutpb, ngen=n_generations,
         stats=mstats, halloffame=hof, verbose=True)
 
