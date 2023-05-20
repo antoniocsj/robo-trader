@@ -21,14 +21,14 @@ class Hist:
         Procurando pelos arquivos csv correspondentes ao 'simbolo' e ao 'timeframe'
         :return:
         """
-        for arquivo in self.files_csv:
-            if arquivo.endswith('.csv'):
-                _simbolo = arquivo.split('_')[0]
-                _timeframe = arquivo.split('_')[1]
-                self.hist_csv[f'{_simbolo}_{_timeframe}'] = arquivo
+        for filename in self.files_csv:
+            if filename.endswith('.csv'):
+                _symbol = filename.split('_')[0]
+                _timeframe = filename.split('_')[1]
+                self.hist_csv[f'{_symbol}_{_timeframe}'] = filename
 
-    def get_csv_filepath(self, _simbolo: str, _timeframe: str) -> str:
-        _filepath = Hist.dir_csv + '/' + self.hist_csv[f'{_simbolo}_{_timeframe}']
+    def get_csv_filepath(self, _symbol: str, _timeframe: str) -> str:
+        _filepath = Hist.dir_csv + '/' + self.hist_csv[f'{_symbol}_{_timeframe}']
         return _filepath
 
     def get_hist_data(self, _simbolo: str, _timeframe: str):
@@ -51,6 +51,6 @@ class Hist:
 
 if __name__ == '__main__':
     hist = Hist()
-    hist.get_hist_data('XAUUSD', 'H1')
+    hist.get_hist_data('XAUUSD', 'M5')
     hist.print_hist()
 
