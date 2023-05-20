@@ -36,7 +36,7 @@ class Hist:
         self.df = pd.read_csv(_filepath, delimiter='\t')
         # self.df.drop(columns=['<VOL>', '<SPREAD>'], inplace=True)
         # self.df.columns = ['DATE', 'TIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'TICKVOL']
-        self.arr = self.df.values
+        self.arr = self.df.to_numpy()
 
         if self.df.isnull().sum().values.sum() != 0:
             print(f'Há dados faltando no arquivo {_filepath}')
