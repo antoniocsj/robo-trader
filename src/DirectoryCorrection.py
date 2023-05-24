@@ -108,7 +108,8 @@ class DirectoryCorrection:
         self.symbols = []
         self.timeframe = ''
         self.sheets = []
-        self.first_insertion_done = False
+        self.num_insertions_done = 0
+        self.exclude_first_rows = False
         self.new_start_row_datetime: datetime = None
 
         self.search_symbols()
@@ -215,7 +216,7 @@ class DirectoryCorrection:
             _results = set()
 
             self.insert_rows()
-            
+
             for s in self.sheets:
                 _r = s.go_to_next_row()
                 _results.add(_r)
@@ -273,11 +274,13 @@ class DirectoryCorrection:
                 # faz as inserções de novas linhas até _date_time. os datetime's das linhas inseridas
                 # começam em _lower_datetime e vão até (mas não incluindo) _date_time.
                 _new_date_time = _lower_datetime
-                self.new_start_row_datetime = _lower_datetime
+                if self.num_insertions_done == 0:
+                    self.new_start_row_datetime = _lower_datetime
+                _index_start = s.current_row
                 _index_new_row = s.current_row - 0.5
 
                 while _new_date_time < _date_time:
-                    print(f'inserindo nova linha {_new_date_time}')
+                    print(f'{s.symbol} inserindo nova linha {_new_date_time}')
 
                     _date = _new_date_time.strftime('%Y.%m.%d')
                     _time = _new_date_time.strftime('%H:%M:%S')
@@ -290,14 +293,17 @@ class DirectoryCorrection:
                     s.current_row += 1
                     _index_new_row = s.current_row - 0.5
 
-                    self.first_insertion_done = True
                     _new_date_time += s.timedelta
+
+                self.num_insertions_done += 1
+                s.current_row = _index_start
 
         # se estas foram as primeiras inserções sofridas pelas planilhas, então as planilhas estão
         # sincronizadas pelo menos nas linhas que vão de new_start_row_datetime até _date_time.
         # portanto pode excluir todas as linhas anteriores a new_start_row_datetime.
-        if self.first_insertion_done:
+        if self.new_start_row_datetime is not None:
             print('excluindo todas as linhas iniciais desnecessárias.')
+            self.new_start_row_datetime = None
 
 
 def main():
