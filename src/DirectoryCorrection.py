@@ -196,9 +196,6 @@ class DirectoryCorrection:
         for s in self.sheets:
             s.go_to_next_day()
 
-        for s in self.sheets:
-            s.print_current_row()
-
     def correct_directory(self):
         self.find_first_row()
         _counter = 0
