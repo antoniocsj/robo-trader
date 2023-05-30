@@ -136,6 +136,8 @@ class DirectoryCorrection:
             if filename.endswith('.csv'):
                 _symbol = filename.split('_')[0]
                 _timeframe = filename.split('_')[1]
+                if _timeframe.endswith('.csv'):
+                    _timeframe = _timeframe.replace('.csv', '')
 
                 if _symbol not in self.symbols:
                     self.symbols.append(_symbol)
@@ -156,17 +158,26 @@ class DirectoryCorrection:
         return _filepath
 
     def load_sheets(self):
+        k: str
         for i, k in enumerate(self.csv_files):
-            _symbol, _timeframe = k.split('_')
+            _name = k.replace('.csv', '')
+            _symbol, _timeframe = _name.split('_')[0], _name.split('_')[1]
             _filepath = self.get_csv_filepath(k)
             self.sheets.append(Sheet(_filepath, _symbol, _timeframe))
 
-    def _calc_max(self, _list: list[tuple[datetime, Sheet]]):
-        _max_datetime_sheet = (datetime(1970, 1, 1), None)
+    def _calc_max(self, _list: list[tuple[datetime, Sheet]]) -> tuple[datetime, Sheet]:
+        _max_datetime_sheet = (datetime.min, None)
         for e in _list:
             if e[0] > _max_datetime_sheet[0]:
                 _max_datetime_sheet = e
         return _max_datetime_sheet
+
+    def _calc_min(self, _list: list[tuple[datetime, Sheet]]) -> tuple[datetime, Sheet]:
+        _min_datetime_sheet = (datetime.max, None)
+        for e in _list:
+            if e[0] < _min_datetime_sheet[0]:
+                _min_datetime_sheet = e
+        return _min_datetime_sheet
 
     def find_first_row(self):
         print('find_first_row')
@@ -199,7 +210,8 @@ class DirectoryCorrection:
         # buscando uma nova linha que será o novo começo.
         # para que uma data ou horário sejam válidos, tem que estar presente em todas as planilhas.
         # _highest_datetime = max(_date_time_set)
-        _highest_datetime_sheet = max(_datetime_sheet_list)
+        # _highest_datetime_sheet = max(_datetime_sheet_list)
+        _highest_datetime_sheet = self._calc_max(_datetime_sheet_list)
 
         # continua aqui
         while True:
@@ -251,8 +263,6 @@ class DirectoryCorrection:
 
     def correct_directory(self):
         self.find_first_row()
-        self.find_first_row()
-        exit(-1)
 
         _counter = 0
         _max_len = 0
@@ -273,6 +283,11 @@ class DirectoryCorrection:
             for s in self.sheets:
                 _r = s.go_to_next_row()
                 _results.add(_r)
+                if s.current_row >= 518:
+                    print(f'{s.current_row}')
+
+            # if False in _results:
+            #     pass
 
             if _counter % 10000 == 0:
                 print(f'{100 * _counter / _max_len: .2f} %')
@@ -283,7 +298,10 @@ class DirectoryCorrection:
             _counter += 1
 
         for s in self.sheets:
+            _filepath = self.get_csv_filepath(f'{s.symbol}_{s.timeframe}')
+            print(f'salvando arquivo {_filepath}')
             s.print_current_row()
+            s.df.to_csv(_filepath, sep='\t', index=False)
 
     def insert_rows(self):
         """
@@ -292,6 +310,7 @@ class DirectoryCorrection:
         """
         # verifique se a linha atual de cada planilha contém a mesma data e horário.
         s: Sheet
+        _datetime_sheet_list = []
         _date_time_list = []
         for s in self.sheets:
             row = s.df.iloc[s.current_row]
@@ -299,8 +318,9 @@ class DirectoryCorrection:
             _time = row['<TIME>']
             _date_time_str = f"{_date}T{_time}"
             _date_time = datetime.fromisoformat(_date_time_str)
-            _date_time_list.append(_date_time)
+            _datetime_sheet_list.append((_date_time, s))
 
+        _date_time_list = [t[0] for t in _datetime_sheet_list]
         _date_time_set = set(_date_time_list)
         if len(_date_time_set) == 1:
             # todas as planilhas estão sincronizadas nesta linha.
@@ -308,7 +328,8 @@ class DirectoryCorrection:
 
         # nem todas as planilhas estão sincronizadas nesta linha.
         # descubra qual planilha possui o menor 'datetime'.
-        _lower_datetime = min(_date_time_list)
+        # _lower_datetime = min(_date_time_list)
+        _lower_datetime_sheet = self._calc_min(_datetime_sheet_list)
 
         # o menor datetime será a referência. se alguma planilha tiver um datetime maior,
         # então essa planilha sofrerá inserções de novas linhas até que esteja sincronizada.
@@ -319,8 +340,9 @@ class DirectoryCorrection:
             _date_time_str = f"{_date}T{_time}"
             _date_time = datetime.fromisoformat(_date_time_str)
 
-            if _date_time > _lower_datetime:
-                print(f'{s.symbol} {_date_time} > {_lower_datetime}')
+            if _date_time > _lower_datetime_sheet[0]:
+                _lower_datetime, _lower_sheet = _lower_datetime_sheet[0], _lower_datetime_sheet[1]
+                print(f'{s.symbol} {_date_time} > {_lower_datetime} ({_lower_sheet.symbol})')
                 _previous_row = s.df.iloc[s.current_row - 1]
                 _previous_close = _previous_row['<CLOSE>']
 
@@ -331,23 +353,50 @@ class DirectoryCorrection:
                 _index_new_row = s.current_row - 0.5
 
                 while _new_date_time < _date_time:
-                    print(f'{s.symbol} inserindo nova linha {_new_date_time}')
+                    is_present = self.is_present_inother_sheets(_new_date_time,
+                                                                _lower_datetime_sheet[1].current_row,
+                                                                s.current_row)
+                    if not is_present:
+                        _new_date_time += s.timedelta
+                        continue
 
-                    _date = _new_date_time.strftime('%Y.%m.%d')
-                    _time = _new_date_time.strftime('%H:%M:%S')
-                    _O = _H = _L = _C = _previous_close
-
-                    # insere a nova linha. que será uma vela com O=H=L=C igual a _previous_close e V=0
-                    s.df.loc[_index_new_row] = [_date, _time, _O, _H, _L, _C, 0, 0, 0]
-                    s.df.sort_index(ignore_index=True, inplace=True)
-                    s.df.reset_index(drop=True)
-                    s.current_row += 1
-                    _index_new_row = s.current_row - 0.5
+                    _index_new_row = self.insert_new_row(_index_new_row, _new_date_time,
+                                                         _previous_close, s)
 
                     _new_date_time += s.timedelta
 
                 self.num_insertions_done += 1
                 s.current_row = _index_start
+
+    def insert_new_row(self, _index_new_row, _new_date_time, _previous_close, s):
+        print(f'{s.symbol} inserindo nova linha {_new_date_time}')
+        _date = _new_date_time.strftime('%Y.%m.%d')
+        _time = _new_date_time.strftime('%H:%M:%S')
+        _O = _H = _L = _C = _previous_close
+        # insere a nova linha. que será uma vela com O=H=L=C igual a _previous_close e V=0
+        s.df.loc[_index_new_row] = [_date, _time, _O, _H, _L, _C, 0, 0, 0]
+        s.df.sort_index(ignore_index=True, inplace=True)
+        s.df.reset_index(drop=True)
+        s.current_row += 1
+        _index_new_row = s.current_row - 0.5
+        return _index_new_row
+
+    def is_present_inother_sheets(self, _new_date_time, _nrow_start, _nrow_end):
+        s: Sheet
+        _date_time_list = []
+        for s in self.sheets:
+            for i in range(_nrow_start, _nrow_end+1):
+                if i > len(s.df) - 1:
+                    break
+                row = s.df.iloc[i]
+                _date = row['<DATE>'].replace('.', '-')
+                _time = row['<TIME>']
+                _date_time_str = f"{_date}T{_time}"
+                _date_time = datetime.fromisoformat(_date_time_str)
+                _date_time_list.append(_date_time)
+
+        _ret = _new_date_time in _date_time_list
+        return _ret
 
 
 def main():
