@@ -1,4 +1,5 @@
 import os
+import pickle
 from datetime import datetime, timedelta
 import pandas as pd
 from pandas import DataFrame
@@ -131,6 +132,7 @@ class DirectoryCorrection:
         self.num_insertions_done = 0
         self.exclude_first_rows = False
         self.new_start_row_datetime: datetime = None
+        self.cp = {}
 
         self.search_symbols()
         self.load_sheets()
@@ -279,6 +281,10 @@ class DirectoryCorrection:
                 i += 1
 
     def correct_directory(self):
+        _r, _current_row = self.open_checkpoint()
+        if _r:
+            self.sheets_set_current_row(_current_row)
+
         self.find_first_row()
 
         _counter = 0
@@ -310,6 +316,7 @@ class DirectoryCorrection:
 
             if _counter % 10000 == 0 and _counter > 0:
                 print(f'{100 * _counter / _max_len: .2f} %')
+                self.write_checkpoint()
                 self.save_sheets(print_row='current')
 
             # if len(_results) == 1 and list(_results)[0] is False:
@@ -451,6 +458,33 @@ class DirectoryCorrection:
                 s.print_current_row()
 
             s.df.to_csv(_filepath, sep='\t', index=False)
+
+    def sheets_set_current_row(self, _current_row):
+        s: Sheet
+        for s in self.sheets:
+            s.current_row = _current_row
+
+    def open_checkpoint(self):
+        if os.path.exists('checkpoint.pkl'):
+            with open('checkpoint.pkl', 'rb') as file:
+                self.cp = pickle.load(file)
+            current_row = self.cp['current_row']
+            return True, current_row
+        return False, 0
+
+    def write_checkpoint(self):
+        s: Sheet
+        _rows_set = set()
+        for s in self.sheets:
+            _rows_set.add(s.current_row)
+        if len(_rows_set) == 1:
+            self.cp['current_row'] = list(_rows_set)[0]
+            with open('checkpoint.pkl', 'wb') as file:
+                pickle.dump(self.cp, file)
+        else:
+            print(f'erro. write_checkpoint. as planilhas NÃO estão sincronizadas. '
+                  f'current_rows = {list(_rows_set)}')
+            exit(-1)
 
 
 def main():
