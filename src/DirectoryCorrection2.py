@@ -274,26 +274,28 @@ class DirectoryCorrection:
         _max_len = max(_len_list)
 
         # percorre todas as linhas de todas as planilhas.
+        _sheet_reached_the_end: Sheet = None
         while True:
             s: Sheet
-            _results = set()
+
+            if _sheet_reached_the_end:
+                print('a sincronização está concluída')
+                break
 
             self.insert_rows()
 
             for s in self.sheets:
                 _r = s.go_to_next_row()
-                _results.add(_r)
-                if s.current_row >= 518:
-                    print(f'{s.current_row}')
-
-            # if False in _results:
-            #     pass
+                if _r is False:
+                    _sheet_reached_the_end = s
+                    self.sheets_exclude_last_rows(s.current_row)
+                    break
 
             if _counter % 10000 == 0:
                 print(f'{100 * _counter / _max_len: .2f} %')
 
-            if len(_results) == 1 and list(_results)[0] is False:
-                break
+            # if len(_results) == 1 and list(_results)[0] is False:
+            #     break
 
             _counter += 1
 
@@ -397,6 +399,16 @@ class DirectoryCorrection:
 
         _ret = _new_date_time in _date_time_list
         return _ret
+
+    def sheets_exclude_last_rows(self, current_row):
+        for s in self.sheets:
+            i = current_row + 1
+            if i > len(s.df) - 1:
+                continue
+            s.df.drop(s.df.index[i:], inplace=True)
+
+            s.df.sort_index(ignore_index=True, inplace=True)
+            s.df.reset_index(drop=True)
 
 
 def main():
