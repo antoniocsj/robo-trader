@@ -97,10 +97,27 @@ class Sheet:
             self.previous_close = self.df.iloc[self.current_row - 1]['<CLOSE>']
 
     def print_current_row(self):
+        print(f'linha atual de {self.symbol}. (linha = {self.current_row})')
         row = self.df.iloc[self.current_row]
         _date, _time = row['<DATE>'], row['<TIME>']
         _O, _H, _L, _C, _V = row['<OPEN>'], row['<HIGH>'], row['<LOW>'], row['<CLOSE>'], row['<TICKVOL>']
         print(f'{self.symbol} {_date} {_time} OHLCV = {_O} {_H} {_L} {_C} {_V}')
+
+    def print_last_row(self):
+        print(f'a última linha de {self.symbol}. ({len(self.df)} linhas)')
+        row = self.df.iloc[-1]
+        _date, _time = row['<DATE>'], row['<TIME>']
+        _O, _H, _L, _C, _V = row['<OPEN>'], row['<HIGH>'], row['<LOW>'], row['<CLOSE>'], row['<TICKVOL>']
+        print(f'{self.symbol} {_date} {_time} OHLCV = {_O} {_H} {_L} {_C} {_V}')
+
+    def get_datetime_last_row(self) -> datetime:
+        row = self.df.iloc[-1]
+        _date = row['<DATE>'].replace('.', '-')
+        _time = row['<TIME>']
+        _date_time_str = f"{_date}T{_time}"
+        _date_time = datetime.fromisoformat(_date_time_str)
+
+        return _date_time
 
 
 class DirectoryCorrection:
@@ -291,19 +308,17 @@ class DirectoryCorrection:
                     self.sheets_exclude_last_rows(s.current_row)
                     break
 
-            if _counter % 10000 == 0:
+            if _counter % 10000 == 0 and _counter > 0:
                 print(f'{100 * _counter / _max_len: .2f} %')
+                self.save_sheets(print_row='current')
 
             # if len(_results) == 1 and list(_results)[0] is False:
             #     break
 
             _counter += 1
 
-        for s in self.sheets:
-            _filepath = self.get_csv_filepath(f'{s.symbol}_{s.timeframe}')
-            print(f'salvando arquivo {_filepath}')
-            s.print_current_row()
-            s.df.to_csv(_filepath, sep='\t', index=False)
+        if self.check_sheets_last_row():
+            self.save_sheets()
 
     def insert_rows(self):
         """
@@ -371,7 +386,7 @@ class DirectoryCorrection:
                 s.current_row = _index_start
 
     def insert_new_row(self, _index_new_row, _new_date_time, _previous_close, s):
-        print(f'{s.symbol} inserindo nova linha {_new_date_time}')
+        # print(f'{s.symbol} inserindo nova linha {_new_date_time}')
         _date = _new_date_time.strftime('%Y.%m.%d')
         _time = _new_date_time.strftime('%H:%M:%S')
         _O = _H = _L = _C = _previous_close
@@ -409,6 +424,33 @@ class DirectoryCorrection:
 
             s.df.sort_index(ignore_index=True, inplace=True)
             s.df.reset_index(drop=True)
+
+    def check_sheets_last_row(self) -> bool:
+        _date_time_set = set()
+        _len_set = set()
+        s: Sheet
+        for s in self.sheets:
+            _date_time_set.add(s.get_datetime_last_row())
+            _len_set.add(len(s.df))
+        if len(_date_time_set) == 1 and len(_len_set) == 1:
+            print('as últimas linhas estão sincronizadas')
+            return True
+        else:
+            print('as últimas linhas NÃO estão sincronizadas')
+            return False
+
+    def save_sheets(self, print_row='last'):
+        s: Sheet
+        for s in self.sheets:
+            _filepath = self.get_csv_filepath(f'{s.symbol}_{s.timeframe}')
+            print(f'salvando arquivo {_filepath}. linha atual = {s.current_row}')
+
+            if print_row == 'last':
+                s.print_last_row()
+            elif print_row == 'current':
+                s.print_current_row()
+
+            s.df.to_csv(_filepath, sep='\t', index=False)
 
 
 def main():
