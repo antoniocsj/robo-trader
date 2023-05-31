@@ -321,8 +321,8 @@ class DirectoryCorrection:
 
             if _current_row % 10000 == 0 and _current_row > 0:
                 print(f'{100 * _current_row / _max_len: .2f} %')
-                self.write_checkpoint()
                 self.save_sheets(print_row='current')
+                self.write_checkpoint()
 
         if self.check_sheets_last_row():
             self.save_sheets()
