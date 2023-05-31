@@ -98,11 +98,11 @@ class Sheet:
             self.previous_close = self.df.iloc[self.current_row - 1]['<CLOSE>']
 
     def print_current_row(self):
-        print(f'linha atual de {self.symbol}. (linha = {self.current_row})')
         row = self.df.iloc[self.current_row]
         _date, _time = row['<DATE>'], row['<TIME>']
         _O, _H, _L, _C, _V = row['<OPEN>'], row['<HIGH>'], row['<LOW>'], row['<CLOSE>'], row['<TICKVOL>']
-        print(f'{self.symbol} {_date} {_time} OHLCV = {_O} {_H} {_L} {_C} {_V}')
+        print(f'{self.symbol} {_date} {_time} (linha = {self.current_row}) '
+              f'OHLCV = {_O} {_H} {_L} {_C} {_V}')
 
     def print_last_row(self):
         print(f'a última linha de {self.symbol}. ({len(self.df)} linhas)')
@@ -221,6 +221,9 @@ class DirectoryCorrection:
             # se todas as planilhas começam na mesma data e horário, então apenas retorne.
             # pois todas as planilhas já tem o current_row ajustado para 0 inicialmente.
             print('todas as planilhas começam na mesma data e horário.')
+            for s in self.sheets:
+                s.print_current_row()
+            print()
             return
 
         print('nem todas as planilhas começam na mesma data e horário.')
@@ -283,6 +286,7 @@ class DirectoryCorrection:
     def correct_directory(self):
         _r, _current_row = self.open_checkpoint()
         if _r:
+            print(f'checkpoint carregado. linha atual = {_current_row}')
             self.sheets_set_current_row(_current_row)
 
         self.find_first_row()
@@ -309,20 +313,16 @@ class DirectoryCorrection:
 
             for s in self.sheets:
                 _r = s.go_to_next_row()
+                _current_row = s.current_row
                 if _r is False:
                     _sheet_reached_the_end = s
                     self.sheets_exclude_last_rows(s.current_row)
                     break
 
-            if _counter % 10000 == 0 and _counter > 0:
-                print(f'{100 * _counter / _max_len: .2f} %')
+            if _current_row % 10000 == 0 and _current_row > 0:
+                print(f'{100 * _current_row / _max_len: .2f} %')
                 self.write_checkpoint()
                 self.save_sheets(print_row='current')
-
-            # if len(_results) == 1 and list(_results)[0] is False:
-            #     break
-
-            _counter += 1
 
         if self.check_sheets_last_row():
             self.save_sheets()
@@ -428,9 +428,9 @@ class DirectoryCorrection:
             if i > len(s.df) - 1:
                 continue
             s.df.drop(s.df.index[i:], inplace=True)
-
             s.df.sort_index(ignore_index=True, inplace=True)
             s.df.reset_index(drop=True)
+            s.current_row = s.df.index[-1]
 
     def check_sheets_last_row(self) -> bool:
         _date_time_set = set()
@@ -478,12 +478,14 @@ class DirectoryCorrection:
         for s in self.sheets:
             _rows_set.add(s.current_row)
         if len(_rows_set) == 1:
-            self.cp['current_row'] = list(_rows_set)[0]
+            _current_row = list(_rows_set)[0]
+            self.cp['current_row'] = _current_row
             with open('checkpoint.pkl', 'wb') as file:
                 pickle.dump(self.cp, file)
+            print(f'checkpoint gravado. linha atual = {_current_row}\n')
         else:
             print(f'erro. write_checkpoint. as planilhas NÃO estão sincronizadas. '
-                  f'current_rows = {list(_rows_set)}')
+                  f'current_rows = {list(_rows_set)}\n')
             exit(-1)
 
 
