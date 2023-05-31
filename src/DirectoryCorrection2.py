@@ -320,9 +320,9 @@ class DirectoryCorrection:
                     break
 
             if _current_row % 10000 == 0 and _current_row > 0:
-                print(f'{100 * _current_row / _max_len: .2f} %')
                 self.save_sheets(print_row='current')
                 self.write_checkpoint()
+                print(f'{100 * _current_row / _max_len: .2f} %\n')
 
         if self.check_sheets_last_row():
             self.save_sheets()
@@ -366,7 +366,8 @@ class DirectoryCorrection:
 
             if _date_time > _lower_datetime_sheet[0]:
                 _lower_datetime, _lower_sheet = _lower_datetime_sheet[0], _lower_datetime_sheet[1]
-                print(f'{s.symbol} {_date_time} > {_lower_datetime} ({_lower_sheet.symbol})')
+                print(f'{s.symbol} {_date_time} > {_lower_datetime} ({_lower_sheet.symbol}) '
+                      f'(linha atual = {s.current_row})')
                 _previous_row = s.df.iloc[s.current_row - 1]
                 _previous_close = _previous_row['<CLOSE>']
 
