@@ -13,7 +13,7 @@ class HistMulti:
         self.symbols = []
         self.timeframe = ''
         self.hist_csv = {}  # guarda os nomes dos arquivos csv conforme seu 'simbolo' e 'timeframe'
-        self.hist_data = {}  # guarda os arrays dos dados históricos conforme seu 'simbolo' e 'timeframe'
+        self.arr = {}  # guarda os arrays dos dados históricos conforme seu 'simbolo' e 'timeframe'
 
         self.search_symbols()
 
@@ -44,6 +44,7 @@ class HistMulti:
                     exit(-1)
 
                 self.csv_files[f'{_symbol}_{_timeframe}'] = filename
+                self.symbols = sorted(self.symbols)
 
     def get_csv_filepath(self, _symbol_timeframe: str) -> str:
         _filepath = self.directory + '/' + self.csv_files[_symbol_timeframe]
@@ -58,15 +59,15 @@ class HistMulti:
             print(f'Há dados faltando no arquivo {_filepath}')
             exit(-1)
 
-        self.hist_data[key] = df.to_numpy(copy=True)
-        print(f'{key} carregando dados a partir de {_filepath}. {len(self.hist_data[key])} linhas')
+        self.arr[key] = df.to_numpy(copy=True)
+        print(f'{key} carregando dados a partir de {_filepath}. {len(self.arr[key])} linhas')
         del df
 
     def print_hist(self):
         print('primeiras linhas dos históricos:')
-        if len(self.hist_data) > 0:
-            for k, v in enumerate(self.hist_data):
-                print(k, v, self.hist_data[v][0])
+        if len(self.arr) > 0:
+            for k, v in enumerate(self.arr):
+                print(k, v, self.arr[v][0])
         else:
             print('os dados históricos não foram carregados ainda.')
 
@@ -85,4 +86,3 @@ if __name__ == '__main__':
         hist.add_hist_data(asset, 'M5')
 
     hist.print_hist()
-
