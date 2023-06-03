@@ -19,7 +19,7 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 10000
+n_population = 500
 n_generations = 200
 max_height = 17
 mutpb = 0.1
@@ -30,7 +30,7 @@ timeframe = 'M5'
 initial_deposit = 1000.0
 num_velas_anteriores = 7
 tipo_vela = 'C'
-candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
+candlesticks_quantity = 500  # quantidade de velas usadas no treinamento
 
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()

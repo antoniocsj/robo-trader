@@ -58,7 +58,6 @@ if __name__ == '__main__':
     #                'XAUUSD']
 
     list_assets = ['EURUSD', 'USDJPY', 'EURGBP', 'EURJPY']
-
     list_assets = sorted(list_assets)
 
     for asset in list_assets:

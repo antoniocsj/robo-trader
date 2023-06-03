@@ -47,12 +47,12 @@ def criar_hist_csv():
     symbol1 = 'XAUUSD'
     symbol2 = 'XAUUSD-SENO'
     timeframe = 'M5'
-    hist = Hist()
+    hist = Hist('../csv')
     hist.get_hist_data(symbol1, timeframe)
 
     df2: DataFrame = hist.df.copy()
 
-    filepath1 = hist.get_csv_filepath(symbol1, timeframe)
+    filepath1 = hist.get_csv_filepath(f'{symbol1}_{timeframe}')
     filepath2 = filepath1.replace(symbol1, symbol2)
 
     t = 360

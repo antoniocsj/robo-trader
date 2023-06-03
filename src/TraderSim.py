@@ -2,10 +2,12 @@ from Hist import Hist
 
 
 class TraderSim:
+    dir_csv = '../csv'
+
     def __init__(self, symbol: str, timeframe: str, initial_deposit: float) -> None:
         self.symbol = symbol  # financial asset, security or contract etc.
         self.timeframe = timeframe
-        self.hist = Hist()
+        self.hist = Hist(TraderSim.dir_csv)
         self.open_position = None
         self.candlestick_count = 0  # contagem de velas desde a abertura da posição
         self.max_candlestick_count = 1  # contagem máxima permitida de velas desde a abertura da posição
