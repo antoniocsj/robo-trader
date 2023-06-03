@@ -324,8 +324,27 @@ class DirectoryCorrection:
                 self.write_checkpoint()
                 print(f'{100 * _current_row / _max_len: .2f} %\n')
 
+            if _current_row % 1000 == 0 and _current_row > 0:
+                print('\nrelatório parcial.')
+                for s in self.sheets:
+                    s.print_current_row()
+                if self.all_sheets_datetime_synced_this_row():
+                    print('OK! TODAS as planilhas estão SINCRONIZADAS até aqui.')
+                else:
+                    print('ERRO! NEM todas as planilhas estão sincronizadas até aqui.')
+                print()
+
         if self.check_sheets_last_row():
             self.save_sheets()
+
+        print()
+        for s in self.sheets:
+            s.print_current_row()
+        if self.all_sheets_datetime_synced_this_row():
+            print('OK! TODAS as planilhas estão SINCRONIZADAS até aqui.')
+        else:
+            print('ERRO! NEM todas as planilhas estão sincronizadas até aqui.')
+        print()
 
     def insert_rows(self):
         """
@@ -478,7 +497,7 @@ class DirectoryCorrection:
         _rows_set = set()
         for s in self.sheets:
             _rows_set.add(s.current_row)
-        if len(_rows_set) == 1:
+        if self.all_sheets_row_synced():
             _current_row = list(_rows_set)[0]
             self.cp['current_row'] = _current_row
             with open('checkpoint.pkl', 'wb') as file:
@@ -488,6 +507,44 @@ class DirectoryCorrection:
             print(f'erro. write_checkpoint. as planilhas NÃO estão sincronizadas. '
                   f'current_rows = {list(_rows_set)}\n')
             exit(-1)
+
+    def all_sheets_datetime_synced_this_row(self):
+        """
+        Testa se todas as planilhas estão sincronizadas (mesma data e hora) nesta linha.
+        :return: True, se estiverem sinzronizadas, False, caso contrário.
+        """
+        s: Sheet
+        _rows_set = set()
+        _datetime_set = set()
+
+        for s in self.sheets:
+            row = s.df.iloc[s.current_row]
+            _date = row['<DATE>'].replace('.', '-')
+            _time = row['<TIME>']
+            _datetime_str = f"{_date}T{_time}"
+            _rows_set.add(s.current_row)
+            _datetime_set.add(_datetime_str)
+
+        if len(_rows_set) == 1 and len(_datetime_set) == 1:
+            return True
+        else:
+            return False
+
+    def all_sheets_row_synced(self):
+        """
+        Testa se todas as planilhas estão sincronizadas (mesmo current_row) nesta linha.
+        :return: True, se estiverem sinzronizadas, False, caso contrário.
+        """
+        s: Sheet
+        _rows_set = set()
+
+        for s in self.sheets:
+            _rows_set.add(s.current_row)
+
+        if len(_rows_set) == 1:
+            return True
+        else:
+            return False
 
 
 def main():
