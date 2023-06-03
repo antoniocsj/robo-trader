@@ -199,11 +199,6 @@ class DirectoryCorrection:
         return _min_datetime_sheet
 
     def find_first_row(self):
-        """
-        Procura pela primeira linha comum a todas as planilhas. Essa será a nova primeira linha
-        de todas as planilhas. Caso necessário, serão excluídas as primeiras
-        :return: True, se houver exlusões. False, se não houver exclusões.
-        """
         print('find_first_row')
 
         #  analisando a primeira linha de cada planilha.
@@ -229,7 +224,7 @@ class DirectoryCorrection:
             for s in self.sheets:
                 s.print_current_row()
             print()
-            return False
+            return
 
         print('nem todas as planilhas começam na mesma data e horário.')
         print(f'datas/horários encontrados na primeira linha de todas as planilhas: {_date_time_set}')
@@ -288,8 +283,6 @@ class DirectoryCorrection:
                     break
                 i += 1
 
-        return True
-
     def correct_directory(self):
         _r, _current_row = self.open_checkpoint()
         if _r:
@@ -310,14 +303,13 @@ class DirectoryCorrection:
         # percorre todas as linhas de todas as planilhas.
         _sheet_reached_the_end: Sheet = None
         while True:
-            _there_were_changes = False
             s: Sheet
 
             if _sheet_reached_the_end:
                 print('a sincronização está concluída')
                 break
 
-            _there_were_changes = self.insert_rows()
+            self.insert_rows()
 
             for s in self.sheets:
                 _r = s.go_to_next_row()
@@ -328,19 +320,16 @@ class DirectoryCorrection:
                     break
 
             if _current_row % 10000 == 0 and _current_row > 0:
-                if _there_were_changes:
-                    self.save_sheets(print_row='current')
+                self.save_sheets(print_row='current')
                 self.write_checkpoint()
                 print(f'{100 * _current_row / _max_len: .2f} %\n')
 
         if self.check_sheets_last_row():
-            if _there_were_changes:
-                self.save_sheets()
+            self.save_sheets()
 
-    def insert_rows(self) -> bool:
+    def insert_rows(self):
         """
         Se for necessário, faz inserções de linhas nas planilhas.
-        retorna True se houve inserções, False se não houve.
         :return:
         """
         # verifique se a linha atual de cada planilha contém a mesma data e horário.
@@ -359,7 +348,7 @@ class DirectoryCorrection:
         _date_time_set = set(_date_time_list)
         if len(_date_time_set) == 1:
             # todas as planilhas estão sincronizadas nesta linha.
-            return False
+            return
 
         # nem todas as planilhas estão sincronizadas nesta linha.
         # descubra qual planilha possui o menor 'datetime'.
@@ -404,8 +393,6 @@ class DirectoryCorrection:
                 self.num_insertions_done += 1
                 s.current_row = _index_start
 
-        return True
-
     def insert_new_row(self, _index_new_row, _new_date_time, _previous_close, s):
         # print(f'{s.symbol} inserindo nova linha {_new_date_time}')
         _date = _new_date_time.strftime('%Y.%m.%d')
@@ -437,11 +424,6 @@ class DirectoryCorrection:
         return _ret
 
     def sheets_exclude_last_rows(self, current_row):
-        """
-        Exclui as últimas linhas de todas as planilhas, a partir de current_row + 1.
-        :param current_row:
-        :return: True, pois houve alterações nas planilhas.
-        """
         for s in self.sheets:
             i = current_row + 1
             if i > len(s.df) - 1:
@@ -450,7 +432,6 @@ class DirectoryCorrection:
             s.df.sort_index(ignore_index=True, inplace=True)
             s.df.reset_index(drop=True)
             s.current_row = s.df.index[-1]
-        return True
 
     def check_sheets_last_row(self) -> bool:
         _date_time_set = set()
