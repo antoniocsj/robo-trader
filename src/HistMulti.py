@@ -5,7 +5,7 @@ import pandas as pd
 from pandas import DataFrame
 
 
-class Hist:
+class HistMulti:
     def __init__(self, directory: str):
         self.directory = directory  # diretório onde se encontra os arquivos csv
         self.all_files = []
@@ -72,7 +72,7 @@ class Hist:
 
 
 if __name__ == '__main__':
-    hist = Hist('../csv')
+    hist = HistMulti('../csv')
     # list_assets = ['AUDCAD', 'AUDCHF', 'AUDJPY', 'AUDUSD', 'CADCHF', 'CADJPY', 'CHFJPY',
     #                'EURAUD', 'EURCAD', 'EURCHF', 'EURGBP', 'EURJPY', 'EURUSD', 'GBPAUD',
     #                'GBPCAD', 'GBPCHF', 'GBPJPY', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY',
