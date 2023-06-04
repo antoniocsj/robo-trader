@@ -37,13 +37,13 @@ def formar_entradas(arr: np.ndarray, index: int, _num_velas: int, _tipo_vela: st
 
 def formar_entradas_multi(_hist: HistMulti, _index: int, _num_velas: int, _tipo_vela: str) -> list[float]:
     _entradas = []
-    _timeframe = hist.timeframe
+    _timeframe = _hist.timeframe
 
     if _tipo_vela == 'C':
-        for _symbol in hist.symbols:
+        for _symbol in _hist.symbols:
             _symbol_timeframe = f'{_symbol}_{_timeframe}'
-            for vela in hist.arr[_symbol_timeframe][_index - _num_velas:_index]:
-                _entradas += vela[5:6].tolist()
+            for _vela in _hist.arr[_symbol_timeframe][_index - _num_velas:_index]:
+                _entradas += _vela[5:6].tolist()
 
     return _entradas
 

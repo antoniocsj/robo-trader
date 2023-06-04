@@ -155,9 +155,9 @@ def eval_trade_sim_noprints(individual):
         entradas = formar_entradas_multi(trader.hist, i, num_velas_anteriores, tipo_vela)
         comando = func(*entradas)
         if comando:
-            trader.buy()
+            trader.buy('EURUSD')
         else:
-            trader.sell()
+            trader.sell('EURUSD')
 
         if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
             print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')
