@@ -93,7 +93,7 @@ class TraderSimMulti:
 
     def buy(self, _symbol: str):
         if not self.simulation_is_running:
-            print('simulação não está executando')
+            # print('simulação não está executando')
             return
 
         current_price = self.get_close_price_symbol_at(_symbol, self.index)
@@ -101,28 +101,29 @@ class TraderSimMulti:
         if not self.open_position[0]:
             self.candlestick_count = 0
             self.profit = 0.0
-            print(f'{_symbol} iniciando negociação de compra a {current_price}')
+            # print(f'{_symbol} iniciando negociação de compra a {current_price}')
             self.open_position = ('buying', _symbol)
             self.starting_price = current_price
             self.num_buys += 1
         elif self.open_position[0] == 'selling':
             self.close_position()
-            print(f'{_symbol} iniciando negociação de compra a {current_price}')
+            # print(f'{_symbol} iniciando negociação de compra a {current_price}')
             self.open_position = ('buying', _symbol)
             self.starting_price = current_price
             self.num_buys += 1
         elif self.open_position[0] == 'buying' and self.open_position[1] == _symbol:
-            print(f'operação negada. já tem uma negociação de compra pendente no mesmo ativo {_symbol}.')
+            # print(f'operação negada. já tem uma negociação de compra pendente no mesmo ativo {_symbol}.')
+            pass
         elif self.open_position[0] == 'buying' and self.open_position[1] != _symbol:
             self.close_position()
-            print(f'{_symbol} iniciando negociação de compra a {current_price}')
+            # print(f'{_symbol} iniciando negociação de compra a {current_price}')
             self.open_position = ('buying', _symbol)
             self.starting_price = current_price
             self.num_buys += 1
 
     def sell(self, _symbol: str):
         if not self.simulation_is_running:
-            print('simulação não está executando')
+            # print('simulação não está executando')
             return
 
         current_price = self.get_close_price_symbol_at(_symbol, self.index)
@@ -130,28 +131,29 @@ class TraderSimMulti:
         if not self.open_position[0]:
             self.candlestick_count = 0
             self.profit = 0.0
-            print(f'{_symbol} iniciando negociação de compra a {current_price}')
+            # print(f'{_symbol} iniciando negociação de compra a {current_price}')
             self.open_position = ('selling', _symbol)
             self.starting_price = current_price
             self.num_sells += 1
         elif self.open_position[0] == 'buying':
             self.close_position()
-            print(f'{_symbol} iniciando negociação de venda a {current_price}')
+            # print(f'{_symbol} iniciando negociação de venda a {current_price}')
             self.open_position = ('selling', _symbol)
             self.starting_price = current_price
             self.num_sells += 1
         elif self.open_position[0] == 'selling' and self.open_position[1] == _symbol:
-            print(f'operação negada. já tem uma negociação de venda pendente no mesmo ativo {_symbol}.')
+            # print(f'operação negada. já tem uma negociação de venda pendente no mesmo ativo {_symbol}.')
+            pass
         elif self.open_position[0] == 'selling' and self.open_position[1] != _symbol:
             self.close_position()
-            print(f'{_symbol} iniciando negociação de venda a {current_price}')
+            # print(f'{_symbol} iniciando negociação de venda a {current_price}')
             self.open_position = ('selling', _symbol)
             self.starting_price = current_price
             self.num_sells += 1
 
     def update_profit(self):
         if not self.simulation_is_running:
-            print('a simulação não está executando.')
+            # print('a simulação não está executando.')
             return
 
         if self.open_position[0] and self.open_position[1]:
@@ -167,7 +169,7 @@ class TraderSimMulti:
 
     def close_position(self):
         if not self.simulation_is_running:
-            print('a simulação não está executando.')
+            # print('a simulação não está executando.')
             return
 
         if not self.open_position[0]:
@@ -176,10 +178,10 @@ class TraderSimMulti:
         _symbol = self.open_position[1]
 
         if self.open_position[0] == 'buying':
-            print(f'{_symbol} fechando negociação de compra aberta. profit = {self.profit:.5f}')
+            # print(f'{_symbol} fechando negociação de compra aberta. profit = {self.profit:.5f}')
             self.num_sells += 1
         elif self.open_position[0] == 'selling':
-            print(f'{_symbol} fechando negociação de venda aberta. profit = {self.profit:.5f}')
+            # print(f'{_symbol} fechando negociação de venda aberta. profit = {self.profit:.5f}')
             self.num_buys += 1
 
         self.open_position = ('', '')
