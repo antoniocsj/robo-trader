@@ -10,7 +10,7 @@ class TraderSimMulti:
         self.hist = HistMulti(TraderSimMulti.dir_csv)
         self.open_position = ('', '')
         self.candlestick_count = 0  # contagem de velas desde a abertura da posição
-        self.max_candlestick_count = 5  # contagem máxima permitida de velas desde a abertura da posição
+        self.max_candlestick_count = 1  # contagem máxima permitida de velas desde a abertura da posição
         self.simulation_is_running = False
         self.index = 0
         self.num_hits = 0  # número de acertos
