@@ -16,7 +16,7 @@ from scoop import futures
 
 # -------------------------------------------------------------------
 from TraderSimMultiNoPrints import TraderSimMulti
-from utils import formar_entradas
+from utils import formar_entradas_multi
 
 # configurações para a programação genética
 n_population = 500
@@ -152,7 +152,7 @@ def eval_trade_sim_noprints(individual):
         trader.print_symbols_close_price_at(i)
         trader.update_profit()
 
-        entradas = formar_entradas(trader.hist.arr, i, num_velas_anteriores, tipo_vela)
+        entradas = formar_entradas_multi(trader.hist, i, num_velas_anteriores, tipo_vela)
         comando = func(*entradas)
         if comando:
             trader.buy()
