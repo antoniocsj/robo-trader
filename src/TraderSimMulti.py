@@ -5,14 +5,15 @@ class TraderSimMulti:
     dir_csv = '../csv'
 
     def __init__(self, initial_deposit: float) -> None:
-        self.symbols = []
-        self.active_symbol = ''  # financial asset, security or contract etc.
+        self.symbols = []  # financial assets
+        self.active_symbol = ''
         self.timeframe = ''
         self.hist = HistMulti(TraderSimMulti.dir_csv)
-        self.open_position = None
+        self.open_position = ('', '')
         self.candlestick_count = 0  # contagem de velas desde a abertura da posição
-        self.max_candlestick_count = 1  # contagem máxima permitida de velas desde a abertura da posição
+        self.max_candlestick_count = 5  # contagem máxima permitida de velas desde a abertura da posição
         self.simulation_is_running = False
+        self.index = 0
         self.num_hits = 0  # número de acertos
         self.num_misses = 0  # número de erros
         self.num_buys = 0  # número de negociações de compra
@@ -38,9 +39,10 @@ class TraderSimMulti:
             self.hist.add_hist_data(symbol, self.timeframe)
 
     def reset(self):
-        self.open_position = None
+        self.open_position = ('', '')
         self.candlestick_count = 0
         self.simulation_is_running = False
+        self.index = 0
         self.num_hits = 0
         self.num_misses = 0
         self.num_buys = 0
@@ -90,76 +92,98 @@ class TraderSimMulti:
     def finish_simulation(self):
         self.simulation_is_running = False
 
-    def buy(self):
+    def buy(self, _symbol: str):
         if not self.simulation_is_running:
             print('simulação não está executando')
             return
 
-        if self.open_position is None:
+        current_price = self.get_close_price_symbol_at(_symbol, self.index)
+
+        if not self.open_position[0]:
             self.candlestick_count = 0
             self.profit = 0.0
-            print(f'iniciando negociação de compra a {self.current_price}')
-            self.open_position = 'buying'
-            self.starting_price = self.current_price
+            print(f'{_symbol} iniciando negociação de compra a {current_price}')
+            self.open_position = ('buying', _symbol)
+            self.starting_price = current_price
             self.num_buys += 1
-        elif self.open_position == 'selling':
+        elif self.open_position[0] == 'selling':
             self.close_position()
-            print(f'iniciando negociação de compra a {self.current_price}')
-            self.open_position = 'buying'
-            self.starting_price = self.current_price
+            print(f'{_symbol} iniciando negociação de compra a {current_price}')
+            self.open_position = ('buying', _symbol)
+            self.starting_price = current_price
             self.num_buys += 1
-        elif self.open_position == 'buying':
-            print('proibido comprar com uma negociação de compra pendente.')
+        elif self.open_position[0] == 'buying' and self.open_position[1] == _symbol:
+            print(f'operação negada. já tem uma negociação de compra pendente no mesmo ativo {self.active_symbol}.')
+        elif self.open_position[0] == 'buying' and self.open_position[1] != _symbol:
+            self.close_position()
+            print(f'{_symbol} iniciando negociação de compra a {current_price}')
+            self.open_position = ('buying', _symbol)
+            self.starting_price = current_price
+            self.num_buys += 1
 
-    def sell(self):
+    def sell(self, _symbol: str):
         if not self.simulation_is_running:
             print('simulação não está executando')
             return
 
-        if self.open_position is None:
+        current_price = self.get_close_price_symbol_at(_symbol, self.index)
+
+        if not self.open_position[0]:
             self.candlestick_count = 0
             self.profit = 0.0
-            print(f'iniciando negociação de venda a {self.current_price}')
-            self.open_position = 'selling'
-            self.starting_price = self.current_price
+            print(f'{_symbol} iniciando negociação de compra a {current_price}')
+            self.open_position = ('selling', _symbol)
+            self.starting_price = current_price
             self.num_sells += 1
-        elif self.open_position == 'buying':
+        elif self.open_position[0] == 'buying':
             self.close_position()
-            print(f'iniciando negociação de venda a {self.current_price}')
-            self.open_position = 'selling'
-            self.starting_price = self.current_price
+            print(f'{_symbol} iniciando negociação de venda a {current_price}')
+            self.open_position = ('selling', _symbol)
+            self.starting_price = current_price
             self.num_sells += 1
-        elif self.open_position == 'selling':
-            print('proibido vender com uma negociação de venda pendente.')
+        elif self.open_position[0] == 'selling' and self.open_position[1] == _symbol:
+            print(f'operação negada. já tem uma negociação de venda pendente no mesmo ativo {self.active_symbol}.')
+        elif self.open_position[0] == 'selling' and self.open_position[1] != _symbol:
+            self.close_position()
+            print(f'{_symbol} iniciando negociação de venda a {current_price}')
+            self.open_position = ('selling', _symbol)
+            self.starting_price = current_price
+            self.num_sells += 1
 
     def update_profit(self):
         if not self.simulation_is_running:
             print('a simulação não está executando.')
             return
 
-        if self.open_position == 'buying':
-            self.profit = self.current_price - self.starting_price
-        elif self.open_position == 'selling':
-            self.profit = self.starting_price - self.current_price
+        if self.open_position[0] and self.open_position[1]:
+            _symbol = self.open_position[1]
+            current_price = self.get_close_price_symbol_at(_symbol, self.index)
 
-        self.equity = self.balance + self.profit
+            if self.open_position[0] == 'buying':
+                self.profit = current_price - self.starting_price
+            elif self.open_position[0] == 'selling':
+                self.profit = self.starting_price - current_price
+
+            self.equity = self.balance + self.profit
 
     def close_position(self):
         if not self.simulation_is_running:
             print('a simulação não está executando.')
             return
 
-        if self.open_position is None:
+        if not self.open_position[0]:
             return
 
-        if self.open_position == 'buying':
-            print(f'fechando negociação de compra aberta. profit = {self.profit:.2f}')
+        _symbol = self.open_position[1]
+
+        if self.open_position[0] == 'buying':
+            print(f'{_symbol} fechando negociação de compra aberta. profit = {self.profit:.5f}')
             self.num_sells += 1
-        elif self.open_position == 'selling':
-            print(f'fechando negociação de venda aberta. profit = {self.profit:.2f}')
+        elif self.open_position[0] == 'selling':
+            print(f'{_symbol} fechando negociação de venda aberta. profit = {self.profit:.5f}')
             self.num_buys += 1
 
-        self.open_position = None
+        self.open_position = ('', '')
         self.candlestick_count = 0
 
         if self.profit > 0:
@@ -170,25 +194,30 @@ class TraderSimMulti:
         self.profit = 0.0
         self.balance = self.equity
 
-    def change_active_symbol(self):
-        pass
-
     def interact_with_user(self) -> str:
         print('menu commands: ')
         cmd = input('quit(q) buy(b) sell(s) close(c) next(n) <-- ')
-        cmd = cmd.lower()
+        cmd = cmd.upper().split()
 
         return_msg = 'continue'
 
-        if cmd == 'q':
+        if cmd[0] == 'Q':
             return_msg = 'break'
-        elif cmd == 'b':
-            self.buy()
-        elif cmd == 's':
-            self.sell()
-        elif cmd == 'c':
+        elif cmd[0] == 'B':
+            if len(cmd) != 2:
+                print('comando de compra inválido.')
+                return_msg = 'continue'
+            else:
+                self.buy(cmd[1])
+        elif cmd[0] == 'S':
+            if len(cmd) != 2:
+                print('comando de venda inválido.')
+                return_msg = 'continue'
+            else:
+                self.sell(cmd[1])
+        elif cmd[0] == 'C':
             self.close_position()
-        elif cmd == 'n':
+        elif cmd[0] == 'N':
             pass
         else:
             pass
@@ -198,24 +227,15 @@ class TraderSimMulti:
     def print_trade_stats(self):
         print(f'candlestick_count = {self.candlestick_count}, ', end='')
         print(f'open_position = {self.open_position}, ', end='')
-        print(f'initial_balance = {self.initial_balance:.2f}, ', end='')
-        print(f'balance = {self.balance:.2f}, ', end='')
-        print(f'equity = {self.equity:.2f}')
-        print(f'profit = {self.profit:.2f}, ', end='')
+        print(f'initial_balance = {self.initial_balance:.5f}, ', end='')
+        print(f'balance = {self.balance:.5f}, ', end='')
+        print(f'equity = {self.equity:.5f}')
+        print(f'profit = {self.profit:.5f}, ', end='')
         print(f'num_hits = {self.num_hits}, ', end='')
         print(f'num_misses = {self.num_misses}, ', end='')
         print(f'num_trades = {self.num_trades}, ', end='')
         print(f'hit_rate = {self.hit_rate*100:.2f} %, ', end='')
-        print(f'roi = {self.roi * 100:.2f} %')
-
-    def get_close_price_at(self, _index: int):
-        """
-        Obtém o preço de fechamento da vela do símbolo ativo no índice indicado.
-        :param _index:
-        :return:
-        """
-        close_price_col = 5
-        return self.hist.arr[self.active_symbol][_index, close_price_col]
+        print(f'roi = {self.roi * 100:.5f} %')
 
     def get_close_price_symbol_at(self, _symbol: str, _index: int):
         """
@@ -235,23 +255,18 @@ class TraderSimMulti:
 
 
 def main():
-    symbol = 'XAUUSD_M5'
     initial_deposit = 100.0
 
     trader = TraderSimMulti(initial_deposit)
-    trader.active_symbol = symbol
     trader.start_simulation()
 
-    trader.previous_price = trader.get_close_price_at(0)
     candlesticks_quantity = 50  # quantidade de velas que serão usadas na simulação
 
     for i in range(0, candlesticks_quantity):
-        trader.current_price = trader.get_close_price_at(i)
 
         print(f'i = {i}')
+        trader.index = i
         trader.print_symbols_close_price_at(i)
-        print(f'current_price = {trader.current_price:.2f}, ', end='')
-        print(f'price_delta = {trader.current_price-trader.previous_price:.2f}')
 
         trader.update_profit()
 
@@ -275,14 +290,13 @@ def main():
             print(f'fechamento forçado de negociações abertas. a contagem de velas atingiu o limite.')
             trader.close_position()
 
-        if trader.open_position:
+        if trader.open_position[0]:
             trader.candlestick_count += 1
         else:
             trader.candlestick_count = 0
 
         trader.print_trade_stats()
 
-        trader.previous_price = trader.current_price
         ret_msg = trader.interact_with_user()
 
         if ret_msg == 'break':
