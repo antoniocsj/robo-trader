@@ -16,6 +16,7 @@ class HistMulti:
         self.arr = {}  # guarda os arrays dos dados históricos conforme seu 'simbolo' e 'timeframe'
 
         self.search_symbols()
+        self.load_symbols()
 
     def search_symbols(self):
         """
@@ -44,7 +45,8 @@ class HistMulti:
                     exit(-1)
 
                 self.csv_files[f'{_symbol}_{_timeframe}'] = filename
-                self.symbols = sorted(self.symbols)
+
+        self.symbols = sorted(self.symbols)
 
     def get_csv_filepath(self, _symbol_timeframe: str) -> str:
         _filepath = self.directory + '/' + self.csv_files[_symbol_timeframe]
@@ -63,6 +65,10 @@ class HistMulti:
         print(f'{key} carregando dados a partir de {_filepath}. {len(self.arr[key])} linhas')
         del df
 
+    def load_symbols(self):
+        for s in self.symbols:
+            self.add_hist_data(s, self.timeframe)
+
     def print_hist(self):
         print('primeiras linhas dos históricos:')
         if len(self.arr) > 0:
@@ -78,11 +84,5 @@ if __name__ == '__main__':
     #                'EURAUD', 'EURCAD', 'EURCHF', 'EURGBP', 'EURJPY', 'EURUSD', 'GBPAUD',
     #                'GBPCAD', 'GBPCHF', 'GBPJPY', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY',
     #                'XAUUSD']
-
-    list_assets = ['EURUSD', 'USDJPY', 'EURGBP', 'EURJPY']
-    list_assets = sorted(list_assets)
-
-    for asset in list_assets:
-        hist.add_hist_data(asset, 'M5')
 
     hist.print_hist()

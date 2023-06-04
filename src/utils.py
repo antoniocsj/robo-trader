@@ -1,5 +1,6 @@
 import numpy as np
 from Hist import Hist
+from HistMulti import HistMulti
 
 
 def formar_entradas(arr: np.ndarray, index: int, _num_velas: int, _tipo_vela: str) -> list[float]:
@@ -33,6 +34,26 @@ def formar_entradas(arr: np.ndarray, index: int, _num_velas: int, _tipo_vela: st
 
     return _entradas
 
+
+def formar_entradas_multi(_hist: HistMulti, index: int, _num_velas: int, _tipo_vela: str) -> list[float]:
+    _entradas = []
+
+    if _tipo_vela == 'OHLCV':
+        col_final = len(_tipo_vela) + 2
+        for vela in arr[index - _num_velas:index]:
+            _entradas += vela[2:col_final].tolist()
+    elif _tipo_vela == 'OHLC':
+        col_final = len(_tipo_vela) + 2
+        for vela in arr[index - _num_velas:index]:
+            _entradas += vela[2:col_final].tolist()
+    elif _tipo_vela == 'CV':
+        for vela in arr[index - _num_velas:index]:
+            _entradas += vela[5:7].tolist()
+    elif _tipo_vela == 'C':
+        for vela in arr[index - _num_velas:index]:
+            _entradas += vela[5:6].tolist()
+
+    return _entradas
 
 # escrever uma função que cria um arquivo csv que represente um histórico fictício de um par de moeda fictício.
 # as velas devem seguir um padrão simples definido por alguma função matemática (do tipo senoidal, por exemplo).
@@ -102,4 +123,6 @@ def criar_hist_csv():
 
 
 if __name__ == '__main__':
-    criar_hist_csv()
+    # criar_hist_csv()
+    hist = HistMulti('../csv')
+    formar_entradas_multi(hist)
