@@ -93,6 +93,22 @@ def protectedCos(x):
         return 1
 
 
+# Define a protected tan function
+def protectedTan(x):
+    try:
+        return math.tan(x)
+    except ValueError:
+        return 1
+
+
+# Define a protected atan function
+def protectedAtan(x):
+    try:
+        return math.atan(x)
+    except ValueError:
+        return 1
+
+
 pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
 pset.addPrimitive(operator.mul, [float, float], float)
@@ -104,6 +120,8 @@ pset.addPrimitive(max, [float, float], float, 'max')
 pset.addPrimitive(min, [float, float], float, 'min')
 pset.addPrimitive(protectedCos, [float], float, 'cos')
 pset.addPrimitive(protectedSin, [float], float, 'sin')
+pset.addPrimitive(protectedTan, [float], float, 'tan')
+pset.addPrimitive(protectedAtan, [float], float, 'atan')
 
 
 # logic operators
