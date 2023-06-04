@@ -35,25 +35,18 @@ def formar_entradas(arr: np.ndarray, index: int, _num_velas: int, _tipo_vela: st
     return _entradas
 
 
-def formar_entradas_multi(_hist: HistMulti, index: int, _num_velas: int, _tipo_vela: str) -> list[float]:
+def formar_entradas_multi(_hist: HistMulti, _index: int, _num_velas: int, _tipo_vela: str) -> list[float]:
     _entradas = []
+    _timeframe = hist.timeframe
 
-    if _tipo_vela == 'OHLCV':
-        col_final = len(_tipo_vela) + 2
-        for vela in arr[index - _num_velas:index]:
-            _entradas += vela[2:col_final].tolist()
-    elif _tipo_vela == 'OHLC':
-        col_final = len(_tipo_vela) + 2
-        for vela in arr[index - _num_velas:index]:
-            _entradas += vela[2:col_final].tolist()
-    elif _tipo_vela == 'CV':
-        for vela in arr[index - _num_velas:index]:
-            _entradas += vela[5:7].tolist()
-    elif _tipo_vela == 'C':
-        for vela in arr[index - _num_velas:index]:
-            _entradas += vela[5:6].tolist()
+    if _tipo_vela == 'C':
+        for _symbol in hist.symbols:
+            _symbol_timeframe = f'{_symbol}_{_timeframe}'
+            for vela in hist.arr[_symbol_timeframe][_index - _num_velas:_index]:
+                _entradas += vela[5:6].tolist()
 
     return _entradas
+
 
 # escrever uma função que cria um arquivo csv que represente um histórico fictício de um par de moeda fictício.
 # as velas devem seguir um padrão simples definido por alguma função matemática (do tipo senoidal, por exemplo).
@@ -80,7 +73,7 @@ def criar_hist_csv():
     # p = 12
     p = 32
     d = t / p
-    time = np.linspace(0, t-d, p)
+    time = np.linspace(0, t - d, p)
     # data = np.sin(time*np.pi/180)
     data = np.sin(0.5 * np.pi * time * np.pi / 180) + np.cos(2 * np.pi * time * np.pi / 180) * np.cos(
         0.5 * np.pi * time * np.pi / 180)
@@ -114,7 +107,7 @@ def criar_hist_csv():
         df2.at[i, '<SPREAD>'] = 0
 
         if i % 5000 == 0:
-            print(f'{100*i/len_df2:.2f} %')
+            print(f'{100 * i / len_df2:.2f} %')
 
         _close_ant = _close
 
@@ -125,4 +118,6 @@ def criar_hist_csv():
 if __name__ == '__main__':
     # criar_hist_csv()
     hist = HistMulti('../csv')
-    formar_entradas_multi(hist)
+    for i in range(3, 10):
+        entradas = formar_entradas_multi(hist, _index=i, _num_velas=3, _tipo_vela='C')
+        print(f'index = {i} {entradas}')
