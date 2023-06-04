@@ -172,6 +172,8 @@ class DirectoryCorrection:
 
                 self.csv_files[f'{_symbol}_{_timeframe}'] = filename
 
+        self.symbols = sorted(self.symbols)
+
     def get_csv_filepath(self, _symbol_timeframe: str) -> str:
         _filepath = self.directory + '/' + self.csv_files[_symbol_timeframe]
         return _filepath
