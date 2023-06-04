@@ -62,7 +62,7 @@ class HistMulti:
             exit(-1)
 
         self.arr[key] = df.to_numpy(copy=True)
-        print(f'{key} carregando dados a partir de {_filepath}. {len(self.arr[key])} linhas')
+        # print(f'{key} carregando dados a partir de {_filepath}. {len(self.arr[key])} linhas')
         del df
 
     def load_symbols(self):

@@ -149,9 +149,9 @@ def eval_trade_sim_noprints(individual):
     trader.reset()
 
     for i in range(index_inicio, index_final):
-        print(f'\ni = {i},')
+        # print(f'\ni = {i},')
         trader.index = i
-        trader.print_symbols_close_price_at(i)
+        # trader.print_symbols_close_price_at(i)
         trader.update_profit()
 
         entradas = formar_entradas_multi(trader.hist, i, num_velas_anteriores, tipo_vela)
@@ -165,23 +165,23 @@ def eval_trade_sim_noprints(individual):
             trader.sell(_symbol)
 
         if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
-            print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')
+            # print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')
             trader.close_position()
 
         if trader.equity <= 0.0:
             trader.close_position()
             trader.finish_simulation()
-            print('equity <= 0. a simulação será encerrada.')
+            # print('equity <= 0. a simulação será encerrada.')
             break
 
         # fecha a posição quando acabarem as novas barras (velas ou candlesticks)
         if i == candlesticks_quantity - 1:
             trader.close_position()
             trader.finish_simulation()
-            print('a última vela atingida. a simulação chegou ao fim.')
+            # print('a última vela atingida. a simulação chegou ao fim.')
 
         if trader.candlestick_count >= trader.max_candlestick_count:
-            print(f'fechamento forçado de negociações abertas. a contagem de velas atingiu o limite.')
+            # print(f'fechamento forçado de negociações abertas. a contagem de velas atingiu o limite.')
             trader.close_position()
 
         if trader.open_position[0]:
@@ -189,10 +189,10 @@ def eval_trade_sim_noprints(individual):
         else:
             trader.candlestick_count = 0
 
-        trader.print_trade_stats()
+        # trader.print_trade_stats()
 
-    print('\nresultados finais da simulação')
-    trader.print_trade_stats()
+    # print('\nresultados finais da simulação')
+    # trader.print_trade_stats()
 
     return trader.hit_rate,
 
@@ -225,7 +225,7 @@ def main():
     #                                stats=mstats, halloffame=hof, verbose=True)
 
     pop, log, hof = my_algorithms.eaSimple_WithCP(
-        population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl', freq=1,
+        population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl', freq=10,
         cxpb=0.5, mutpb=mutpb, ngen=n_generations,
         stats=mstats, halloffame=hof, verbose=True)
 
