@@ -29,13 +29,11 @@ class TraderSimMulti:
         self.profit = 0.0  # lucro (ou prejuízo) na negociação
         self.roi = 0.0  # Return on Investment ou Retorno de Investmento
         self.stop_loss = 0.01  # limiar de percentual de perda máxima por negociação
-        self.load_hist()
+        self.load_symbols()
 
-    def load_hist(self):
+    def load_symbols(self):
         self.symbols = self.hist.symbols[:]
         self.timeframe = self.hist.timeframe
-        for symbol in self.symbols:
-            self.hist.add_hist_data(symbol, self.timeframe)
 
     def reset(self):
         self.open_position = ('', '')
@@ -250,7 +248,6 @@ class TraderSimMulti:
         return self.hist.arr[_symbol][_index, close_price_col]
 
     def print_symbols_close_price_at(self, _index):
-        _list = [_s for _s in self.symbols]
         _list = [(_s, self.get_close_price_symbol_at(_s, _index)) for _s in self.symbols]
         print(_list)
 
