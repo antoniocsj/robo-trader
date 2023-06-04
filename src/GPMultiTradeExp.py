@@ -4,6 +4,8 @@ import numpy
 import itertools
 import pickle
 
+import numpy as np
+
 import my_algorithms
 from deap import base
 from deap import creator
@@ -38,7 +40,7 @@ index_final = index_inicio + candlesticks_quantity
 num_entradas = num_velas_anteriores * len(tipo_vela) * num_ativos
 
 # defined a new primitive set for strongly typed GP
-pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), bool, "X")
+pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), float, "X")
 
 # Definição de funções que serão usadas na Programação Genética
 
@@ -153,11 +155,14 @@ def eval_trade_sim_noprints(individual):
         trader.update_profit()
 
         entradas = formar_entradas_multi(trader.hist, i, num_velas_anteriores, tipo_vela)
-        comando = func(*entradas)
-        if comando:
-            trader.buy('EURUSD')
+        y = func(*entradas)
+        _y = int(np.clip(y, 0, num_ativos - 1))
+        _symbol = trader.symbols[_y]
+
+        if y >= 0:
+            trader.buy(_symbol)
         else:
-            trader.sell('EURUSD')
+            trader.sell(_symbol)
 
         if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
             print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')
