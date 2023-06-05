@@ -179,12 +179,10 @@ class DirectoryCorrection:
         return _filepath
 
     def load_sheets(self):
-        k: str
-        for i, k in enumerate(self.csv_files):
-            _name = k.replace('.csv', '')
-            _symbol, _timeframe = _name.split('_')[0], _name.split('_')[1]
-            _filepath = self.get_csv_filepath(k)
-            self.sheets.append(Sheet(_filepath, _symbol, _timeframe))
+        for _symbol in self.symbols:
+            _symbol_timeframe = f'{_symbol}_{self.timeframe}'
+            _filepath = self.get_csv_filepath(_symbol_timeframe)
+            self.sheets.append(Sheet(_filepath, _symbol, self.timeframe))
 
     def _calc_max(self, _list: list[tuple[datetime, Sheet]]) -> tuple[datetime, Sheet]:
         _max_datetime_sheet = (datetime.min, None)
