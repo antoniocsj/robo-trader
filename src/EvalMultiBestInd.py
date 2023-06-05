@@ -93,6 +93,7 @@ def eval_trade_sim_noprints(individual):
 
     return trader.hit_rate,
 
+
 def eval_trade_sim_withprints(individual):
     # Transform the tree expression in a callable function
     func = toolbox.compile(expr=individual)
