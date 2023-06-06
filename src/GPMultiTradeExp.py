@@ -1,5 +1,7 @@
 import operator
 import math
+import random
+
 import numpy
 import itertools
 import pickle
@@ -21,7 +23,7 @@ from TraderSimMultiNoPrints import TraderSimMulti
 from utils import formar_entradas_multi
 
 # configurações para a programação genética
-n_population = 20000
+n_population = 2000
 n_generations = 200
 max_height = 17
 mutpb = 0.1
@@ -30,7 +32,7 @@ mutpb = 0.1
 initial_deposit = 1000.0
 trader = TraderSimMulti(initial_deposit)
 num_ativos = len(trader.symbols)
-num_velas_anteriores = 12
+num_velas_anteriores = 2
 tipo_vela = 'C'
 candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
 
@@ -141,10 +143,10 @@ pset.addPrimitive(if_then_else, [bool, float, float], float)
 # terminals
 pset.addTerminal(False, bool)
 pset.addTerminal(True, bool)
-# pset.addEphemeralConstant("pi", lambda: np.pi, float)
-# pset.addEphemeralConstant("e", lambda: np.e, float)
-# pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5))/2, float)
-# pset.addEphemeralConstant("rand", lambda: random.random(), float)
+pset.addEphemeralConstant("pi", lambda: np.pi, float)
+pset.addEphemeralConstant("e", lambda: np.e, float)
+pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5))/2, float)
+pset.addEphemeralConstant("rand", lambda: random.random(), float)
 # pset.renameArguments(X='x')
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -243,7 +245,7 @@ def main():
     #                                stats=mstats, halloffame=hof, verbose=True)
 
     pop, log, hof = my_algorithms.eaSimple_WithCP(
-        population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl', freq=1,
+        population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl', freq=10,
         cxpb=0.5, mutpb=mutpb, ngen=n_generations,
         stats=mstats, halloffame=hof, verbose=True)
 

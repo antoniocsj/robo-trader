@@ -44,6 +44,11 @@ def formar_entradas_multi(_hist: HistMulti, _index: int, _num_velas: int, _tipo_
             _symbol_timeframe = f'{_symbol}_{_timeframe}'
             for _vela in _hist.arr[_symbol_timeframe][_index - _num_velas:_index]:
                 _entradas += _vela[5:6].tolist()
+    elif _tipo_vela == 'CV':
+        for _symbol in _hist.symbols:
+            _symbol_timeframe = f'{_symbol}_{_timeframe}'
+            for _vela in _hist.arr[_symbol_timeframe][_index - _num_velas:_index]:
+                _entradas += _vela[5:7].tolist()
 
     return _entradas
 
