@@ -546,10 +546,35 @@ class DirectoryCorrection:
         else:
             return False
 
+    def check(self):
+        """
+        Verifica se todas as linhas estão com a data/hora em ordem crescente.
+        Se houver alguma linha que desobedece essa regra, reporta o evento.
+        :return:
+        """
+        s: Sheet
+        for s in self.sheets:
+            print(s.symbol)
+            row = s.df.iloc[0]
+            _date = row['<DATE>'].replace('.', '-')
+            _time = row['<TIME>']
+            _datetime_str = f"{_date}T{_time}"
+            _datetime_previous = datetime.fromisoformat(_datetime_str)
+            for i in range(1, len(s.df)):
+                row = s.df.iloc[i]
+                _date = row['<DATE>'].replace('.', '-')
+                _time = row['<TIME>']
+                _datetime_str = f"{_date}T{_time}"
+                _datetime_current = datetime.fromisoformat(_datetime_str)
+                if _datetime_current <= _datetime_previous:
+                    print(f'erro em {s.symbol} {_datetime_current}')
+                _datetime_previous = _datetime_current
+
 
 def main():
     dir_cor = DirectoryCorrection('./csv')
-    dir_cor.correct_directory()
+    # dir_cor.correct_directory()
+    # dir_cor.check()
 
 
 if __name__ == '__main__':
