@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 import pandas as pd
 
@@ -125,15 +127,28 @@ def criar_hist_csv():
 
 def normalize():
     hist = HistMulti('../csv')
-    _symbol = hist.symbols[0]
-    arr = hist.arr[f'{_symbol}_{hist.timeframe}']
-    data = arr[:, 2:7]
-    trans = MinMaxScaler()
-    data = trans.fit_transform(data)
-    dataf = pd.DataFrame(data)
-    dataf.insert(0, 0, arr[:, 0], True)
-    dataf.insert(1, 1, arr[:, 1], True)
-    dataf.columns = range(dataf.columns.size)
+    scalers = {}
+
+    for _symbol in hist.symbols:
+        _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
+        arr = hist.arr[_symbol_timeframe]
+        data = arr[:, 2:7]
+        trans = MinMaxScaler()
+        data = trans.fit_transform(data)
+        dataf = pd.DataFrame(data)
+        dataf.insert(0, 0, arr[:, 0], True)
+        dataf.insert(1, 1, arr[:, 1], True)
+        dataf.columns = range(dataf.columns.size)
+        scalers[_symbol_timeframe] = trans
+
+    with open('scalers.pkl', 'wb') as file:
+        pickle.dump(scalers, file)
+
+    scalers = None
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+
     pass
 
 
