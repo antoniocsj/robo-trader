@@ -1,6 +1,9 @@
 import numpy as np
+import pandas as pd
+
 from Hist import Hist
 from HistMulti import HistMulti
+from sklearn.preprocessing import MinMaxScaler
 
 
 def formar_entradas(arr: np.ndarray, index: int, _num_velas: int, _tipo_vela: str) -> list[float]:
@@ -120,9 +123,24 @@ def criar_hist_csv():
     df2.to_csv(filepath2, sep='\t', index=False, float_format='%.2f')
 
 
+def normalize():
+    hist = HistMulti('../csv')
+    _symbol = hist.symbols[0]
+    arr = hist.arr[f'{_symbol}_{hist.timeframe}']
+    data = arr[:, 2:7]
+    trans = MinMaxScaler()
+    data = trans.fit_transform(data)
+    dataf = pd.DataFrame(data)
+    dataf.insert(0, 0, arr[:, 0], True)
+    dataf.insert(1, 1, arr[:, 1], True)
+    dataf.columns = range(dataf.columns.size)
+    pass
+
+
 if __name__ == '__main__':
     # criar_hist_csv()
-    hist = HistMulti('../csv')
-    for i in range(3, 10):
-        entradas = formar_entradas_multi(hist, _index=i, _num_velas=3, _tipo_vela='C')
-        print(f'index = {i} {entradas}')
+    # hist = HistMulti('../csv')
+    # for i in range(3, 10):
+    #     entradas = formar_entradas_multi(hist, _index=i, _num_velas=3, _tipo_vela='C')
+    #     print(f'index = {i} {entradas}')
+    normalize()
