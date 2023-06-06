@@ -21,7 +21,7 @@ from TraderSimMultiNoPrints import TraderSimMulti
 from utils import formar_entradas_multi
 
 # configurações para a programação genética
-n_population = 5000
+n_population = 20000
 n_generations = 200
 max_height = 17
 mutpb = 0.1
@@ -30,9 +30,9 @@ mutpb = 0.1
 initial_deposit = 1000.0
 trader = TraderSimMulti(initial_deposit)
 num_ativos = len(trader.symbols)
-num_velas_anteriores = 2
+num_velas_anteriores = 12
 tipo_vela = 'C'
-candlesticks_quantity = 500  # quantidade de velas usadas no treinamento
+candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
 
 trader.start_simulation()
 index_inicio = num_velas_anteriores
@@ -174,7 +174,7 @@ def eval_trade_sim_noprints(individual):
 
         entradas = formar_entradas_multi(trader.hist, i, num_velas_anteriores, tipo_vela)
         y = func(*entradas)
-        _y = int(np.clip(y, 0, num_ativos - 1))
+        _y = round(np.clip( abs(y), 0, num_ativos - 1))
         _symbol = trader.symbols[_y]
 
         if y >= 0:
@@ -243,7 +243,7 @@ def main():
     #                                stats=mstats, halloffame=hof, verbose=True)
 
     pop, log, hof = my_algorithms.eaSimple_WithCP(
-        population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl', freq=10,
+        population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl', freq=1,
         cxpb=0.5, mutpb=mutpb, ngen=n_generations,
         stats=mstats, halloffame=hof, verbose=True)
 
