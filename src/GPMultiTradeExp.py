@@ -23,9 +23,9 @@ from TraderSimMultiNoPrints import TraderSimMulti
 from utils import formar_entradas_multi
 
 # configurações para a programação genética
-n_population = 500
-n_generations = 200
-max_height = 17
+n_population = 5000
+n_generations = 600
+max_height = 30
 mutpb = 0.1
 
 # configurações para o TraderSim
@@ -33,8 +33,8 @@ initial_deposit = 1000.0
 trader = TraderSimMulti(initial_deposit)
 num_ativos = len(trader.symbols)
 num_velas_anteriores = 2
-tipo_vela = 'C'
-candlesticks_quantity = 500  # quantidade de velas usadas no treinamento
+tipo_vela = 'CV'
+candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
 
 trader.start_simulation()
 index_inicio = num_velas_anteriores
