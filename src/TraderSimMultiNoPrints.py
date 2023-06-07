@@ -10,7 +10,7 @@ class TraderSimMulti:
         self.hist = HistMulti(TraderSimMulti.dir_csv)
         self.open_position = ('', '')
         self.candlestick_count = 0  # contagem de velas desde a abertura da posição
-        self.max_candlestick_count = 1  # contagem máxima permitida de velas desde a abertura da posição
+        self.max_candlestick_count = 5  # contagem máxima permitida de velas desde a abertura da posição
         self.simulation_is_running = False
         self.index = 0
         self.num_hits = 0  # número de acertos
@@ -103,7 +103,9 @@ class TraderSimMulti:
             self.open_position = ('buying', _symbol)
             self.starting_price = current_price
             self.num_buys += 1
-        elif self.open_position[0] == 'selling':
+        elif self.open_position[0] == 'selling' and self.open_position[1] == _symbol:
+            self.close_position()
+        elif self.open_position[0] == 'selling' and self.open_position[1] != _symbol:
             self.close_position()
             # print(f'{_symbol} iniciando negociação de compra a {current_price}')
             self.open_position = ('buying', _symbol)
@@ -133,7 +135,9 @@ class TraderSimMulti:
             self.open_position = ('selling', _symbol)
             self.starting_price = current_price
             self.num_sells += 1
-        elif self.open_position[0] == 'buying':
+        elif self.open_position[0] == 'buying' and self.open_position[1] == _symbol:
+            self.close_position()
+        elif self.open_position[0] == 'buying' and self.open_position[1] != _symbol:
             self.close_position()
             # print(f'{_symbol} iniciando negociação de venda a {current_price}')
             self.open_position = ('selling', _symbol)

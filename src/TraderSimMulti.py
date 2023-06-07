@@ -103,7 +103,9 @@ class TraderSimMulti:
             self.open_position = ('buying', _symbol)
             self.starting_price = current_price
             self.num_buys += 1
-        elif self.open_position[0] == 'selling':
+        elif self.open_position[0] == 'selling' and self.open_position[1] == _symbol:
+            self.close_position()
+        elif self.open_position[0] == 'selling' and self.open_position[1] != _symbol:
             self.close_position()
             print(f'{_symbol} iniciando negociação de compra a {current_price}')
             self.open_position = ('buying', _symbol)
@@ -132,7 +134,9 @@ class TraderSimMulti:
             self.open_position = ('selling', _symbol)
             self.starting_price = current_price
             self.num_sells += 1
-        elif self.open_position[0] == 'buying':
+        elif self.open_position[0] == 'buying' and self.open_position[1] == _symbol:
+            self.close_position()
+        elif self.open_position[0] == 'buying' and self.open_position[1] != _symbol:
             self.close_position()
             print(f'{_symbol} iniciando negociação de venda a {current_price}')
             self.open_position = ('selling', _symbol)

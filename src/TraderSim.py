@@ -97,10 +97,6 @@ class TraderSim:
             self.num_buys += 1
         elif self.open_position == 'selling':
             self.close_position()
-            print(f'iniciando negociação de compra a {self.current_price}')
-            self.open_position = 'buying'
-            self.starting_price = self.current_price
-            self.num_buys += 1
         elif self.open_position == 'buying':
             print('proibido comprar com uma negociação de compra pendente.')
 
@@ -118,10 +114,6 @@ class TraderSim:
             self.num_sells += 1
         elif self.open_position == 'buying':
             self.close_position()
-            print(f'iniciando negociação de venda a {self.current_price}')
-            self.open_position = 'selling'
-            self.starting_price = self.current_price
-            self.num_sells += 1
         elif self.open_position == 'selling':
             print('proibido vender com uma negociação de venda pendente.')
 
