@@ -57,7 +57,7 @@ class HistMulti:
         key = f'{_symbol}_{_timeframe}'
 
         df: DataFrame = pd.read_csv(_filepath, delimiter='\t')
-        df.drop(columns=['<VOL>', '<SPREAD>'], inplace=True)
+        # df.drop(columns=['<VOL>', '<SPREAD>'], inplace=True)
         if df.isnull().sum().values.sum() != 0:
             print(f'Há dados faltando no arquivo {_filepath}')
             exit(-1)

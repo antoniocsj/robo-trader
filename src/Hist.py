@@ -51,7 +51,7 @@ class Hist:
     def get_hist_data(self, _symbol: str, _timeframe: str):
         _filepath = self.get_csv_filepath(f'{_symbol}_{_timeframe}')
         self.df = pd.read_csv(_filepath, delimiter='\t')
-        self.df.drop(columns=['<VOL>', '<SPREAD>'], inplace=True)
+        # self.df.drop(columns=['<VOL>', '<SPREAD>'], inplace=True)
         # self.df.columns = ['DATE', 'TIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'TICKVOL']
         self.arr = self.df.to_numpy(copy=True)
 

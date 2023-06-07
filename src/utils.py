@@ -139,17 +139,27 @@ def normalize():
         dataf.insert(0, 0, arr[:, 0], True)
         dataf.insert(1, 1, arr[:, 1], True)
         dataf.columns = range(dataf.columns.size)
+        _filepath = hist.get_csv_filepath(_symbol_timeframe)
+        dataf.to_csv(_filepath, index=False, sep='\t')
         scalers[_symbol_timeframe] = trans
 
     with open('scalers.pkl', 'wb') as file:
         pickle.dump(scalers, file)
 
-    scalers = None
 
+def denormalize():
     with open('scalers.pkl', 'rb') as file:
         scalers = pickle.load(file)
 
-    pass
+    hist = HistMulti('../csv')
+
+    for _symbol in hist.symbols:
+        _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
+        arr = hist.arr[_symbol_timeframe]
+        data = arr[:, 2:7]
+        trans: MinMaxScaler = scalers[_symbol_timeframe]
+        data_inv = trans.inverse_transform(data)
+        pass
 
 
 if __name__ == '__main__':
@@ -158,4 +168,5 @@ if __name__ == '__main__':
     # for i in range(3, 10):
     #     entradas = formar_entradas_multi(hist, _index=i, _num_velas=3, _tipo_vela='C')
     #     print(f'index = {i} {entradas}')
-    normalize()
+    # normalize()
+    denormalize()
