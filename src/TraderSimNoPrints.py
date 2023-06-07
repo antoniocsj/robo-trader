@@ -182,15 +182,15 @@ class TraderSim:
     def print_trade_stats(self):
         print(f'candlestick_count = {self.candlestick_count}, ', end='')
         print(f'open_position = {self.open_position}, ', end='')
-        print(f'initial_balance = {self.initial_balance:.2f}, ', end='')
-        print(f'balance = {self.balance:.2f}, ', end='')
-        print(f'equity = {self.equity:.2f}')
-        print(f'profit = {self.profit:.2f}, ', end='')
+        print(f'initial_balance = {self.initial_balance:.5f}, ', end='')
+        print(f'balance = {self.balance:.5f}, ', end='')
+        print(f'equity = {self.equity:.5f}')
+        print(f'profit = {self.profit:.5f}, ', end='')
         print(f'num_hits = {self.num_hits}, ', end='')
         print(f'num_misses = {self.num_misses}, ', end='')
         print(f'num_trades = {self.num_trades}, ', end='')
         print(f'hit_rate = {self.hit_rate*100:.2f} %, ', end='')
-        print(f'roi = {self.roi * 100:.2f} %')
+        print(f'roi = {self.roi * 100:.5f} %')
 
 
 def main():
