@@ -125,7 +125,7 @@ def criar_hist_csv():
     df2.to_csv(filepath2, sep='\t', index=False, float_format='%.2f')
 
 
-def normalize():
+def normalize_directory():
     hist = HistMulti('../csv')
     scalers = {}
 
@@ -147,7 +147,7 @@ def normalize():
         pickle.dump(scalers, file)
 
 
-def denormalize():
+def denormalize__directory():
     with open('scalers.pkl', 'rb') as file:
         scalers = pickle.load(file)
 
@@ -159,7 +159,7 @@ def denormalize():
         data = arr[:, 2:7]
         trans: MinMaxScaler = scalers[_symbol_timeframe]
         data_inv = trans.inverse_transform(data)
-        pass
+        print(f'{_symbol} {data_inv[0]}')
 
 
 if __name__ == '__main__':
