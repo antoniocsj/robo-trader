@@ -130,6 +130,7 @@ def normalize_directory():
     scalers = {}
 
     for _symbol in hist.symbols:
+        print(_symbol)
         _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
         arr = hist.arr[_symbol_timeframe]
         data = arr[:, 2:7]
@@ -168,6 +169,6 @@ if __name__ == '__main__':
     # for i in range(3, 10):
     #     entradas = formar_entradas_multi(hist, _index=i, _num_velas=3, _tipo_vela='C')
     #     print(f'index = {i} {entradas}')
-    # normalize_directory()
+    normalize_directory()
     # denormalize__directory()
     pass
