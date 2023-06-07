@@ -53,7 +53,7 @@ def eval_trade_sim_noprints(individual):
 
         entradas = formar_entradas_multi(trader.hist, i, num_velas_anteriores, tipo_vela)
         y = func(*entradas)
-        _y = int(np.clip(y, 0, num_ativos - 1))
+        _y = int(np.clip(np.round(np.abs(y)), 0, num_ativos - 1))
         _symbol = trader.symbols[_y]
 
         if y >= 0:
