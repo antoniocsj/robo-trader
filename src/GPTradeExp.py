@@ -33,7 +33,7 @@ timeframe = 'M5'
 initial_deposit = 1000.0
 num_velas_anteriores = 7
 tipo_vela = 'C'
-candlesticks_quantity = 500  # quantidade de velas usadas no treinamento
+candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
 
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
@@ -201,10 +201,14 @@ def eval_trade_sim_noprints(individual):
 
         entradas = formar_entradas(trader.hist.arr, i, num_velas_anteriores, tipo_vela)
         y = func(*entradas)
-        if y >= 0:
+        if y >= 1:
             trader.buy()
-        else:
+        elif y <= -1:
             trader.sell()
+        elif abs(y) <= 0.5:
+            trader.close_position()
+        else:
+            pass
 
         trader.update_profit()
         # trader.print_trade_stats()

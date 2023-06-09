@@ -189,10 +189,14 @@ def eval_trade_sim_noprints(individual):
         _y = int(np.clip(np.round(np.abs(y)), 0, num_ativos - 1))
         _symbol = trader.symbols[_y]
 
-        if y >= 0:
+        if y >= 1:
             trader.buy(_symbol)
-        else:
+        elif y <= -1:
             trader.sell(_symbol)
+        elif abs(y) <= 0.5:
+            trader.close_position()
+        else:
+            pass
 
         if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
             # print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')

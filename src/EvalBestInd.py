@@ -30,13 +30,11 @@ initial_deposit = 1000.0
 num_velas_anteriores = num_velas_anteriores_train
 tipo_vela = tipo_vela_train
 candlesticks_quantity = 50000  # quantidade de velas usadas na avaliação
-max_candlestick_count = 1
 
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
 close_price_col = 5
 trader.previous_price = trader.hist.arr[0, close_price_col]
-trader.max_candlestick_count = max_candlestick_count
 
 index_inicio = num_velas_anteriores + candlesticks_quantity_train
 index_final = index_inicio + candlesticks_quantity
@@ -68,10 +66,14 @@ def eval_trade_sim_withprints(individual):
 
         entradas = formar_entradas(trader.hist.arr, i, num_velas_anteriores, tipo_vela)
         y = func(*entradas)
-        if y >= 0:
+        if y >= 1:
             trader.buy()
-        else:
+        elif y <= -1:
             trader.sell()
+        elif abs(y) <= 0.5:
+            trader.close_position()
+        else:
+            pass
 
         trader.update_profit()
         trader.print_trade_stats()

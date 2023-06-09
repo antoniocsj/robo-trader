@@ -29,11 +29,8 @@ num_ativos = num_ativos_train
 num_velas_anteriores = num_velas_anteriores_train
 tipo_vela = tipo_vela_train
 candlesticks_quantity = 50000  # quantidade de velas usadas na avaliação
-max_candlestick_count = 1
 
 trader.start_simulation()
-trader.max_candlestick_count = max_candlestick_count
-
 index_inicio = num_velas_anteriores + candlesticks_quantity_train
 index_final = index_inicio + candlesticks_quantity
 num_entradas = num_velas_anteriores * len(tipo_vela) * num_ativos
@@ -56,10 +53,14 @@ def eval_trade_sim_noprints(individual):
         _y = int(np.clip(np.round(np.abs(y)), 0, num_ativos - 1))
         _symbol = trader.symbols[_y]
 
-        if y >= 0:
+        if y >= 1:
             trader.buy(_symbol)
-        else:
+        elif y <= -1:
             trader.sell(_symbol)
+        elif abs(y) <= 0.5:
+            trader.close_position()
+        else:
+            pass
 
         if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
             # print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')
