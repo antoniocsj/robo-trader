@@ -1,8 +1,11 @@
 import operator
 import math
-import numpy
+import random
+
 import itertools
 import pickle
+
+import numpy as np
 
 import my_algorithms
 from deap import base
@@ -95,6 +98,22 @@ def protectedCos(x):
         return 1
 
 
+# Define a protected tan function
+def protectedTan(x):
+    try:
+        return math.tan(x)
+    except ValueError:
+        return 1
+
+
+# Define a protected atan function
+def protectedAtan(x):
+    try:
+        return math.atan(x)
+    except ValueError:
+        return 1
+
+
 pset.addPrimitive(operator.add, [float, float], float)
 pset.addPrimitive(operator.sub, [float, float], float)
 pset.addPrimitive(operator.mul, [float, float], float)
@@ -106,6 +125,8 @@ pset.addPrimitive(max, [float, float], float, 'max')
 pset.addPrimitive(min, [float, float], float, 'min')
 pset.addPrimitive(protectedCos, [float], float, 'cos')
 pset.addPrimitive(protectedSin, [float], float, 'sin')
+pset.addPrimitive(protectedTan, [float], float, 'tan')
+pset.addPrimitive(protectedAtan, [float], float, 'atan')
 
 
 # logic operators
@@ -125,10 +146,10 @@ pset.addPrimitive(if_then_else, [bool, float, float], float)
 # terminals
 pset.addTerminal(False, bool)
 pset.addTerminal(True, bool)
-# pset.addEphemeralConstant("pi", lambda: np.pi, float)
-# pset.addEphemeralConstant("e", lambda: np.e, float)
-# pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5))/2, float)
-# pset.addEphemeralConstant("rand", lambda: random.random(), float)
+pset.addEphemeralConstant("pi", lambda: np.pi, float)
+pset.addEphemeralConstant("e", lambda: np.e, float)
+pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5))/2, float)
+pset.addEphemeralConstant("rand", lambda: random.random(), float)
 # pset.renameArguments(X='x')
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -217,17 +238,17 @@ def main():
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
     stats_size = tools.Statistics(len)
     mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
-    mstats.register("avg", numpy.mean)
-    mstats.register("std", numpy.std)
-    mstats.register("min", numpy.min)
-    mstats.register("max", numpy.max)
+    mstats.register("avg", np.mean)
+    mstats.register("std", np.std)
+    mstats.register("min", np.min)
+    mstats.register("max", np.max)
 
     # pop, log = algorithms.eaSimple(population=pop, toolbox=toolbox,
     #                                cxpb=0.5, mutpb=mutpb, ngen=n_generations,
     #                                stats=mstats, halloffame=hof, verbose=True)
 
     pop, log, hof = my_algorithms.eaSimple_WithCP(
-        population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl', freq=1,
+        population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl', freq=10,
         cxpb=0.5, mutpb=mutpb, ngen=n_generations,
         stats=mstats, halloffame=hof, verbose=True)
 
