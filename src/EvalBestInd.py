@@ -152,7 +152,7 @@ def eval_trade_sim_noprints(individual):
     # print('\nresultados finais da simulação')
     # trader.print_trade_stats()
 
-    return trader.hit_rate
+    return trader.hit_rate,
 
 
 def read_halloffame():
