@@ -23,8 +23,8 @@ from TraderSimMultiNoPrints import TraderSimMulti
 from utils import formar_entradas_multi
 
 # configurações para a programação genética
-n_population = 5000
-n_generations = 600
+n_population = 500
+n_generations = 200
 max_height = 30
 mutpb = 0.1
 
