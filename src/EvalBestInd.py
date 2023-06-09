@@ -70,7 +70,7 @@ def eval_trade_sim_withprints(individual):
             trader.buy()
         elif y <= -1:
             trader.sell()
-        elif abs(y) <= 0.5:
+        elif np.abs(y) <= 0.5:
             trader.close_position()
         else:
             pass
@@ -172,8 +172,7 @@ def main():
     # eval_trade_sim_withprints(best_ind)
     eval_trade_sim_noprints(best_ind)
     print('resultados finais da simulação:\n')
-    print(f'quantidade de velas usadas na avaliação = {candlesticks_quantity}, '
-          f'max_candlestick_count = {max_candlestick_count}')
+    print(f'quantidade de velas usadas na avaliação = {candlesticks_quantity}')
     trader.print_trade_stats()
 
 

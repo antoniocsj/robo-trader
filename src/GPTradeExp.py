@@ -205,7 +205,7 @@ def eval_trade_sim_noprints(individual):
             trader.buy()
         elif y <= -1:
             trader.sell()
-        elif abs(y) <= 0.5:
+        elif np.abs(y) <= 0.5:
             trader.close_position()
         else:
             pass
