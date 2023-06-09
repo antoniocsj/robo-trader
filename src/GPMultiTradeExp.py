@@ -53,7 +53,7 @@ pset.addPrimitive(operator.not_, [bool], bool)
 
 
 # floating point operators
-# Define a protected division function
+
 def protectedDiv(left, right):
     try:
         return left / right
@@ -61,7 +61,6 @@ def protectedDiv(left, right):
         return 1
 
 
-# Define a protected log function
 def protectedLog(x):
     try:
         return math.log(x)
@@ -69,7 +68,6 @@ def protectedLog(x):
         return 1
 
 
-# Define a protected exp function
 def protectedExp(x):
     try:
         return math.exp(x)
@@ -79,7 +77,6 @@ def protectedExp(x):
         return 1
 
 
-# Define a protected sin function
 def protectedSin(x):
     try:
         return math.sin(x)
@@ -87,15 +84,27 @@ def protectedSin(x):
         return 1
 
 
-# Define a protected cos function
-def protectedCos(x):
+def protectedASin(x):
+    try:
+        return math.asin(x)
+    except ValueError:
+        return 1
+
+
+def protecteCos(x):
     try:
         return math.cos(x)
     except ValueError:
         return 1
 
 
-# Define a protected tan function
+def protectedACos(x):
+    try:
+        return math.acos(x)
+    except ValueError:
+        return 1
+
+
 def protectedTan(x):
     try:
         return math.tan(x)
@@ -103,8 +112,7 @@ def protectedTan(x):
         return 1
 
 
-# Define a protected atan function
-def protectedAtan(x):
+def protectedATan(x):
     try:
         return math.atan(x)
     except ValueError:
@@ -120,10 +128,12 @@ pset.addPrimitive(protectedLog, [float], float, 'log')
 pset.addPrimitive(protectedExp, [float], float, 'exp')
 pset.addPrimitive(max, [float, float], float, 'max')
 pset.addPrimitive(min, [float, float], float, 'min')
-pset.addPrimitive(protectedCos, [float], float, 'cos')
+pset.addPrimitive(protecteCos, [float], float, 'cos')
+pset.addPrimitive(protectedACos, [float], float, 'acos')
 pset.addPrimitive(protectedSin, [float], float, 'sin')
+pset.addPrimitive(protectedASin, [float], float, 'asin')
 pset.addPrimitive(protectedTan, [float], float, 'tan')
-pset.addPrimitive(protectedAtan, [float], float, 'atan')
+pset.addPrimitive(protectedATan, [float], float, 'atan')
 
 
 # logic operators
@@ -137,7 +147,7 @@ def if_then_else(_input, output1, output2):
 
 pset.addPrimitive(operator.lt, [float, float], bool)
 pset.addPrimitive(operator.gt, [float, float], bool)
-# pset.addPrimitive(operator.eq, [float, float], bool)
+pset.addPrimitive(operator.eq, [float, float], bool)
 pset.addPrimitive(if_then_else, [bool, float, float], float)
 
 # terminals
@@ -145,7 +155,7 @@ pset.addTerminal(False, bool)
 pset.addTerminal(True, bool)
 pset.addEphemeralConstant("pi", lambda: np.pi, float)
 pset.addEphemeralConstant("e", lambda: np.e, float)
-pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5))/2, float)
+pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5)) / 2, float)
 pset.addEphemeralConstant("rand", lambda: random.random(), float)
 # pset.renameArguments(X='x')
 
