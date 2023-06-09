@@ -67,8 +67,8 @@ def eval_trade_sim_withprints(individual):
             break
 
         entradas = formar_entradas(trader.hist.arr, i, num_velas_anteriores, tipo_vela)
-        comando = func(*entradas)
-        if comando:
+        y = func(*entradas)
+        if y >= 0:
             trader.buy()
         else:
             trader.sell()

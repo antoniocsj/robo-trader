@@ -45,7 +45,7 @@ index_final = index_inicio + candlesticks_quantity
 num_entradas = num_velas_anteriores * len(tipo_vela)
 
 # defined a new primitive set for strongly typed GP
-pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), bool, "X")
+pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), float, "X")
 
 # Definição de funções que serão usadas na Programação Genética
 
@@ -200,8 +200,8 @@ def eval_trade_sim_noprints(individual):
             break
 
         entradas = formar_entradas(trader.hist.arr, i, num_velas_anteriores, tipo_vela)
-        comando = func(*entradas)
-        if comando:
+        y = func(*entradas)
+        if y >= 0:
             trader.buy()
         else:
             trader.sell()
