@@ -22,8 +22,8 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 100
-n_generations = 50
+n_population = 500
+n_generations = 20
 max_height = 17
 mutpb = 0.1
 
@@ -232,7 +232,8 @@ def eval_trade_sim_noprints(individual):
     # print('\nresultados finais da simulação')
     # trader.print_trade_stats()
 
-    return trader.hit_rate,
+    # return trader.hit_rate,
+    return trader.hit_rate, trader.roi
 
 
 toolbox.register("evaluate", eval_trade_sim_noprints)

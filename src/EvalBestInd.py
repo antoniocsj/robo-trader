@@ -124,11 +124,15 @@ def eval_trade_sim_noprints(individual):
             break
 
         entradas = formar_entradas(trader.hist.arr, i, num_velas_anteriores, tipo_vela)
-        comando = func(*entradas)
-        if comando:
+        y = func(*entradas)
+        if y >= 1:
             trader.buy()
-        else:
+        elif y <= -1:
             trader.sell()
+        elif np.abs(y) <= 0.5:
+            trader.close_position()
+        else:
+            pass
 
         trader.update_profit()
         # trader.print_trade_stats()
