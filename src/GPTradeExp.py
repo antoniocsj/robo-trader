@@ -232,8 +232,7 @@ def eval_trade_sim_noprints(individual):
     # print('\nresultados finais da simulação')
     # trader.print_trade_stats()
 
-    # return trader.hit_rate,
-    return trader.hit_rate, trader.roi
+    return trader.hit_rate,
 
 
 toolbox.register("evaluate", eval_trade_sim_noprints)
