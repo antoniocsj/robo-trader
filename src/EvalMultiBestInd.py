@@ -50,14 +50,15 @@ def eval_trade_sim_noprints(individual):
 
         entradas = formar_entradas_multi(trader.hist, i, num_velas_anteriores, tipo_vela)
         y = func(*entradas)
-        _y = int(np.clip(np.round(np.abs(y)), 0, num_ativos - 1))
-        _symbol = trader.symbols[_y]
+        # _y = int(np.clip(np.round(np.abs(y)), 0, num_ativos - 1))
+        # _symbol = trader.symbols[_y]
+        _symbol = 'XAUUSD'
 
-        if y >= 1:
+        if y > 0.666:
             trader.buy(_symbol)
-        elif y <= -1:
+        elif y < -0.666:
             trader.sell(_symbol)
-        elif np.abs(y) <= 0.5:
+        elif np.abs(y) <= 0.333:
             trader.close_position()
         else:
             pass
@@ -94,6 +95,7 @@ def eval_trade_sim_noprints(individual):
 
     # return trader.hit_rate,
     return trader.roi * trader.hit_rate / (trader.num_trades + 1),
+    # return trader.roi / (trader.num_trades + 1),
 
 
 # def eval_trade_sim_withprints(individual):

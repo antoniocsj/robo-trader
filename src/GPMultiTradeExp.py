@@ -23,8 +23,8 @@ from TraderSimMultiNoPrints import TraderSimMulti
 from utils import formar_entradas_multi
 
 # configurações para a programação genética
-n_population = 5000
-n_generations = 500
+n_population = 500
+n_generations = 100
 max_height = 17
 mutpb = 0.1
 
@@ -33,8 +33,8 @@ initial_deposit = 1000.0
 trader = TraderSimMulti(initial_deposit)
 num_ativos = len(trader.symbols)
 num_velas_anteriores = 2
-tipo_vela = 'CV'
-candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
+tipo_vela = 'C'
+candlesticks_quantity = 500  # quantidade de velas usadas no treinamento
 
 trader.start_simulation()
 index_inicio = num_velas_anteriores
@@ -186,14 +186,15 @@ def eval_trade_sim_noprints(individual):
 
         entradas = formar_entradas_multi(trader.hist, i, num_velas_anteriores, tipo_vela)
         y = func(*entradas)
-        _y = int(np.clip(np.round(np.abs(y)), 0, num_ativos - 1))
-        _symbol = trader.symbols[_y]
+        # _y = int(np.clip(np.round(np.abs(y)), 0, num_ativos - 1))
+        # _symbol = trader.symbols[_y]
+        _symbol = 'XAUUSD'
 
-        if y >= 1:
+        if y > 0.666:
             trader.buy(_symbol)
-        elif y <= -1:
+        elif y < -0.666:
             trader.sell(_symbol)
-        elif np.abs(y) <= 0.5:
+        elif np.abs(y) <= 0.333:
             trader.close_position()
         else:
             pass
@@ -230,6 +231,7 @@ def eval_trade_sim_noprints(individual):
 
     # return trader.hit_rate,
     return trader.roi * trader.hit_rate / (trader.num_trades + 1),
+    # return trader.roi / (trader.num_trades + 1),
 
 
 toolbox.register("evaluate", eval_trade_sim_noprints)
