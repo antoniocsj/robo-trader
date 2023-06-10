@@ -22,8 +22,8 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 500
-n_generations = 20
+n_population = 1000
+n_generations = 100
 max_height = 17
 mutpb = 0.1
 
@@ -33,7 +33,7 @@ timeframe = 'M5'
 initial_deposit = 1000.0
 num_velas_anteriores = 4
 tipo_vela = 'CV'
-candlesticks_quantity = 50000  # quantidade de velas usadas no treinamento
+candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
 
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
@@ -165,7 +165,7 @@ pset.addEphemeralConstant("rand", lambda: random.random(), float)
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax)
-# creator.create("FitnessMaxMin", base.Fitness, weights=(1.0, -1.0))
+# creator.create("FitnessMaxMin", base.Fitness, weights=(1.0, 1.0, -1.0))
 # creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMaxMin)
 
 toolbox = base.Toolbox()
@@ -232,7 +232,10 @@ def eval_trade_sim_noprints(individual):
     # print('\nresultados finais da simulação')
     # trader.print_trade_stats()
 
-    return trader.hit_rate,
+    # return trader.hit_rate,
+    # return trader.hit_rate, trader.roi
+    # return trader.roi,
+    return trader.roi * trader.hit_rate / (trader.num_trades + 1),
 
 
 toolbox.register("evaluate", eval_trade_sim_noprints)
