@@ -44,7 +44,17 @@ def formar_entradas_multi(_hist: HistMulti, _index: int, _num_velas: int, _tipo_
     _entradas = []
     _timeframe = _hist.timeframe
 
-    if _tipo_vela == 'C':
+    if _tipo_vela == 'OHLC':
+        for _symbol in _hist.symbols:
+            _symbol_timeframe = f'{_symbol}_{_timeframe}'
+            for _vela in _hist.arr[_symbol_timeframe][_index - _num_velas:_index]:
+                _entradas += _vela[2:6].tolist()
+    elif _tipo_vela == 'OHLCV':
+        for _symbol in _hist.symbols:
+            _symbol_timeframe = f'{_symbol}_{_timeframe}'
+            for _vela in _hist.arr[_symbol_timeframe][_index - _num_velas:_index]:
+                _entradas += _vela[2:7].tolist()
+    elif _tipo_vela == 'C':
         for _symbol in _hist.symbols:
             _symbol_timeframe = f'{_symbol}_{_timeframe}'
             for _vela in _hist.arr[_symbol_timeframe][_index - _num_velas:_index]:
@@ -54,6 +64,9 @@ def formar_entradas_multi(_hist: HistMulti, _index: int, _num_velas: int, _tipo_
             _symbol_timeframe = f'{_symbol}_{_timeframe}'
             for _vela in _hist.arr[_symbol_timeframe][_index - _num_velas:_index]:
                 _entradas += _vela[5:7].tolist()
+    else:
+        print(f'tipo de vela não suportado: {_tipo_vela}')
+        exit(-1)
 
     return _entradas
 
@@ -169,6 +182,6 @@ if __name__ == '__main__':
     # for i in range(3, 10):
     #     entradas = formar_entradas_multi(hist, _index=i, _num_velas=3, _tipo_vela='C')
     #     print(f'index = {i} {entradas}')
-    normalize_directory()
+    # normalize_directory()
     # denormalize__directory()
     pass

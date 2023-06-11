@@ -48,16 +48,17 @@ pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), float
 def renameArgumentsMulti(_pset, _hist, _num_velas: int, _tipo_vela: str):
     _arguments = {}
     k = len(_tipo_vela)
+    nv = _num_velas
 
     if _tipo_vela == 'OHLCV':
-        for _s in range(len(_hist.symbols)):
-            _symbol = _hist.symbols[_s]
+        for s in range(len(_hist.symbols)):
+            _symbol = _hist.symbols[s]
             for i in range(_num_velas):
-                _arguments[f'X{_s*k + k*i + i + 0}'] = f'{_symbol}_O{i}'
-                _arguments[f'X{_s*k + k*i + i + 1}'] = f'{_symbol}_H{i}'
-                _arguments[f'X{_s*k + k*i + i + 2}'] = f'{_symbol}_L{i}'
-                _arguments[f'X{_s*k + k*i + i + 3}'] = f'{_symbol}_C{i}'
-                _arguments[f'X{_s*k + k*i + i + 4}'] = f'{_symbol}_V{i}'
+                _arguments[f'X{k*i + s*nv*k + 0}'] = f'{_symbol}_O{i}'
+                _arguments[f'X{k*i + s*nv*k + 1}'] = f'{_symbol}_H{i}'
+                _arguments[f'X{k*i + s*nv*k + 2}'] = f'{_symbol}_L{i}'
+                _arguments[f'X{k*i + s*nv*k + 3}'] = f'{_symbol}_C{i}'
+                _arguments[f'X{k*i + s*nv*k + 4}'] = f'{_symbol}_V{i}'
     elif _tipo_vela == 'OHLC':
         for _symbol in _hist.symbols:
             for i in range(_num_velas):
