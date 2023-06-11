@@ -266,8 +266,9 @@ def eval_trade_sim_noprints(individual):
     # trader.print_trade_stats()
 
     # return trader.hit_rate,
-    return trader.roi * trader.hit_rate / (trader.num_trades + 1),
+    # return trader.roi * trader.hit_rate / (trader.num_trades + 1),
     # return trader.roi / (trader.num_trades + 1),
+    return math.pow(trader.roi, 2) * trader.hit_rate / (trader.num_trades + 1),
 
 
 toolbox.register("evaluate", eval_trade_sim_noprints)
