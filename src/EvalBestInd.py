@@ -29,7 +29,7 @@ timeframe = timeframe_train
 initial_deposit = 1000.0
 num_velas_anteriores = num_velas_anteriores_train
 tipo_vela = tipo_vela_train
-candlesticks_quantity = 50000  # quantidade de velas usadas na avaliação
+candlesticks_quantity = 150000  # quantidade de velas usadas na avaliação
 
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
@@ -127,11 +127,11 @@ def eval_trade_sim_noprints(individual):
 
         entradas = formar_entradas(trader.hist.arr, i, num_velas_anteriores, tipo_vela)
         y = func(*entradas)
-        if y >= 1:
+        if y >= 0.666:
             trader.buy()
-        elif y <= -1:
+        elif y <= -0.666:
             trader.sell()
-        elif np.abs(y) <= 0.5:
+        elif np.abs(y) <= 0.333:
             trader.close_position()
         else:
             pass
