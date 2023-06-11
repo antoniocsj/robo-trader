@@ -162,7 +162,8 @@ pset.addEphemeralConstant("pi", lambda: np.pi, float)
 pset.addEphemeralConstant("e", lambda: np.e, float)
 pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5)) / 2, float)
 pset.addEphemeralConstant("rand", lambda: random.random(), float)
-# pset.renameArguments(X='x')
+# for i in range(num_entradas):
+#     pset.addEphemeralConstant(f'rand{i}', lambda: random.random(), float)
 renameArguments(pset, num_velas_anteriores, tipo_vela)
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
