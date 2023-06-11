@@ -28,7 +28,7 @@ trader = TraderSimMulti(initial_deposit)
 num_ativos = num_ativos_train
 num_velas_anteriores = num_velas_anteriores_train
 tipo_vela = tipo_vela_train
-candlesticks_quantity = 50000  # quantidade de velas usadas na avaliação
+candlesticks_quantity = 150000  # quantidade de velas usadas na avaliação
 
 trader.start_simulation()
 index_inicio = num_velas_anteriores + candlesticks_quantity_train
