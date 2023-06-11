@@ -19,7 +19,7 @@ from scoop import futures
 
 # -------------------------------------------------------------------
 from TraderSimNoPrints import TraderSim
-from utils import formar_entradas
+from utils import formar_entradas, renameArguments
 
 # configurações para a programação genética
 n_population = 500
@@ -31,9 +31,9 @@ mutpb = 0.1
 symbol = 'XAUUSD'
 timeframe = 'M5'
 initial_deposit = 1000.0
-num_velas_anteriores = 8
+num_velas_anteriores = 4
 tipo_vela = 'C'
-candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
+candlesticks_quantity = 500  # quantidade de velas usadas no treinamento
 
 trader = TraderSim(symbol, timeframe, initial_deposit)
 trader.start_simulation()
@@ -46,34 +46,6 @@ num_entradas = num_velas_anteriores * len(tipo_vela)
 
 # defined a new primitive set for strongly typed GP
 pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), float, "X")
-
-
-def renameArguments(_pset, _num_velas: int, _tipo_vela: str):
-    _arguments = {}
-    k = len(_tipo_vela)
-
-    if _tipo_vela == 'OHLCV':
-        for i in range(_num_velas):
-            _arguments[f'X{i*k + 0}'] = f'O{i}'
-            _arguments[f'X{i*k + 1}'] = f'H{i}'
-            _arguments[f'X{i*k + 2}'] = f'L{i}'
-            _arguments[f'X{i*k + 3}'] = f'C{i}'
-            _arguments[f'X{i*k + 4}'] = f'V{i}'
-    elif _tipo_vela == 'OHLC':
-        for i in range(_num_velas):
-            _arguments[f'X{i * k + 0}'] = f'O{i}'
-            _arguments[f'X{i * k + 1}'] = f'H{i}'
-            _arguments[f'X{i * k + 2}'] = f'L{i}'
-            _arguments[f'X{i * k + 3}'] = f'C{i}'
-    elif _tipo_vela == 'CV':
-        for i in range(_num_velas):
-            _arguments[f'X{i * k + 0}'] = f'C{i}'
-            _arguments[f'X{i * k + 1}'] = f'V{i}'
-    elif _tipo_vela == 'C':
-        for i in range(_num_velas):
-            _arguments[f'X{i * k + 0}'] = f'C{i}'
-
-    pset.renameArguments(**_arguments)
 
 
 # Definição de funções que serão usadas na Programação Genética

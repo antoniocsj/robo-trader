@@ -138,6 +138,34 @@ def criar_hist_csv():
     df2.to_csv(filepath2, sep='\t', index=False, float_format='%.2f')
 
 
+def renameArguments(_pset, _num_velas: int, _tipo_vela: str):
+    _arguments = {}
+    k = len(_tipo_vela)
+
+    if _tipo_vela == 'OHLCV':
+        for i in range(_num_velas):
+            _arguments[f'X{i*k + 0}'] = f'O{i}'
+            _arguments[f'X{i*k + 1}'] = f'H{i}'
+            _arguments[f'X{i*k + 2}'] = f'L{i}'
+            _arguments[f'X{i*k + 3}'] = f'C{i}'
+            _arguments[f'X{i*k + 4}'] = f'V{i}'
+    elif _tipo_vela == 'OHLC':
+        for i in range(_num_velas):
+            _arguments[f'X{i * k + 0}'] = f'O{i}'
+            _arguments[f'X{i * k + 1}'] = f'H{i}'
+            _arguments[f'X{i * k + 2}'] = f'L{i}'
+            _arguments[f'X{i * k + 3}'] = f'C{i}'
+    elif _tipo_vela == 'CV':
+        for i in range(_num_velas):
+            _arguments[f'X{i * k + 0}'] = f'C{i}'
+            _arguments[f'X{i * k + 1}'] = f'V{i}'
+    elif _tipo_vela == 'C':
+        for i in range(_num_velas):
+            _arguments[f'X{i * k + 0}'] = f'C{i}'
+
+    _pset.renameArguments(**_arguments)
+
+
 def renameArgumentsMulti(_pset, _hist, _num_velas: int, _tipo_vela: str):
     _arguments = {}
     k = len(_tipo_vela)
