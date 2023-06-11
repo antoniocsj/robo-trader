@@ -2,12 +2,14 @@ import pickle
 
 import numpy as np
 import pandas as pd
+from numpy import ndarray
 
 from Hist import Hist
 from HistMulti import HistMulti
 from sklearn.preprocessing import MinMaxScaler
 
 
+# usada na GP
 def formar_entradas(arr: np.ndarray, index: int, _num_velas: int, _tipo_vela: str) -> list[float]:
     """
     Estas função se baseia num array numpy para gerar uma lista de floats.
@@ -40,6 +42,7 @@ def formar_entradas(arr: np.ndarray, index: int, _num_velas: int, _tipo_vela: st
     return _entradas
 
 
+# usada na GP
 def formar_entradas_multi(_hist: HistMulti, _index: int, _num_velas: int, _tipo_vela: str) -> list[float]:
     _entradas = []
     _timeframe = _hist.timeframe
@@ -241,6 +244,47 @@ def denormalize__directory():
         print(f'{_symbol} {data_inv[0]}')
 
 
+# usada nas redes neurais
+def prepare_train_data_multi(_hist: HistMulti, _symbol_out: str, _num_velas: int, _tipo_vela: str) -> ndarray:
+    _data = []
+    _timeframe = _hist.timeframe
+    _symbol_tf_out = f'{_symbol_out}_{_timeframe}'
+
+    if _tipo_vela == 'CV':
+        for _symbol in _hist.symbols:
+            _symbol_timeframe = f'{_symbol}_{_timeframe}'
+            _cv_in = _hist.arr[_symbol_timeframe][0:_num_velas][:, 5:7]
+            if len(_data) == 0:
+                _data = _cv_in
+            else:
+                _data = np.hstack((_data, _cv_in))
+
+        _c_out = _hist.arr[_symbol_tf_out][1:_num_velas+1][:, 5]
+        _c_out = _c_out.reshape(len(_c_out), 1)
+        _data = np.hstack((_data, _c_out))
+        pass
+    else:
+        print(f'tipo de vela não suportado: {_tipo_vela}')
+        exit(-1)
+
+    return _data
+
+
+def teste_1():
+    dir_csv = '../csv'
+    hist = HistMulti(directory=dir_csv)
+    num_ativos = len(hist.symbols)
+    num_velas_anteriores = 2
+    tipo_vela = 'CV'
+    symbol_out = 'XAUUSD'
+    timeframe = hist.timeframe
+    num_entradas = num_velas_anteriores * len(tipo_vela) * num_ativos
+    candlesticks_quantity = 10  # quantidade de velas usadas no treinamento
+
+    x = prepare_train_data_multi(hist, symbol_out, candlesticks_quantity, tipo_vela)
+    print(x)
+
+
 if __name__ == '__main__':
     # criar_hist_csv()
     # hist = HistMulti('../csv')
@@ -249,4 +293,4 @@ if __name__ == '__main__':
     #     print(f'index = {i} {entradas}')
     # normalize_directory()
     # denormalize__directory()
-    pass
+    teste_1()

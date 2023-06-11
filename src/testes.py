@@ -1,4 +1,4 @@
-from utils import formar_entradas_multi
+from utils import prepare_train_data_multi
 from HistMulti import HistMulti
 import numpy as np
 
@@ -17,9 +17,7 @@ def teste_1():
     index_inicio = 1
     index_final = index_inicio + candlesticks_quantity
 
-    for i in range(index_inicio, index_final):
-        entradas = np.array(formar_entradas_multi(hist, i, 1, tipo_vela))
-        saida = np.array([hist.arr[f'{symbol_out}_{timeframe}'][i][5]])
+    x = prepare_train_data_multi(hist, 5, tipo_vela)
 
 
 if __name__ == '__main__':
