@@ -160,7 +160,8 @@ def eval_trade_sim_noprints(individual):
 
     # return trader.hit_rate,
     # return trader.hit_rate, trader.roi
-    return trader.roi * trader.hit_rate / trader.num_trades,
+    # return trader.roi * trader.hit_rate / trader.num_trades,
+    return math.pow(trader.roi, 2) * trader.hit_rate / (trader.num_trades + 1),
 
 
 def read_halloffame():

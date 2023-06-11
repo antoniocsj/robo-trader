@@ -22,8 +22,8 @@ from TraderSimNoPrints import TraderSim
 from utils import formar_entradas
 
 # configurações para a programação genética
-n_population = 1000
-n_generations = 100
+n_population = 500
+n_generations = 200
 max_height = 17
 mutpb = 0.1
 
@@ -31,8 +31,8 @@ mutpb = 0.1
 symbol = 'XAUUSD'
 timeframe = 'M5'
 initial_deposit = 1000.0
-num_velas_anteriores = 4
-tipo_vela = 'CV'
+num_velas_anteriores = 8
+tipo_vela = 'C'
 candlesticks_quantity = 5000  # quantidade de velas usadas no treinamento
 
 trader = TraderSim(symbol, timeframe, initial_deposit)
@@ -46,6 +46,35 @@ num_entradas = num_velas_anteriores * len(tipo_vela)
 
 # defined a new primitive set for strongly typed GP
 pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), float, "X")
+
+
+def renameArguments(_pset, _num_velas: int, _tipo_vela: str):
+    _arguments = {}
+    k = len(_tipo_vela)
+
+    if _tipo_vela == 'OHLCV':
+        for i in range(_num_velas):
+            _arguments[f'X{i*k + 0}'] = f'O{i}'
+            _arguments[f'X{i*k + 1}'] = f'H{i}'
+            _arguments[f'X{i*k + 2}'] = f'L{i}'
+            _arguments[f'X{i*k + 3}'] = f'C{i}'
+            _arguments[f'X{i*k + 4}'] = f'V{i}'
+    elif _tipo_vela == 'OHLC':
+        for i in range(_num_velas):
+            _arguments[f'X{i * k + 0}'] = f'O{i}'
+            _arguments[f'X{i * k + 1}'] = f'H{i}'
+            _arguments[f'X{i * k + 2}'] = f'L{i}'
+            _arguments[f'X{i * k + 3}'] = f'C{i}'
+    elif _tipo_vela == 'CV':
+        for i in range(_num_velas):
+            _arguments[f'X{i * k + 0}'] = f'C{i}'
+            _arguments[f'X{i * k + 1}'] = f'V{i}'
+    elif _tipo_vela == 'C':
+        for i in range(_num_velas):
+            _arguments[f'X{i * k + 0}'] = f'C{i}'
+
+    pset.renameArguments(**_arguments)
+
 
 # Definição de funções que serão usadas na Programação Genética
 
@@ -162,6 +191,7 @@ pset.addEphemeralConstant("e", lambda: np.e, float)
 pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5)) / 2, float)
 pset.addEphemeralConstant("rand", lambda: random.random(), float)
 # pset.renameArguments(X='x')
+renameArguments(pset, num_velas_anteriores, tipo_vela)
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax)
@@ -201,11 +231,11 @@ def eval_trade_sim_noprints(individual):
 
         entradas = formar_entradas(trader.hist.arr, i, num_velas_anteriores, tipo_vela)
         y = func(*entradas)
-        if y >= 1:
+        if y >= 0.666:
             trader.buy()
-        elif y <= -1:
+        elif y <= -0.666:
             trader.sell()
-        elif np.abs(y) <= 0.5:
+        elif np.abs(y) <= 0.333:
             trader.close_position()
         else:
             pass
@@ -235,7 +265,8 @@ def eval_trade_sim_noprints(individual):
     # return trader.hit_rate,
     # return trader.hit_rate, trader.roi
     # return trader.roi,
-    return trader.roi * trader.hit_rate / (trader.num_trades + 1),
+    # return trader.roi * trader.hit_rate / (trader.num_trades + 1),
+    return math.pow(trader.roi, 2) * trader.hit_rate / (trader.num_trades + 1),
 
 
 toolbox.register("evaluate", eval_trade_sim_noprints)
