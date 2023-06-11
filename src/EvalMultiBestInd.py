@@ -52,7 +52,7 @@ def eval_trade_sim_noprints(individual):
         y = func(*entradas)
         # _y = int(np.clip(np.round(np.abs(y)), 0, num_ativos - 1))
         # _symbol = trader.symbols[_y]
-        _symbol = 'XAUUSD'
+        _symbol = 'USDCHF'
 
         if y > 0.666:
             trader.buy(_symbol)

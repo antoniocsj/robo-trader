@@ -138,6 +138,43 @@ def criar_hist_csv():
     df2.to_csv(filepath2, sep='\t', index=False, float_format='%.2f')
 
 
+def renameArgumentsMulti(_pset, _hist, _num_velas: int, _tipo_vela: str):
+    _arguments = {}
+    k = len(_tipo_vela)
+    nv = _num_velas
+
+    if _tipo_vela == 'OHLCV':
+        for s in range(len(_hist.symbols)):
+            _symbol = _hist.symbols[s]
+            for i in range(_num_velas):
+                _arguments[f'X{k*i + s*nv*k + 0}'] = f'{_symbol}_O{i}'
+                _arguments[f'X{k*i + s*nv*k + 1}'] = f'{_symbol}_H{i}'
+                _arguments[f'X{k*i + s*nv*k + 2}'] = f'{_symbol}_L{i}'
+                _arguments[f'X{k*i + s*nv*k + 3}'] = f'{_symbol}_C{i}'
+                _arguments[f'X{k*i + s*nv*k + 4}'] = f'{_symbol}_V{i}'
+    elif _tipo_vela == 'OHLC':
+        for s in range(len(_hist.symbols)):
+            _symbol = _hist.symbols[s]
+            for i in range(_num_velas):
+                _arguments[f'X{k*i + s*nv*k + 0}'] = f'{_symbol}_O{i}'
+                _arguments[f'X{k*i + s*nv*k + 1}'] = f'{_symbol}_H{i}'
+                _arguments[f'X{k*i + s*nv*k + 2}'] = f'{_symbol}_L{i}'
+                _arguments[f'X{k*i + s*nv*k + 3}'] = f'{_symbol}_C{i}'
+    elif _tipo_vela == 'CV':
+        for s in range(len(_hist.symbols)):
+            _symbol = _hist.symbols[s]
+            for i in range(_num_velas):
+                _arguments[f'X{k*i + s*nv*k + 0}'] = f'{_symbol}_C{i}'
+                _arguments[f'X{k*i + s*nv*k + 1}'] = f'{_symbol}_V{i}'
+    elif _tipo_vela == 'C':
+        for s in range(len(_hist.symbols)):
+            _symbol = _hist.symbols[s]
+            for i in range(_num_velas):
+                _arguments[f'X{k*i + s*nv*k + 0}'] = f'{_symbol}_C{i}'
+
+    _pset.renameArguments(**_arguments)
+
+
 def normalize_directory():
     hist = HistMulti('../csv')
     scalers = {}
