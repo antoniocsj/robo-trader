@@ -32,7 +32,7 @@ mutpb = 0.1
 initial_deposit = 1000.0
 trader = TraderSimMulti(initial_deposit)
 num_ativos = len(trader.symbols)
-num_velas_anteriores = 3
+num_velas_anteriores = 2
 tipo_vela = 'OHLCV'
 candlesticks_quantity = 500  # quantidade de velas usadas no treinamento
 
