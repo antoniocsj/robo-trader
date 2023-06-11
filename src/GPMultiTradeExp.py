@@ -33,7 +33,7 @@ initial_deposit = 1000.0
 trader = TraderSimMulti(initial_deposit)
 num_ativos = len(trader.symbols)
 num_velas_anteriores = 2
-tipo_vela = 'C'
+tipo_vela = 'OHLCV'
 candlesticks_quantity = 500  # quantidade de velas usadas no treinamento
 
 trader.start_simulation()
@@ -43,6 +43,40 @@ num_entradas = num_velas_anteriores * len(tipo_vela) * num_ativos
 
 # defined a new primitive set for strongly typed GP
 pset = gp.PrimitiveSetTyped("MAIN", itertools.repeat(float, num_entradas), float, "X")
+
+
+def renameArgumentsMulti(_pset, _hist, _num_velas: int, _tipo_vela: str):
+    _arguments = {}
+    k = len(_tipo_vela)
+
+    if _tipo_vela == 'OHLCV':
+        for _s in range(len(_hist.symbols)):
+            _symbol = _hist.symbols[_s]
+            for i in range(_num_velas):
+                _arguments[f'X{_s*k + k*i + i + 0}'] = f'{_symbol}_O{i}'
+                _arguments[f'X{_s*k + k*i + i + 1}'] = f'{_symbol}_H{i}'
+                _arguments[f'X{_s*k + k*i + i + 2}'] = f'{_symbol}_L{i}'
+                _arguments[f'X{_s*k + k*i + i + 3}'] = f'{_symbol}_C{i}'
+                _arguments[f'X{_s*k + k*i + i + 4}'] = f'{_symbol}_V{i}'
+    elif _tipo_vela == 'OHLC':
+        for _symbol in _hist.symbols:
+            for i in range(_num_velas):
+                _arguments[f'X{i * k + 0}'] = f'{_symbol}_O{i}'
+                _arguments[f'X{i * k + 1}'] = f'{_symbol}_H{i}'
+                _arguments[f'X{i * k + 2}'] = f'{_symbol}_L{i}'
+                _arguments[f'X{i * k + 3}'] = f'{_symbol}_C{i}'
+    elif _tipo_vela == 'CV':
+        for _symbol in _hist.symbols:
+            for i in range(_num_velas):
+                _arguments[f'X{i * k + 0}'] = f'{_symbol}_C{i}'
+                _arguments[f'X{i * k + 1}'] = f'{_symbol}_V{i}'
+    elif _tipo_vela == 'C':
+        for _symbol in _hist.symbols:
+            for i in range(_num_velas):
+                _arguments[f'X{i * k + 0}'] = f'{_symbol}_C{i}'
+
+    pset.renameArguments(**_arguments)
+
 
 # Definição de funções que serão usadas na Programação Genética
 
@@ -158,6 +192,7 @@ pset.addEphemeralConstant("e", lambda: np.e, float)
 pset.addEphemeralConstant("phi", lambda: (1 + np.sqrt(5)) / 2, float)
 pset.addEphemeralConstant("rand", lambda: random.random(), float)
 # pset.renameArguments(X='x')
+renameArgumentsMulti(pset, trader.hist, num_velas_anteriores, tipo_vela)
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax)
