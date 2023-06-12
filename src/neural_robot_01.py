@@ -83,7 +83,7 @@ def train_model():
     n_steps = 2
     tipo_vela = 'CV'
     num_entradas = num_ativos * n_steps * len(tipo_vela)
-    symbol_out = 'XAUUSD'
+    symbol_out = 'USDJPY'
     n_samples_train = 5000  # quantidade de velas usadas no treinamento
     n_epochs = 500
 
@@ -126,7 +126,8 @@ def train_model():
                      'symbols': hist.symbols,
                      'n_steps': n_steps,
                      'n_features': n_features,
-                     'n_samples_train': n_samples_train}
+                     'n_samples_train': n_samples_train,
+                     'last_loss': last_loss}
 
     with open('train_configs.pkl', 'wb') as file:
         pickle.dump(model_configs, file)
