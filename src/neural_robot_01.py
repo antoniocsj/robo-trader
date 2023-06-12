@@ -30,7 +30,7 @@ def prepare_train_data_multi(_hist: HistMulti, _symbol_out: str, _start_index: i
             else:
                 _data = np.hstack((_data, _cv_in))
 
-        _c_out = _hist.arr[_symbol_tf_out][_start_index+1:_start_index+_num_velas + 1][:, 5]
+        _c_out = _hist.arr[_symbol_tf_out][_start_index + 1:_start_index + _num_velas + 1][:, 5]
         _c_out = _c_out.reshape(len(_c_out), 1)
         _data = np.hstack((_data, _c_out))
         pass
@@ -108,7 +108,7 @@ def train_model():
     model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
-    model.add(Dense(num_entradas*2, activation='relu'))
+    model.add(Dense(num_entradas * 2, activation='relu'))
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse', metrics=['accuracy'])
 
@@ -134,6 +134,12 @@ def train_model():
         pickle.dump(model_configs, file)
 
     print('treinamento concluído.')
+
+
+def denorm_close_price(_c, trans: MinMaxScaler):
+    c_denorm = trans.inverse_transform(np.array([0, 0, 0, _c, 0], dtype=object).reshape(1, -1))
+    c_denorm = c_denorm[0][3]
+    return c_denorm
 
 
 def test_model():
@@ -173,15 +179,101 @@ def test_model():
     for i in range(50):
         x_input = X_[i]
         x_input = x_input.reshape((1, n_steps, n_features))
-        yhat = model.predict(x_input)
-        y_denorm = trans.inverse_transform(np.array([0, 0, 0, y_[i], 0], dtype=object).reshape(1, -1))
-        y_denorm = y_denorm[0][3]
-        y_hat_denorm = trans.inverse_transform(np.array([0, 0, 0, yhat[0][0], 0], dtype=object).reshape(1, -1))
-        y_hat_denorm = y_hat_denorm[0][3]
-        diff_real = np.abs(y_hat_denorm - y_denorm)
-        diff_norm = yhat[0][0] - y_[i]
-        # print(f'com normalização: real = {y_[i]}, previsto = {yhat[0][0]}, diferença = {diff_norm}')
-        print(f'previsto = {y_hat_denorm}, real = {y_denorm}, delta = {diff_real}')
+        y_est = model.predict(x_input)
+        y_denorm = denorm_close_price(y_[i], trans)
+        y_est_denorm = denorm_close_price(y_est[0][0], trans)
+        diff_real = y_est_denorm - y_denorm
+        print(f'previsto = {y_est_denorm}, real = {y_denorm}, dif = {diff_real}')
+
+
+def test_model_with_trader():
+    from TraderSimMulti import TraderSimMulti
+
+    dir_csv = '../csv'
+    hist = HistMulti(directory=dir_csv)
+
+    with open('train_configs.pkl', 'rb') as file:
+        train_configs = pickle.load(file)
+
+    print(f'train_configs:')
+    print(f'{train_configs}')
+
+    n_steps = train_configs['n_steps']
+    n_features = train_configs['n_features']
+    symbol_out = train_configs['symbol_out']
+    n_samples_train = train_configs['n_samples_train']
+    tipo_vela = train_configs['tipo_vela']
+    n_samples_test = 100
+    samples_index_start = n_samples_train
+
+    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
+    X_, y_ = split_sequences(dataset_test, n_steps)
+    print(X_.shape, y_.shape)
+
+    model = load_model('model.hdf5')
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+    _symbol_timeframe = f'{symbol_out}_{hist.timeframe}'
+    trans: MinMaxScaler = scalers[_symbol_timeframe]
+
+    # demonstrate prediction
+    # x_input = np.array([[80, 85], [90, 95], [100, 105]])
+    # x_input = x_input.reshape((1, n_steps, n_features))
+    X_ = np.asarray(X_).astype(np.float32)
+    y_ = np.asarray(y_).astype(np.float32)
+
+    initial_deposit = 1000.0
+
+    trader = TraderSimMulti(initial_deposit)
+    trader.start_simulation()
+
+    candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
+
+    for i in range(samples_index_start, samples_index_start + candlesticks_quantity):
+        print(f'i = {i}')
+        trader.index = i
+        trader.print_symbols_close_price_at(i)
+
+        trader.update_profit()
+
+        if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
+            print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')
+            trader.close_position()
+
+        if trader.equity <= 0.0:
+            trader.close_position()
+            trader.finish_simulation()
+            print('equity <= 0. a simulação será encerrada.')
+            break
+
+        # fecha a posição quando acabarem as novas barras (velas ou candlesticks)
+        if i == candlesticks_quantity - 1:
+            trader.close_position()
+            trader.finish_simulation()
+            print('a última vela atingida. a simulação chegou ao fim.')
+
+        if trader.candlestick_count >= trader.max_candlestick_count:
+            print(f'fechamento forçado de negociações abertas. a contagem de velas atingiu o limite.')
+            trader.close_position()
+
+        if trader.open_position[0]:
+            trader.candlestick_count += 1
+        else:
+            trader.candlestick_count = 0
+
+        trader.print_trade_stats()
+
+        ret_msg = trader.interact_with_user()
+
+        if ret_msg == 'break':
+            print('o usuário decidiu encerrar a simulação.')
+            trader.close_position()
+            trader.finish_simulation()
+            break
+
+    print('\nresultados finais da simulação')
+    trader.print_trade_stats()
 
 
 def show_tf():
@@ -195,3 +287,4 @@ if __name__ == '__main__':
     show_tf()
     # train_model()
     test_model()
+    # test_model_with_trader()

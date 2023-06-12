@@ -1,4 +1,15 @@
+import os
+import pickle
+
+import numpy as np
 from HistMulti import HistMulti
+from sklearn.preprocessing import MinMaxScaler
+
+
+def denorm_close_price(_c, trans: MinMaxScaler):
+    c_denorm = trans.inverse_transform(np.array([0, 0, 0, _c, 0], dtype=object).reshape(1, -1))
+    c_denorm = c_denorm[0][3]
+    return c_denorm
 
 
 class TraderSimMulti:
@@ -29,11 +40,18 @@ class TraderSimMulti:
         self.profit = 0.0  # lucro (ou prejuízo) na negociação
         self.roi = 0.0  # Return on Investment ou Retorno de Investmento
         self.stop_loss = 0.01  # limiar de percentual de perda máxima por negociação
+        self.scalers = None
         self.load_symbols()
+        self.load_scalers()
 
     def load_symbols(self):
         self.symbols = self.hist.symbols[:]
         self.timeframe = self.hist.timeframe
+
+    def load_scalers(self):
+        if os.path.exists('scalers.pkl'):
+            with open('scalers.pkl', 'rb') as file:
+                self.scalers = pickle.load(file)
 
     def reset(self):
         self.open_position = ('', '')
@@ -247,15 +265,25 @@ class TraderSimMulti:
         """
         close_price_col = 5
         _symbol = f'{_symbol}_{self.timeframe}'
-        return self.hist.arr[_symbol][_index, close_price_col]
+        _c = self.hist.arr[_symbol][_index, close_price_col]
+
+        if self.scalers:
+            trans: MinMaxScaler = self.scalers[_symbol]
+            _c = denorm_close_price(_c, trans)
+
+        return _c
 
     def print_symbols_close_price_at(self, _index):
-        _list = [(_s, self.get_close_price_symbol_at(_s, _index)) for _s in self.symbols]
-        print(_list)
+        _list = []
+        for _s in self.symbols:
+            _c = self.get_close_price_symbol_at(_s, _index)
+            _list.append(f'({_s} {_c:.5f})')
+        _l = ' '.join(_list)
+        print(_l)
 
 
 def main():
-    initial_deposit = 100.0
+    initial_deposit = 1000.0
 
     trader = TraderSimMulti(initial_deposit)
     trader.start_simulation()
