@@ -147,11 +147,11 @@ def renameArguments(_pset, _num_velas: int, _tipo_vela: str):
 
     if _tipo_vela == 'OHLCV':
         for i in range(_num_velas):
-            _arguments[f'X{i*k + 0}'] = f'O{i}'
-            _arguments[f'X{i*k + 1}'] = f'H{i}'
-            _arguments[f'X{i*k + 2}'] = f'L{i}'
-            _arguments[f'X{i*k + 3}'] = f'C{i}'
-            _arguments[f'X{i*k + 4}'] = f'V{i}'
+            _arguments[f'X{i * k + 0}'] = f'O{i}'
+            _arguments[f'X{i * k + 1}'] = f'H{i}'
+            _arguments[f'X{i * k + 2}'] = f'L{i}'
+            _arguments[f'X{i * k + 3}'] = f'C{i}'
+            _arguments[f'X{i * k + 4}'] = f'V{i}'
     elif _tipo_vela == 'OHLC':
         for i in range(_num_velas):
             _arguments[f'X{i * k + 0}'] = f'O{i}'
@@ -178,30 +178,30 @@ def renameArgumentsMulti(_pset, _hist, _num_velas: int, _tipo_vela: str):
         for s in range(len(_hist.symbols)):
             _symbol = _hist.symbols[s]
             for i in range(_num_velas):
-                _arguments[f'X{k*i + s*nv*k + 0}'] = f'{_symbol}_O{i}'
-                _arguments[f'X{k*i + s*nv*k + 1}'] = f'{_symbol}_H{i}'
-                _arguments[f'X{k*i + s*nv*k + 2}'] = f'{_symbol}_L{i}'
-                _arguments[f'X{k*i + s*nv*k + 3}'] = f'{_symbol}_C{i}'
-                _arguments[f'X{k*i + s*nv*k + 4}'] = f'{_symbol}_V{i}'
+                _arguments[f'X{k * i + s * nv * k + 0}'] = f'{_symbol}_O{i}'
+                _arguments[f'X{k * i + s * nv * k + 1}'] = f'{_symbol}_H{i}'
+                _arguments[f'X{k * i + s * nv * k + 2}'] = f'{_symbol}_L{i}'
+                _arguments[f'X{k * i + s * nv * k + 3}'] = f'{_symbol}_C{i}'
+                _arguments[f'X{k * i + s * nv * k + 4}'] = f'{_symbol}_V{i}'
     elif _tipo_vela == 'OHLC':
         for s in range(len(_hist.symbols)):
             _symbol = _hist.symbols[s]
             for i in range(_num_velas):
-                _arguments[f'X{k*i + s*nv*k + 0}'] = f'{_symbol}_O{i}'
-                _arguments[f'X{k*i + s*nv*k + 1}'] = f'{_symbol}_H{i}'
-                _arguments[f'X{k*i + s*nv*k + 2}'] = f'{_symbol}_L{i}'
-                _arguments[f'X{k*i + s*nv*k + 3}'] = f'{_symbol}_C{i}'
+                _arguments[f'X{k * i + s * nv * k + 0}'] = f'{_symbol}_O{i}'
+                _arguments[f'X{k * i + s * nv * k + 1}'] = f'{_symbol}_H{i}'
+                _arguments[f'X{k * i + s * nv * k + 2}'] = f'{_symbol}_L{i}'
+                _arguments[f'X{k * i + s * nv * k + 3}'] = f'{_symbol}_C{i}'
     elif _tipo_vela == 'CV':
         for s in range(len(_hist.symbols)):
             _symbol = _hist.symbols[s]
             for i in range(_num_velas):
-                _arguments[f'X{k*i + s*nv*k + 0}'] = f'{_symbol}_C{i}'
-                _arguments[f'X{k*i + s*nv*k + 1}'] = f'{_symbol}_V{i}'
+                _arguments[f'X{k * i + s * nv * k + 0}'] = f'{_symbol}_C{i}'
+                _arguments[f'X{k * i + s * nv * k + 1}'] = f'{_symbol}_V{i}'
     elif _tipo_vela == 'C':
         for s in range(len(_hist.symbols)):
             _symbol = _hist.symbols[s]
             for i in range(_num_velas):
-                _arguments[f'X{k*i + s*nv*k + 0}'] = f'{_symbol}_C{i}'
+                _arguments[f'X{k * i + s * nv * k + 0}'] = f'{_symbol}_C{i}'
 
     _pset.renameArguments(**_arguments)
 
@@ -259,7 +259,7 @@ def prepare_train_data_multi(_hist: HistMulti, _symbol_out: str, _num_velas: int
             else:
                 _data = np.hstack((_data, _cv_in))
 
-        _c_out = _hist.arr[_symbol_tf_out][1:_num_velas+1][:, 5]
+        _c_out = _hist.arr[_symbol_tf_out][1:_num_velas + 1][:, 5]
         _c_out = _c_out.reshape(len(_c_out), 1)
         _data = np.hstack((_data, _c_out))
         pass
@@ -268,6 +268,22 @@ def prepare_train_data_multi(_hist: HistMulti, _symbol_out: str, _num_velas: int
         exit(-1)
 
     return _data
+
+
+# split a multivariate sequence into samples
+def split_sequences(sequences, n_steps):
+    X, y = list(), list()
+    for i in range(len(sequences)):
+        # find the end of this pattern
+        end_ix = i + n_steps
+        # check if we are beyond the dataset
+        if end_ix > len(sequences):
+            break
+        # gather input and output parts of the pattern
+        seq_x, seq_y = sequences[i:end_ix, :-1], sequences[end_ix - 1, -1]
+        X.append(seq_x)
+        y.append(seq_y)
+    return np.array(X), np.array(y)
 
 
 def teste_1():
@@ -279,10 +295,18 @@ def teste_1():
     symbol_out = 'XAUUSD'
     timeframe = hist.timeframe
     num_entradas = num_velas_anteriores * len(tipo_vela) * num_ativos
-    candlesticks_quantity = 10  # quantidade de velas usadas no treinamento
+    candlesticks_quantity = 20  # quantidade de velas usadas no treinamento
 
-    x = prepare_train_data_multi(hist, symbol_out, candlesticks_quantity, tipo_vela)
-    print(x)
+    # horizontally stack columns
+    dataset = prepare_train_data_multi(hist, symbol_out, candlesticks_quantity, tipo_vela)
+    # choose a number of time steps
+    n_steps = 3
+    # convert into input/output
+    X, y = split_sequences(dataset, n_steps)
+    print(X.shape, y.shape)
+    # summarize the data
+    for i in range(len(X)):
+        print(X[i], y[i])
 
 
 if __name__ == '__main__':
