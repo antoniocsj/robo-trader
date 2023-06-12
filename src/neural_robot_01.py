@@ -79,10 +79,13 @@ def split_sequences(sequences, n_steps):
 def train_model():
     dir_csv = '../csv'
     hist = HistMulti(directory=dir_csv)
+    num_ativos = len(hist.symbols)
     n_steps = 2
     tipo_vela = 'CV'
+    num_entradas = num_ativos * n_steps * len(tipo_vela)
     symbol_out = 'XAUUSD'
     n_samples_train = 5000  # quantidade de velas usadas no treinamento
+    n_epochs = 500
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
@@ -105,14 +108,14 @@ def train_model():
     model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
-    model.add(Dense(50, activation='relu'))
+    model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse')
 
     # fit model
     X = np.asarray(X).astype(np.float32)
     y = np.asarray(y).astype(np.float32)
-    model.fit(X, y, epochs=100, verbose=1)
+    model.fit(X, y, epochs=n_epochs, verbose=1)
     last_loss = model.history.history['loss'][-1]
     print(f'loss = {last_loss}')
 
@@ -184,5 +187,5 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    train_model()
-    # test_model()
+    # train_model()
+    test_model()
