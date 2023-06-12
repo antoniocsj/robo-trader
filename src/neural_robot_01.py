@@ -27,7 +27,7 @@ def prepare_train_data_multi(_hist: HistMulti, _symbol_out: str, _start_index: i
             else:
                 _data = np.hstack((_data, _cv_in))
 
-        _c_out = _hist.arr[_symbol_tf_out][1:_num_velas + 1][:, 5]
+        _c_out = _hist.arr[_symbol_tf_out][_start_index+1:_start_index+_num_velas + 1][:, 5]
         _c_out = _c_out.reshape(len(_c_out), 1)
         _data = np.hstack((_data, _c_out))
         pass
@@ -125,6 +125,8 @@ def train_model():
     with open('train_configs.pkl', 'wb') as file:
         pickle.dump(model_configs, file)
 
+    print('treinamento concluído.')
+
 
 def test_model():
     dir_csv = '../csv'
@@ -159,5 +161,5 @@ def test_model():
 
 
 if __name__ == '__main__':
-    train_model()
-    # test_model()
+    # train_model()
+    test_model()
