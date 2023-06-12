@@ -1,9 +1,11 @@
+import os
 import pickle
 import numpy as np
 from numpy import ndarray
 from HistMulti import HistMulti
 from sklearn.preprocessing import MinMaxScaler
 
+import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Flatten
@@ -173,6 +175,14 @@ def test_model():
         print(f'sem normalização: real = {y_denorm}, previsto = {y_hat_denorm}, diferença = {diff_real}')
 
 
+def show_tf():
+    print(os.environ["LD_LIBRARY_PATH"])
+    print(os.environ["PYTHONPATH"])
+    print(tf.__version__)
+    print(tf.config.list_physical_devices('GPU'))
+
+
 if __name__ == '__main__':
-    # train_model()
-    test_model()
+    show_tf()
+    train_model()
+    # test_model()
