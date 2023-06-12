@@ -140,15 +140,19 @@ def test_model():
     hist = HistMulti(directory=dir_csv)
 
     with open('train_configs.pkl', 'rb') as file:
-        model_configs = pickle.load(file)
+        train_configs = pickle.load(file)
 
-    n_steps = model_configs['n_steps']
-    n_features = model_configs['n_features']
-    symbol_out = model_configs['symbol_out']
-    n_samples_train = model_configs['n_samples_train']
-    tipo_vela = model_configs['tipo_vela']
+    print(f'train_configs:')
+    print(f'{train_configs}')
 
-    dataset_test = prepare_train_data_multi(hist, symbol_out, n_samples_train, 100, tipo_vela)
+    n_steps = train_configs['n_steps']
+    n_features = train_configs['n_features']
+    symbol_out = train_configs['symbol_out']
+    n_samples_train = train_configs['n_samples_train']
+    tipo_vela = train_configs['tipo_vela']
+    n_samples_test = 100
+
+    dataset_test = prepare_train_data_multi(hist, symbol_out, n_samples_train, n_samples_test, tipo_vela)
     X_, y_ = split_sequences(dataset_test, n_steps)
     print(X_.shape, y_.shape)
 
@@ -174,9 +178,9 @@ def test_model():
         y_hat_denorm = trans.inverse_transform(np.array([0, 0, 0, yhat[0][0], 0], dtype=object).reshape(1, -1))
         y_hat_denorm = y_hat_denorm[0][3]
         diff_real = np.abs(y_hat_denorm - y_denorm)
-        diff_norm = np.abs( yhat[0][0] - y_[i])
-        print(f'com normalização: real = {y_[i]}, previsto = {yhat[0][0]}, diferença = {diff_norm}')
-        print(f'sem normalização: real = {y_denorm}, previsto = {y_hat_denorm}, diferença = {diff_real}')
+        diff_norm = yhat[0][0] - y_[i]
+        # print(f'com normalização: real = {y_[i]}, previsto = {yhat[0][0]}, diferença = {diff_norm}')
+        print(f'previsto = {y_hat_denorm}, real = {y_denorm}, delta = {diff_real}')
 
 
 def show_tf():
