@@ -2,6 +2,7 @@ import pickle
 import numpy as np
 from numpy import ndarray
 from HistMulti import HistMulti
+from sklearn.preprocessing import MinMaxScaler
 
 from keras.models import Sequential
 from keras.layers import Dense
@@ -147,17 +148,29 @@ def test_model():
 
     model = load_model('model.hdf5')
 
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+    _symbol_timeframe = f'{symbol_out}_{hist.timeframe}'
+    trans: MinMaxScaler = scalers[_symbol_timeframe]
+
     # demonstrate prediction
     # x_input = np.array([[80, 85], [90, 95], [100, 105]])
     # x_input = x_input.reshape((1, n_steps, n_features))
     X_ = np.asarray(X_).astype(np.float32)
     y_ = np.asarray(y_).astype(np.float32)
-    for i in range(10):
+
+    for i in range(50):
         x_input = X_[i]
         x_input = x_input.reshape((1, n_steps, n_features))
         yhat = model.predict(x_input)
-        diff = np.abs(yhat - y_[i])
-        print(f'real = {y_[i]}, predicted = {yhat}, diff = {diff}')
+        y_denorm = trans.inverse_transform(np.array([0, 0, 0, y_[i], 0], dtype=object).reshape(1, -1))
+        y_denorm = y_denorm[0][3]
+        y_hat_denorm = trans.inverse_transform(np.array([0, 0, 0, yhat[0][0], 0], dtype=object).reshape(1, -1))
+        y_hat_denorm = y_hat_denorm[0][3]
+        diff_real = np.abs(y_hat_denorm - y_denorm)
+        diff_norm = np.abs( yhat[0][0] - y_[i])
+        print(f'com normalização: real = {y_[i]}, previsto = {yhat[0][0]}, diferença = {diff_norm}')
+        print(f'sem normalização: real = {y_denorm}, previsto = {y_hat_denorm}, diferença = {diff_real}')
 
 
 if __name__ == '__main__':
