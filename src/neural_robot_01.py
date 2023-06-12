@@ -84,8 +84,8 @@ def train_model():
     tipo_vela = 'CV'
     num_entradas = num_ativos * n_steps * len(tipo_vela)
     symbol_out = 'USDJPY'
-    n_samples_train = 5000  # quantidade de velas usadas no treinamento
-    n_epochs = 500
+    n_samples_train = 15000  # quantidade de velas usadas no treinamento
+    n_epochs = 100
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
@@ -108,16 +108,17 @@ def train_model():
     model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
-    model.add(Dense(num_entradas, activation='relu'))
+    model.add(Dense(num_entradas*2, activation='relu'))
     model.add(Dense(1))
-    model.compile(optimizer='adam', loss='mse')
+    model.compile(optimizer='adam', loss='mse', metrics=['accuracy'])
 
     # fit model
     X = np.asarray(X).astype(np.float32)
     y = np.asarray(y).astype(np.float32)
-    model.fit(X, y, epochs=n_epochs, verbose=1)
+    model.fit(X, y, epochs=n_epochs, verbose=1, validation_split=0.3)
     last_loss = model.history.history['loss'][-1]
-    print(f'loss = {last_loss}')
+    last_val_loss = model.history.history['val_loss'][-1]
+    print(f'loss = {last_loss}, val_loss = {last_val_loss}')
 
     model.save('model.hdf5')
 
