@@ -258,9 +258,10 @@ class TraderSimMulti:
         print(f'hit_rate = {self.hit_rate*100:.2f} %, ', end='')
         print(f'roi = {self.roi * 100:.5f} %')
 
-    def get_close_price_symbol_at(self, _symbol: str, _index: int):
+    def get_close_price_symbol_at(self, _symbol: str, _index: int, use_scalers=True):
         """
         Obtém o preço de fechamento da vela do símbolo indicado no índice indicado.
+        :param use_scalers:
         :param _symbol:
         :param _index:
         :return:
@@ -269,16 +270,16 @@ class TraderSimMulti:
         _symbol = f'{_symbol}_{self.timeframe}'
         _c = self.hist.arr[_symbol][_index, close_price_col]
 
-        if self.scalers:
+        if use_scalers and self.scalers:
             trans: MinMaxScaler = self.scalers[_symbol]
             _c = denorm_close_price(_c, trans)
 
         return _c
 
-    def print_symbols_close_price_at(self, _index):
+    def print_symbols_close_price_at(self, _index, use_scalers=True):
         _list = []
         for _s in self.symbols:
-            _c = self.get_close_price_symbol_at(_s, _index)
+            _c = self.get_close_price_symbol_at(_s, _index, use_scalers)
             _list.append(f'({_s} {_c:.5f})')
         _l = ' '.join(_list)
         print(_l)
