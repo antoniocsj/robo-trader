@@ -14,6 +14,12 @@ from keras.layers.convolutional import MaxPooling1D
 from keras.models import load_model
 
 
+def denorm_close_price(_c, trans: MinMaxScaler):
+    c_denorm = trans.inverse_transform(np.array([0, 0, 0, _c, 0], dtype=object).reshape(1, -1))
+    c_denorm = c_denorm[0][3]
+    return c_denorm
+
+
 # usada nas redes neurais
 def prepare_train_data_multi(_hist: HistMulti, _symbol_out: str, _start_index: int,
                              _num_velas: int, _tipo_vela: str) -> ndarray:
@@ -136,12 +142,6 @@ def train_model():
     print('treinamento concluído.')
 
 
-def denorm_close_price(_c, trans: MinMaxScaler):
-    c_denorm = trans.inverse_transform(np.array([0, 0, 0, _c, 0], dtype=object).reshape(1, -1))
-    c_denorm = c_denorm[0][3]
-    return c_denorm
-
-
 def test_model():
     dir_csv = '../csv'
     hist = HistMulti(directory=dir_csv)
@@ -187,7 +187,7 @@ def test_model():
 
 
 def test_model_with_trader():
-    from TraderSimMulti import TraderSimMulti
+    from TraderSimMultiNoPrints import TraderSimMulti
 
     dir_csv = '../csv'
     hist = HistMulti(directory=dir_csv)
@@ -232,10 +232,10 @@ def test_model_with_trader():
     candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
 
     for i in range(samples_index_start+n_steps, samples_index_start + candlesticks_quantity):
-        print(f'i = {i}')
+        # print(f'i = {i}')
         trader.index = i
-        trader.print_symbols_close_price_at(i)
-        trader.print_symbols_close_price_at(i, use_scalers=False)
+        # trader.print_symbols_close_price_at(i)
+        # trader.print_symbols_close_price_at(i, use_scalers=False)
         trader.update_profit()
 
         # fechamento da vela atual
@@ -280,7 +280,7 @@ def test_model_with_trader():
         else:
             trader.candlestick_count = 0
 
-        trader.print_trade_stats()
+        # trader.print_trade_stats()
 
     print('\nresultados finais da simulação')
     trader.print_trade_stats()
