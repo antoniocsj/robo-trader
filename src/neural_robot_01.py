@@ -203,7 +203,7 @@ def test_model_with_trader():
     symbol_out = train_configs['symbol_out']
     n_samples_train = train_configs['n_samples_train']
     tipo_vela = train_configs['tipo_vela']
-    n_samples_test = 100
+    n_samples_test = 1000
     samples_index_start = n_samples_train
 
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
@@ -226,6 +226,7 @@ def test_model_with_trader():
     initial_deposit = 1000.0
 
     trader = TraderSimMulti(initial_deposit)
+    trader.max_candlestick_count = 100
     trader.start_simulation()
 
     candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
@@ -245,7 +246,7 @@ def test_model_with_trader():
         x_input = X_[j]
         x_input = x_input.reshape((1, n_steps, n_features))
         close_pred_norm = model.predict(x_input)
-        close_denorm = denorm_close_price(y_[j], trans)
+        # close_denorm = denorm_close_price(y_[j], trans)
         close_pred_denorm = denorm_close_price(close_pred_norm[0][0], trans)
 
         # aqui toma-se a decisão de comprar ou vender baseando-se no valor da previsão
