@@ -14,6 +14,9 @@ from keras.layers.convolutional import MaxPooling1D
 from keras.models import load_model
 
 
+tf.keras.utils.set_random_seed(0)
+
+
 def denorm_close_price(_c, trans: MinMaxScaler):
     c_denorm = trans.inverse_transform(np.array([0, 0, 0, _c, 0], dtype=object).reshape(1, -1))
     c_denorm = c_denorm[0][3]
@@ -231,7 +234,7 @@ def test_model_with_trader():
 
     candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
 
-    for i in range(samples_index_start+n_steps, samples_index_start + candlesticks_quantity):
+    for i in range(samples_index_start + n_steps, samples_index_start + candlesticks_quantity):
         # print(f'i = {i}')
         trader.index = i
         # trader.print_symbols_close_price_at(i)
