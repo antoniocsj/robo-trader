@@ -1,17 +1,24 @@
 import os
 
 os.environ['PYTHONHASHSEED'] = str(1)
+os.environ['TF_CUDNN_DETERMINISM'] = str(1)
+os.environ['TF_DETERMINISTIC_OPS'] = str(1)
+
+import numpy as np
+np.random.seed(1)
+
+import random
+random.seed(1)
+
+import tensorflow as tf
+tf.random.set_seed(1)
+tf.keras.utils.set_random_seed(1)
 
 import pickle
-import numpy as np
+import json
 from numpy import ndarray
 from HistMulti import HistMulti
 from sklearn.preprocessing import MinMaxScaler
-
-import tensorflow as tf
-
-tf.keras.utils.set_random_seed(1)
-
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Flatten
@@ -19,11 +26,18 @@ from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
 from keras.models import load_model
 
+tf.keras.utils.set_random_seed(1)
+
 
 def denorm_close_price(_c, trans: MinMaxScaler):
     c_denorm = trans.inverse_transform(np.array([0, 0, 0, _c, 0], dtype=object).reshape(1, -1))
     c_denorm = c_denorm[0][3]
     return c_denorm
+
+
+def save_history(_history: dict):
+    with open("history.json", "w") as file:
+        json.dump(_history, file)
 
 
 # usada nas redes neurais
@@ -92,12 +106,13 @@ def train_model():
     dir_csv = '../csv'
     hist = HistMulti(directory=dir_csv)
     num_ativos = len(hist.symbols)
-    n_steps = 2
+    n_steps = 4
     tipo_vela = 'CV'
     num_entradas = num_ativos * n_steps * len(tipo_vela)
-    symbol_out = 'USDCAD'
-    n_samples_train = 15000  # quantidade de velas usadas no treinamento
-    n_epochs = 300
+    symbol_out = 'EURUSD'
+    n_samples_train = 30000  # quantidade de velas usadas no treinamento
+    validation_split = 0.5
+    n_epochs = 10
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
@@ -120,14 +135,16 @@ def train_model():
     model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
-    model.add(Dense(num_entradas * 2, activation='relu'))
+    model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(1))
-    model.compile(optimizer='adam', loss='mse', metrics=['accuracy'])
+    model.compile(optimizer='adam', loss='mse')
 
     # fit model
     X = np.asarray(X).astype(np.float32)
     y = np.asarray(y).astype(np.float32)
-    model.fit(X, y, epochs=n_epochs, verbose=1, validation_split=0.3)
+    history = model.fit(X, y, epochs=n_epochs, verbose=1, validation_split=validation_split)
+    save_history(history.history)
+
     last_loss = model.history.history['loss'][-1]
     last_val_loss = model.history.history['val_loss'][-1]
     print(f'loss = {last_loss}, val_loss = {last_val_loss}')
@@ -140,6 +157,7 @@ def train_model():
                      'n_steps': n_steps,
                      'n_features': n_features,
                      'n_samples_train': n_samples_train,
+                     'validation_split': validation_split,
                      'n_epochs': n_epochs,
                      'num_entradas': num_entradas,
                      'last_loss': last_loss,
