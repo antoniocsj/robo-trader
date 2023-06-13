@@ -179,11 +179,11 @@ def test_model():
     for i in range(50):
         x_input = X_[i]
         x_input = x_input.reshape((1, n_steps, n_features))
-        y_est = model.predict(x_input)
+        y_pred_norm = model.predict(x_input)
         y_denorm = denorm_close_price(y_[i], trans)
-        y_est_denorm = denorm_close_price(y_est[0][0], trans)
-        diff_real = y_est_denorm - y_denorm
-        print(f'previsto = {y_est_denorm}, real = {y_denorm}, dif = {diff_real}')
+        y_pred_denorm = denorm_close_price(y_pred_norm[0][0], trans)
+        diff_real = y_pred_denorm - y_denorm
+        print(f'previsto = {y_pred_denorm}, real = {y_denorm}, dif = {diff_real}')
 
 
 def test_model_with_trader():
@@ -230,12 +230,29 @@ def test_model_with_trader():
 
     candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
 
-    for i in range(samples_index_start, samples_index_start + candlesticks_quantity):
+    for i in range(samples_index_start+n_steps, samples_index_start + candlesticks_quantity):
         print(f'i = {i}')
         trader.index = i
         trader.print_symbols_close_price_at(i)
-
+        trader.print_symbols_close_price_at(i, use_scalers=False)
         trader.update_profit()
+
+        # fechamento da vela atual
+        current_price = trader.get_close_price_symbol_at(symbol_out, i)
+
+        # aqui a rede neural faz a previsão do valor de fechamento da próxima vela
+        j = i - samples_index_start - n_steps + 1
+        x_input = X_[j]
+        x_input = x_input.reshape((1, n_steps, n_features))
+        close_pred_norm = model.predict(x_input)
+        close_denorm = denorm_close_price(y_[j], trans)
+        close_pred_denorm = denorm_close_price(close_pred_norm[0][0], trans)
+
+        # aqui toma-se a decisão de comprar ou vender baseando-se no valor da previsão
+        if close_pred_denorm > current_price:
+            trader.buy(symbol_out)
+        else:
+            trader.sell(symbol_out)
 
         if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
             print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')
@@ -248,7 +265,7 @@ def test_model_with_trader():
             break
 
         # fecha a posição quando acabarem as novas barras (velas ou candlesticks)
-        if i == candlesticks_quantity - 1:
+        if i == samples_index_start + candlesticks_quantity - 1:
             trader.close_position()
             trader.finish_simulation()
             print('a última vela atingida. a simulação chegou ao fim.')
@@ -264,14 +281,6 @@ def test_model_with_trader():
 
         trader.print_trade_stats()
 
-        ret_msg = trader.interact_with_user()
-
-        if ret_msg == 'break':
-            print('o usuário decidiu encerrar a simulação.')
-            trader.close_position()
-            trader.finish_simulation()
-            break
-
     print('\nresultados finais da simulação')
     trader.print_trade_stats()
 
@@ -286,5 +295,5 @@ def show_tf():
 if __name__ == '__main__':
     show_tf()
     # train_model()
-    test_model()
-    # test_model_with_trader()
+    # test_model()
+    test_model_with_trader()
