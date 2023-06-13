@@ -18,8 +18,8 @@ def test_02():
     val_loss = history['val_loss']
     i_min_loss = np.argmin(loss)
     i_min_val_loss = np.argmin(val_loss)
-    print(f'min_loss: {loss[i_min_loss]}, epoch = {i_min_loss}')
-    print(f'min_val_loss: {val_loss[i_min_val_loss]}, epoch = {i_min_val_loss}')
+    print(f'min_loss: {loss[i_min_loss]}, epoch = {i_min_loss+1}, val_loss = {val_loss[i_min_loss]}')
+    print(f'min_val_loss: {val_loss[i_min_val_loss]}, epoch = {i_min_val_loss+1}, loss = {loss[i_min_val_loss]}')
     pass
 
 
