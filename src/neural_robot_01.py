@@ -1,4 +1,7 @@
 import os
+
+os.environ['PYTHONHASHSEED'] = str(1)
+
 import pickle
 import numpy as np
 from numpy import ndarray
@@ -6,15 +9,15 @@ from HistMulti import HistMulti
 from sklearn.preprocessing import MinMaxScaler
 
 import tensorflow as tf
+
+tf.keras.utils.set_random_seed(1)
+
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Flatten
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
 from keras.models import load_model
-
-
-tf.keras.utils.set_random_seed(0)
 
 
 def denorm_close_price(_c, trans: MinMaxScaler):
@@ -92,9 +95,9 @@ def train_model():
     n_steps = 2
     tipo_vela = 'CV'
     num_entradas = num_ativos * n_steps * len(tipo_vela)
-    symbol_out = 'USDJPY'
+    symbol_out = 'USDCAD'
     n_samples_train = 15000  # quantidade de velas usadas no treinamento
-    n_epochs = 100
+    n_epochs = 300
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
@@ -137,7 +140,10 @@ def train_model():
                      'n_steps': n_steps,
                      'n_features': n_features,
                      'n_samples_train': n_samples_train,
-                     'last_loss': last_loss}
+                     'n_epochs': n_epochs,
+                     'num_entradas': num_entradas,
+                     'last_loss': last_loss,
+                     'last_val_loss': last_val_loss}
 
     with open('train_configs.pkl', 'wb') as file:
         pickle.dump(model_configs, file)
@@ -229,7 +235,7 @@ def test_model_with_trader():
     initial_deposit = 1000.0
 
     trader = TraderSimMulti(initial_deposit)
-    trader.max_candlestick_count = 100
+    trader.max_candlestick_count = 5
     trader.start_simulation()
 
     candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
@@ -298,6 +304,6 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    # train_model()
+    train_model()
     # test_model()
-    test_model_with_trader()
+    # test_model_with_trader()
