@@ -112,7 +112,7 @@ def train_model():
     symbol_out = 'EURUSD'
     n_samples_train = 30000  # quantidade de velas usadas no treinamento
     validation_split = 0.5
-    n_epochs = 30
+    n_epochs = 146
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
@@ -229,6 +229,7 @@ def test_model_with_trader():
     n_features = train_configs['n_features']
     symbol_out = train_configs['symbol_out']
     n_samples_train = train_configs['n_samples_train']
+    validation_split = train_configs['validation_split']
     tipo_vela = train_configs['tipo_vela']
     n_samples_test = 1000
     samples_index_start = n_samples_train
@@ -259,7 +260,7 @@ def test_model_with_trader():
     candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
 
     for i in range(samples_index_start + n_steps, samples_index_start + candlesticks_quantity):
-        # print(f'i = {i}')
+        print(f'i = {i}, {100 * (i-samples_index_start-n_steps) / (candlesticks_quantity - n_steps):.2f} %')
         trader.index = i
         # trader.print_symbols_close_price_at(i)
         # trader.print_symbols_close_price_at(i, use_scalers=False)
@@ -310,6 +311,7 @@ def test_model_with_trader():
         # trader.print_trade_stats()
 
     print('\nresultados finais da simulação')
+    print(f'n_samples_test = {n_samples_test}, max_candlestick_count = {trader.max_candlestick_count}')
     trader.print_trade_stats()
 
 
@@ -322,6 +324,6 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    train_model()
+    # train_model()
     # test_model()
-    # test_model_with_trader()
+    test_model_with_trader()
