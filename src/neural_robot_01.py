@@ -25,6 +25,8 @@ from keras.layers import Flatten
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
 from keras.models import load_model
+from keras.callbacks import EarlyStopping, ModelCheckpoint
+
 
 tf.keras.utils.set_random_seed(1)
 
@@ -112,7 +114,7 @@ def train_model():
     symbol_out = 'EURUSD'
     n_samples_train = 30000  # quantidade de velas usadas no treinamento
     validation_split = 0.5
-    n_epochs = 146
+    n_epochs = num_entradas * 5
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
@@ -136,19 +138,18 @@ def train_model():
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
     model.add(Dense(num_entradas, activation='relu'))
+    model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse')
 
     # fit model
     X = np.asarray(X).astype(np.float32)
     y = np.asarray(y).astype(np.float32)
-    history = model.fit(X, y, epochs=n_epochs, verbose=1, validation_split=validation_split)
+    callbacks = [EarlyStopping(monitor='val_loss', patience=int(n_epochs/10), verbose=1),
+                 ModelCheckpoint(filepath='model.hdf5', monitor='val_loss', save_best_only=True, verbose=1)]
+    history = model.fit(X, y, epochs=n_epochs, verbose=1, validation_split=validation_split, callbacks=callbacks)
+
     save_history(history.history)
-
-    last_loss = model.history.history['loss'][-1]
-    last_val_loss = model.history.history['val_loss'][-1]
-    print(f'loss = {last_loss}, val_loss = {last_val_loss}')
-
     model.save('model.hdf5')
 
     model_configs = {'tipo_vela': tipo_vela,
@@ -324,6 +325,6 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    # train_model()
+    train_model()
     # test_model()
-    test_model_with_trader()
+    # test_model_with_trader()
