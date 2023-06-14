@@ -114,9 +114,10 @@ def train_model():
     tipo_vela = 'CV'
     num_entradas = num_ativos * n_steps * len(tipo_vela)
     symbol_out = 'EURUSD'
-    n_samples_train = 400  # quantidade de velas usadas no treinamento
+    n_samples_train = 40000  # quantidade de velas usadas no treinamento
     validation_split = 0.5
-    max_n_epochs = num_entradas * 3 * 0 + 20
+    max_n_epochs = num_entradas * 3
+    patience = int(max_n_epochs / 10)
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
@@ -142,6 +143,7 @@ def train_model():
     model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse')
+    model_config = model.get_config()
 
     # fit model
     print(f'treinando o modelo em parte das amostras de treinamento.')
@@ -149,7 +151,7 @@ def train_model():
           f'{int(n_samples_train * validation_split)}).')
     X_train = np.asarray(X_train).astype(np.float32)
     y_train = np.asarray(y_train).astype(np.float32)
-    callbacks = [EarlyStopping(monitor='val_loss', patience=int(max_n_epochs/10), verbose=1),
+    callbacks = [EarlyStopping(monitor='val_loss', patience=patience, verbose=1),
                  ModelCheckpoint(filepath='model.h5', monitor='val_loss', save_best_only=True, verbose=1)]
     history = model.fit(X_train, y_train, epochs=max_n_epochs, verbose=1,
                         validation_split=validation_split, callbacks=callbacks)
@@ -161,12 +163,13 @@ def train_model():
     losses = {'min_loss': {'value': min_loss, 'index': i_min_loss, 'epoch': i_min_loss + 1},
               'min_val_loss': {'value': min_val_loss, 'index': i_min_val_loss, 'epoch': i_min_val_loss + 1}}
 
-    print(f'avaliando o modelo treinado no conjunto inteiro das amostras de trainamento.')
+    print(f'avaliando o modelo no conjunto inteiro das amostras de treinamento.')
     saved_model = load_model('model.h5')
     whole_set_train_loss_eval = saved_model.evaluate(X_train, y_train, verbose=0)
     print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
 
-    n_samples_test = 1000
+    print(f'avaliando o modelo num novo conjunto de amostras de teste.')
+    n_samples_test = int(n_samples_train * validation_split)
     samples_index_start = n_samples_train
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
 
@@ -188,10 +191,12 @@ def train_model():
                      'validation_split': validation_split,
                      'effective_n_epochs': effective_n_epochs,
                      'max_n_epochs': max_n_epochs,
+                     'patience': patience,
                      'whole_set_train_loss_eval': whole_set_train_loss_eval,
                      'n_samples_test': n_samples_test,
                      'test_loss_eval': test_loss_eval,
                      'losses': losses,
+                     'model_config': model_config,
                      'symbols': hist.symbols,
                      'history': history.history}
 
