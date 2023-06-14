@@ -110,11 +110,11 @@ def train_model():
     dir_csv = '../csv'
     hist = HistMulti(directory=dir_csv)
     num_ativos = len(hist.symbols)
-    n_steps = 4
+    n_steps = 8
     tipo_vela = 'CV'
     num_entradas = num_ativos * n_steps * len(tipo_vela)
     symbol_out = 'EURUSD'
-    n_samples_train = 30000  # quantidade de velas usadas no treinamento
+    n_samples_train = 40000  # quantidade de velas usadas no treinamento
     validation_split = 0.5
     n_epochs = num_entradas * 3
 
@@ -132,17 +132,14 @@ def train_model():
 
     # define model
     model = Sequential()
-    model.add(Conv1D(filters=num_entradas, kernel_size=2, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
-    # model.add(Dense(num_entradas, input_shape=(n_steps, n_features), activation='relu', kernel_constraint=MaxNorm(3)))
-    # model.add(Dropout(0.2, input_shape=(n_steps, n_features)))
     model.add(Dense(num_entradas, activation='relu'))
-    # model.add(Dropout(0.2))
     model.add(Dense(num_entradas, activation='relu'))
-    # model.add(Dropout(0.2))
     model.add(Dense(num_entradas, activation='relu'))
-    # model.add(Dropout(0.2))
+    model.add(Dense(num_entradas, activation='relu'))
+    model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse')
 
@@ -291,7 +288,7 @@ def test_model_with_trader():
     initial_deposit = 1000.0
 
     trader = TraderSimMulti(initial_deposit)
-    trader.max_candlestick_count = 1000
+    trader.max_candlestick_count = 1
     trader.start_simulation()
 
     candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
