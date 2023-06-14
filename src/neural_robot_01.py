@@ -116,7 +116,7 @@ def train_model():
     symbol_out = 'EURUSD'
     n_samples_train = 30000  # quantidade de velas usadas no treinamento
     validation_split = 0.5
-    n_epochs = num_entradas * 4
+    n_epochs = num_entradas * 3
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
