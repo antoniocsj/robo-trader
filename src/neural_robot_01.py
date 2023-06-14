@@ -28,9 +28,9 @@ from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
 from keras.models import load_model
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-
-
 tf.keras.utils.set_random_seed(1)
+
+from utils import NpEncoder
 
 
 def denorm_close_price(_c, trans: MinMaxScaler):
@@ -39,9 +39,9 @@ def denorm_close_price(_c, trans: MinMaxScaler):
     return c_denorm
 
 
-def save_history(_history: dict):
-    with open("history.json", "w") as file:
-        json.dump(_history, file)
+def save_train_configs(_train_configs: dict):
+    with open("train_configs.json", "w") as file:
+        json.dump(_train_configs, file, indent=4, sort_keys=False, cls=NpEncoder)
 
 
 # usada nas redes neurais
@@ -110,13 +110,13 @@ def train_model():
     dir_csv = '../csv'
     hist = HistMulti(directory=dir_csv)
     num_ativos = len(hist.symbols)
-    n_steps = 8
+    n_steps = 3
     tipo_vela = 'CV'
     num_entradas = num_ativos * n_steps * len(tipo_vela)
     symbol_out = 'EURUSD'
-    n_samples_train = 40000  # quantidade de velas usadas no treinamento
+    n_samples_train = 400  # quantidade de velas usadas no treinamento
     validation_split = 0.5
-    n_epochs = num_entradas * 3
+    max_n_epochs = num_entradas * 3 * 0 + 20
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
@@ -144,42 +144,67 @@ def train_model():
     model.compile(optimizer='adam', loss='mse')
 
     # fit model
+    print(f'treinando o modelo em parte das amostras de treinamento.')
+    print(f'n_samples_train * validation_split = {n_samples_train} * {validation_split} = '
+          f'{int(n_samples_train * validation_split)}).')
     X_train = np.asarray(X_train).astype(np.float32)
     y_train = np.asarray(y_train).astype(np.float32)
-    callbacks = [EarlyStopping(monitor='val_loss', patience=int(n_epochs/10), verbose=1),
+    callbacks = [EarlyStopping(monitor='val_loss', patience=int(max_n_epochs/10), verbose=1),
                  ModelCheckpoint(filepath='model.h5', monitor='val_loss', save_best_only=True, verbose=1)]
-    history = model.fit(X_train, y_train, epochs=n_epochs, verbose=1,
+    history = model.fit(X_train, y_train, epochs=max_n_epochs, verbose=1,
                         validation_split=validation_split, callbacks=callbacks)
 
-    save_history(history.history)
-    # model.save('model.hdf5')
+    effective_n_epochs = len(history.history['loss'])
+    loss, val_loss = history.history['loss'], history.history['val_loss']
+    i_min_loss, i_min_val_loss = np.argmin(loss), np.argmin(val_loss)
+    min_loss, min_val_loss = loss[i_min_loss], val_loss[i_min_val_loss]
+    losses = {'min_loss': {'value': min_loss, 'index': i_min_loss, 'epoch': i_min_loss + 1},
+              'min_val_loss': {'value': min_val_loss, 'index': i_min_val_loss, 'epoch': i_min_val_loss + 1}}
 
-    model_configs = {'tipo_vela': tipo_vela,
+    print(f'avaliando o modelo treinado no conjunto inteiro das amostras de trainamento.')
+    saved_model = load_model('model.h5')
+    whole_set_train_loss_eval = saved_model.evaluate(X_train, y_train, verbose=0)
+    print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
+
+    n_samples_test = 1000
+    samples_index_start = n_samples_train
+    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
+
+    X_test, y_test = split_sequences(dataset_test, n_steps)
+    X_test = np.asarray(X_test).astype(np.float32)
+    y_test = np.asarray(y_test).astype(np.float32)
+
+    saved_model = load_model('model.h5')
+    test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)
+    print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
+
+    train_configs = {'tipo_vela': tipo_vela,
                      'symbol_out': symbol_out,
                      'symbols': hist.symbols,
                      'n_steps': n_steps,
                      'n_features': n_features,
                      'n_samples_train': n_samples_train,
                      'validation_split': validation_split,
-                     'n_epochs': n_epochs,
-                     'num_entradas': num_entradas}
+                     'max_n_epochs': max_n_epochs,
+                     'num_entradas': num_entradas,
+                     'losses': losses,
+                     'whole_set_train_loss_eval': whole_set_train_loss_eval,
+                     'effective_n_epochs': effective_n_epochs,
+                     'n_samples_test': n_samples_test,
+                     'test_loss_eval': test_loss_eval,
+                     'history': history.history}
 
-    with open('train_configs.pkl', 'wb') as file:
-        pickle.dump(model_configs, file)
-
-    print('treinamento concluído.')
-    print('avaliando o modelo treinado.')
-    saved_model = load_model('model.h5')
-    train_acc = saved_model.evaluate(X_train, y_train, verbose=0)
-    print(f'Train Loss: {train_acc:} (n_samples_train = {n_samples_train})')
+    save_train_configs(train_configs)
 
 
 def evaluate_model():
     dir_csv = '../csv'
     hist = HistMulti(directory=dir_csv)
 
-    with open('train_configs.pkl', 'rb') as file:
-        train_configs = pickle.load(file)
+    # with open('train_configs.pkl', 'rb') as file:
+    #     train_configs = pickle.load(file)
+    with open("train_configs.json", "r") as file:
+        train_configs = json.load(file)
 
     print(f'train_configs:')
     print(f'{train_configs}')
@@ -358,6 +383,6 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    # train_model()
+    train_model()
     # evaluate_model()
-    test_model_with_trader()
+    # test_model_with_trader()

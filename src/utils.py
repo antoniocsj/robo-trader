@@ -6,6 +6,18 @@ import pandas as pd
 from Hist import Hist
 from HistMulti import HistMulti
 from sklearn.preprocessing import MinMaxScaler
+import json
+
+
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(NpEncoder, self).default(obj)
 
 
 # usada na GP
