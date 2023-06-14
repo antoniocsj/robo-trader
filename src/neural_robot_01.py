@@ -22,6 +22,8 @@ from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Flatten
+from keras.layers import Dropout
+from keras.constraints import MaxNorm
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
 from keras.models import load_model
@@ -114,43 +116,46 @@ def train_model():
     symbol_out = 'EURUSD'
     n_samples_train = 30000  # quantidade de velas usadas no treinamento
     validation_split = 0.5
-    n_epochs = num_entradas * 5
+    n_epochs = num_entradas * 4
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
 
     # convert into input/output
-    X, y = split_sequences(dataset_train, n_steps)
-    print(X.shape, y.shape)
-
-    # summarize the data
-    # for i in range(len(X)):
-    #     print(X[i], y[i])
+    X_train, y_train = split_sequences(dataset_train, n_steps)
+    print(X_train.shape, y_train.shape)
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
     # features to expect for each input sample, in this case three and two respectively.
 
-    n_features = X.shape[2]
+    n_features = X_train.shape[2]
 
     # define model
     model = Sequential()
     model.add(Conv1D(filters=num_entradas, kernel_size=2, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
+    # model.add(Dense(num_entradas, input_shape=(n_steps, n_features), activation='relu', kernel_constraint=MaxNorm(3)))
+    # model.add(Dropout(0.2, input_shape=(n_steps, n_features)))
     model.add(Dense(num_entradas, activation='relu'))
+    # model.add(Dropout(0.2))
     model.add(Dense(num_entradas, activation='relu'))
+    # model.add(Dropout(0.2))
+    model.add(Dense(num_entradas, activation='relu'))
+    # model.add(Dropout(0.2))
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse')
 
     # fit model
-    X = np.asarray(X).astype(np.float32)
-    y = np.asarray(y).astype(np.float32)
+    X_train = np.asarray(X_train).astype(np.float32)
+    y_train = np.asarray(y_train).astype(np.float32)
     callbacks = [EarlyStopping(monitor='val_loss', patience=int(n_epochs/10), verbose=1),
-                 ModelCheckpoint(filepath='model.hdf5', monitor='val_loss', save_best_only=True, verbose=1)]
-    history = model.fit(X, y, epochs=n_epochs, verbose=1, validation_split=validation_split, callbacks=callbacks)
+                 ModelCheckpoint(filepath='model.h5', monitor='val_loss', save_best_only=True, verbose=1)]
+    history = model.fit(X_train, y_train, epochs=n_epochs, verbose=1,
+                        validation_split=validation_split, callbacks=callbacks)
 
     save_history(history.history)
-    model.save('model.hdf5')
+    # model.save('model.hdf5')
 
     model_configs = {'tipo_vela': tipo_vela,
                      'symbol_out': symbol_out,
@@ -160,14 +165,45 @@ def train_model():
                      'n_samples_train': n_samples_train,
                      'validation_split': validation_split,
                      'n_epochs': n_epochs,
-                     'num_entradas': num_entradas,
-                     'last_loss': last_loss,
-                     'last_val_loss': last_val_loss}
+                     'num_entradas': num_entradas}
 
     with open('train_configs.pkl', 'wb') as file:
         pickle.dump(model_configs, file)
 
     print('treinamento concluído.')
+    print('avaliando o modelo treinado.')
+    saved_model = load_model('model.h5')
+    train_acc = saved_model.evaluate(X_train, y_train, verbose=0)
+    print(f'Train Loss: {train_acc:} (n_samples_train = {n_samples_train})')
+
+
+def evaluate_model():
+    dir_csv = '../csv'
+    hist = HistMulti(directory=dir_csv)
+
+    with open('train_configs.pkl', 'rb') as file:
+        train_configs = pickle.load(file)
+
+    print(f'train_configs:')
+    print(f'{train_configs}')
+
+    n_steps = train_configs['n_steps']
+    n_features = train_configs['n_features']
+    symbol_out = train_configs['symbol_out']
+    n_samples_train = train_configs['n_samples_train']
+    tipo_vela = train_configs['tipo_vela']
+
+    n_samples_test = 1000
+    samples_index_start = n_samples_train
+    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
+
+    X_test, y_test = split_sequences(dataset_test, n_steps)
+    X_test = np.asarray(X_test).astype(np.float32)
+    y_test = np.asarray(y_test).astype(np.float32)
+
+    saved_model = load_model('model.h5')
+    test_acc = saved_model.evaluate(X_test, y_test, verbose=0)
+    print(f'Test Loss: {test_acc} (n_samples_test = {n_samples_test})')
 
 
 def test_model():
@@ -185,7 +221,7 @@ def test_model():
     symbol_out = train_configs['symbol_out']
     n_samples_train = train_configs['n_samples_train']
     tipo_vela = train_configs['tipo_vela']
-    n_samples_test = 100
+    n_samples_test = 1000
 
     dataset_test = prepare_train_data_multi(hist, symbol_out, n_samples_train, n_samples_test, tipo_vela)
     X_, y_ = split_sequences(dataset_test, n_steps)
@@ -239,7 +275,7 @@ def test_model_with_trader():
     X_, y_ = split_sequences(dataset_test, n_steps)
     print(X_.shape, y_.shape)
 
-    model = load_model('model.hdf5')
+    model = load_model('model.h5')
 
     with open('scalers.pkl', 'rb') as file:
         scalers = pickle.load(file)
@@ -255,7 +291,7 @@ def test_model_with_trader():
     initial_deposit = 1000.0
 
     trader = TraderSimMulti(initial_deposit)
-    trader.max_candlestick_count = 5
+    trader.max_candlestick_count = 1000
     trader.start_simulation()
 
     candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
@@ -325,6 +361,6 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    train_model()
-    # test_model()
-    # test_model_with_trader()
+    # train_model()
+    # evaluate_model()
+    test_model_with_trader()
