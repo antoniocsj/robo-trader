@@ -178,20 +178,21 @@ def train_model():
     test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)
     print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
 
-    train_configs = {'tipo_vela': tipo_vela,
-                     'symbol_out': symbol_out,
-                     'symbols': hist.symbols,
+    train_configs = {'symbol_out': symbol_out,
+                     'tipo_vela': tipo_vela,
                      'n_steps': n_steps,
+                     'n_symbols': num_ativos,
                      'n_features': n_features,
+                     'num_entradas': num_entradas,
                      'n_samples_train': n_samples_train,
                      'validation_split': validation_split,
-                     'max_n_epochs': max_n_epochs,
-                     'num_entradas': num_entradas,
-                     'losses': losses,
-                     'whole_set_train_loss_eval': whole_set_train_loss_eval,
                      'effective_n_epochs': effective_n_epochs,
+                     'max_n_epochs': max_n_epochs,
+                     'whole_set_train_loss_eval': whole_set_train_loss_eval,
                      'n_samples_test': n_samples_test,
                      'test_loss_eval': test_loss_eval,
+                     'losses': losses,
+                     'symbols': hist.symbols,
                      'history': history.history}
 
     save_train_configs(train_configs)
