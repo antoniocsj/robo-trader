@@ -267,7 +267,7 @@ def calculate_model_bias():
     diffs = []
     len_X_ = len(X_)
     for i in range(len_X_):
-        print(f'{100 * i / len_X_}')
+        print(f'{100 * i / len_X_:.2f} %')
         x_input = X_[i]
         x_input = x_input.reshape((1, n_steps, n_features))
         y_pred = model.predict(x_input)
