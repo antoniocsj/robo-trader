@@ -486,7 +486,8 @@ def test_model_with_trader_interactive():
         close_pred_norm = model.predict(x_input)
         close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, trans)
         print(f'fechamento da vela atual {symbol_out}: {current_price:.5f}')
-        print(f'previsão para o fechamento da próxima vela {symbol_out}: {close_pred_denorm:.5f}')
+        print(f'previsão para o fechamento da próxima vela {symbol_out}: {close_pred_denorm:.5f} '
+              f'(dif = {close_pred_denorm-current_price:.5f})')
 
         if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
             print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')
