@@ -393,6 +393,12 @@ def test_model_with_trader():
         else:
             trader.sell(symbol_out)
 
+        # dif = close_pred_denorm - current_price
+        # if dif > 0 and abs(dif) > 0.0005:
+        #     trader.buy(symbol_out)
+        # elif dif < 0 and abs(dif) > 0.0005:
+        #     trader.sell(symbol_out)
+
         if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
             print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')
             trader.close_position()
@@ -539,5 +545,5 @@ if __name__ == '__main__':
     show_tf()
     # train_model()
     # calculate_model_bias()
-    # test_model_with_trader()
-    test_model_with_trader_interactive()
+    test_model_with_trader()
+    # test_model_with_trader_interactive()
