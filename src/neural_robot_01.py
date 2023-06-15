@@ -31,6 +31,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 tf.keras.utils.set_random_seed(1)
 
 from utils import NpEncoder
+import time
 
 
 def denorm_close_price(_c, trans: MinMaxScaler):
@@ -251,7 +252,7 @@ def calculate_model_bias():
     tipo_vela = train_configs['tipo_vela']
     validation_split = train_configs['validation_split']
     istart_samples_test = int(n_samples_train * validation_split)
-    n_samples_test = int(n_samples_train * validation_split * 0.1)
+    n_samples_test = int(n_samples_train * validation_split)
     print(f'calculando o bias do modelo. (n_samples_test = {n_samples_test})')
 
     dataset_test = prepare_train_data_multi(hist, symbol_out, istart_samples_test, n_samples_test, tipo_vela)
@@ -272,7 +273,10 @@ def calculate_model_bias():
         y_pred = model.predict(x_input)
         diff = y_[i] - y_pred[0][0]
         diffs.append(diff)
-        # print(f'previsto = {y_pred}, real = {y_[i]}, dif = {diff}')
+        if i % 1000 == 0 and i > 0:
+            _t = 60
+            print(f'esperando {_t} segundos para continuar')
+            time.sleep(_t)
 
     diffs = np.asarray(diffs)
     print(diffs)
@@ -324,7 +328,7 @@ def test_model_with_trader():
     initial_deposit = 1000.0
 
     trader = TraderSimMulti(initial_deposit)
-    trader.max_candlestick_count = 1
+    trader.max_candlestick_count = 5
     trader.start_simulation()
 
     candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
