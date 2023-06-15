@@ -317,7 +317,6 @@ def calculate_model_bias():
             time.sleep(_t)
 
     diffs = np.asarray(diffs)
-    print(diffs)
     bias = np.sum(diffs) / len(diffs)
     print(f'bias = {bias}')
 
@@ -435,6 +434,6 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    train_model()
-    # calculate_model_bias()
+    # train_model()
+    calculate_model_bias()
     # test_model_with_trader()
