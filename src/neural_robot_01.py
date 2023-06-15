@@ -114,9 +114,9 @@ def train_model():
     tipo_vela = 'CV'
     num_entradas = num_ativos * n_steps * len(tipo_vela)
     symbol_out = 'EURUSD'
-    n_samples_train = 40000  # quantidade de velas usadas no treinamento
+    n_samples_train = 40000*0+400  # quantidade de velas usadas no treinamento
     validation_split = 0.5
-    max_n_epochs = num_entradas * 3
+    max_n_epochs = num_entradas * 3 * 0 + 20
     patience = int(max_n_epochs / 10)
 
     # horizontally stack columns
@@ -234,7 +234,7 @@ def evaluate_model():
     print(f'Test Loss: {test_acc} (n_samples_test = {n_samples_test})')
 
 
-def test_model():
+def calculate_model_bias():
     dir_csv = '../csv'
     hist = HistMulti(directory=dir_csv)
 
@@ -249,35 +249,40 @@ def test_model():
     symbol_out = train_configs['symbol_out']
     n_samples_train = train_configs['n_samples_train']
     tipo_vela = train_configs['tipo_vela']
-    n_samples_test = 1000
+    validation_split = train_configs['validation_split']
+    istart_samples_test = int(n_samples_train * validation_split)
+    n_samples_test = int(n_samples_train * validation_split * 0.1)
+    print(f'calculando o bias do modelo. (n_samples_test = {n_samples_test})')
 
-    dataset_test = prepare_train_data_multi(hist, symbol_out, n_samples_train, n_samples_test, tipo_vela)
+    dataset_test = prepare_train_data_multi(hist, symbol_out, istart_samples_test, n_samples_test, tipo_vela)
     X_, y_ = split_sequences(dataset_test, n_steps)
     print(X_.shape, y_.shape)
 
     model = load_model('model.h5')
 
-    _symbol_timeframe = f'{symbol_out}_{hist.timeframe}'
-    with open('scalers.pkl', 'rb') as file:
-        scalers = pickle.load(file)
-    trans: MinMaxScaler = scalers[_symbol_timeframe]
-
-    # with open('scalers.json', 'r') as file:
-    #     scalers = json.load(file)
-    # trans: MinMaxScaler = MinMaxScaler()
-    # trans.__dict__ = scalers['EURUSD_M5']
-
     X_ = np.asarray(X_).astype(np.float32)
     y_ = np.asarray(y_).astype(np.float32)
 
-    for i in range(50):
+    diffs = []
+    len_X_ = len(X_)
+    for i in range(len_X_):
+        print(f'{100 * i / len_X_}')
         x_input = X_[i]
         x_input = x_input.reshape((1, n_steps, n_features))
-        y_pred_norm = model.predict(x_input)
-        y_denorm = denorm_close_price(y_[i], trans)
-        y_pred_denorm = denorm_close_price(y_pred_norm[0][0], trans)
-        diff_real = y_pred_denorm - y_denorm
-        print(f'previsto = {y_pred_denorm}, real = {y_denorm}, dif = {diff_real}')
+        y_pred = model.predict(x_input)
+        diff = y_[i] - y_pred[0][0]
+        diffs.append(diff)
+        # print(f'previsto = {y_pred}, real = {y_[i]}, dif = {diff}')
+
+    diffs = np.asarray(diffs)
+    print(diffs)
+    bias = np.sum(diffs) / len(diffs)
+    print(f'bias = {bias}')
+
+    train_configs['bias'] = bias
+    train_configs['n_samples_test_for_calc_bias'] = n_samples_test
+    save_train_configs(train_configs)
+    print('bias salvo em train_configs.json')
 
 
 def test_model_with_trader():
@@ -296,7 +301,7 @@ def test_model_with_trader():
     n_features = train_configs['n_features']
     symbol_out = train_configs['symbol_out']
     n_samples_train = train_configs['n_samples_train']
-    validation_split = train_configs['validation_split']
+    bias = train_configs['bias']
     tipo_vela = train_configs['tipo_vela']
     n_samples_test = 1000
     samples_index_start = n_samples_train
@@ -313,9 +318,6 @@ def test_model_with_trader():
     _symbol_timeframe = f'{symbol_out}_{hist.timeframe}'
     trans: MinMaxScaler = scalers[_symbol_timeframe]
 
-    # demonstrate prediction
-    # x_input = np.array([[80, 85], [90, 95], [100, 105]])
-    # x_input = x_input.reshape((1, n_steps, n_features))
     X_ = np.asarray(X_).astype(np.float32)
     y_ = np.asarray(y_).astype(np.float32)
 
@@ -342,8 +344,7 @@ def test_model_with_trader():
         x_input = X_[j]
         x_input = x_input.reshape((1, n_steps, n_features))
         close_pred_norm = model.predict(x_input)
-        # close_denorm = denorm_close_price(y_[j], trans)
-        close_pred_denorm = denorm_close_price(close_pred_norm[0][0], trans)
+        close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, trans)
 
         # aqui toma-se a decisão de comprar ou vender baseando-se no valor da previsão
         if close_pred_denorm > current_price:
@@ -393,5 +394,5 @@ def show_tf():
 if __name__ == '__main__':
     show_tf()
     # train_model()
-    test_model()
+    calculate_model_bias()
     # test_model_with_trader()
