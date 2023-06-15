@@ -52,7 +52,20 @@ def prepare_train_data_multi(_hist: HistMulti, _symbol_out: str, _start_index: i
     _timeframe = _hist.timeframe
     _symbol_tf_out = f'{_symbol_out}_{_timeframe}'
 
-    if _tipo_vela == 'CV':
+    if _tipo_vela == 'C':
+        for _symbol in _hist.symbols:
+            _symbol_timeframe = f'{_symbol}_{_timeframe}'
+            _c_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 5]
+            _c_in = _c_in.reshape(len(_c_in), 1)
+            if len(_data) == 0:
+                _data = _c_in
+            else:
+                _data = np.hstack((_data, _c_in))
+
+        _c_out = _hist.arr[_symbol_tf_out][_start_index + 1:_start_index + _num_velas + 1][:, 5]
+        _c_out = _c_out.reshape(len(_c_out), 1)
+        _data = np.hstack((_data, _c_out))
+    elif _tipo_vela == 'CV':
         for _symbol in _hist.symbols:
             _symbol_timeframe = f'{_symbol}_{_timeframe}'
             _cv_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 5:7]
@@ -64,7 +77,30 @@ def prepare_train_data_multi(_hist: HistMulti, _symbol_out: str, _start_index: i
         _c_out = _hist.arr[_symbol_tf_out][_start_index + 1:_start_index + _num_velas + 1][:, 5]
         _c_out = _c_out.reshape(len(_c_out), 1)
         _data = np.hstack((_data, _c_out))
-        pass
+    elif _tipo_vela == 'OHLC':
+        for _symbol in _hist.symbols:
+            _symbol_timeframe = f'{_symbol}_{_timeframe}'
+            _ohlc_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 2:6]
+            if len(_data) == 0:
+                _data = _ohlc_in
+            else:
+                _data = np.hstack((_data, _ohlc_in))
+
+        _c_out = _hist.arr[_symbol_tf_out][_start_index + 1:_start_index + _num_velas + 1][:, 5]
+        _c_out = _c_out.reshape(len(_c_out), 1)
+        _data = np.hstack((_data, _c_out))
+    elif _tipo_vela == 'OHLCV':
+        for _symbol in _hist.symbols:
+            _symbol_timeframe = f'{_symbol}_{_timeframe}'
+            _ohlcv_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 2:7]
+            if len(_data) == 0:
+                _data = _ohlcv_in
+            else:
+                _data = np.hstack((_data, _ohlcv_in))
+
+        _c_out = _hist.arr[_symbol_tf_out][_start_index + 1:_start_index + _num_velas + 1][:, 5]
+        _c_out = _c_out.reshape(len(_c_out), 1)
+        _data = np.hstack((_data, _c_out))
     else:
         print(f'tipo de vela não suportado: {_tipo_vela}')
         exit(-1)
@@ -113,7 +149,7 @@ def train_model():
 
     symbol_out = 'EURUSD'
     n_steps = 2
-    tipo_vela = 'CV'
+    tipo_vela = 'OHLCV'
     n_samples_train = 1000
     validation_split = 0.5
 
