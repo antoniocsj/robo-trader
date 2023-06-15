@@ -54,6 +54,13 @@ def test_03():
     with open('scalers.json', 'w') as file:
         json.dump(scalers, file, indent=4, sort_keys=False, cls=MinMaxScalerEncoder)
 
+    with open('scalers.json', 'r') as file:
+        scalers = json.load(file)
+
+    trans: MinMaxScaler = MinMaxScaler()
+    trans.__dict__ = scalers['EURUSD_M5']
+    print(trans)
+
 
 if __name__ == '__main__':
     # test_02()

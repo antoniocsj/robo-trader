@@ -255,17 +255,18 @@ def test_model():
     X_, y_ = split_sequences(dataset_test, n_steps)
     print(X_.shape, y_.shape)
 
-    model = load_model('model.hdf5')
-
-    with open('scalers.pkl', 'rb') as file:
-        scalers = pickle.load(file)
+    model = load_model('model.h5')
 
     _symbol_timeframe = f'{symbol_out}_{hist.timeframe}'
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
     trans: MinMaxScaler = scalers[_symbol_timeframe]
 
-    # demonstrate prediction
-    # x_input = np.array([[80, 85], [90, 95], [100, 105]])
-    # x_input = x_input.reshape((1, n_steps, n_features))
+    # with open('scalers.json', 'r') as file:
+    #     scalers = json.load(file)
+    # trans: MinMaxScaler = MinMaxScaler()
+    # trans.__dict__ = scalers['EURUSD_M5']
+
     X_ = np.asarray(X_).astype(np.float32)
     y_ = np.asarray(y_).astype(np.float32)
 
@@ -308,6 +309,7 @@ def test_model_with_trader():
 
     with open('scalers.pkl', 'rb') as file:
         scalers = pickle.load(file)
+
     _symbol_timeframe = f'{symbol_out}_{hist.timeframe}'
     trans: MinMaxScaler = scalers[_symbol_timeframe]
 
@@ -391,4 +393,5 @@ def show_tf():
 if __name__ == '__main__':
     show_tf()
     # train_model()
-    test_model_with_trader()
+    test_model()
+    # test_model_with_trader()
