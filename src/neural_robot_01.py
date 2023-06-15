@@ -360,7 +360,7 @@ def test_model_with_trader():
     trans: MinMaxScaler = scalers[_symbol_timeframe]
 
     X_ = np.asarray(X_).astype(np.float32)
-    y_ = np.asarray(y_).astype(np.float32)
+    # y_ = np.asarray(y_).astype(np.float32)
 
     initial_deposit = 1000.0
 
@@ -425,6 +425,108 @@ def test_model_with_trader():
     trader.print_trade_stats()
 
 
+def test_model_with_trader_interactive():
+    from TraderSimMultiNoPrints import TraderSimMulti
+
+    dir_csv = '../csv'
+    hist = HistMulti(directory=dir_csv)
+
+    with open("train_configs.json", "r") as file:
+        train_configs = json.load(file)
+
+    print(f'train_configs:')
+    print(f'{train_configs}')
+
+    n_steps = train_configs['n_steps']
+    n_features = train_configs['n_features']
+    symbol_out = train_configs['symbol_out']
+    n_samples_train = train_configs['n_samples_train']
+    bias = train_configs['bias']
+    tipo_vela = train_configs['tipo_vela']
+    n_samples_test = 1000
+    samples_index_start = n_samples_train
+
+    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
+    X_, y_ = split_sequences(dataset_test, n_steps)
+    print(X_.shape, y_.shape)
+
+    model = load_model('model.h5')
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+
+    _symbol_timeframe = f'{symbol_out}_{hist.timeframe}'
+    trans: MinMaxScaler = scalers[_symbol_timeframe]
+
+    X_ = np.asarray(X_).astype(np.float32)
+    # y_ = np.asarray(y_).astype(np.float32)
+
+    initial_deposit = 1000.0
+
+    trader = TraderSimMulti(initial_deposit)
+    trader.max_candlestick_count = 1000
+    trader.start_simulation()
+
+    candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
+
+    for i in range(samples_index_start + n_steps, samples_index_start + candlesticks_quantity):
+        print(f'i = {i}, {100 * (i-samples_index_start-n_steps) / (candlesticks_quantity - n_steps):.2f} %')
+        trader.index = i
+        trader.print_symbols_close_price_at(i)
+        # trader.print_symbols_close_price_at(i, use_scalers=False)
+        trader.update_profit()
+
+        # fechamento da vela atual
+        current_price = trader.get_close_price_symbol_at(symbol_out, i)
+
+        # aqui a rede neural faz a previsão do valor de fechamento da próxima vela
+        j = i - samples_index_start - n_steps + 1
+        x_input = X_[j]
+        x_input = x_input.reshape((1, n_steps, n_features))
+        close_pred_norm = model.predict(x_input)
+        close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, trans)
+        print(f'fechamento da vela atual {symbol_out}: {current_price}')
+        print(f'previsão para o fechamento da próxima vela {symbol_out}: {close_pred_denorm:.5f}')
+
+        if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
+            print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')
+            trader.close_position()
+
+        if trader.equity <= 0.0:
+            trader.close_position()
+            trader.finish_simulation()
+            print('equity <= 0. a simulação será encerrada.')
+            break
+
+        # fecha a posição quando acabarem as novas barras (velas ou candlesticks)
+        if i == samples_index_start + candlesticks_quantity - 1:
+            trader.close_position()
+            trader.finish_simulation()
+            print('a última vela atingida. a simulação chegou ao fim.')
+
+        if trader.candlestick_count >= trader.max_candlestick_count:
+            print(f'fechamento forçado de negociações abertas. a contagem de velas atingiu o limite.')
+            trader.close_position()
+
+        if trader.open_position[0]:
+            trader.candlestick_count += 1
+        else:
+            trader.candlestick_count = 0
+
+        trader.print_trade_stats()
+
+        ret_msg = trader.interact_with_user()
+        if ret_msg == 'break':
+            print('o usuário decidiu encerrar a simulação.')
+            trader.close_position()
+            trader.finish_simulation()
+            break
+
+    print('\nresultados finais da simulação')
+    print(f'n_samples_test = {n_samples_test}, max_candlestick_count = {trader.max_candlestick_count}')
+    trader.print_trade_stats()
+
+
 def show_tf():
     print(os.environ["LD_LIBRARY_PATH"])
     print(os.environ["PYTHONPATH"])
@@ -435,5 +537,6 @@ def show_tf():
 if __name__ == '__main__':
     show_tf()
     # train_model()
-    calculate_model_bias()
+    # calculate_model_bias()
     # test_model_with_trader()
+    test_model_with_trader_interactive()
