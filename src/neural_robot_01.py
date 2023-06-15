@@ -238,8 +238,8 @@ def test_model():
     dir_csv = '../csv'
     hist = HistMulti(directory=dir_csv)
 
-    with open('train_configs.pkl', 'rb') as file:
-        train_configs = pickle.load(file)
+    with open("train_configs.json", "r") as file:
+        train_configs = json.load(file)
 
     print(f'train_configs:')
     print(f'{train_configs}')
@@ -259,6 +259,7 @@ def test_model():
 
     with open('scalers.pkl', 'rb') as file:
         scalers = pickle.load(file)
+
     _symbol_timeframe = f'{symbol_out}_{hist.timeframe}'
     trans: MinMaxScaler = scalers[_symbol_timeframe]
 
@@ -284,8 +285,8 @@ def test_model_with_trader():
     dir_csv = '../csv'
     hist = HistMulti(directory=dir_csv)
 
-    with open('train_configs.pkl', 'rb') as file:
-        train_configs = pickle.load(file)
+    with open("train_configs.json", "r") as file:
+        train_configs = json.load(file)
 
     print(f'train_configs:')
     print(f'{train_configs}')
@@ -389,6 +390,5 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    train_model()
-    # evaluate_model()
-    # test_model_with_trader()
+    # train_model()
+    test_model_with_trader()
