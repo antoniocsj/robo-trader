@@ -150,7 +150,7 @@ def train_model():
     symbol_out = 'EURUSD'
     n_steps = 2
     tipo_vela = 'OHLCV'
-    n_samples_train = 1000
+    n_samples_train = 40000
     validation_split = 0.5
 
     num_ativos = len(hist.symbols)
@@ -485,7 +485,7 @@ def test_model_with_trader_interactive():
         x_input = x_input.reshape((1, n_steps, n_features))
         close_pred_norm = model.predict(x_input)
         close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, trans)
-        print(f'fechamento da vela atual {symbol_out}: {current_price}')
+        print(f'fechamento da vela atual {symbol_out}: {current_price:.5f}')
         print(f'previsão para o fechamento da próxima vela {symbol_out}: {close_pred_denorm:.5f}')
 
         if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
