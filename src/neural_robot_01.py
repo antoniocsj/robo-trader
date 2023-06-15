@@ -110,14 +110,16 @@ def split_sequences(sequences, n_steps):
 def train_model():
     dir_csv = '../csv'
     hist = HistMulti(directory=dir_csv)
-    num_ativos = len(hist.symbols)
-    n_steps = 3
-    tipo_vela = 'CV'
-    num_entradas = num_ativos * n_steps * len(tipo_vela)
+
     symbol_out = 'EURUSD'
-    n_samples_train = 40000*0+400  # quantidade de velas usadas no treinamento
+    n_steps = 2
+    tipo_vela = 'CV'
+    n_samples_train = 1000
     validation_split = 0.5
-    max_n_epochs = num_entradas * 3 * 0 + 20
+
+    num_ativos = len(hist.symbols)
+    num_entradas = num_ativos * n_steps * len(tipo_vela)
+    max_n_epochs = num_entradas * 3
     patience = int(max_n_epochs / 10)
 
     # horizontally stack columns
@@ -397,6 +399,6 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    # train_model()
+    train_model()
     # calculate_model_bias()
-    test_model_with_trader()
+    # test_model_with_trader()
