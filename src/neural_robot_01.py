@@ -222,6 +222,7 @@ def train_model():
 
     train_configs = {'symbol_out': symbol_out,
                      'tipo_vela': tipo_vela,
+                     'timeframe': hist.timeframe,
                      'n_steps': n_steps,
                      'n_symbols': num_ativos,
                      'n_features': n_features,
