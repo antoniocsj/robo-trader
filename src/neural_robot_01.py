@@ -344,7 +344,7 @@ def test_model_with_trader():
     n_samples_train = train_configs['n_samples_train']
     bias = train_configs['bias']
     tipo_vela = train_configs['tipo_vela']
-    n_samples_test = 1000
+    n_samples_test = 8000
     samples_index_start = n_samples_train
 
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
@@ -365,11 +365,11 @@ def test_model_with_trader():
     initial_deposit = 1000.0
 
     trader = TraderSimMulti(initial_deposit)
-    trader.max_candlestick_count = 5
+    trader.max_candlestick_count = 1000
     trader.start_simulation()
 
     candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
-
+    counter = 0
     for i in range(samples_index_start + n_steps, samples_index_start + candlesticks_quantity):
         print(f'i = {i}, {100 * (i-samples_index_start-n_steps) / (candlesticks_quantity - n_steps):.2f} %')
         trader.index = i
@@ -388,16 +388,19 @@ def test_model_with_trader():
         close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, trans)
 
         # aqui toma-se a decisão de comprar ou vender baseando-se no valor da previsão
-        if close_pred_denorm > current_price:
-            trader.buy(symbol_out)
-        else:
-            trader.sell(symbol_out)
-
-        # dif = close_pred_denorm - current_price
-        # if dif > 0 and abs(dif) > 0.0005:
+        # if close_pred_denorm > current_price:
         #     trader.buy(symbol_out)
-        # elif dif < 0 and abs(dif) > 0.0005:
+        # else:
         #     trader.sell(symbol_out)
+
+        if trader.profit >= 0.5 and trader.profit <= -0.5:
+            trader.close_position()
+        else:
+            dif = close_pred_denorm - current_price
+            if dif > 0 and abs(dif) > 0.00035:
+                trader.buy(symbol_out)
+            elif dif < 0 and abs(dif) > 0.00035:
+                trader.sell(symbol_out)
 
         if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
             print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')
@@ -423,6 +426,10 @@ def test_model_with_trader():
             trader.candlestick_count += 1
         else:
             trader.candlestick_count = 0
+
+        counter += 1
+        if counter % 2000 == 0:
+            time.sleep(60)
 
         # trader.print_trade_stats()
 
