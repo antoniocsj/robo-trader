@@ -142,13 +142,6 @@ class DirectoryCorrection:
         Procurando pelos arquivos csv correspondentes ao 'simbolo' e ao 'timeframe'
         :return:
         """
-        # antes de tudo, remova todos os arquivos corrigidos, pois uma nova correção será feita.
-        self.all_files = os.listdir(self.directory)
-        for filename in self.all_files:
-            if filename.endswith('_C.csv'):
-                _filepath = self.directory + '/' + filename
-                os.remove(_filepath)
-
         # passe por todos os arquivos csv e descubra o symbol e timeframe
         self.all_files = os.listdir(self.directory)
         for filename in self.all_files:
