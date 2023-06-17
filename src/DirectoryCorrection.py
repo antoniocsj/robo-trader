@@ -572,7 +572,7 @@ class DirectoryCorrection:
 
 
 def main():
-    dir_cor = DirectoryCorrection('./csv')
+    dir_cor = DirectoryCorrection('../csv')
     # dir_cor.correct_directory()
     # dir_cor.check()
 
