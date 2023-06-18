@@ -411,7 +411,8 @@ class DirectoryCorrection:
         _time = _new_date_time.strftime('%H:%M:%S')
         _O = _H = _L = _C = _previous_close
         # insere a nova linha. que será uma vela com O=H=L=C igual a _previous_close e V=0
-        s.df.loc[_index_new_row] = [_date, _time, _O, _H, _L, _C, 0, 0, 0]
+        # s.df.loc[_index_new_row] = [_date, _time, _O, _H, _L, _C, 0, 0, 0]
+        s.df.loc[_index_new_row] = [_date, _time, _O, _H, _L, _C, 0]
         s.df.sort_index(ignore_index=True, inplace=True)
         s.df.reset_index(drop=True)
         s.current_row += 1
@@ -566,7 +567,7 @@ class DirectoryCorrection:
 
 def main():
     dir_cor = DirectoryCorrection('../csv')
-    # dir_cor.correct_directory()
+    dir_cor.correct_directory()
     # dir_cor.check()
 
 
