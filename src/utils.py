@@ -140,8 +140,8 @@ def criar_hist_csv():
         df2.at[i, '<OPEN>'] = _open
         df2.at[i, '<LOW>'] = _low
         df2.at[i, '<TICKVOL>'] = 0
-        df2.at[i, '<VOL>'] = 0
-        df2.at[i, '<SPREAD>'] = 0
+        # df2.at[i, '<VOL>'] = 0
+        # df2.at[i, '<SPREAD>'] = 0
 
         if i % 5000 == 0:
             print(f'{100 * i / len_df2:.2f} %')
