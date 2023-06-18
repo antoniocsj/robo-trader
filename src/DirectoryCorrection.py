@@ -312,12 +312,12 @@ class DirectoryCorrection:
                     self.sheets_exclude_last_rows(s.current_row)
                     break
 
-            if _current_row % 10000 == 0 and _current_row > 0:
+            if _current_row % 1000 == 0 and _current_row > 0:
                 self.save_sheets(print_row='current')
                 self.write_checkpoint()
                 print(f'{100 * _current_row / _max_len: .2f} %\n')
 
-            if _current_row % 1000 == 0 and _current_row > 0:
+            if _current_row % 100 == 0 and _current_row > 0:
                 print('\nrelatório parcial.')
                 for s in self.sheets:
                     s.print_current_row()
