@@ -1,12 +1,14 @@
-from flask import Flask
+from flask import Flask, request
 
 app = Flask(__name__)
 
 
-@app.route('/')
+@app.route('/', methods=['POST'])
 def hello_world():
     print('hello_world()')
-    return "<p>Hello, World!</p>"
+    data = request.json
+    print(data)
+    return "OK"
 
 
 if __name__ == '__main__':
