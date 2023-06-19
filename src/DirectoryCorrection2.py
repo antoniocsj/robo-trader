@@ -354,7 +354,7 @@ class DirectoryCorrection:
                     self.sheets_exclude_last_rows(s.current_row)
                     break
 
-            if _current_row % 1000 == 0 and _current_row > 0:
+            if _current_row % 300 == 0 and _current_row > 0:
                 self.save_sheets(print_row='current')
                 self.write_checkpoint(index_proc)
                 print(f'{100 * _current_row / _max_len: .2f} %\n')
@@ -629,29 +629,47 @@ class DirectoryCorrection:
                 _datetime_previous = _datetime_current
 
 
+def get_list_sync_files():
+    _list = []
+    all_files = os.listdir('.')
+
+    for filename in all_files:
+        if filename.startswith('sync_cp_') and filename.endswith('.pkl'):
+            _list.append(filename)
+
+    return _list
+
+
 def main():
     dir_csv = '../csv'
     timeframe = 'M10'
     symbols = search_symbols_in_directory(dir_csv, timeframe)
     symbols_to_sync_per_proc = []
-    n_procs = 4
 
-    for i in range(n_procs):
-        symbols_to_sync_per_proc.append([])
+    list_sync_files = sorted(get_list_sync_files())
+    if len(list_sync_files) == 0:
+        print('iniciando a sincronização dos arquivos csv pela PRIMEIRA vez.')
+        n_procs = 4
 
-    for i in range(len(symbols)):
-        i_proc = i % n_procs
-        symbols_to_sync_per_proc[i_proc].append(symbols[i])
+        for i in range(n_procs):
+            symbols_to_sync_per_proc.append([])
 
-    dir_cor_l: list[DirectoryCorrection] = []
-    for i in range(n_procs):
-        dir_cor = DirectoryCorrection(dir_csv, timeframe, symbols_to_sync_per_proc[i])
-        dir_cor_l.append(dir_cor)
+        for i in range(len(symbols)):
+            i_proc = i % n_procs
+            symbols_to_sync_per_proc[i_proc].append(symbols[i])
 
-    for i in range(n_procs):
-        print(f'process index {i}')
-        print(f'symbols to sync {symbols_to_sync_per_proc[i]}')
-        dir_cor_l[i].correct_directory(i)
+        dir_cor_l: list[DirectoryCorrection] = []
+        for i in range(n_procs):
+            dir_cor = DirectoryCorrection(dir_csv, timeframe, symbols_to_sync_per_proc[i])
+            dir_cor_l.append(dir_cor)
+
+        for i in range(n_procs):
+            print(f'\n*** process index {i}')
+            print(f'*** symbols to sync {symbols_to_sync_per_proc[i]}\n')
+            dir_cor_l[i].correct_directory(i)
+    else:
+        print('já tem sincronização em andamento.')
+        print(f'checkpoints: {list_sync_files}')
 
 
 if __name__ == '__main__':
