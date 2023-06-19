@@ -3,6 +3,7 @@ import pickle
 from datetime import datetime, timedelta
 import pandas as pd
 from pandas import DataFrame
+import multiprocessing
 
 
 def search_symbols_in_directory(directory: str, timeframe: str) -> list[str]:
@@ -154,12 +155,12 @@ class Sheet:
 
 
 class DirectoryCorrection:
-    def __init__(self, directory: str, symbols_to_sync: list[str] = None):
+    def __init__(self, directory: str, timeframe: str, symbols_to_sync: list[str] = None):
         self.directory = directory
         self.all_files = []
         self.csv_files = {}
         self.symbols = []
-        self.timeframe = ''
+        self.timeframe = timeframe
         self.sheets = []
         self.num_insertions_done = 0
         self.exclude_first_rows = False
@@ -189,14 +190,14 @@ class DirectoryCorrection:
                     else:
                         if _symbol in symbols_to_sync:
                             self.symbols.append(_symbol)
+                        else:
+                            continue
                 else:
                     print(f'erro. o símbolo {_symbol} aparece repetido no mesmo diretório')
                     exit(-1)
 
-                if self.timeframe == '':
-                    self.timeframe = _timeframe
-                elif _timeframe != self.timeframe:
-                    print(f'erro. há mais de um timeframe no mesmo diretório')
+                if _timeframe != self.timeframe:
+                    print(f'erro. {_timeframe} timeframe inválido')
                     exit(-1)
 
                 self.csv_files[f'{_symbol}_{_timeframe}'] = filename
@@ -312,11 +313,16 @@ class DirectoryCorrection:
                     break
                 i += 1
 
-    def correct_directory(self):
-        _r, _current_row = self.open_checkpoint()
+    def correct_directory(self, index_proc: int):
+        _r, _current_row, finished = self.open_checkpoint(index_proc)
         if _r:
-            print(f'checkpoint carregado. linha atual = {_current_row}')
-            self.sheets_set_current_row(_current_row)
+            print(f'checkpoint {index_proc} carregado. linha atual = {_current_row}')
+
+            if finished:
+                print(f'checkpoint {index_proc} indica que símbolos já estão sincronizados.')
+                return
+            else:
+                self.sheets_set_current_row(_current_row)
 
         self.find_first_row()
 
@@ -350,7 +356,7 @@ class DirectoryCorrection:
 
             if _current_row % 1000 == 0 and _current_row > 0:
                 self.save_sheets(print_row='current')
-                self.write_checkpoint()
+                self.write_checkpoint(index_proc)
                 print(f'{100 * _current_row / _max_len: .2f} %\n')
 
             if _current_row % 100 == 0 and _current_row > 0:
@@ -371,6 +377,7 @@ class DirectoryCorrection:
             s.print_current_row()
         if self.all_sheets_datetime_synced_this_row():
             print('OK! TODAS as planilhas estão SINCRONIZADAS até aqui.')
+            self.write_checkpoint(index_proc, finished=True)
         else:
             print('ERRO! NEM todas as planilhas estão sincronizadas até aqui.')
         print()
@@ -514,29 +521,50 @@ class DirectoryCorrection:
         for s in self.sheets:
             s.current_row = _current_row
 
-    def open_checkpoint(self):
-        if os.path.exists('checkpoint.pkl'):
-            with open('checkpoint.pkl', 'rb') as file:
+    def open_checkpoint(self, index_proc: int):
+        _filename = f'sync_cp_{index_proc}.pkl'
+        if os.path.exists(_filename):
+            with open(_filename, 'rb') as file:
                 self.cp = pickle.load(file)
             current_row = self.cp['current_row']
-            return True, current_row
-        return False, 0
+            finished = self.cp['finished']
+            return True, current_row, finished
+        return False, 0, False
 
-    def write_checkpoint(self):
+    # def write_checkpoint(self, index_proc: int):
+    #     s: Sheet
+    #     _rows_set = set()
+    #     for s in self.sheets:
+    #         _rows_set.add(s.current_row)
+    #     if self.all_sheets_row_synced():
+    #         _current_row = list(_rows_set)[0]
+    #         self.cp['current_row'] = _current_row
+    #         with open(f'sync_cp_{index_proc}.pkl', 'wb') as file:
+    #             pickle.dump(self.cp, file)
+    #         print(f'checkpoint gravado. linha atual = {_current_row}\n')
+    #     else:
+    #         print(f'erro. write_checkpoint. as planilhas NÃO estão sincronizadas. '
+    #               f'current_rows = {list(_rows_set)}\n')
+    #         exit(-1)
+
+    def write_checkpoint(self, index_proc: int, finished=False):
         s: Sheet
         _rows_set = set()
         for s in self.sheets:
             _rows_set.add(s.current_row)
-        if self.all_sheets_row_synced():
-            _current_row = list(_rows_set)[0]
-            self.cp['current_row'] = _current_row
-            with open('checkpoint.pkl', 'wb') as file:
-                pickle.dump(self.cp, file)
-            print(f'checkpoint gravado. linha atual = {_current_row}\n')
-        else:
-            print(f'erro. write_checkpoint. as planilhas NÃO estão sincronizadas. '
+        if not self.all_sheets_row_synced():
+            print(f'cuidado. write_checkpoint. as planilhas NÃO estão todas sincronizadas ainda. '
                   f'current_rows = {list(_rows_set)}\n')
-            exit(-1)
+
+        _current_row = list(_rows_set)[0]
+        self.cp['symbols_to_sync'] = self.symbols
+        self.cp['finished'] = finished
+        self.cp['current_row'] = _current_row
+
+        _filename = f'sync_cp_{index_proc}.pkl'
+        with open(_filename, 'wb') as file:
+            pickle.dump(self.cp, file)
+        print(f'checkpoint {_filename} gravado. linha atual = {_current_row}\n')
 
     def all_sheets_datetime_synced_this_row(self):
         """
@@ -602,9 +630,12 @@ class DirectoryCorrection:
 
 
 def main():
-    symbols = search_symbols_in_directory('../csv', 'M10')
+    dir_csv = '../csv'
+    timeframe = 'M10'
+    symbols = search_symbols_in_directory(dir_csv, timeframe)
     symbols_to_sync_per_proc = []
     n_procs = 4
+
     for i in range(n_procs):
         symbols_to_sync_per_proc.append([])
 
@@ -612,9 +643,15 @@ def main():
         i_proc = i % n_procs
         symbols_to_sync_per_proc[i_proc].append(symbols[i])
 
-    dir_cor = DirectoryCorrection('../csv')
-    dir_cor.correct_directory()
-    # dir_cor.check()
+    dir_cor_l: list[DirectoryCorrection] = []
+    for i in range(n_procs):
+        dir_cor = DirectoryCorrection(dir_csv, timeframe, symbols_to_sync_per_proc[i])
+        dir_cor_l.append(dir_cor)
+
+    for i in range(n_procs):
+        print(f'process index {i}')
+        print(f'symbols to sync {symbols_to_sync_per_proc[i]}')
+        dir_cor_l[i].correct_directory(i)
 
 
 if __name__ == '__main__':
