@@ -408,7 +408,7 @@ class DirectoryCorrection:
     def insert_new_row(self, _index_new_row, _new_date_time, _previous_close, s):
         # print(f'{s.symbol} inserindo nova linha {_new_date_time}')
         _date = _new_date_time.strftime('%Y.%m.%d')
-        _time = _new_date_time.strftime('%H:%M:%S')
+        _time = _new_date_time.strftime('%H:%M')
         _O = _H = _L = _C = _previous_close
         # insere a nova linha. que será uma vela com O=H=L=C igual a _previous_close e V=0
         # s.df.loc[_index_new_row] = [_date, _time, _O, _H, _L, _C, 0, 0, 0]
