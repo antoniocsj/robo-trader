@@ -5,6 +5,38 @@ import pandas as pd
 from pandas import DataFrame
 
 
+def search_symbols_in_directory(directory: str, timeframe: str) -> list[str]:
+    """
+    Procurando pelos símbolos presentes num diretório contendo arquivos csv.
+    Todos os arquivos devem ser do mesmo timeframe
+    :return: lista dos símbolos
+    """
+    # passe por todos os arquivos csv e descubra o symbol e timeframe
+    symbols = []
+    all_files = os.listdir(directory)
+
+    for filename in all_files:
+        if filename.endswith('.csv'):
+            _symbol = filename.split('_')[0]
+            _timeframe = filename.split('_')[1]
+            if _timeframe.endswith('.csv'):
+                _timeframe = _timeframe.replace('.csv', '')
+
+            if _symbol not in symbols:
+                symbols.append(_symbol)
+            else:
+                print(f'erro. o símbolo {_symbol} aparece repetido no mesmo diretório')
+                exit(-1)
+
+            if _timeframe != timeframe:
+                print(f'erro. timeframe {_timeframe} diferente do especificado {timeframe} foi '
+                      f'encontrado no diretório')
+                exit(-1)
+
+    symbols = sorted(symbols)
+    return symbols
+
+
 class Sheet:
     def __init__(self, filepath: str, symbol: str, timeframe: str):
         print(f'criando planilha a partir de {filepath}')
@@ -122,7 +154,7 @@ class Sheet:
 
 
 class DirectoryCorrection:
-    def __init__(self, directory: str):
+    def __init__(self, directory: str, symbols_to_sync: list[str] = None):
         self.directory = directory
         self.all_files = []
         self.csv_files = {}
@@ -134,10 +166,10 @@ class DirectoryCorrection:
         self.new_start_row_datetime: datetime = None
         self.cp = {}
 
-        self.search_symbols()
+        self.search_symbols(symbols_to_sync)
         self.load_sheets()
 
-    def search_symbols(self):
+    def search_symbols(self, symbols_to_sync: list[str] = None):
         """
         Procurando pelos arquivos csv correspondentes ao 'simbolo' e ao 'timeframe'
         :return:
@@ -152,7 +184,11 @@ class DirectoryCorrection:
                     _timeframe = _timeframe.replace('.csv', '')
 
                 if _symbol not in self.symbols:
-                    self.symbols.append(_symbol)
+                    if not symbols_to_sync:
+                        self.symbols.append(_symbol)
+                    else:
+                        if _symbol in symbols_to_sync:
+                            self.symbols.append(_symbol)
                 else:
                     print(f'erro. o símbolo {_symbol} aparece repetido no mesmo diretório')
                     exit(-1)
@@ -423,7 +459,7 @@ class DirectoryCorrection:
         s: Sheet
         _date_time_list = []
         for s in self.sheets:
-            for i in range(_nrow_start, _nrow_end+1):
+            for i in range(_nrow_start, _nrow_end + 1):
                 if i > len(s.df) - 1:
                     break
                 row = s.df.iloc[i]
@@ -566,6 +602,16 @@ class DirectoryCorrection:
 
 
 def main():
+    symbols = search_symbols_in_directory('../csv', 'M10')
+    symbols_to_sync_per_proc = []
+    n_procs = 4
+    for i in range(n_procs):
+        symbols_to_sync_per_proc.append([])
+
+    for i in range(len(symbols)):
+        i_proc = i % n_procs
+        symbols_to_sync_per_proc[i_proc].append(symbols[i])
+
     dir_cor = DirectoryCorrection('../csv')
     dir_cor.correct_directory()
     # dir_cor.check()
