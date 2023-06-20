@@ -551,7 +551,7 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    # train_model()
+    train_model()
     # calculate_model_bias()
-    test_model_with_trader()
+    # test_model_with_trader()
     # test_model_with_trader_interactive()
