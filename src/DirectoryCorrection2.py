@@ -710,6 +710,7 @@ def remove_sync_cp_files(_list_sync_files: list[str]):
             print(f'erro em remove_sync_cp_files(). arquivo {filename} não encontrado.')
             exit(-1)
 
+
 def main():
     dir_csv = '../csv'
     timeframe = 'M10'
