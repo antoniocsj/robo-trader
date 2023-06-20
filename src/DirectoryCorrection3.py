@@ -362,7 +362,7 @@ class DirectoryCorrection:
                     self.sheets_exclude_last_rows(s.current_row)
                     break
 
-            if _current_row % 300 == 0 and _current_row > 0:
+            if _current_row % 1000 == 0 and _current_row > 0:
                 self.save_sheets(print_row='current')
                 self.write_checkpoint(index_proc)
                 print(f'{100 * _current_row / _max_len: .2f} %\n')
@@ -724,7 +724,7 @@ def main():
     list_sync_files = get_list_sync_files()
     if len(list_sync_files) == 0:
         print('iniciando a sincronização dos arquivos csv pela PRIMEIRA vez.')
-        n_procs = 4
+        n_procs = 8
         pool = mp.Pool(n_procs)
 
         for i in range(n_procs):
