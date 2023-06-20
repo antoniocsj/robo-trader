@@ -1,4 +1,5 @@
 import os
+import math
 import pickle
 from datetime import datetime, timedelta
 from typing import Any
@@ -654,7 +655,7 @@ def get_list_sync_files():
         if filename.startswith('sync_cp_') and filename.endswith('.pkl'):
             _list.append(filename)
 
-    return _list
+    return sorted(_list)
 
 
 def get_sync_status(_filename: str):
@@ -675,13 +676,47 @@ def get_symbols_to_sync(_filename: str) -> list[str] | None:
     return None
 
 
+def get_all_sync_cp_dic(_list_sync_files: list[str]) -> list[dict]:
+    _list = []
+    for _filename in _list_sync_files:
+        if os.path.exists(_filename):
+            with open(_filename, 'rb') as file:
+                cp = pickle.load(file)
+                _list.append(cp)
+        else:
+            print(f'erro em get_all_sync_cp_dic(). arquivo {_filename} não foi encontrado.')
+            exit(-1)
+
+    return _list
+
+
+def create_sync_cp_file(index_proc: int, _symbols_to_sync: list[str]):
+    _filename = f'sync_cp_{index_proc}.pkl'
+    _cp = {'symbols_to_sync': _symbols_to_sync,
+           'finished': False,
+           'current_row': 0}
+
+    _filename = f'sync_cp_{index_proc}.pkl'
+    with open(_filename, 'wb') as file:
+        pickle.dump(_cp, file)
+    print(f'checkpoint {_filename} criado.')
+
+
+def remove_sync_cp_files(_list_sync_files: list[str]):
+    for filename in _list_sync_files:
+        if os.path.exists(filename):
+            os.remove(filename)
+        else:
+            print(f'erro em remove_sync_cp_files(). arquivo {filename} não encontrado.')
+            exit(-1)
+
 def main():
     dir_csv = '../csv'
     timeframe = 'M10'
     symbols = search_symbols_in_directory(dir_csv, timeframe)
     symbols_to_sync_per_proc = []
 
-    list_sync_files = sorted(get_list_sync_files())
+    list_sync_files = get_list_sync_files()
     if len(list_sync_files) == 0:
         print('iniciando a sincronização dos arquivos csv pela PRIMEIRA vez.')
         n_procs = 4
@@ -712,6 +747,43 @@ def main():
             _results_set.add(_sync_status)
         if len(_results_set) == 1 and list(_results_set)[0] is True:
             print('TODOS os checkpoints indicam que suas sincronização estão FINALIZADAS')
+            # assume-se que sempre há um número de processos/num_sync_cp_files que seja uma potência de 2
+            # pois será feita uma fusão de cada 2 conjuntos de símbolos de modo que na próxima sincronização
+            # haverá a metade do número de processos/num_sync_cp_files do que havia na sincronização precedente.
+            n_procs = len(list_sync_files)
+            if n_procs == 1:
+                print('a sincronização total está finalizada. parabéns!')
+            else:
+                print(f'iniciando a fusão de conjuntos de símbolos')
+                list_sync_cp_dic = get_all_sync_cp_dic(list_sync_files)
+                n_procs = n_procs // 2
+                symbols_to_sync_per_proc = []
+
+                for i in range(n_procs):
+                    symbols_to_sync_per_proc.append([])
+
+                for i in range(n_procs * 2):
+                    j = math.floor(i / 2)
+                    symbols_to_sync_per_proc[j] += list_sync_cp_dic[i]['symbols_to_sync']
+
+                print('removendo sync_cp_files')
+                remove_sync_cp_files(get_list_sync_files())
+
+                print('criando novo(s) sync_cp_file(s)')
+                for i in range(n_procs):
+                    create_sync_cp_file(i, symbols_to_sync_per_proc[i])
+
+                dir_cor_l: list[DirectoryCorrection] = []
+                for i in range(n_procs):
+                    dir_cor = DirectoryCorrection(dir_csv, timeframe, i, symbols_to_sync_per_proc[i])
+                    dir_cor_l.append(dir_cor)
+
+                for i in range(n_procs):
+                    print(f'\n*** process index {i}')
+                    print(f'*** symbols to sync {symbols_to_sync_per_proc[i]}\n')
+                    dir_cor_l[i].correct_directory(i)
+
+                pass
         else:
             print('NEM todos os checkpoints indicam que suas sincronização estão finalizadas')
             print('continuando as sincronizações')
