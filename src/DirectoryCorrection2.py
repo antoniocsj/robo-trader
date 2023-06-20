@@ -1,6 +1,8 @@
 import os
 import pickle
 from datetime import datetime, timedelta
+from typing import Any
+
 import pandas as pd
 from pandas import DataFrame
 import multiprocessing
@@ -155,7 +157,7 @@ class Sheet:
 
 
 class DirectoryCorrection:
-    def __init__(self, directory: str, timeframe: str, symbols_to_sync: list[str] = None):
+    def __init__(self, directory: str, timeframe: str, index_proc: int, symbols_to_sync: list[str] = None):
         self.directory = directory
         self.all_files = []
         self.csv_files = {}
@@ -169,6 +171,7 @@ class DirectoryCorrection:
 
         self.search_symbols(symbols_to_sync)
         self.load_sheets()
+        self.create_checkpoint(index_proc)
 
     def search_symbols(self, symbols_to_sync: list[str] = None):
         """
@@ -359,15 +362,15 @@ class DirectoryCorrection:
                 self.write_checkpoint(index_proc)
                 print(f'{100 * _current_row / _max_len: .2f} %\n')
 
-            if _current_row % 100 == 0 and _current_row > 0:
-                print('\nrelatório parcial.')
-                for s in self.sheets:
-                    s.print_current_row()
-                if self.all_sheets_datetime_synced_this_row():
-                    print('OK! TODAS as planilhas estão SINCRONIZADAS até aqui.')
-                else:
-                    print('ERRO! NEM todas as planilhas estão sincronizadas até aqui.')
-                print()
+            # if _current_row % 100 == 0 and _current_row > 0:
+            #     print('\nrelatório parcial.')
+            #     for s in self.sheets:
+            #         s.print_current_row()
+            #     if self.all_sheets_datetime_synced_this_row():
+            #         print(f'OK! TODAS as planilhas estão SINCRONIZADAS até aqui. (linha {_current_row})')
+            #     else:
+            #         print('ERRO! NEM todas as planilhas estão sincronizadas até aqui.')
+            #     print()
 
         if self.check_sheets_last_row():
             self.save_sheets()
@@ -566,6 +569,20 @@ class DirectoryCorrection:
             pickle.dump(self.cp, file)
         print(f'checkpoint {_filename} gravado. linha atual = {_current_row}\n')
 
+    def create_checkpoint(self, index_proc: int):
+        _filename = f'sync_cp_{index_proc}.pkl'
+        if os.path.exists(_filename):
+            return
+
+        self.cp['symbols_to_sync'] = self.symbols
+        self.cp['finished'] = False
+        self.cp['current_row'] = 0
+
+        _filename = f'sync_cp_{index_proc}.pkl'
+        with open(_filename, 'wb') as file:
+            pickle.dump(self.cp, file)
+        print(f'checkpoint {_filename} criado.\n')
+
     def all_sheets_datetime_synced_this_row(self):
         """
         Testa se todas as planilhas estão sincronizadas (mesma data e hora) nesta linha.
@@ -640,6 +657,24 @@ def get_list_sync_files():
     return _list
 
 
+def get_sync_status(_filename: str):
+    if os.path.exists(_filename):
+        with open(_filename, 'rb') as file:
+            cp = pickle.load(file)
+        finished = cp['finished']
+        return finished
+    return False
+
+
+def get_symbols_to_sync(_filename: str) -> list[str] | None:
+    if os.path.exists(_filename):
+        with open(_filename, 'rb') as file:
+            cp = pickle.load(file)
+        _symbols = cp['symbols_to_sync']
+        return _symbols
+    return None
+
+
 def main():
     dir_csv = '../csv'
     timeframe = 'M10'
@@ -660,7 +695,7 @@ def main():
 
         dir_cor_l: list[DirectoryCorrection] = []
         for i in range(n_procs):
-            dir_cor = DirectoryCorrection(dir_csv, timeframe, symbols_to_sync_per_proc[i])
+            dir_cor = DirectoryCorrection(dir_csv, timeframe, i, symbols_to_sync_per_proc[i])
             dir_cor_l.append(dir_cor)
 
         for i in range(n_procs):
@@ -668,8 +703,35 @@ def main():
             print(f'*** symbols to sync {symbols_to_sync_per_proc[i]}\n')
             dir_cor_l[i].correct_directory(i)
     else:
-        print('já tem sincronização em andamento.')
+        print('pode haver sincronização em andamento.')
         print(f'checkpoints: {list_sync_files}')
+        # verifique se todos os checkpoints indicam sincronização finalizada
+        _results_set = set()
+        for i in range(len(list_sync_files)):
+            _sync_status = get_sync_status(list_sync_files[i])
+            _results_set.add(_sync_status)
+        if len(_results_set) == 1 and list(_results_set)[0] is True:
+            print('TODOS os checkpoints indicam que suas sincronização estão FINALIZADAS')
+        else:
+            print('NEM todos os checkpoints indicam que suas sincronização estão finalizadas')
+            print('continuando as sincronizações')
+            n_procs = len(list_sync_files)
+
+            for i in range(n_procs):
+                symbols_to_sync_per_proc.append([])
+
+            for i in range(n_procs):
+                symbols_to_sync_per_proc[i] = get_symbols_to_sync(list_sync_files[i])
+
+            dir_cor_l: list[DirectoryCorrection] = []
+            for i in range(n_procs):
+                dir_cor = DirectoryCorrection(dir_csv, timeframe, i, symbols_to_sync_per_proc[i])
+                dir_cor_l.append(dir_cor)
+
+            for i in range(n_procs):
+                print(f'\n*** process index {i}')
+                print(f'*** symbols to sync {symbols_to_sync_per_proc[i]}\n')
+                dir_cor_l[i].correct_directory(i)
 
 
 if __name__ == '__main__':
