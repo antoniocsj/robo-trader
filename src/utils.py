@@ -256,11 +256,4 @@ def denormalize__directory():
 
 
 if __name__ == '__main__':
-    # criar_hist_csv()
-    # hist = HistMulti('../csv')
-    # for i in range(3, 10):
-    #     entradas = formar_entradas_multi(hist, _index=i, _num_velas=3, _tipo_vela='C')
-    #     print(f'index = {i} {entradas}')
-    # normalize_directory()
-    # denormalize__directory()
-    pass
+    normalize_directory()
