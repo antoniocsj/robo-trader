@@ -347,7 +347,7 @@ def test_model_with_trader():
     n_samples_train = train_configs['n_samples_train']
     bias = train_configs['bias']
     tipo_vela = train_configs['tipo_vela']
-    n_samples_test = 8000
+    n_samples_test = 1500
     samples_index_start = n_samples_train
 
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
@@ -459,7 +459,7 @@ def test_model_with_trader_interactive():
     n_samples_train = train_configs['n_samples_train']
     bias = train_configs['bias']
     tipo_vela = train_configs['tipo_vela']
-    n_samples_test = 1000
+    n_samples_test = 1500
     samples_index_start = n_samples_train
 
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
