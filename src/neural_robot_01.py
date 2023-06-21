@@ -152,7 +152,7 @@ def train_model():
     symbol_out = 'EURUSD'
     n_steps = 2
     tipo_vela = 'OHLCV'
-    n_samples_train = 40000
+    n_samples_train = 30000
     validation_split = 0.5
 
     num_ativos = len(hist.symbols)
@@ -177,6 +177,8 @@ def train_model():
     model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
+    model.add(Dense(num_entradas, activation='relu'))
+    model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(num_entradas, activation='relu'))
