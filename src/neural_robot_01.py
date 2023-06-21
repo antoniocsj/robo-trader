@@ -210,7 +210,7 @@ def train_model():
     print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
 
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
-    n_samples_test = int(n_samples_train * validation_split)
+    n_samples_test = 1500
     samples_index_start = n_samples_train
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
 
