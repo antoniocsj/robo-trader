@@ -724,7 +724,7 @@ def main():
     list_sync_files = get_list_sync_files()
     if len(list_sync_files) == 0:
         print('iniciando a sincronização dos arquivos csv pela PRIMEIRA vez.')
-        n_procs = 1
+        n_procs = 4
         pool = mp.Pool(n_procs)
 
         for i in range(n_procs):

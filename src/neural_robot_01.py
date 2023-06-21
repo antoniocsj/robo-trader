@@ -174,14 +174,14 @@ def train_model():
 
     # define model
     model = Sequential()
-    model.add(Conv1D(filters=num_entradas, kernel_size=2, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
     model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(num_entradas, activation='relu'))
-    # model.add(Dense(num_entradas, activation='relu'))
-    # model.add(Dense(num_entradas, activation='relu'))
-    # model.add(Dense(num_entradas, activation='relu'))
+    model.add(Dense(num_entradas, activation='relu'))
+    model.add(Dense(num_entradas, activation='relu'))
+    model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse')
     model_config = model.get_config()
