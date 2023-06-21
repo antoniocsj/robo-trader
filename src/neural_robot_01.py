@@ -153,7 +153,7 @@ def train_model():
     n_steps = 2
     tipo_vela = 'OHLCV'
     n_samples_train = 30000
-    validation_split = 0.5
+    validation_split = 0.1
 
     num_ativos = len(hist.symbols)
     num_entradas = num_ativos * n_steps * len(tipo_vela)
@@ -174,14 +174,14 @@ def train_model():
 
     # define model
     model = Sequential()
-    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(Conv1D(filters=num_entradas, kernel_size=2, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
     model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(num_entradas, activation='relu'))
-    model.add(Dense(num_entradas, activation='relu'))
-    model.add(Dense(num_entradas, activation='relu'))
-    model.add(Dense(num_entradas, activation='relu'))
+    # model.add(Dense(num_entradas, activation='relu'))
+    # model.add(Dense(num_entradas, activation='relu'))
+    # model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse')
     model_config = model.get_config()
@@ -314,7 +314,7 @@ def calculate_model_bias():
         y_pred = model.predict(x_input)
         diff = y_[i] - y_pred[0][0]
         diffs.append(diff)
-        if i % 1000 == 0 and i > 0:
+        if i % 3000 == 0 and i > 0:
             _t = 60
             print(f'esperando {_t} segundos para continuar')
             time.sleep(_t)
@@ -553,7 +553,7 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    train_model()
-    # calculate_model_bias()
+    # train_model()
+    calculate_model_bias()
     # test_model_with_trader()
     # test_model_with_trader_interactive()
