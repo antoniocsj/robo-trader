@@ -255,5 +255,23 @@ def denormalize__directory():
         print(f'{_symbol} {data_inv[0]}')
 
 
+def differentiate_directory():
+    hist = HistMulti('../csv')
+
+    for _symbol in hist.symbols:
+        print(_symbol)
+        _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
+        arr = hist.arr[_symbol_timeframe]
+        data = arr[:, 2:7]
+        data = np.diff(data, axis=0)
+        dataf = pd.DataFrame(data)
+        dataf.insert(0, 0, arr[:-1, 1], True)
+        dataf.insert(1, 1, arr[:-1, 1], True)
+        dataf.columns = range(dataf.columns.size)
+        _filepath = hist.get_csv_filepath(_symbol_timeframe)
+        dataf.to_csv(_filepath, index=False, sep='\t')
+
+
 if __name__ == '__main__':
     normalize_directory()
+    # differentiate_directory()
