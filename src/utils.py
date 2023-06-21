@@ -265,8 +265,8 @@ def differentiate_directory():
         data = arr[:, 2:7]
         data = np.diff(data, axis=0)
         dataf = pd.DataFrame(data)
-        dataf.insert(0, 0, arr[:-1, 0], True)
-        dataf.insert(1, 1, arr[:-1, 1], True)
+        dataf.insert(0, 0, arr[1:, 0], True)
+        dataf.insert(1, 1, arr[1:, 1], True)
         dataf.columns = range(dataf.columns.size)
         _filepath = hist.get_csv_filepath(_symbol_timeframe)
         dataf.to_csv(_filepath, index=False, sep='\t')
