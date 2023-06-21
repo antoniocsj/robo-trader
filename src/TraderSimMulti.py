@@ -38,7 +38,7 @@ class TraderSimMulti:
         self.balance = self.initial_balance  # saldo atual
         self.equity = self.initial_balance  # patrimônio líquido
         self.profit = 0.0  # lucro (ou prejuízo) na negociação
-        self.contract_size = 100000  # EURUSD
+        self.contract_size = 100000  # Forex Majors=100000, XAUUSD=100
         self.volume_operation = 0.01
         self.roi = 0.0  # Return on Investment ou Retorno de Investmento
         self.stop_loss = 0.01  # limiar de percentual de perda máxima por negociação
