@@ -1,4 +1,5 @@
 import os
+import shutil
 import math
 import pickle
 from datetime import datetime, timedelta
@@ -715,6 +716,20 @@ def remove_sync_cp_files(_list_sync_files: list[str]):
             exit(-1)
 
 
+def make_backup(dir_csv: str):
+    from utils import are_dir_trees_equal
+
+    dir_csv_backup = dir_csv + '-s'
+    print(f'copiando o diretório sincronizado para {dir_csv_backup}')
+    if os.path.exists(dir_csv_backup):
+        print(f'o diretório {dir_csv_backup} já existe. será substituído.')
+        shutil.rmtree(dir_csv_backup)
+    shutil.copytree(dir_csv, dir_csv_backup)
+    if are_dir_trees_equal(dir_csv, dir_csv_backup):
+        print('Backup efetuado com SUCESSO!')
+    else:
+        print('ERRO ao fazer o backup.')
+
 def main():
     dir_csv = '../csv'
     timeframe = 'M10'
@@ -724,7 +739,7 @@ def main():
     list_sync_files = get_list_sync_files()
     if len(list_sync_files) == 0:
         print('iniciando a sincronização dos arquivos csv pela PRIMEIRA vez.')
-        n_procs = 4
+        n_procs = 1
         pool = mp.Pool(n_procs)
 
         for i in range(n_procs):
@@ -761,6 +776,7 @@ def main():
             n_procs = len(list_sync_files)
             if n_procs == 1:
                 print('a sincronização total está finalizada. parabéns!')
+                make_backup(dir_csv)
             else:
                 print(f'iniciando a fusão de conjuntos de símbolos')
                 list_sync_cp_dic = get_all_sync_cp_dic(list_sync_files)
