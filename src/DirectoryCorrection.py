@@ -122,6 +122,13 @@ class Sheet:
 
 
 class DirectoryCorrection:
+    """
+    Realiza a correção/sincronização de todos os arquivos CSVs contidos no diretório indicado.
+    Quando realiza inserções de linhas, faz do seguinte modo:
+    - Obtém o valor de fechamento da última vela conhecida (C');
+    - as velas inseridas terão O=H=L=C=C' e V=0;
+    Todas as planilhas são sincronizadas simultaneamente em apenas 1 processo.
+    """
     def __init__(self, directory: str):
         self.directory = directory
         self.all_files = []
@@ -277,6 +284,14 @@ class DirectoryCorrection:
                 i += 1
 
     def correct_directory(self):
+        _len_symbols = len(self.symbols)
+        if _len_symbols == 0:
+            print('Não há arquivos para sincronizar.')
+            return
+        elif _len_symbols == 1:
+            print('Apenas 1 arquivo, portanto não há necessidade de sincronização.')
+            return
+
         _r, _current_row = self.open_checkpoint()
         if _r:
             print(f'checkpoint carregado. linha atual = {_current_row}')
@@ -567,8 +582,8 @@ class DirectoryCorrection:
 
 def main():
     dir_cor = DirectoryCorrection('../csv')
-    # dir_cor.correct_directory()
-    dir_cor.check()
+    dir_cor.correct_directory()
+    # dir_cor.check()
 
 
 if __name__ == '__main__':

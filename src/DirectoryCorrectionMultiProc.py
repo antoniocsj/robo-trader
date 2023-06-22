@@ -159,6 +159,20 @@ class Sheet:
 
 
 class DirectoryCorrection:
+    """
+    Realiza a correção/sincronização de todos os arquivos CSVs contidos no diretório indicado.
+    Quando realiza inserções de linhas, faz do seguinte modo:
+    - Obtém o valor de fechamento da última vela conhecida (C');
+    - as velas inseridas terão O=H=L=C=C' e V=0;
+    Esta classe utiliza MultiProcessamento para realizar suas tarefas.
+    O processo de sincronização é efetuado em várias etapas nas quais vários conjuntos de planilhas são sincronizados
+    separadamente em vários processos paralelos. O número de processos (n_procs_start) a serem criados na primeira
+    execução do script deve ser escolhido de modo que cada processo tenha ao menos 2 arquivos/símbolos para sincronizar.
+    É necessário rodar algumas vezes o script até que a sincronização
+    total seja atingida. No final, é feito um backup do diretório sincronizado.
+    """
+    n_procs_start = 4
+
     def __init__(self, directory: str, timeframe: str, index_proc: int, symbols_to_sync: list[str] = None):
         self.directory = directory
         self.all_files = []
@@ -540,22 +554,6 @@ class DirectoryCorrection:
             return True, current_row, finished
         return False, 0, False
 
-    # def write_checkpoint(self, index_proc: int):
-    #     s: Sheet
-    #     _rows_set = set()
-    #     for s in self.sheets:
-    #         _rows_set.add(s.current_row)
-    #     if self.all_sheets_row_synced():
-    #         _current_row = list(_rows_set)[0]
-    #         self.cp['current_row'] = _current_row
-    #         with open(f'sync_cp_{index_proc}.pkl', 'wb') as file:
-    #             pickle.dump(self.cp, file)
-    #         print(f'checkpoint gravado. linha atual = {_current_row}\n')
-    #     else:
-    #         print(f'erro. write_checkpoint. as planilhas NÃO estão sincronizadas. '
-    #               f'current_rows = {list(_rows_set)}\n')
-    #         exit(-1)
-
     def write_checkpoint(self, index_proc: int, finished=False):
         s: Sheet
         _rows_set = set()
@@ -730,6 +728,7 @@ def make_backup(dir_csv: str):
     else:
         print('ERRO ao fazer o backup.')
 
+
 def main():
     dir_csv = '../csv'
     timeframe = 'M10'
@@ -739,7 +738,16 @@ def main():
     list_sync_files = get_list_sync_files()
     if len(list_sync_files) == 0:
         print('iniciando a sincronização dos arquivos csv pela PRIMEIRA vez.')
-        n_procs = 1
+
+        _len_symbols = len(symbols)
+        if _len_symbols == 0:
+            print('Não há arquivos para sincronizar.')
+            return
+        elif _len_symbols == 1:
+            print('Apenas 1 arquivo, portanto não há necessidade de sincronização.')
+            return
+
+        n_procs = DirectoryCorrection.n_procs_start
         pool = mp.Pool(n_procs)
 
         for i in range(n_procs):
@@ -755,10 +763,9 @@ def main():
             dir_cor_l.append(dir_cor)
 
         for i in range(n_procs):
-            pool.apply_async(dir_cor_l[i].correct_directory, args=(i, ))
+            pool.apply_async(dir_cor_l[i].correct_directory, args=(i,))
         pool.close()
         pool.join()
-        print('*************************************')
 
     else:
         print('pode haver sincronização em andamento.')
@@ -769,7 +776,7 @@ def main():
             _sync_status = get_sync_status(list_sync_files[i])
             _results_set.add(_sync_status)
         if len(_results_set) == 1 and list(_results_set)[0] is True:
-            print('TODOS os checkpoints indicam que suas sincronização estão FINALIZADAS')
+            print('TODOS os checkpoints indicam que suas sincronizações estão FINALIZADAS')
             # assume-se que sempre há um número de processos/num_sync_cp_files que seja uma potência de 2
             # pois será feita uma fusão de cada 2 conjuntos de símbolos de modo que na próxima sincronização
             # haverá a metade do número de processos/num_sync_cp_files do que havia na sincronização precedente.
@@ -807,7 +814,7 @@ def main():
                     pool.apply_async(dir_cor_l[i].correct_directory, args=(i,))
                 pool.close()
                 pool.join()
-                print('*************************************')
+
         else:
             print('NEM todos os checkpoints indicam que suas sincronização estão finalizadas')
             print('continuando as sincronizações')
@@ -829,7 +836,6 @@ def main():
                 pool.apply_async(dir_cor_l[i].correct_directory, args=(i,))
             pool.close()
             pool.join()
-            print('*************************************')
 
 
 if __name__ == '__main__':
