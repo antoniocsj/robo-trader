@@ -168,8 +168,31 @@ class DirectoryCorrection:
     O processo de sincronização é efetuado em várias etapas nas quais vários conjuntos de planilhas são sincronizados
     separadamente em vários processos paralelos. O número de processos (n_procs_start) a serem criados na primeira
     execução do script deve ser escolhido de modo que cada processo tenha ao menos 2 arquivos/símbolos para sincronizar.
-    É necessário rodar algumas vezes o script até que a sincronização
-    total seja atingida. No final, é feito um backup do diretório sincronizado.
+    É necessário rodar algumas vezes o script até que a sincronização total seja atingida.
+    No final, é feito um backup do diretório sincronizado.
+    -> É IMPORTANTE sempre escolher n_procs_start como uma potência de 2 (2^n).
+    Na tabela abaixo, mostra-se como deve ser feita a escolha de n_procs_start e como é feita a distribuição dos
+    símbolos que irão para cada processo.
+    n_symbols   n_procs_start(max)   distribuição
+    2           1                   [2]
+    3           1                   [3]
+    4           2                   [2, 2]
+    5           2                   [3, 2]
+    6           2                   [3, 3]
+    7           2                   [4, 3]
+    8           2                   [4, 4]
+    8           4                   [2, 2, 2, 2]
+    9           4                   [3, 2, 2, 2]
+    10          4                   [3, 3, 2, 2]
+    11          4                   [3, 3, 3, 2]
+    12          4                   [3, 3, 3, 3]
+    13          4                   [4, 3, 3, 3]
+    14          4                   [4, 4, 3, 3]
+    15          4                   [4, 4, 4, 3]
+    16          4                   [4, 4, 4, 4]
+    16          8                   [2, 2, 2, 2, 2, 2, 2, 2]
+    17          4                   [5, 4, 4, 4]
+    17          8                   [3, 2, 2, 2, 2, 2, 2, 2]
     """
     n_procs_start = 4
 
