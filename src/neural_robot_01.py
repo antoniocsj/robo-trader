@@ -150,10 +150,10 @@ def train_model():
     hist = HistMulti(directory=dir_csv)
 
     symbol_out = 'EURUSD'
-    n_steps = 2
+    n_steps = 1
     tipo_vela = 'OHLCV'
     n_samples_train = 30000
-    validation_split = 0.1
+    validation_split = 0.2
 
     num_ativos = len(hist.symbols)
     num_entradas = num_ativos * n_steps * len(tipo_vela)
@@ -174,7 +174,7 @@ def train_model():
 
     # define model
     model = Sequential()
-    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(Conv1D(filters=64, kernel_size=1, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
     model.add(Dense(num_entradas, activation='relu'))
@@ -368,7 +368,7 @@ def test_model_with_trader():
     initial_deposit = 1000.0
 
     trader = TraderSimMulti(initial_deposit)
-    trader.max_candlestick_count = 1000
+    trader.max_candlestick_count = 5
     trader.start_simulation()
 
     candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
@@ -398,7 +398,7 @@ def test_model_with_trader():
 
         _tp = 0.5
         _sl = 0.5
-        _k = 0.00035
+        _k = 0.00050
         # if _tp <= trader.profit <= -_sl:
         #     trader.close_position()
         # else:
