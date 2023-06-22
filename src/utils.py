@@ -272,6 +272,10 @@ def differentiate_directory():
         dataf.to_csv(_filepath, index=False, sep='\t')
 
 
+def preparation_01():
+    pass
+
+
 if __name__ == '__main__':
     normalize_directory()
     # differentiate_directory()
