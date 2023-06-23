@@ -738,7 +738,7 @@ def make_backup(src_dir: str, dst_dir: str):
         print('ERRO ao fazer o backup.')
 
 
-def find_max_power2_less_half(n):
+def find_max_power2_less_half(n: int) -> int:
     i = 0
     power2 = 2 ** i
     half = n // 2
@@ -751,7 +751,7 @@ def find_max_power2_less_half(n):
     return 2 ** i
 
 
-def find_max_power2_less_half_with_restriction(n_symbols, max_n_procs):
+def find_max_power2_less_half_with_restriction(n_symbols: int, max_n_procs: int) -> int:
     p2 = find_max_power2_less_half(n_symbols)
     if p2 > max_n_procs:
         p2 = max_n_procs
