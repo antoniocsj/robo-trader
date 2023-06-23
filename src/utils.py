@@ -273,15 +273,18 @@ def search_symbols(directory: str):
     """
     Procurando pelos símbolos nos nomes dos arquivos csv.
     Considera erro encontrar símbolos repetidos ou mais de 1 timeframe.
-    :return: lista dos símbolos ordenada alfabeticamente.
+    :return: lista dos símbolos ordenada alfabeticamente e um dicionário contendo os caminhos relativos
+             para os arquivos CSVs correspondentes.
     """
     # passe por todos os arquivos csv e descubra o symbol e timeframe
     if not os.path.exists(directory):
         print(f'ERRO. o diretório {directory} não existe.')
         exit(-1)
 
-    symbols = []
+    symbols_names = []
     timeframes = set()
+    symbols_paths = {}
+
     all_files = os.listdir(directory)
     for filename in all_files:
         if filename.endswith('.csv'):
@@ -290,19 +293,21 @@ def search_symbols(directory: str):
             if _timeframe.endswith('.csv'):
                 _timeframe = _timeframe.replace('.csv', '')
 
-            if _symbol not in symbols:
-                symbols.append(_symbol)
+            if _symbol not in symbols_names:
+                symbols_names.append(_symbol)
+                _filepath = f'{directory}/{filename}'
+                symbols_paths[_symbol] = _filepath
                 timeframes.add(_timeframe)
             else:
                 print(f'ERRO. o símbolo {_symbol} aparece repetido no mesmo diretório')
                 exit(-1)
 
-            if len(timeframes) > 1:
-                print(f'ERRO. Há mais de 1 timeframe no diretório {directory}')
-                exit(-1)
+    if len(timeframes) > 1:
+        print(f'ERRO. Há mais de 1 timeframe no diretório {directory}')
+        exit(-1)
 
-    symbols = sorted(symbols)
-    return symbols
+    symbols_names = sorted(symbols_names)
+    return symbols_names, symbols_paths
 
 
 def normalize_directory():

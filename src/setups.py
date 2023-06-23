@@ -54,8 +54,8 @@ def check_base_ok():
     print(sync_cp)
     if sync_cp['finished']:
         symbols_to_sync = sync_cp['symbols_to_sync']
-        symbols_found = search_symbols(csv_s_dir)
-        if not symbols_found == symbols_to_sync:
+        symbols_names, symbols_paths = search_symbols(csv_s_dir)
+        if not symbols_names == symbols_to_sync:
             print(f'ERRO. os símbolos encontrados em {csv_s_dir} não coincidem com a lista dos símbolos '
                   f'sincronizados presente no arquivo {_sync_files[0]}')
             return False
@@ -63,7 +63,7 @@ def check_base_ok():
         print('a sincronização não está finalizada ainda.')
         return False
 
-    if symbol_out not in symbols_found:
+    if symbol_out not in symbols_names:
         print(f'ERRO. o símbolo principal {symbol_out} não está presente no diretório sincronizado csv_s.')
         return False
 
@@ -89,7 +89,14 @@ def setup_01():
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
     symbol_out = setup['symbol_out']
-    symbols = search_symbols(csv_s_dir)
+    symbols_names, symbols_paths = search_symbols(csv_s_dir)
+
+    # copiar todos os símbolos, menos symbol_out, de csv_s_dir para csv_dir
+    for symbol in symbols_names:
+        if symbol != symbol_out:
+            _src = symbols_paths[symbol]
+            _dst = f'{csv_dir}/{symbol}.csv'
+            shutil.copy(_src, _dst)
 
 
 if __name__ == '__main__':
