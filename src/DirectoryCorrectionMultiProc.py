@@ -716,13 +716,13 @@ def load_setup():
 def make_backup(src_dir: str, dst_dir: str):
     from utils import are_dir_trees_equal
 
-    print(f'copiando o diretório sincronizado para {dst_dir}')
+    print(f'copiando os arquivos para o diretório sincronizado {dst_dir}')
     if os.path.exists(dst_dir):
         print(f'o diretório {dst_dir} já existe. será substituído.')
         shutil.rmtree(dst_dir)
     shutil.copytree(src_dir, dst_dir)
     if are_dir_trees_equal(src_dir, dst_dir):
-        print('Backup efetuado com SUCESSO!')
+        print('Backup efetuado e verificado com SUCESSO!')
     else:
         print('ERRO ao fazer o backup.')
 
@@ -808,7 +808,8 @@ def main():
         print('Não há arquivos CSVs para serem sincronizados.')
         exit(-1)
     elif _len_symbols == 1:
-        print('Há apenas 1 arquivo CSV. Portanto, não haverá sincronização.')
+        print('Há apenas 1 arquivo CSV. Portanto, o arquivo será considerado já sincronizado.')
+        make_backup(csv_dir, csv_s_dir)
         exit(0)
 
     symbols_to_sync_per_proc = []
