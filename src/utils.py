@@ -248,6 +248,17 @@ def are_dir_trees_equal(dir1, dir2):
     return True
 
 
+def get_list_sync_files():
+    _list = []
+    all_files = os.listdir('.')
+
+    for filename in all_files:
+        if filename.startswith('sync_cp_') and filename.endswith('.pkl'):
+            _list.append(filename)
+
+    return sorted(_list)
+
+
 def normalize_directory():
     hist = HistMulti('../csv')
     scalers = {}

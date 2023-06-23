@@ -1,6 +1,7 @@
 import os
 import shutil
 import json
+from utils import get_list_sync_files
 
 
 # As funções 'setup' buscam automatizar parte do trabalho feita na configuração e preparação de um experimento
@@ -29,7 +30,20 @@ def setup_01():
         _f = open(_filename, 'x')  # para manter o diretório no git
         _f.close()
 
-    _list_sync_files = []
+    _sync_files = []
+    _sync_files = get_list_sync_files()
+    if len(_sync_files) == 0:
+        print('nenhum arquivo de checkpoint de sincronização foi encontrado.')
+        print('não há garantia de que os arquivos foram sinzronizados.')
+        exit(-1)
+    elif len(_sync_files) > 1:
+        print('há mais de 1 arquivo de checkpoint de sincronização.')
+        print('a sincronização não foi finalizada ainda.')
+        exit(-1)
+
+    if not os.path.exists(csv_s_dir):
+        print(f'o diretório csv_s não foi encontrado.')
+        exit(-1)
 
 
 if __name__ == '__main__':

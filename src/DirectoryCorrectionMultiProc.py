@@ -4,11 +4,11 @@ import shutil
 import math
 import pickle
 from datetime import datetime, timedelta
-from typing import Any
 
 import pandas as pd
 from pandas import DataFrame
 import multiprocessing as mp
+from utils import get_list_sync_files
 
 
 def search_symbols_in_directory(directory: str, timeframe: str) -> list[str]:
@@ -646,17 +646,6 @@ class DirectoryCorrection:
                 if _datetime_current <= _datetime_previous:
                     print(f'erro em {s.symbol} {_datetime_current}')
                 _datetime_previous = _datetime_current
-
-
-def get_list_sync_files():
-    _list = []
-    all_files = os.listdir('.')
-
-    for filename in all_files:
-        if filename.startswith('sync_cp_') and filename.endswith('.pkl'):
-            _list.append(filename)
-
-    return sorted(_list)
 
 
 def get_sync_status(_filename: str):
