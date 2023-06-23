@@ -259,6 +259,52 @@ def get_list_sync_files():
     return sorted(_list)
 
 
+def load_sync_cp_file(_filename: str) -> dict:
+    if os.path.exists(_filename):
+        with open(_filename, 'rb') as file:
+            cp = pickle.load(file)
+    else:
+        print(f'erro em load_sync_file(). arquivo {_filename} não foi encontrado.')
+        exit(-1)
+    return cp
+
+
+def search_symbols(directory: str):
+    """
+    Procurando pelos símbolos nos nomes dos arquivos csv.
+    Considera erro encontrar símbolos repetidos ou mais de 1 timeframe.
+    :return: lista dos símbolos ordenada alfabeticamente.
+    """
+    # passe por todos os arquivos csv e descubra o symbol e timeframe
+    if not os.path.exists(directory):
+        print(f'ERRO. o diretório {directory} não existe.')
+        exit(-1)
+
+    symbols = []
+    timeframes = set()
+    all_files = os.listdir(directory)
+    for filename in all_files:
+        if filename.endswith('.csv'):
+            _symbol = filename.split('_')[0]
+            _timeframe = filename.split('_')[1]
+            if _timeframe.endswith('.csv'):
+                _timeframe = _timeframe.replace('.csv', '')
+
+            if _symbol not in symbols:
+                symbols.append(_symbol)
+                timeframes.add(_timeframe)
+            else:
+                print(f'ERRO. o símbolo {_symbol} aparece repetido no mesmo diretório')
+                exit(-1)
+
+            if len(timeframes) > 1:
+                print(f'ERRO. Há mais de 1 timeframe no diretório {directory}')
+                exit(-1)
+
+    symbols = sorted(symbols)
+    return symbols
+
+
 def normalize_directory():
     hist = HistMulti('../csv')
     scalers = {}
