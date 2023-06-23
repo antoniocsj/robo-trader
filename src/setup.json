@@ -1,4 +1,6 @@
 {
     "symbol_out": "EURUSD",
-    "csv_dir": "../csv"
+    "timeframe": "M10",
+    "csv_dir": "../csv",
+    "csv_s_dir": "../csv_s"
 }

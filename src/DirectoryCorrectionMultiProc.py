@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import math
@@ -166,36 +167,10 @@ class DirectoryCorrection:
     - as velas inseridas terão O=H=L=C=C' e V=0;
     Esta classe utiliza MultiProcessamento para realizar suas tarefas.
     O processo de sincronização é efetuado em várias etapas nas quais vários conjuntos de planilhas são sincronizados
-    separadamente em vários processos paralelos. O número de processos (n_procs_start) a serem criados na primeira
-    execução do script deve ser escolhido de modo que cada processo tenha ao menos 2 arquivos/símbolos para sincronizar.
+    separadamente em vários processos paralelos.
     É necessário rodar algumas vezes o script até que a sincronização total seja atingida.
     No final, é feito um backup do diretório sincronizado.
-    -> É IMPORTANTE sempre escolher n_procs_start como uma potência de 2 (2^n).
-    Na tabela abaixo, mostra-se como deve ser feita a escolha de n_procs_start e como é feita a distribuição dos
-    símbolos que irão para cada processo.
-    n_symbols   n_procs_start(max)   distribuição
-    2           1                   [2]
-    3           1                   [3]
-    4           2                   [2, 2]
-    5           2                   [3, 2]
-    6           2                   [3, 3]
-    7           2                   [4, 3]
-    8           2                   [4, 4]
-    8           4                   [2, 2, 2, 2]
-    9           4                   [3, 2, 2, 2]
-    10          4                   [3, 3, 2, 2]
-    11          4                   [3, 3, 3, 2]
-    12          4                   [3, 3, 3, 3]
-    13          4                   [4, 3, 3, 3]
-    14          4                   [4, 4, 3, 3]
-    15          4                   [4, 4, 4, 3]
-    16          4                   [4, 4, 4, 4]
-    16          8                   [2, 2, 2, 2, 2, 2, 2, 2]
-    17          4                   [5, 4, 4, 4]
-    17          8                   [3, 2, 2, 2, 2, 2, 2, 2]
     """
-    n_procs_start = 4
-
     def __init__(self, directory: str, timeframe: str, index_proc: int, symbols_to_sync: list[str] = None):
         self.directory = directory
         self.all_files = []
@@ -737,32 +712,98 @@ def remove_sync_cp_files(_list_sync_files: list[str]):
             exit(-1)
 
 
-def make_backup(dir_csv: str):
+def load_setup():
+    _filename = 'setup.json'
+    _setup = {}
+    if os.path.exists(_filename):
+        with open('setup.json', 'r') as file:
+            _setup = json.load(file)
+        return _setup
+    else:
+        print(f'ERRO. Não foi encontrado o arquivo {_filename}')
+        exit(-1)
+
+
+def make_backup(src_dir: str, dst_dir: str):
     from utils import are_dir_trees_equal
 
-    dir_csv_backup = dir_csv + '-s'
-    print(f'copiando o diretório sincronizado para {dir_csv_backup}')
-    if os.path.exists(dir_csv_backup):
-        print(f'o diretório {dir_csv_backup} já existe. será substituído.')
-        shutil.rmtree(dir_csv_backup)
-    shutil.copytree(dir_csv, dir_csv_backup)
-    if are_dir_trees_equal(dir_csv, dir_csv_backup):
+    print(f'copiando o diretório sincronizado para {dst_dir}')
+    if os.path.exists(dst_dir):
+        print(f'o diretório {dst_dir} já existe. será substituído.')
+        shutil.rmtree(dst_dir)
+    shutil.copytree(src_dir, dst_dir)
+    if are_dir_trees_equal(src_dir, dst_dir):
         print('Backup efetuado com SUCESSO!')
     else:
         print('ERRO ao fazer o backup.')
 
 
+def choose_n_procs_start(_n_symbols: int):
+    """
+    O número de processos (n_procs_start) a serem criados na primeira execução do script deve ser escolhido de modo
+    que cada processo tenha ao menos 2 arquivos/símbolos para sincronizar.
+    -> É IMPORTANTE sempre escolher n_procs_start como uma potência de 2 (2^n).
+    Na tabela abaixo, mostra-se como deve ser feita a escolha de n_procs_start e como é feita a distribuição dos
+    símbolos que irão para cada processo.
+    n_symbols   n_procs_start(max)   distribuição
+    2           1                   [2]
+    3           1                   [3]
+    4           2                   [2, 2]
+    5           2                   [3, 2]
+    6           2                   [3, 3]
+    7           2                   [4, 3]
+    8           2                   [4, 4]
+    8           4                   [2, 2, 2, 2]
+    9           4                   [3, 2, 2, 2]
+    10          4                   [3, 3, 2, 2]
+    11          4                   [3, 3, 3, 2]
+    12          4                   [3, 3, 3, 3]
+    13          4                   [4, 3, 3, 3]
+    14          4                   [4, 4, 3, 3]
+    15          4                   [4, 4, 4, 3]
+    16          4                   [4, 4, 4, 4]
+    16          8                   [2, 2, 2, 2, 2, 2, 2, 2]
+    17          4                   [5, 4, 4, 4]
+    17          8                   [3, 2, 2, 2, 2, 2, 2, 2]
+    :param _n_symbols: quantidade de símbolos(arquivos CSV) a serem sincronizados.
+    :return: número de processos a serem criados na primeira iteração da sincronização.
+    """
+    _n_procs = 1
+    n_cpus = os.cpu_count()
+    _max_n_procs = n_cpus // 2
+
+    return _n_procs
+
+
 def main():
-    dir_csv = '../csv'
-    timeframe = 'M10'
-    symbols = search_symbols_in_directory(dir_csv, timeframe)
+    setup = load_setup()
+    csv_dir = setup['csv_dir']
+    csv_s_dir = setup['csv_s_dir']
+    timeframe = setup['timeframe']
+
+    # se o diretório csv não existe, então crie-o.
+    if not os.path.exists(csv_dir):
+        print('o diretório csv não existe. criando-o.')
+        os.mkdir(csv_dir)
+        _filename = f'{csv_dir}/.directory'
+        _f = open(_filename, 'x')  # para manter o diretório no git
+        _f.close()
+
+    symbols = search_symbols_in_directory(csv_dir, timeframe)
+    _len_symbols = len(symbols)
+    if _len_symbols == 0:
+        print('Não há arquivos CSVs para serem sincronizados.')
+        exit(-1)
+    elif _len_symbols == 1:
+        print('Há apenas 1 arquivo CSV. Portanto, não haverá sincronização.')
+        exit(0)
+
     symbols_to_sync_per_proc = []
 
     list_sync_files = get_list_sync_files()
     if len(list_sync_files) == 0:
         print('iniciando a sincronização dos arquivos csv pela PRIMEIRA vez.')
 
-        _len_symbols = len(symbols)
         if _len_symbols == 0:
             print('Não há arquivos para sincronizar.')
             return
@@ -770,7 +811,8 @@ def main():
             print('Apenas 1 arquivo, portanto não há necessidade de sincronização.')
             return
 
-        n_procs = DirectoryCorrection.n_procs_start
+        # n_procs = DirectoryCorrection.n_procs_start
+        n_procs = choose_n_procs_start(_len_symbols)
         pool = mp.Pool(n_procs)
 
         for i in range(n_procs):
@@ -782,7 +824,7 @@ def main():
 
         dir_cor_l: list[DirectoryCorrection] = []
         for i in range(n_procs):
-            dir_cor = DirectoryCorrection(dir_csv, timeframe, i, symbols_to_sync_per_proc[i])
+            dir_cor = DirectoryCorrection(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
             dir_cor_l.append(dir_cor)
 
         for i in range(n_procs):
@@ -806,7 +848,7 @@ def main():
             n_procs = len(list_sync_files)
             if n_procs == 1:
                 print('a sincronização total está finalizada. parabéns!')
-                make_backup(dir_csv)
+                make_backup(csv_dir, csv_s_dir)
             else:
                 print(f'iniciando a fusão de conjuntos de símbolos')
                 list_sync_cp_dic = get_all_sync_cp_dic(list_sync_files)
@@ -830,7 +872,7 @@ def main():
 
                 dir_cor_l: list[DirectoryCorrection] = []
                 for i in range(n_procs):
-                    dir_cor = DirectoryCorrection(dir_csv, timeframe, i, symbols_to_sync_per_proc[i])
+                    dir_cor = DirectoryCorrection(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
                     dir_cor_l.append(dir_cor)
 
                 for i in range(n_procs):
@@ -852,7 +894,7 @@ def main():
 
             dir_cor_l: list[DirectoryCorrection] = []
             for i in range(n_procs):
-                dir_cor = DirectoryCorrection(dir_csv, timeframe, i, symbols_to_sync_per_proc[i])
+                dir_cor = DirectoryCorrection(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
                 dir_cor_l.append(dir_cor)
 
             for i in range(n_procs):

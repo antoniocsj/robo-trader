@@ -307,8 +307,8 @@ def setup_01():
     """
     As funções 'setup' buscam automatizar parte do trabalho feita na configuração e preparação de um experimento.
     1) Lê arquivo de setup.json para obter as configurações gerais do experimento, como o 'symbol_out'.
-    2) Deleta todos os arquivos CSVs atualmente presentes no diretório 'csv'.
-    3) Obtém a lista de todos os arquivos contidos no diretório dos CSVs sincronizados 'csv-s'
+    2) Reseta o diretório csv, deletando-o e recriando-o novamente.
+    3) Obtém a lista de todos os arquivos contidos no diretório dos CSVs sincronizados 'csv_s'
     :return:
     """
     setup = {}
@@ -317,6 +317,7 @@ def setup_01():
     print(f'setup.json: {setup}')
 
     csv_dir = setup['csv_dir']
+    csv_s_dir = setup['csv_s_dir']
 
     if os.path.exists(csv_dir):
         print(f'o diretório {csv_dir} já existe. deletando todo seu conteúdo.')

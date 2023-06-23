@@ -1,3 +1,6 @@
+import os
+
+
 def test_01():
     import os
     import tensorflow as tf
@@ -62,5 +65,31 @@ def test_03():
     print(trans)
 
 
+def find_powerof2(n_symbols, max_n_procs):
+    i = 0
+    p2 = 2 ** i
+    half = n_symbols // 2
+    while p2 < half and p2 <= max_n_procs:
+        i += 1
+        p2 = 2 ** i
+    return p2
+
+
+def test_04():
+    # n_cpus = os.cpu_count()
+    # n_symbols = 2
+
+    for n_symbols in range(2, 20):
+        for n_cpus in range(1, 20):
+
+            if n_cpus == 1:
+                _max_n_procs = 1
+            else:
+                _max_n_procs = n_cpus // 2
+
+            n_procs = find_powerof2(n_symbols, _max_n_procs)
+            print(f'n_symbols = {n_symbols}, n_cpus = {n_cpus} --> n_procs = {n_procs}')
+
+
 if __name__ == '__main__':
-    test_03()
+    test_04()
