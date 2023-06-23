@@ -65,13 +65,23 @@ def test_03():
     print(trans)
 
 
-def find_powerof2(n_symbols, max_n_procs):
+def find_max_power2_less_half(n):
     i = 0
-    p2 = 2 ** i
-    half = n_symbols // 2
-    while p2 < half and p2 <= max_n_procs:
+    power2 = 2 ** i
+    half = n // 2
+    while power2 < half:
         i += 1
-        p2 = 2 ** i
+        power2 = 2 ** i
+        if power2 > half:
+            i -= 1
+            break
+    return 2 ** i
+
+
+def find_max_power2_less_half_with_restriction(n_symbols, max_n_procs):
+    p2 = find_max_power2_less_half(n_symbols)
+    if p2 > max_n_procs:
+        p2 = max_n_procs
     return p2
 
 
@@ -79,16 +89,13 @@ def test_04():
     # n_cpus = os.cpu_count()
     # n_symbols = 2
 
-    for n_symbols in range(2, 20):
-        for n_cpus in range(1, 20):
+    for n_symbols in range(2, 33):
+        for n_cpus in range(1, 33):
 
-            if n_cpus == 1:
-                _max_n_procs = 1
-            else:
-                _max_n_procs = n_cpus // 2
-
-            n_procs = find_powerof2(n_symbols, _max_n_procs)
-            print(f'n_symbols = {n_symbols}, n_cpus = {n_cpus} --> n_procs = {n_procs}')
+            max_n_procs = find_max_power2_less_half(n_cpus)
+            n_procs = find_max_power2_less_half_with_restriction(n_symbols, max_n_procs)
+            print(f'n_symbols = {n_symbols}, n_cpus = {n_cpus}, max_n_procs = {max_n_procs} '
+                  f'--> n_procs = {n_procs}')
 
 
 if __name__ == '__main__':

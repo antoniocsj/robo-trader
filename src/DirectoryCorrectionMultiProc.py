@@ -738,6 +738,26 @@ def make_backup(src_dir: str, dst_dir: str):
         print('ERRO ao fazer o backup.')
 
 
+def find_max_power2_less_half(n):
+    i = 0
+    power2 = 2 ** i
+    half = n // 2
+    while power2 < half:
+        i += 1
+        power2 = 2 ** i
+        if power2 > half:
+            i -= 1
+            break
+    return 2 ** i
+
+
+def find_max_power2_less_half_with_restriction(n_symbols, max_n_procs):
+    p2 = find_max_power2_less_half(n_symbols)
+    if p2 > max_n_procs:
+        p2 = max_n_procs
+    return p2
+
+
 def choose_n_procs_start(_n_symbols: int):
     """
     O número de processos (n_procs_start) a serem criados na primeira execução do script deve ser escolhido de modo
@@ -770,7 +790,11 @@ def choose_n_procs_start(_n_symbols: int):
     """
     _n_procs = 1
     n_cpus = os.cpu_count()
-    _max_n_procs = n_cpus // 2
+    _max_n_procs = find_max_power2_less_half(n_cpus)
+    n_procs = find_max_power2_less_half_with_restriction(_n_symbols, _max_n_procs)
+    print('escolhendo o número de processos (n_procs)')
+    print(f'n_symbols = {_n_symbols}, n_cpus = {n_cpus}, max_n_procs = {_max_n_procs} '
+          f'--> n_procs = {n_procs}')
 
     return _n_procs
 
