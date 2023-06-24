@@ -1,7 +1,11 @@
 import os
 import shutil
 import json
-from utils import get_list_sync_files, load_sync_cp_file, search_symbols
+
+import pandas as pd
+
+from utils import get_list_sync_files, load_sync_cp_file, search_symbols, \
+    differentiate_directory, normalize_directory
 
 
 # As funções 'setup' buscam automatizar parte do trabalho feita na configuração e preparação de um experimento
@@ -12,7 +16,14 @@ from utils import get_list_sync_files, load_sync_cp_file, search_symbols
 def check_base_ok():
     """
     O objetivo desta função é verificar se os diretórios csv e csv_s estão prontos para os experimentos a serem
-    definidos nas funções 'setup'
+    definidos nas funções 'setup'.
+    1) Lê arquivo de setup.json para obter as configurações gerais do experimento.
+    2) Reseta o diretório csv, deletando-o e recriando-o novamente.
+    3) verifica se a sincronização já está finalizada. caso esteja, verifica se os símbolos presentes no
+       diretório csv_s coincidem com a lista de símbolos presente no arquivo de checkpoint final sincronização.
+    4) verifica se o símbolo principal {symbol_out} está presente no diretório sincronizado csv_s.
+    5) No final, garante que que o diretório csv está resetado e o diretório csv_s com símbolos sincronizados
+       corretos.
     :return: True se tudo está OK, False, caso contrário.
     """
     with open('setup.json', 'r') as file:
@@ -71,11 +82,17 @@ def check_base_ok():
     return True
 
 
+def csv_delete_first_row(_filepath: str):
+    df: pd.DataFrame = pd.read_csv(_filepath, delimiter='\t')
+    df.drop(df.index[0], inplace=True)
+    df.sort_index(ignore_index=True, inplace=True)
+    df.reset_index(drop=True)
+    df.to_csv(_filepath, sep='\t', index=False)
+
+
 def setup_01():
     """
-    1) Lê arquivo de setup.json para obter as configurações gerais do experimento.
-    2) Reseta o diretório csv, deletando-o e recriando-o novamente.
-    3) Obtém a lista de todos os arquivos contidos no diretório dos CSVs sincronizados 'csv_s'
+    A rede neural terá as seguintes entradas: symbol_out normalizado, demais símbolos diferenciados e normalizados.
     :return:
     """
     if not check_base_ok():
@@ -89,14 +106,30 @@ def setup_01():
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
     symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir)
 
     # copiar todos os símbolos, menos symbol_out, de csv_s_dir para csv_dir
     for symbol in symbols_names:
         if symbol != symbol_out:
-            _src = symbols_paths[symbol]
-            _dst = f'{csv_dir}/{symbol}.csv'
+            _src = symbols_paths[f'{symbol}_{timeframe}']
+            _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
             shutil.copy(_src, _dst)
+
+    # diferenciar os símbolos do diretório csv
+    differentiate_directory(csv_dir)
+
+    # copiar symbol_out, de csv_s_dir para csv_dir
+    _src = symbols_paths[f'{symbol_out}_{timeframe}']
+    _dst = f'{csv_dir}/{symbol_out}_{timeframe}.csv'
+    shutil.copy(_src, _dst)
+
+    # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
+    # symbol_out também, mas delete do arquivo que está em csv.
+    csv_delete_first_row(_dst)
+
+    # normaliza todos os symbolos de csv.
+    normalize_directory(csv_dir)
 
 
 if __name__ == '__main__':

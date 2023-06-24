@@ -296,7 +296,7 @@ def search_symbols(directory: str):
             if _symbol not in symbols_names:
                 symbols_names.append(_symbol)
                 _filepath = f'{directory}/{filename}'
-                symbols_paths[_symbol] = _filepath
+                symbols_paths[f'{_symbol}_{_timeframe}'] = _filepath
                 timeframes.add(_timeframe)
             else:
                 print(f'ERRO. o símbolo {_symbol} aparece repetido no mesmo diretório')
@@ -310,8 +310,8 @@ def search_symbols(directory: str):
     return symbols_names, symbols_paths
 
 
-def normalize_directory():
-    hist = HistMulti('../csv')
+def normalize_directory(directory: str):
+    hist = HistMulti(directory)
     scalers = {}
 
     for _symbol in hist.symbols:
@@ -332,12 +332,15 @@ def normalize_directory():
     with open('scalers.pkl', 'wb') as file:
         pickle.dump(scalers, file)
 
+    print(f'todos os símbolos do diretório {directory} foram normalizados.')
+    print('o arquivo scalers.pkl, que guarda as informações da normalização, foi salvo.')
 
-def denormalize__directory():
+
+def denormalize__directory(directory: str):
     with open('scalers.pkl', 'rb') as file:
         scalers = pickle.load(file)
 
-    hist = HistMulti('../csv')
+    hist = HistMulti(directory)
 
     for _symbol in hist.symbols:
         _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
@@ -347,9 +350,12 @@ def denormalize__directory():
         data_inv = trans.inverse_transform(data)
         print(f'{_symbol} {data_inv[0]}')
 
+    print(f'todos os símbolos do diretório {directory} foram desnormalizados.')
 
-def differentiate_directory():
-    hist = HistMulti('../csv')
+
+def differentiate_directory(directory: str):
+    print(f'diferenciando diretório {directory}')
+    hist = HistMulti(directory)
 
     for _symbol in hist.symbols:
         print(_symbol)
@@ -363,6 +369,8 @@ def differentiate_directory():
         dataf.columns = range(dataf.columns.size)
         _filepath = hist.get_csv_filepath(_symbol_timeframe)
         dataf.to_csv(_filepath, index=False, sep='\t')
+
+    print(f'todos os símbolos do diretório {directory} foram diferenciados.')
 
 
 if __name__ == '__main__':
