@@ -12,6 +12,7 @@ from utils import get_list_sync_files, load_sync_cp_file, search_symbols, \
 # com uma rede neural.
 # Os experimentos com as redes neurais, geralmente, usam o diretórios csv para formar os conjuntos
 # de treinamento e testes.
+# symbol_out é o ativo principal no qual serão feitas as negociações de compra e venda.
 
 def check_base_ok():
     """
@@ -92,7 +93,40 @@ def csv_delete_first_row(_filepath: str):
 
 def setup_01():
     """
-    A rede neural terá as seguintes entradas: symbol_out normalizado, demais símbolos diferenciados e normalizados.
+    A rede neural terá as seguintes entradas:
+    -> 1) symbol_out normalizado;
+    -> 2) demais símbolos normalizados.
+    :return:
+    """
+    if not check_base_ok():
+        print('abortando setup.')
+        exit(-1)
+
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    csv_s_dir = setup['csv_s_dir']
+    symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
+    symbols_names, symbols_paths = search_symbols(csv_s_dir)
+
+    # copiar todos os símbolos de csv_s_dir para csv_dir
+    for symbol in symbols_names:
+        _src = symbols_paths[f'{symbol}_{timeframe}']
+        _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
+        shutil.copy(_src, _dst)
+
+    # normaliza todos os symbolos de csv.
+    normalize_directory(csv_dir)
+
+
+def setup_02():
+    """
+    A rede neural terá as seguintes entradas:
+    -> 1) symbol_out normalizado;
+    -> 2) demais símbolos diferenciados e normalizados.
     :return:
     """
     if not check_base_ok():
@@ -133,4 +167,4 @@ def setup_01():
 
 
 if __name__ == '__main__':
-    setup_01()
+    setup_02()
