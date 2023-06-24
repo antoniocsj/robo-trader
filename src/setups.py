@@ -93,7 +93,7 @@ def csv_delete_first_row(_filepath: str):
 
 def setup_01():
     """
-    A rede neural terá as seguintes entradas:
+    O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) demais símbolos normalizados.
     :return:
@@ -124,7 +124,7 @@ def setup_01():
 
 def setup_02():
     """
-    A rede neural terá as seguintes entradas:
+    O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) demais símbolos diferenciados e normalizados.
     :return:
@@ -166,5 +166,104 @@ def setup_02():
     normalize_directory(csv_dir)
 
 
+def setup_03():
+    """
+    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    -> 1) symbol_out normalizado;
+    -> 2) symbol_out diferenciado e normalizado;
+    -> 3) demais símbolos diferenciados e normalizados;
+    :return:
+    """
+    if not check_base_ok():
+        print('abortando setup.')
+        exit(-1)
+
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    csv_s_dir = setup['csv_s_dir']
+    symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
+    symbols_names, symbols_paths = search_symbols(csv_s_dir)
+
+    # copiar todos os símbolos, menos symbol_out, de csv_s_dir para csv_dir
+    for symbol in symbols_names:
+        if symbol != symbol_out:
+            _src = symbols_paths[f'{symbol}_{timeframe}']
+            _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
+            shutil.copy(_src, _dst)
+
+    # copiar symbol_out, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta D no final).
+    # isso é para poder ter dois arquivos do mesmo símbolo. assim, um será diferenciado e normalizados,
+    # enquanto que o outro será apenas normalizado.
+    _src = symbols_paths[f'{symbol_out}_{timeframe}']
+    _dst = f'{csv_dir}/{symbol_out}D_{timeframe}.csv'
+    shutil.copy(_src, _dst)
+
+    # diferenciar os símbolos do diretório csv
+    differentiate_directory(csv_dir)
+
+    # copiar symbol_out, de csv_s_dir para csv_dir
+    _src = symbols_paths[f'{symbol_out}_{timeframe}']
+    _dst = f'{csv_dir}/{symbol_out}_{timeframe}.csv'
+    shutil.copy(_src, _dst)
+
+    # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
+    # symbol_out também, mas delete do arquivo que está em csv apenas.
+    csv_delete_first_row(_dst)
+
+    # normaliza todos os symbolos de csv.
+    normalize_directory(csv_dir)
+
+
+def setup_04():
+    """
+    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    -> 1) symbol_out normalizado;
+    -> 2) symbol_out diferenciado e normalizado;
+    -> 3) demais símbolos normalizados;
+    -> 4) demais símbolos diferenciados e normalizados;
+    :return:
+    """
+    if not check_base_ok():
+        print('abortando setup.')
+        exit(-1)
+
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    csv_s_dir = setup['csv_s_dir']
+    symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
+    symbols_names, symbols_paths = search_symbols(csv_s_dir)
+
+    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta D no final).
+    # isso é para poder ter dois arquivos do mesmo símbolo. assim, um será diferenciado e normalizados,
+    # enquanto que o outro será apenas normalizado.
+    for symbol in symbols_names:
+        _src = symbols_paths[f'{symbol}_{timeframe}']
+        _dst = f'{csv_dir}/{symbol}D_{timeframe}.csv'
+        shutil.copy(_src, _dst)
+
+    # diferenciar os símbolos do diretório csv
+    differentiate_directory(csv_dir)
+
+    # copiar todos os símbolos, de csv_s_dir para csv_dir
+    for symbol in symbols_names:
+        _src = symbols_paths[f'{symbol}_{timeframe}']
+        _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
+        shutil.copy(_src, _dst)
+        # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha,
+        # delete a 1a linha do de cada símbolo também, mas delete do arquivo que está em csv apenas.
+        csv_delete_first_row(_dst)
+
+    # normaliza todos os symbolos de csv.
+    normalize_directory(csv_dir)
+
+
 if __name__ == '__main__':
-    setup_02()
+    setup_04()
