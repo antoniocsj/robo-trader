@@ -146,10 +146,15 @@ def split_sequences(sequences, n_steps):
 # We can demonstrate this with a simple example of two parallel input time series where the output series
 # is the simple addition of the input series.
 def train_model():
-    dir_csv = '../csv'
-    hist = HistMulti(directory=dir_csv)
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
 
-    symbol_out = 'EURUSD'
+    csv_dir = setup['csv_dir']
+    symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
+    hist = HistMulti(directory=csv_dir)
+
     n_steps = 2
     tipo_vela = 'OHLCV'
     n_samples_train = 30000
@@ -247,8 +252,12 @@ def train_model():
 
 
 def evaluate_model():
-    dir_csv = '../csv'
-    hist = HistMulti(directory=dir_csv)
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    hist = HistMulti(directory=csv_dir)
 
     # with open('train_configs.pkl', 'rb') as file:
     #     train_configs = pickle.load(file)
@@ -278,8 +287,12 @@ def evaluate_model():
 
 
 def calculate_model_bias():
-    dir_csv = '../csv'
-    hist = HistMulti(directory=dir_csv)
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    hist = HistMulti(directory=csv_dir)
 
     with open("train_configs.json", "r") as file:
         train_configs = json.load(file)
@@ -333,8 +346,12 @@ def calculate_model_bias():
 def test_model_with_trader():
     from TraderSimMultiNoPrints import TraderSimMulti
 
-    dir_csv = '../csv'
-    hist = HistMulti(directory=dir_csv)
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    hist = HistMulti(directory=csv_dir)
 
     with open("train_configs.json", "r") as file:
         train_configs = json.load(file)
@@ -457,8 +474,12 @@ def test_model_with_trader():
 def test_model_with_trader_interactive():
     from TraderSimMultiNoPrints import TraderSimMulti
 
-    dir_csv = '../csv'
-    hist = HistMulti(directory=dir_csv)
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    hist = HistMulti(directory=csv_dir)
 
     with open("train_configs.json", "r") as file:
         train_configs = json.load(file)
