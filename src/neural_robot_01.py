@@ -20,7 +20,6 @@ tf.keras.utils.set_random_seed(1)
 import time
 import pickle
 import json
-from numpy import ndarray
 from HistMulti import HistMulti
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
@@ -67,7 +66,7 @@ def train_model():
     timeframe = setup['timeframe']
     hist = HistMulti(directory=csv_dir)
 
-    n_steps = 2
+    n_steps = 1
     tipo_vela = 'OHLCV'
     n_samples_train = 30000
     validation_split = 0.2

@@ -2,6 +2,7 @@ import os
 import pickle
 import filecmp
 import numpy as np
+from numpy import ndarray
 import pandas as pd
 from Hist import Hist
 from HistMulti import HistMulti
