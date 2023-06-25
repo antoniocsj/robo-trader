@@ -163,8 +163,8 @@ def train_model():
     num_ativos = len(hist.symbols)
     num_entradas = num_ativos * n_steps * len(tipo_vela)
     max_n_epochs = num_entradas * 3
-    patience = int(max_n_epochs / 10) * 2
-
+    patience = int(max_n_epochs / 10)
+    
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
 
@@ -409,14 +409,14 @@ def test_model_with_trader():
         close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, trans)
 
         # aqui toma-se a decisão de comprar ou vender baseando-se no valor da previsão
-        if close_pred_denorm > current_price:
-            trader.buy(symbol_out)
-        else:
-            trader.sell(symbol_out)
+        # if close_pred_denorm > current_price:
+        #     trader.buy(symbol_out)
+        # else:
+        #     trader.sell(symbol_out)
 
-        # _tp = 0.5
-        # _sl = 0.5
-        # _k = 0.00050
+        _tp = 0.5
+        _sl = 0.5
+        _k = 0.00050
         # if _tp <= trader.profit <= -_sl:
         #     trader.close_position()
         # else:
@@ -426,14 +426,14 @@ def test_model_with_trader():
         #     elif dif < 0 and abs(dif) > _k:
         #         trader.sell(symbol_out)
 
-        # if _tp <= trader.profit <= -_sl:
-        #     trader.close_position()
-        #
-        # dif = close_pred_denorm - current_price
-        # if dif > 0 and abs(dif) > _k:
-        #     trader.buy(symbol_out)
-        # elif dif < 0 and abs(dif) > _k:
-        #     trader.sell(symbol_out)
+        if _tp <= trader.profit <= -_sl:
+            trader.close_position()
+
+        dif = close_pred_denorm - current_price
+        if dif > 0 and abs(dif) > _k:
+            trader.buy(symbol_out)
+        elif dif < 0 and abs(dif) > _k:
+            trader.sell(symbol_out)
 
         if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
             print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')
