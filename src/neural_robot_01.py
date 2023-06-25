@@ -66,15 +66,18 @@ def train_model():
     timeframe = setup['timeframe']
     hist = HistMulti(directory=csv_dir)
 
-    n_steps = 1
-    tipo_vela = 'OHLCV'
+    n_steps = 4
+    tipo_vela = 'CV'
     n_samples_train = 30000
-    validation_split = 0.2
+    validation_split = 0.5
 
     num_ativos = len(hist.symbols)
     num_entradas = num_ativos * n_steps * len(tipo_vela)
     max_n_epochs = num_entradas * 3
     patience = int(max_n_epochs / 10)
+
+    print(f'n_steps = {n_steps}, tipo_vela = {tipo_vela}, n_samples_train = {n_samples_train} '
+          f'validation_split = {validation_split}')
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
@@ -90,13 +93,9 @@ def train_model():
 
     # define model
     model = Sequential()
-    model.add(Conv1D(filters=64, kernel_size=1, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(Conv1D(filters=64, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
-    model.add(Dense(num_entradas, activation='relu'))
-    model.add(Dense(num_entradas, activation='relu'))
-    model.add(Dense(num_entradas, activation='relu'))
-    model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse')
