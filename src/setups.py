@@ -62,7 +62,7 @@ def check_base_ok():
     # verifique se a sincronização já está finalizada. caso esteja, verifique se os símbolos presentes no
     # diretório csv_s coincidem com a lista de símbolos presente no arquivo de checkpoint final sincronização.
     print(_sync_files)
-    sync_cp = load_sync_cp_file(_sync_files[0])
+    sync_cp = load_sync_cp_file(csv_s_dir, _sync_files[0])
     print(sync_cp)
     if sync_cp['finished']:
         symbols_to_sync = sync_cp['symbols_to_sync']

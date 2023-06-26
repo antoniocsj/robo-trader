@@ -716,13 +716,18 @@ def load_setup():
 def make_backup(src_dir: str, dst_dir: str):
     from utils import are_dir_trees_equal
 
-    print(f'copiando os arquivos para o diretório sincronizado {dst_dir}')
+    print(f'copiando os arquivos sincronizadoo para o diretório {dst_dir}')
     if os.path.exists(dst_dir):
         print(f'o diretório {dst_dir} já existe. será substituído.')
         shutil.rmtree(dst_dir)
     shutil.copytree(src_dir, dst_dir)
     if are_dir_trees_equal(src_dir, dst_dir):
         print('Backup efetuado e verificado com SUCESSO!')
+        # aproveita e copia o arquivo final de checkpoint de sincronização 'sync_cp_0.pkl' para dst_dir também
+        _list = get_list_sync_files()
+        _sync_filename = _list[0]
+        _sync_filepath_copy = f'{dst_dir}/{_sync_filename}'
+        shutil.copy(_sync_filename, _sync_filepath_copy)
     else:
         print('ERRO ao fazer o backup.')
 
@@ -845,7 +850,6 @@ def main():
             pool.apply_async(dir_cor_l[i].correct_directory, args=(i,))
         pool.close()
         pool.join()
-
     else:
         print('pode haver sincronização em andamento.')
         print(f'checkpoints: {list_sync_files}')
@@ -854,12 +858,14 @@ def main():
         for i in range(len(list_sync_files)):
             _sync_status = get_sync_status(list_sync_files[i])
             _results_set.add(_sync_status)
+
         if len(_results_set) == 1 and list(_results_set)[0] is True:
             print('TODOS os checkpoints indicam que suas sincronizações estão FINALIZADAS')
             # assume-se que sempre há um número de processos/num_sync_cp_files que seja uma potência de 2
             # pois será feita uma fusão de cada 2 conjuntos de símbolos de modo que na próxima sincronização
             # haverá a metade do número de processos/num_sync_cp_files do que havia na sincronização precedente.
             n_procs = len(list_sync_files)
+
             if n_procs == 1:
                 print('a sincronização total está finalizada. parabéns!')
                 make_backup(csv_dir, csv_s_dir)

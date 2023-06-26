@@ -259,12 +259,13 @@ def get_list_sync_files():
     return sorted(_list)
 
 
-def load_sync_cp_file(_filename: str) -> dict:
-    if os.path.exists(_filename):
+def load_sync_cp_file(_dirname: str, _filename: str) -> dict:
+    _filepath = f'{_dirname}/{_filename}'
+    if os.path.exists(_filepath):
         with open(_filename, 'rb') as file:
             cp = pickle.load(file)
     else:
-        print(f'erro em load_sync_file(). arquivo {_filename} não foi encontrado.')
+        print(f'erro em load_sync_file(). arquivo {_filepath} não foi encontrado.')
         exit(-1)
     return cp
 
