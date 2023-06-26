@@ -782,7 +782,6 @@ def choose_n_procs_start(_n_symbols: int):
     :param _n_symbols: quantidade de símbolos(arquivos CSV) a serem sincronizados.
     :return: número de processos a serem criados na primeira iteração da sincronização.
     """
-    _n_procs = 1
     n_cpus = os.cpu_count()
     _max_n_procs = find_max_power2_less_half(n_cpus)
     n_procs = find_max_power2_less_half_with_restriction(_n_symbols, _max_n_procs)
@@ -790,7 +789,7 @@ def choose_n_procs_start(_n_symbols: int):
     print(f'n_symbols = {_n_symbols}, n_cpus = {n_cpus}, max_n_procs = {_max_n_procs} '
           f'--> n_procs = {n_procs}')
 
-    return _n_procs
+    return n_procs
 
 
 def main():

@@ -5,18 +5,21 @@ os.environ['TF_CUDNN_DETERMINISM'] = str(1)
 os.environ['TF_DETERMINISTIC_OPS'] = str(1)
 
 import numpy as np
+
 np.random.seed(1)
 
 import random
+
 random.seed(1)
 
 import tensorflow as tf
+
 tf.random.set_seed(1)
 tf.keras.utils.set_random_seed(1)
 
+import time
 import pickle
 import json
-from numpy import ndarray
 from HistMulti import HistMulti
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
@@ -30,102 +33,10 @@ from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
 from keras.models import load_model
 from keras.callbacks import EarlyStopping, ModelCheckpoint
+
 tf.keras.utils.set_random_seed(1)
 
-from utils import NpEncoder
-import time
-
-
-def denorm_close_price(_c, trans: MinMaxScaler):
-    c_denorm = trans.inverse_transform(np.array([0, 0, 0, _c, 0], dtype=object).reshape(1, -1))
-    c_denorm = c_denorm[0][3]
-    return c_denorm
-
-
-def save_train_configs(_train_configs: dict):
-    with open("train_configs.json", "w") as file:
-        json.dump(_train_configs, file, indent=4, sort_keys=False, cls=NpEncoder)
-
-
-# usada nas redes neurais
-def prepare_train_data_multi(_hist: HistMulti, _symbol_out: str, _start_index: int,
-                             _num_velas: int, _tipo_vela: str) -> ndarray:
-    _data = []
-    _timeframe = _hist.timeframe
-    _symbol_tf_out = f'{_symbol_out}_{_timeframe}'
-
-    if _tipo_vela == 'C':
-        for _symbol in _hist.symbols:
-            _symbol_timeframe = f'{_symbol}_{_timeframe}'
-            _c_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 5]
-            _c_in = _c_in.reshape(len(_c_in), 1)
-            if len(_data) == 0:
-                _data = _c_in
-            else:
-                _data = np.hstack((_data, _c_in))
-
-        _c_out = _hist.arr[_symbol_tf_out][_start_index + 1:_start_index + _num_velas + 1][:, 5]
-        _c_out = _c_out.reshape(len(_c_out), 1)
-        _data = np.hstack((_data, _c_out))
-    elif _tipo_vela == 'CV':
-        for _symbol in _hist.symbols:
-            _symbol_timeframe = f'{_symbol}_{_timeframe}'
-            _cv_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 5:7]
-            if len(_data) == 0:
-                _data = _cv_in
-            else:
-                _data = np.hstack((_data, _cv_in))
-
-        _c_out = _hist.arr[_symbol_tf_out][_start_index + 1:_start_index + _num_velas + 1][:, 5]
-        _c_out = _c_out.reshape(len(_c_out), 1)
-        _data = np.hstack((_data, _c_out))
-    elif _tipo_vela == 'OHLC':
-        for _symbol in _hist.symbols:
-            _symbol_timeframe = f'{_symbol}_{_timeframe}'
-            _ohlc_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 2:6]
-            if len(_data) == 0:
-                _data = _ohlc_in
-            else:
-                _data = np.hstack((_data, _ohlc_in))
-
-        _c_out = _hist.arr[_symbol_tf_out][_start_index + 1:_start_index + _num_velas + 1][:, 5]
-        _c_out = _c_out.reshape(len(_c_out), 1)
-        _data = np.hstack((_data, _c_out))
-    elif _tipo_vela == 'OHLCV':
-        for _symbol in _hist.symbols:
-            _symbol_timeframe = f'{_symbol}_{_timeframe}'
-            _ohlcv_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 2:7]
-            if len(_data) == 0:
-                _data = _ohlcv_in
-            else:
-                _data = np.hstack((_data, _ohlcv_in))
-
-        _c_out = _hist.arr[_symbol_tf_out][_start_index + 1:_start_index + _num_velas + 1][:, 5]
-        _c_out = _c_out.reshape(len(_c_out), 1)
-        _data = np.hstack((_data, _c_out))
-    else:
-        print(f'tipo de vela não suportado: {_tipo_vela}')
-        exit(-1)
-
-    return _data
-
-
-# split a multivariate sequence into samples.
-# We can define a function named split_sequences() that will take a dataset as we have defined it with rows for
-# time steps and columns for parallel series and return input/output samples.
-def split_sequences(sequences, n_steps):
-    X, y = list(), list()
-    for i in range(len(sequences)):
-        # find the end of this pattern
-        end_ix = i + n_steps
-        # check if we are beyond the dataset
-        if end_ix > len(sequences):
-            break
-        # gather input and output parts of the pattern
-        seq_x, seq_y = sequences[i:end_ix, :-1], sequences[end_ix - 1, -1]
-        X.append(seq_x)
-        y.append(seq_y)
-    return np.array(X), np.array(y)
+from utils import denorm_close_price, save_train_configs, prepare_train_data_multi, split_sequences
 
 
 # Multivariate CNN Models
@@ -146,19 +57,27 @@ def split_sequences(sequences, n_steps):
 # We can demonstrate this with a simple example of two parallel input time series where the output series
 # is the simple addition of the input series.
 def train_model():
-    dir_csv = '../csv'
-    hist = HistMulti(directory=dir_csv)
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
 
-    symbol_out = 'EURUSD'
+    csv_dir = setup['csv_dir']
+    symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
+    hist = HistMulti(directory=csv_dir)
+
     n_steps = 2
     tipo_vela = 'OHLCV'
     n_samples_train = 30000
-    validation_split = 0.2
+    validation_split = 0.1
 
     num_ativos = len(hist.symbols)
     num_entradas = num_ativos * n_steps * len(tipo_vela)
     max_n_epochs = num_entradas * 3
-    patience = int(max_n_epochs / 10) * 2
+    patience = int(max_n_epochs / 10)
+
+    print(f'n_steps = {n_steps}, tipo_vela = {tipo_vela}, n_samples_train = {n_samples_train} '
+          f'validation_split = {validation_split}')
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
@@ -174,13 +93,9 @@ def train_model():
 
     # define model
     model = Sequential()
-    model.add(Conv1D(filters=64, kernel_size=1, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
-    model.add(Dense(num_entradas, activation='relu'))
-    model.add(Dense(num_entradas, activation='relu'))
-    model.add(Dense(num_entradas, activation='relu'))
-    model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse')
@@ -247,8 +162,12 @@ def train_model():
 
 
 def evaluate_model():
-    dir_csv = '../csv'
-    hist = HistMulti(directory=dir_csv)
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    hist = HistMulti(directory=csv_dir)
 
     # with open('train_configs.pkl', 'rb') as file:
     #     train_configs = pickle.load(file)
@@ -278,8 +197,12 @@ def evaluate_model():
 
 
 def calculate_model_bias():
-    dir_csv = '../csv'
-    hist = HistMulti(directory=dir_csv)
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    hist = HistMulti(directory=csv_dir)
 
     with open("train_configs.json", "r") as file:
         train_configs = json.load(file)
@@ -333,8 +256,12 @@ def calculate_model_bias():
 def test_model_with_trader():
     from TraderSimMultiNoPrints import TraderSimMulti
 
-    dir_csv = '../csv'
-    hist = HistMulti(directory=dir_csv)
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    hist = HistMulti(directory=csv_dir)
 
     with open("train_configs.json", "r") as file:
         train_configs = json.load(file)
@@ -375,7 +302,7 @@ def test_model_with_trader():
     candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
     counter = 0
     for i in range(samples_index_start + n_steps, samples_index_start + candlesticks_quantity):
-        print(f'i = {i}, {100 * (i-samples_index_start-n_steps) / (candlesticks_quantity - n_steps):.2f} %')
+        print(f'i = {i}, {100 * (i - samples_index_start - n_steps) / (candlesticks_quantity - n_steps):.2f} %')
         trader.index = i
         # trader.print_symbols_close_price_at(i)
         # trader.print_symbols_close_price_at(i, use_scalers=False)
@@ -457,8 +384,12 @@ def test_model_with_trader():
 def test_model_with_trader_interactive():
     from TraderSimMultiNoPrints import TraderSimMulti
 
-    dir_csv = '../csv'
-    hist = HistMulti(directory=dir_csv)
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    hist = HistMulti(directory=csv_dir)
 
     with open("train_configs.json", "r") as file:
         train_configs = json.load(file)
@@ -499,7 +430,7 @@ def test_model_with_trader_interactive():
     candlesticks_quantity = n_samples_test  # quantidade de velas que serão usadas na simulação
 
     for i in range(samples_index_start + n_steps, samples_index_start + candlesticks_quantity):
-        print(f'i = {i}, {100 * (i-samples_index_start-n_steps) / (candlesticks_quantity - n_steps):.2f} %')
+        print(f'i = {i}, {100 * (i - samples_index_start - n_steps) / (candlesticks_quantity - n_steps):.2f} %')
         trader.index = i
         trader.print_symbols_close_price_at(i)
         # trader.print_symbols_close_price_at(i, use_scalers=False)
@@ -516,7 +447,7 @@ def test_model_with_trader_interactive():
         close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, trans)
         print(f'fechamento da vela atual {symbol_out}: {current_price:.5f}')
         print(f'previsão para o fechamento da próxima vela {symbol_out}: {close_pred_denorm:.5f} '
-              f'(dif = {close_pred_denorm-current_price:.5f})')
+              f'(dif = {close_pred_denorm - current_price:.5f})')
 
         if trader.profit < 0 and abs(trader.profit) / trader.balance >= trader.stop_loss:
             print(f'o stop_loss de {100 * trader.stop_loss:.2f} % for atingido.')

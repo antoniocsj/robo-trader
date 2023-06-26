@@ -1,11 +1,9 @@
 import os
 import pickle
 import filecmp
-import shutil
-
 import numpy as np
+from numpy import ndarray
 import pandas as pd
-
 from Hist import Hist
 from HistMulti import HistMulti
 from sklearn.preprocessing import MinMaxScaler
@@ -372,6 +370,98 @@ def differentiate_directory(directory: str):
         dataf.to_csv(_filepath, index=False, sep='\t')
 
     print(f'todos os símbolos do diretório {directory} foram diferenciados.')
+
+
+def denorm_close_price(_c, trans: MinMaxScaler):
+    c_denorm = trans.inverse_transform(np.array([0, 0, 0, _c, 0], dtype=object).reshape(1, -1))
+    c_denorm = c_denorm[0][3]
+    return c_denorm
+
+
+def save_train_configs(_train_configs: dict):
+    with open("train_configs.json", "w") as file:
+        json.dump(_train_configs, file, indent=4, sort_keys=False, cls=NpEncoder)
+
+
+# usada nas redes neurais
+def prepare_train_data_multi(_hist: HistMulti, _symbol_out: str, _start_index: int,
+                             _num_velas: int, _tipo_vela: str) -> ndarray:
+    _data = []
+    _timeframe = _hist.timeframe
+    _symbol_tf_out = f'{_symbol_out}_{_timeframe}'
+
+    if _tipo_vela == 'C':
+        for _symbol in _hist.symbols:
+            _symbol_timeframe = f'{_symbol}_{_timeframe}'
+            _c_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 5]
+            _c_in = _c_in.reshape(len(_c_in), 1)
+            if len(_data) == 0:
+                _data = _c_in
+            else:
+                _data = np.hstack((_data, _c_in))
+
+        _c_out = _hist.arr[_symbol_tf_out][_start_index + 1:_start_index + _num_velas + 1][:, 5]
+        _c_out = _c_out.reshape(len(_c_out), 1)
+        _data = np.hstack((_data, _c_out))
+    elif _tipo_vela == 'CV':
+        for _symbol in _hist.symbols:
+            _symbol_timeframe = f'{_symbol}_{_timeframe}'
+            _cv_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 5:7]
+            if len(_data) == 0:
+                _data = _cv_in
+            else:
+                _data = np.hstack((_data, _cv_in))
+
+        _c_out = _hist.arr[_symbol_tf_out][_start_index + 1:_start_index + _num_velas + 1][:, 5]
+        _c_out = _c_out.reshape(len(_c_out), 1)
+        _data = np.hstack((_data, _c_out))
+    elif _tipo_vela == 'OHLC':
+        for _symbol in _hist.symbols:
+            _symbol_timeframe = f'{_symbol}_{_timeframe}'
+            _ohlc_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 2:6]
+            if len(_data) == 0:
+                _data = _ohlc_in
+            else:
+                _data = np.hstack((_data, _ohlc_in))
+
+        _c_out = _hist.arr[_symbol_tf_out][_start_index + 1:_start_index + _num_velas + 1][:, 5]
+        _c_out = _c_out.reshape(len(_c_out), 1)
+        _data = np.hstack((_data, _c_out))
+    elif _tipo_vela == 'OHLCV':
+        for _symbol in _hist.symbols:
+            _symbol_timeframe = f'{_symbol}_{_timeframe}'
+            _ohlcv_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 2:7]
+            if len(_data) == 0:
+                _data = _ohlcv_in
+            else:
+                _data = np.hstack((_data, _ohlcv_in))
+
+        _c_out = _hist.arr[_symbol_tf_out][_start_index + 1:_start_index + _num_velas + 1][:, 5]
+        _c_out = _c_out.reshape(len(_c_out), 1)
+        _data = np.hstack((_data, _c_out))
+    else:
+        print(f'tipo de vela não suportado: {_tipo_vela}')
+        exit(-1)
+
+    return _data
+
+
+# split a multivariate sequence into samples.
+# We can define a function named split_sequences() that will take a dataset as we have defined it with rows for
+# time steps and columns for parallel series and return input/output samples.
+def split_sequences(sequences, n_steps):
+    X, y = list(), list()
+    for i in range(len(sequences)):
+        # find the end of this pattern
+        end_ix = i + n_steps
+        # check if we are beyond the dataset
+        if end_ix > len(sequences):
+            break
+        # gather input and output parts of the pattern
+        seq_x, seq_y = sequences[i:end_ix, :-1], sequences[end_ix - 1, -1]
+        X.append(seq_x)
+        y.append(seq_y)
+    return np.array(X), np.array(y)
 
 
 if __name__ == '__main__':
