@@ -66,10 +66,10 @@ def train_model():
     timeframe = setup['timeframe']
     hist = HistMulti(directory=csv_dir)
 
-    n_steps = 4
+    n_steps = 2
     tipo_vela = 'CV'
     n_samples_train = 30000
-    validation_split = 0.5
+    validation_split = 0.1
 
     num_ativos = len(hist.symbols)
     num_entradas = num_ativos * n_steps * len(tipo_vela)
@@ -93,7 +93,7 @@ def train_model():
 
     # define model
     model = Sequential()
-    model.add(Conv1D(filters=64, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
     model.add(Dense(num_entradas, activation='relu'))
