@@ -98,5 +98,26 @@ def test_04():
                   f'--> n_procs = {n_procs}')
 
 
+def test_05():
+    import pickle
+    import json
+
+    with open('sync_cp_0.pkl', 'rb') as file:
+        cp = pickle.load(file)
+
+    _cp = {'finished': cp['finished'],
+           'current_row': cp['current_row'],
+           'symbols_to_sync': cp['symbols_to_sync']
+           }
+
+    with open('sync_cp_0.json', 'w') as file:
+        json.dump(_cp, file, indent=4)
+
+    with open('sync_cp_0.json', 'r') as file:
+        cp = json.load(file)
+
+    print(cp)
+
+
 if __name__ == '__main__':
-    test_04()
+    test_05()

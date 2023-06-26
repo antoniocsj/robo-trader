@@ -169,8 +169,6 @@ def evaluate_model():
     csv_dir = setup['csv_dir']
     hist = HistMulti(directory=csv_dir)
 
-    # with open('train_configs.pkl', 'rb') as file:
-    #     train_configs = pickle.load(file)
     with open("train_configs.json", "r") as file:
         train_configs = json.load(file)
 

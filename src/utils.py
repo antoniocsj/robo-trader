@@ -251,7 +251,7 @@ def get_list_sync_files():
     all_files = os.listdir('.')
 
     for filename in all_files:
-        if filename.startswith('sync_cp_') and filename.endswith('.pkl'):
+        if filename.startswith('sync_cp_') and filename.endswith('.json'):
             _list.append(filename)
 
     return sorted(_list)
@@ -260,8 +260,8 @@ def get_list_sync_files():
 def load_sync_cp_file(_dirname: str, _filename: str) -> dict:
     _filepath = f'{_dirname}/{_filename}'
     if os.path.exists(_filepath):
-        with open(_filename, 'rb') as file:
-            cp = pickle.load(file)
+        with open(_filename, 'r') as file:
+            cp = json.load(file)
     else:
         print(f'erro em load_sync_file(). arquivo {_filepath} não foi encontrado.')
         exit(-1)

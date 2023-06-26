@@ -1,8 +1,7 @@
-import json
 import os
 import shutil
 import math
-import pickle
+import json
 from datetime import datetime, timedelta
 
 import pandas as pd
@@ -543,12 +542,12 @@ class DirectoryCorrection:
             s.current_row = _current_row
 
     def open_checkpoint(self, index_proc: int):
-        _filename = f'sync_cp_{index_proc}.pkl'
+        _filename = f'sync_cp_{index_proc}.json'
         if os.path.exists(_filename):
-            with open(_filename, 'rb') as file:
-                self.cp = pickle.load(file)
-            current_row = self.cp['current_row']
+            with open(_filename, 'r') as file:
+                self.cp = json.load(file)
             finished = self.cp['finished']
+            current_row = self.cp['current_row']
             return True, current_row, finished
         return False, 0, False
 
@@ -562,27 +561,27 @@ class DirectoryCorrection:
                   f'current_rows = {list(_rows_set)}\n')
 
         _current_row = list(_rows_set)[0]
-        self.cp['symbols_to_sync'] = self.symbols
         self.cp['finished'] = finished
         self.cp['current_row'] = _current_row
+        self.cp['symbols_to_sync'] = self.symbols
 
-        _filename = f'sync_cp_{index_proc}.pkl'
-        with open(_filename, 'wb') as file:
-            pickle.dump(self.cp, file)
+        _filename = f'sync_cp_{index_proc}.json'
+        with open(_filename, 'w') as file:
+            json.dump(self.cp, file, indent=4)
         print(f'checkpoint {_filename} gravado. linha atual = {_current_row}\n')
 
     def create_checkpoint(self, index_proc: int):
-        _filename = f'sync_cp_{index_proc}.pkl'
+        _filename = f'sync_cp_{index_proc}.json'
         if os.path.exists(_filename):
             return
 
-        self.cp['symbols_to_sync'] = self.symbols
         self.cp['finished'] = False
         self.cp['current_row'] = 0
+        self.cp['symbols_to_sync'] = self.symbols
 
-        _filename = f'sync_cp_{index_proc}.pkl'
-        with open(_filename, 'wb') as file:
-            pickle.dump(self.cp, file)
+        _filename = f'sync_cp_{index_proc}.json'
+        with open(_filename, 'w') as file:
+            json.dump(self.cp, file)
         print(f'checkpoint {_filename} criado.\n')
 
     def all_sheets_datetime_synced_this_row(self):
@@ -650,8 +649,8 @@ class DirectoryCorrection:
 
 def get_sync_status(_filename: str):
     if os.path.exists(_filename):
-        with open(_filename, 'rb') as file:
-            cp = pickle.load(file)
+        with open(_filename, 'r') as file:
+            cp = json.load(file)
         finished = cp['finished']
         return finished
     return False
@@ -659,8 +658,8 @@ def get_sync_status(_filename: str):
 
 def get_symbols_to_sync(_filename: str) -> list[str] | None:
     if os.path.exists(_filename):
-        with open(_filename, 'rb') as file:
-            cp = pickle.load(file)
+        with open(_filename, 'r') as file:
+            cp = json.load(file)
         _symbols = cp['symbols_to_sync']
         return _symbols
     return None
@@ -670,8 +669,8 @@ def get_all_sync_cp_dic(_list_sync_files: list[str]) -> list[dict]:
     _list = []
     for _filename in _list_sync_files:
         if os.path.exists(_filename):
-            with open(_filename, 'rb') as file:
-                cp = pickle.load(file)
+            with open(_filename, 'r') as file:
+                cp = json.load(file)
                 _list.append(cp)
         else:
             print(f'erro em get_all_sync_cp_dic(). arquivo {_filename} não foi encontrado.')
@@ -681,14 +680,14 @@ def get_all_sync_cp_dic(_list_sync_files: list[str]) -> list[dict]:
 
 
 def create_sync_cp_file(index_proc: int, _symbols_to_sync: list[str]):
-    _filename = f'sync_cp_{index_proc}.pkl'
+    _filename = f'sync_cp_{index_proc}.json'
     _cp = {'symbols_to_sync': _symbols_to_sync,
            'finished': False,
            'current_row': 0}
 
-    _filename = f'sync_cp_{index_proc}.pkl'
-    with open(_filename, 'wb') as file:
-        pickle.dump(_cp, file)
+    _filename = f'sync_cp_{index_proc}.json'
+    with open(_filename, 'w') as file:
+        json.dump(_cp, file)
     print(f'checkpoint {_filename} criado.')
 
 
