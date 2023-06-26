@@ -36,7 +36,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 tf.keras.utils.set_random_seed(1)
 
-from utils import denorm_close_price, save_train_configs, prepare_train_data_multi, split_sequences
+from utils import denorm_close_price, save_train_configs, prepare_train_data_multi, split_sequences, search_symbols
 
 
 # Multivariate CNN Models
@@ -71,9 +71,10 @@ def train_model():
     n_samples_train = 30000
     validation_split = 0.1
 
-    num_ativos = len(hist.symbols)
+    symbols_names, symbols_paths = search_symbols(csv_dir)
+    num_ativos = len(symbols_names)
     num_entradas = num_ativos * n_steps * len(tipo_vela)
-    max_n_epochs = num_entradas * 3
+    max_n_epochs = num_entradas
     patience = int(max_n_epochs / 10)
 
     print(f'n_steps = {n_steps}, tipo_vela = {tipo_vela}, n_samples_train = {n_samples_train} '
@@ -430,8 +431,6 @@ def test_model_with_trader_interactive():
     for i in range(samples_index_start + n_steps, samples_index_start + candlesticks_quantity):
         print(f'i = {i}, {100 * (i - samples_index_start - n_steps) / (candlesticks_quantity - n_steps):.2f} %')
         trader.index = i
-        trader.print_symbols_close_price_at(i)
-        # trader.print_symbols_close_price_at(i, use_scalers=False)
         trader.update_profit()
 
         # fechamento da vela atual

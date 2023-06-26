@@ -305,5 +305,47 @@ def setup_05():
     normalize_directory(csv_dir)
 
 
+def setup_06():
+    """
+    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    -> 1) symbol_out normalizado;
+    -> 2) symbol_out transformado e normalizado (1 coluna Y: (C-O)*V);
+    -> 3) demais símbolos normalizados;
+    -> 4) demais símbolos transformados e normalizado (1 coluna Y: (C-O)*V);
+    :return:
+    """
+    if not check_base_ok():
+        print('abortando setup.')
+        exit(-1)
+
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    csv_s_dir = setup['csv_s_dir']
+    symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
+    symbols_names, symbols_paths = search_symbols(csv_s_dir)
+
+    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @ no final).
+    # isso é para poder ter dois arquivos do mesmo símbolo.
+    for symbol in symbols_names:
+        _src = symbols_paths[f'{symbol}_{timeframe}']
+        _dst = f'{csv_dir}/{symbol}@_{timeframe}.csv'
+        shutil.copy(_src, _dst)
+
+    transform_directory(csv_dir, '(C-O)*V')
+
+    # copiar todos os símbolos, de csv_s_dir para csv_dir
+    for symbol in symbols_names:
+        _src = symbols_paths[f'{symbol}_{timeframe}']
+        _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
+        shutil.copy(_src, _dst)
+
+    # normaliza todos os symbolos de csv.
+    normalize_directory(csv_dir)
+
+
 if __name__ == '__main__':
-    setup_05()
+    setup_06()
