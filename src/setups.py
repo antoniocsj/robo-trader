@@ -43,8 +43,12 @@ def check_base_ok():
         _f = open(_filename, 'x')  # para manter o diretório no git
         _f.close()
 
+    if not os.path.exists(csv_s_dir):
+        print(f'o diretório csv_s não foi encontrado.')
+        return False
+
     _sync_files = []
-    _sync_files = get_list_sync_files()
+    _sync_files = get_list_sync_files(csv_s_dir)
     if len(_sync_files) == 0:
         print('nenhum arquivo de checkpoint de sincronização foi encontrado.')
         print('não há garantia de que os arquivos foram sinzronizados.')
@@ -52,10 +56,6 @@ def check_base_ok():
     elif len(_sync_files) > 1:
         print('há mais de 1 arquivo de checkpoint de sincronização.')
         print('a sincronização não foi finalizada ainda.')
-        return False
-
-    if not os.path.exists(csv_s_dir):
-        print(f'o diretório csv_s não foi encontrado.')
         return False
 
     # se chegou até aqui, então len(_sync_files) == 1 e existe o diretório csv_s.

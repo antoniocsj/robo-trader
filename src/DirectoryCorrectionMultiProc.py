@@ -723,7 +723,7 @@ def make_backup(src_dir: str, dst_dir: str):
     if are_dir_trees_equal(src_dir, dst_dir):
         print('Backup efetuado e verificado com SUCESSO!')
         # aproveita e copia o arquivo final de checkpoint de sincronização 'sync_cp_0.pkl' para dst_dir também
-        _list = get_list_sync_files()
+        _list = get_list_sync_files('.')
         _sync_filename = _list[0]
         _sync_filepath_copy = f'{dst_dir}/{_sync_filename}'
         shutil.copy(_sync_filename, _sync_filepath_copy)
@@ -817,7 +817,7 @@ def main():
 
     symbols_to_sync_per_proc = []
 
-    list_sync_files = get_list_sync_files()
+    list_sync_files = get_list_sync_files('.')
     if len(list_sync_files) == 0:
         print('iniciando a sincronização dos arquivos csv pela PRIMEIRA vez.')
 
@@ -882,7 +882,7 @@ def main():
                     symbols_to_sync_per_proc[j] += list_sync_cp_dic[i]['symbols_to_sync']
 
                 print('removendo sync_cp_files')
-                remove_sync_cp_files(get_list_sync_files())
+                remove_sync_cp_files(get_list_sync_files('.'))
 
                 print('criando novo(s) sync_cp_file(s)')
                 for i in range(n_procs):

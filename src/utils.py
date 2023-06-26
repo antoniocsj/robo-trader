@@ -246,9 +246,9 @@ def are_dir_trees_equal(dir1, dir2):
     return True
 
 
-def get_list_sync_files():
+def get_list_sync_files(directory: str):
     _list = []
-    all_files = os.listdir('.')
+    all_files = os.listdir(directory)
 
     for filename in all_files:
         if filename.startswith('sync_cp_') and filename.endswith('.json'):
@@ -260,7 +260,7 @@ def get_list_sync_files():
 def load_sync_cp_file(_dirname: str, _filename: str) -> dict:
     _filepath = f'{_dirname}/{_filename}'
     if os.path.exists(_filepath):
-        with open(_filename, 'r') as file:
+        with open(_filepath, 'r') as file:
             cp = json.load(file)
     else:
         print(f'erro em load_sync_file(). arquivo {_filepath} não foi encontrado.')
