@@ -372,6 +372,30 @@ def differentiate_directory(directory: str):
     print(f'todos os símbolos do diretório {directory} foram diferenciados.')
 
 
+def transform_directory(directory: str, transform_str: str):
+    print(f'transformando diretório {directory}')
+    hist = HistMulti(directory)
+
+    if transform_str == '(C-O)*V':
+        for _symbol in hist.symbols:
+            print(_symbol)
+            _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
+            arr = hist.arr[_symbol_timeframe]
+            data = (arr[:, 5] - arr[:, 2]) * arr[:, 6]
+            data = np.reshape(data, (len(data), 1))
+            dataf = pd.DataFrame(data)
+            dataf.insert(0, 0, arr[:, 0], True)
+            dataf.insert(1, 1, arr[:, 1], True)
+            dataf.columns = range(dataf.columns.size)
+            _filepath = hist.get_csv_filepath(_symbol_timeframe)
+            dataf.to_csv(_filepath, index=False, sep='\t')
+    else:
+        print(f'ERRO. a tranformação {transform_str} não está implementada')
+        exit(-1)
+
+    print(f'todos os símbolos do diretório {directory} foram transformados: {transform_str}.')
+
+
 def denorm_close_price(_c, trans: MinMaxScaler):
     c_denorm = trans.inverse_transform(np.array([0, 0, 0, _c, 0], dtype=object).reshape(1, -1))
     c_denorm = c_denorm[0][3]
@@ -383,7 +407,7 @@ def save_train_configs(_train_configs: dict):
         json.dump(_train_configs, file, indent=4, sort_keys=False, cls=NpEncoder)
 
 
-# usada nas redes neurais
+# usada nas criação de amostra de treinamento das redes neurais
 def prepare_train_data_multi(_hist: HistMulti, _symbol_out: str, _start_index: int,
                              _num_velas: int, _tipo_vela: str) -> ndarray:
     _data = []
