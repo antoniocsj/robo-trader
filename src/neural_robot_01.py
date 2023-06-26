@@ -36,7 +36,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 tf.keras.utils.set_random_seed(1)
 
-from utils import denorm_close_price, save_train_configs, prepare_train_data_multi, split_sequences, search_symbols
+from utils import denorm_close_price, save_train_configs, prepare_train_data_multi, split_sequences, calc_n_inputs
 
 
 # Multivariate CNN Models
@@ -71,9 +71,8 @@ def train_model():
     n_samples_train = 30000
     validation_split = 0.1
 
-    symbols_names, symbols_paths = search_symbols(csv_dir)
-    num_ativos = len(symbols_names)
-    num_entradas = num_ativos * n_steps * len(tipo_vela)
+    n_cols = calc_n_inputs(csv_dir, tipo_vela)
+    num_entradas = n_steps * n_cols
     max_n_epochs = num_entradas
     patience = int(max_n_epochs / 10)
 

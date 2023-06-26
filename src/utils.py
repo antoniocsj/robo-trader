@@ -309,6 +309,17 @@ def search_symbols(directory: str):
     return symbols_names, symbols_paths
 
 
+def calc_n_inputs(directory: str, tipo_vela: str):
+    count = 0
+    symbols_names, symbols_paths = search_symbols(directory)
+    for s in symbols_names:
+        if s.endswith('@'):
+            count += 1
+        else:
+            count += len(tipo_vela)
+    return count
+
+
 def normalize_directory(directory: str):
     hist = HistMulti(directory)
     scalers = {}
