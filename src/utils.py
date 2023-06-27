@@ -390,6 +390,24 @@ def differentiate_directory(directory: str):
     print(f'todos os símbolos do diretório {directory} foram diferenciados.')
 
 
+def differentiate_files(filepath_list: list[str], directory: str):
+    print(f'diferenciando alguns símbolos do diretório {directory}')
+
+    for _filepath in filepath_list:
+        print(_filepath)
+        df: pd.DataFrame = pd.read_csv(_filepath, sep='\t')
+        arr = df.to_numpy()
+        data = arr[:, 2:7]
+        data = np.diff(data, axis=0)
+        dataf = pd.DataFrame(data)
+        dataf.insert(0, 0, arr[1:, 0], True)
+        dataf.insert(1, 1, arr[1:, 1], True)
+        dataf.columns = range(dataf.columns.size)
+        dataf.to_csv(_filepath, index=False, sep='\t')
+
+    print(f'{len(filepath_list)} símbolos do diretório {directory} foram diferenciados: {filepath_list}')
+
+
 def transform_directory(directory: str, transform_str: str):
     print(f'transformando diretório {directory}')
     hist = HistMulti(directory)
@@ -412,6 +430,28 @@ def transform_directory(directory: str, transform_str: str):
         exit(-1)
 
     print(f'todos os símbolos do diretório {directory} foram transformados: {transform_str}.')
+
+
+def transform_files(filepath_list: list[str], directory: str, transform_str: str):
+    print(f'transformando alguns símbolos do diretório {directory}')
+
+    if transform_str == '(C-O)*V':
+        for _filepath in filepath_list:
+            print(_filepath)
+            df: pd.DataFrame = pd.read_csv(_filepath, sep='\t')
+            arr = df.to_numpy()
+            data = (arr[:, 5] - arr[:, 2]) * arr[:, 6]
+            data = np.reshape(data, (len(data), 1))
+            dataf = pd.DataFrame(data)
+            dataf.insert(0, 0, arr[:, 0], True)
+            dataf.insert(1, 1, arr[:, 1], True)
+            dataf.columns = range(dataf.columns.size)
+            dataf.to_csv(_filepath, index=False, sep='\t')
+    else:
+        print(f'ERRO. a tranformação {transform_str} não está implementada')
+        exit(-1)
+
+    print(f'{len(filepath_list)} símbolos do diretório {directory} foram transformados: {filepath_list}.')
 
 
 def denorm_close_price(_c, trans: MinMaxScaler):
