@@ -66,7 +66,7 @@ def train_model():
     timeframe = setup['timeframe']
     hist = HistMulti(directory=csv_dir)
 
-    n_steps = 2
+    n_steps = 1
     tipo_vela = 'OHLCV'
     n_samples_train = 30000  # 30000-M10, 60000-M5
     validation_split = 0.2

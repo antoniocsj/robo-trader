@@ -325,7 +325,7 @@ def calc_n_inputs(directory: str, tipo_vela: str, timeframe: str):
     count = 0
     symbols_names, symbols_paths = search_symbols(directory, timeframe)
     for s in symbols_names:
-        if s.endswith('@T'):
+        if s.endswith('@T') or s. endswith('@DT'):
             count += 1
         else:
             count += len(tipo_vela)
