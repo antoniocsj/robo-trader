@@ -71,7 +71,7 @@ def train_model():
     n_samples_train = 30000  # 30000-M10, 60000-M5
     validation_split = 0.2
 
-    n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela)
+    n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela, timeframe)
     num_entradas = n_steps * n_cols
     max_n_epochs = num_entradas
     patience = int(max_n_epochs / 10)

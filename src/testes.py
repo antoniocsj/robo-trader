@@ -119,5 +119,22 @@ def test_05():
     print(cp)
 
 
+def test_06():
+    import itertools as it
+    import json
+    from utils import search_symbols
+
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
+
+    symbols_names, symbols_paths = search_symbols(csv_dir, timeframe)
+    pass
+
+
 if __name__ == '__main__':
-    test_05()
+    test_06()

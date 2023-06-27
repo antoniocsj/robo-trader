@@ -268,7 +268,7 @@ def load_sync_cp_file(_dirname: str, _filename: str) -> dict:
     return cp
 
 
-def search_symbols(directory: str):
+def search_symbols(directory: str, timeframe: str):
     """
     Procurando pelos símbolos nos nomes dos arquivos csv.
     Considera erro encontrar símbolos repetidos ou mais de 1 timeframe.
@@ -305,20 +305,25 @@ def search_symbols(directory: str):
         print(f'ERRO. Há mais de 1 timeframe no diretório {directory}')
         exit(-1)
 
+    if list(timeframes)[0] != timeframe:
+        print(f'ERRO. O diretório {directory} não possui símbolos com timeframe {timeframe}')
+        exit(-1)
+
     symbols_names = sorted(symbols_names)
     return symbols_names, symbols_paths
 
 
-def calc_n_inputs(directory: str, tipo_vela: str):
+def calc_n_inputs(directory: str, tipo_vela: str, timeframe: str):
     """
     Faz uma varredura no diretório e retorna o número de colunas (além da data e horário) que há em cada arquivos
     CSV e também retorna o número de símbolos/arquivos CSVs
     :param directory:
     :param tipo_vela:
+    :param timeframe:
     :return:
     """
     count = 0
-    symbols_names, symbols_paths = search_symbols(directory)
+    symbols_names, symbols_paths = search_symbols(directory, timeframe)
     for s in symbols_names:
         if s.endswith('@T'):
             count += 1

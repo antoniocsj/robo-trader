@@ -34,6 +34,7 @@ def check_base_ok():
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
     symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
 
     if os.path.exists(csv_dir):
         print(f'o diretório {csv_dir} já existe. deletando todo seu conteúdo.')
@@ -72,7 +73,7 @@ def check_base_ok():
     print(sync_cp)
     if sync_cp['finished']:
         symbols_to_sync = sync_cp['symbols_to_sync']
-        symbols_names, symbols_paths = search_symbols(csv_s_dir)
+        symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
         if not symbols_names == symbols_to_sync:
             print(f'ERRO. os símbolos encontrados em {csv_s_dir} não coincidem com a lista dos símbolos '
                   f'sincronizados presente no arquivo {_sync_files[0]}')
@@ -117,7 +118,7 @@ def setup_01():
     csv_s_dir = setup['csv_s_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
-    symbols_names, symbols_paths = search_symbols(csv_s_dir)
+    symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos de csv_s_dir para csv_dir
     for symbol in symbols_names:
@@ -149,7 +150,7 @@ def setup_02():
     csv_s_dir = setup['csv_s_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
-    symbols_names, symbols_paths = search_symbols(csv_s_dir)
+    symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos, menos symbol_out, de csv_s_dir para csv_dir
     for symbol in symbols_names:
@@ -195,7 +196,7 @@ def setup_03():
     csv_s_dir = setup['csv_s_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
-    symbols_names, symbols_paths = search_symbols(csv_s_dir)
+    symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos, menos symbol_out, de csv_s_dir para csv_dir
     for symbol in symbols_names:
@@ -249,7 +250,7 @@ def setup_04():
     csv_s_dir = setup['csv_s_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
-    symbols_names, symbols_paths = search_symbols(csv_s_dir)
+    symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta D no final).
     # isso é para poder ter dois arquivos do mesmo símbolo. assim, um será diferenciado e normalizados,
@@ -296,7 +297,7 @@ def setup_05():
     csv_s_dir = setup['csv_s_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
-    symbols_names, symbols_paths = search_symbols(csv_s_dir)
+    symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @ no final).
     # isso é para poder ter dois arquivos do mesmo símbolo.
@@ -338,7 +339,7 @@ def setup_06():
     csv_s_dir = setup['csv_s_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
-    symbols_names, symbols_paths = search_symbols(csv_s_dir)
+    symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @ no final).
     # isso é para poder ter dois arquivos do mesmo símbolo.
@@ -383,7 +384,7 @@ def setup_07():
     csv_s_dir = setup['csv_s_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
-    symbols_names, symbols_paths = search_symbols(csv_s_dir)
+    symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @ no final).
     # isso é para poder ter dois arquivos do mesmo símbolo.
