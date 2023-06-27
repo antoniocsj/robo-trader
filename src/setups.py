@@ -428,5 +428,54 @@ def setup_07():
         csv_delete_first_row(_filepath)
 
 
+def setup_08():
+    """
+    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    -> 1) symbol_out normalizado;
+    -> 2) symbol_out diferenciado, transformado e normalizado (1 coluna Y: C*V);
+    -> 4) demais símbolos diferenciados, transformados e normalizados (1 coluna Y: C*V);
+    :return:
+    """
+    print('setup_08.')
+    if not check_base_ok():
+        print('abortando setup.')
+        exit(-1)
+
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    csv_s_dir = setup['csv_s_dir']
+    symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
+    symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
+
+    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @ no final).
+    # isso é para poder ter dois arquivos do mesmo símbolo.
+    # símbolos que sofrerão uma transformação.
+    _transformed = []
+    for symbol in symbols_names:
+        _src = symbols_paths[f'{symbol}_{timeframe}']
+        _dst = f'{csv_dir}/{symbol}@DT_{timeframe}.csv'
+        shutil.copy(_src, _dst)
+        _transformed.append(_dst)
+
+    differentiate_directory(csv_dir)
+    transform_directory(csv_dir, 'C*V')
+
+    # copiar symbol_out, de csv_s_dir para csv_dir
+    _src = symbols_paths[f'{symbol_out}_{timeframe}']
+    _dst = f'{csv_dir}/{symbol_out}_{timeframe}.csv'
+    shutil.copy(_src, _dst)
+
+    # normaliza todos os symbolos de csv.
+    normalize_directory(csv_dir)
+
+    # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
+    # symbol_out também, mas delete do arquivo que está em csv.
+    csv_delete_first_row(_dst)
+
+
 if __name__ == '__main__':
-    setup_01()
+    setup_08()

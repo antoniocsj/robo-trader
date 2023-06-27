@@ -430,6 +430,19 @@ def transform_directory(directory: str, transform_str: str):
             dataf.columns = range(dataf.columns.size)
             _filepath = hist.get_csv_filepath(_symbol_timeframe)
             dataf.to_csv(_filepath, index=False, sep='\t')
+    elif transform_str == 'C*V':
+        for _symbol in hist.symbols:
+            print(_symbol)
+            _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
+            arr = hist.arr[_symbol_timeframe]
+            data = arr[:, 5] * arr[:, 6]
+            data = np.reshape(data, (len(data), 1))
+            dataf = pd.DataFrame(data)
+            dataf.insert(0, 0, arr[:, 0], True)
+            dataf.insert(1, 1, arr[:, 1], True)
+            dataf.columns = range(dataf.columns.size)
+            _filepath = hist.get_csv_filepath(_symbol_timeframe)
+            dataf.to_csv(_filepath, index=False, sep='\t')
     else:
         print(f'ERRO. a tranformação {transform_str} não está implementada')
         exit(-1)
