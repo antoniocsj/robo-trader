@@ -34,8 +34,8 @@ def search_symbols_in_directory(directory: str, timeframe: str) -> list[str]:
                 exit(-1)
 
             if _timeframe != timeframe:
-                print(f'erro. timeframe {_timeframe} diferente do especificado {timeframe} foi '
-                      f'encontrado no diretório')
+                print(f'ERRO. timeframe {_timeframe} diferente do especificado {timeframe} foi '
+                      f'encontrado no diretório {directory}')
                 exit(-1)
 
     symbols = sorted(symbols)
@@ -170,6 +170,7 @@ class DirectoryCorrection:
     É necessário rodar algumas vezes o script até que a sincronização total seja atingida.
     No final, é feito um backup do diretório sincronizado.
     """
+
     def __init__(self, directory: str, timeframe: str, index_proc: int, symbols_to_sync: list[str] = None):
         self.directory = directory
         self.all_files = []
@@ -561,9 +562,28 @@ class DirectoryCorrection:
                   f'current_rows = {list(_rows_set)}\n')
 
         _current_row = list(_rows_set)[0]
+        self.cp['id'] = ''
         self.cp['finished'] = finished
         self.cp['current_row'] = _current_row
         self.cp['timeframe'] = self.timeframe
+
+        if finished:
+            s: Sheet = self.sheets[0]
+            row = s.df.iloc[0]
+            _date = row['<DATE>'].replace('.', '-')
+            _time = row['<TIME>']
+            _datetime_start_str = f'{_date}T{_time}'
+            self.cp['start'] = _datetime_start_str
+            row = s.df.iloc[-1]
+            _date = row['<DATE>'].replace('.', '-')
+            _time = row['<TIME>']
+            _datetime_end_str = f'{_date}T{_time}'
+            self.cp['end'] = _datetime_end_str
+            _datetime_start_str = _datetime_start_str.replace('-', '').replace(':', '')
+            _datetime_end_str = _datetime_end_str.replace('-', '').replace(':', '')
+            self.cp['id'] = f'{len(self.symbols)}_{self.timeframe}_{_datetime_start_str}_{_datetime_end_str}'
+
+        self.cp['n_symbols'] = len(self.symbols)
         self.cp['symbols_to_sync'] = self.symbols
 
         _filename = f'sync_cp_{index_proc}.json'
@@ -576,9 +596,13 @@ class DirectoryCorrection:
         if os.path.exists(_filename):
             return
 
+        self.cp['id'] = ''
         self.cp['finished'] = False
         self.cp['current_row'] = 0
         self.cp['timeframe'] = self.timeframe
+        self.cp['start'] = ''
+        self.cp['end'] = ''
+        self.cp['n_symbols'] = len(self.symbols)
         self.cp['symbols_to_sync'] = self.symbols
 
         _filename = f'sync_cp_{index_proc}.json'
@@ -683,9 +707,13 @@ def get_all_sync_cp_dic(_list_sync_files: list[str]) -> list[dict]:
 
 def create_sync_cp_file(index_proc: int, _symbols_to_sync: list[str], timeframe: str):
     _filename = f'sync_cp_{index_proc}.json'
-    _cp = {'finished': False,
+    _cp = {'id': '',
+           'finished': False,
            'current_row': 0,
            'timeframe': timeframe,
+           'start': '',
+           'end': '',
+           'n_symbols': len(_symbols_to_sync),
            'symbols_to_sync': _symbols_to_sync}
 
     _filename = f'sync_cp_{index_proc}.json'
