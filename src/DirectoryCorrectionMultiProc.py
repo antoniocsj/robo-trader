@@ -563,6 +563,7 @@ class DirectoryCorrection:
         _current_row = list(_rows_set)[0]
         self.cp['finished'] = finished
         self.cp['current_row'] = _current_row
+        self.cp['timeframe'] = self.timeframe
         self.cp['symbols_to_sync'] = self.symbols
 
         _filename = f'sync_cp_{index_proc}.json'
@@ -577,6 +578,7 @@ class DirectoryCorrection:
 
         self.cp['finished'] = False
         self.cp['current_row'] = 0
+        self.cp['timeframe'] = self.timeframe
         self.cp['symbols_to_sync'] = self.symbols
 
         _filename = f'sync_cp_{index_proc}.json'
@@ -679,11 +681,12 @@ def get_all_sync_cp_dic(_list_sync_files: list[str]) -> list[dict]:
     return _list
 
 
-def create_sync_cp_file(index_proc: int, _symbols_to_sync: list[str]):
+def create_sync_cp_file(index_proc: int, _symbols_to_sync: list[str], timeframe: str):
     _filename = f'sync_cp_{index_proc}.json'
-    _cp = {'symbols_to_sync': _symbols_to_sync,
-           'finished': False,
-           'current_row': 0}
+    _cp = {'finished': False,
+           'current_row': 0,
+           'timeframe': timeframe,
+           'symbols_to_sync': _symbols_to_sync}
 
     _filename = f'sync_cp_{index_proc}.json'
     with open(_filename, 'w') as file:
@@ -886,7 +889,7 @@ def main():
 
                 print('criando novo(s) sync_cp_file(s)')
                 for i in range(n_procs):
-                    create_sync_cp_file(i, symbols_to_sync_per_proc[i])
+                    create_sync_cp_file(i, symbols_to_sync_per_proc[i], timeframe)
 
                 dir_cor_l: list[DirectoryCorrection] = []
                 for i in range(n_procs):
