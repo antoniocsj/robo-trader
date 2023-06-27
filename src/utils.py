@@ -317,7 +317,7 @@ def calc_n_inputs(directory: str, tipo_vela: str):
             count += 1
         else:
             count += len(tipo_vela)
-    return count
+    return count, len(symbols_names)
 
 
 def normalize_directory(directory: str):

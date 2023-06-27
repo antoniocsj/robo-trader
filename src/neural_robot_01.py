@@ -68,10 +68,10 @@ def train_model():
 
     n_steps = 2
     tipo_vela = 'OHLCV'
-    n_samples_train = 30000
-    validation_split = 0.1
+    n_samples_train = 60000
+    validation_split = 0.2
 
-    n_cols = calc_n_inputs(csv_dir, tipo_vela)
+    n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela)
     num_entradas = n_steps * n_cols
     max_n_epochs = num_entradas
     patience = int(max_n_epochs / 10)
@@ -141,7 +141,7 @@ def train_model():
                      'tipo_vela': tipo_vela,
                      'timeframe': hist.timeframe,
                      'n_steps': n_steps,
-                     'n_symbols': num_ativos,
+                     'n_symbols': n_symbols,
                      'n_features': n_features,
                      'num_entradas': num_entradas,
                      'n_samples_train': n_samples_train,
