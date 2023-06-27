@@ -320,7 +320,7 @@ def calc_n_inputs(directory: str, tipo_vela: str):
     count = 0
     symbols_names, symbols_paths = search_symbols(directory)
     for s in symbols_names:
-        if s.endswith('@'):
+        if s.endswith('@T'):
             count += 1
         else:
             count += len(tipo_vela)

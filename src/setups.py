@@ -332,7 +332,7 @@ def setup_06():
     # isso é para poder ter dois arquivos do mesmo símbolo.
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}@_{timeframe}.csv'
+        _dst = f'{csv_dir}/{symbol}@T_{timeframe}.csv'
         shutil.copy(_src, _dst)
 
     transform_directory(csv_dir, '(C-O)*V')
@@ -378,7 +378,7 @@ def setup_07():
     _transformed = []
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}@_{timeframe}.csv'
+        _dst = f'{csv_dir}/{symbol}@T_{timeframe}.csv'
         shutil.copy(_src, _dst)
         _transformed.append(_dst)
 
@@ -398,7 +398,7 @@ def setup_07():
     _differentiated = []
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}D_{timeframe}.csv'
+        _dst = f'{csv_dir}/{symbol}@D_{timeframe}.csv'
         shutil.copy(_src, _dst)
         _differentiated.append(_dst)
 
