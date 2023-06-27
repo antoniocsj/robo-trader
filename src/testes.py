@@ -132,7 +132,10 @@ def test_06():
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
 
-    symbols_names, symbols_paths = search_symbols(csv_dir, timeframe)
+    symbols, symbols_paths = search_symbols(csv_dir, timeframe)
+    symbols.remove(symbol_out)
+    for i in range(2, 5):
+        c = list(it.combinations(symbols, i))
     pass
 
 
