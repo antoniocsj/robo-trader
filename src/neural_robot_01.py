@@ -68,7 +68,7 @@ def train_model():
 
     n_steps = 2
     tipo_vela = 'OHLCV'
-    n_samples_train = 60000
+    n_samples_train = 30000  # 30000-M10, 60000-M5
     validation_split = 0.2
 
     n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela)
