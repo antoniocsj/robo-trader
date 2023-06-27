@@ -310,6 +310,13 @@ def search_symbols(directory: str):
 
 
 def calc_n_inputs(directory: str, tipo_vela: str):
+    """
+    Faz uma varredura no diretório e retorna o número de colunas (além da data e horário) que há em cada arquivos
+    CSV e também retorna o número de símbolos/arquivos CSVs
+    :param directory:
+    :param tipo_vela:
+    :return:
+    """
     count = 0
     symbols_names, symbols_paths = search_symbols(directory)
     for s in symbols_names:
