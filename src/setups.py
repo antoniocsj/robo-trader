@@ -42,6 +42,12 @@ def check_base_ok():
         _filename = f'{csv_dir}/.directory'
         _f = open(_filename, 'x')  # para manter o diretório no git
         _f.close()
+    else:
+        print(f'o diretório {csv_dir} não existe. criando-o.')
+        os.mkdir(csv_dir)
+        _filename = f'{csv_dir}/.directory'
+        _f = open(_filename, 'x')  # para manter o diretório no git
+        _f.close()
 
     if not os.path.exists(csv_s_dir):
         print(f'o diretório csv_s não foi encontrado.')
@@ -98,6 +104,7 @@ def setup_01():
     -> 2) demais símbolos normalizados.
     :return:
     """
+    print('setup_01.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
@@ -129,6 +136,7 @@ def setup_02():
     -> 2) demais símbolos diferenciados e normalizados.
     :return:
     """
+    print('setup_02.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
@@ -174,6 +182,7 @@ def setup_03():
     -> 3) demais símbolos diferenciados e normalizados;
     :return:
     """
+    print('setup_03.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
@@ -227,6 +236,7 @@ def setup_04():
     -> 4) demais símbolos diferenciados e normalizados;
     :return:
     """
+    print('setup_04.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
@@ -273,6 +283,7 @@ def setup_05():
     -> 3) demais símbolos transformados e normalizado (1 coluna Y: (C-O)*V);
     :return:
     """
+    print('setup_05.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
@@ -314,6 +325,7 @@ def setup_06():
     -> 4) demais símbolos transformados e normalizado (1 coluna Y: (C-O)*V);
     :return:
     """
+    print('setup_06.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
@@ -358,6 +370,7 @@ def setup_07():
     -> 4) demais símbolos transformados e normalizado (1 coluna Y: (C-O)*V);
     :return:
     """
+    print('setup_07.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
