@@ -156,7 +156,7 @@ def setup_02():
     for symbol in symbols_names:
         if symbol != symbol_out:
             _src = symbols_paths[f'{symbol}_{timeframe}']
-            _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
+            _dst = f'{csv_dir}/{symbol}@D_{timeframe}.csv'
             shutil.copy(_src, _dst)
 
     # diferenciar os símbolos do diretório csv
@@ -198,19 +198,11 @@ def setup_03():
     timeframe = setup['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
-    # copiar todos os símbolos, menos symbol_out, de csv_s_dir para csv_dir
+    # copiar todos os símbolos de csv_s_dir para csv_dir
     for symbol in symbols_names:
-        if symbol != symbol_out:
-            _src = symbols_paths[f'{symbol}_{timeframe}']
-            _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
-            shutil.copy(_src, _dst)
-
-    # copiar symbol_out, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta D no final).
-    # isso é para poder ter dois arquivos do mesmo símbolo. assim, um será diferenciado e normalizados,
-    # enquanto que o outro será apenas normalizado.
-    _src = symbols_paths[f'{symbol_out}_{timeframe}']
-    _dst = f'{csv_dir}/{symbol_out}D_{timeframe}.csv'
-    shutil.copy(_src, _dst)
+        _src = symbols_paths[f'{symbol}_{timeframe}']
+        _dst = f'{csv_dir}/{symbol}@D_{timeframe}.csv'
+        shutil.copy(_src, _dst)
 
     # diferenciar os símbolos do diretório csv
     differentiate_directory(csv_dir)
@@ -220,12 +212,12 @@ def setup_03():
     _dst = f'{csv_dir}/{symbol_out}_{timeframe}.csv'
     shutil.copy(_src, _dst)
 
+    # normaliza todos os symbolos de csv.
+    normalize_directory(csv_dir)
+
     # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
     # symbol_out também, mas delete do arquivo que está em csv apenas.
     csv_delete_first_row(_dst)
-
-    # normaliza todos os symbolos de csv.
-    normalize_directory(csv_dir)
 
 
 def setup_04():
@@ -257,7 +249,7 @@ def setup_04():
     # enquanto que o outro será apenas normalizado.
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}D_{timeframe}.csv'
+        _dst = f'{csv_dir}/{symbol}@D_{timeframe}.csv'
         shutil.copy(_src, _dst)
 
     # diferenciar os símbolos do diretório csv
@@ -299,11 +291,11 @@ def setup_05():
     timeframe = setup['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
-    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @ no final).
+    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @T no final).
     # isso é para poder ter dois arquivos do mesmo símbolo.
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}@_{timeframe}.csv'
+        _dst = f'{csv_dir}/{symbol}@T_{timeframe}.csv'
         shutil.copy(_src, _dst)
 
     transform_directory(csv_dir, '(C-O)*V')
@@ -341,7 +333,7 @@ def setup_06():
     timeframe = setup['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
-    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @ no final).
+    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @T no final).
     # isso é para poder ter dois arquivos do mesmo símbolo.
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
@@ -386,7 +378,7 @@ def setup_07():
     timeframe = setup['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
-    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @ no final).
+    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @T no final).
     # isso é para poder ter dois arquivos do mesmo símbolo.
     # símbolos que sofrerão uma transformação.
     _transformed = []
@@ -478,4 +470,4 @@ def setup_08():
 
 
 if __name__ == '__main__':
-    setup_08()
+    setup_04()
