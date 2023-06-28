@@ -123,7 +123,7 @@ def setup_01():
     # copiar todos os símbolos de csv_s_dir para csv_dir
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
+        _dst = f'{csv_dir}/{symbol}@N_{timeframe}.csv'
         shutil.copy(_src, _dst)
 
     # normaliza todos os symbolos de csv.
@@ -470,4 +470,4 @@ def setup_08():
 
 
 if __name__ == '__main__':
-    setup_04()
+    setup_01()
