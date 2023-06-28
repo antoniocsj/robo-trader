@@ -87,13 +87,13 @@ def train_model():
     print(X_train.shape, y_train.shape)
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
-    # features to expect for each input sample, in this case three and two respectively.
+    # features to expect for each input sample.
 
     n_features = X_train.shape[2]
 
     # define model
     model = Sequential()
-    model.add(Conv1D(filters=2, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
     # model.add(Dense(5, activation='relu'))
@@ -159,6 +159,135 @@ def train_model():
                      'bias': 0.0}
 
     save_train_configs(train_configs)
+
+
+def train_model_return(setup: dict, hist: HistMulti, n_steps: int, tipo_vela: str, layer_type: list):
+    csv_dir = setup['csv_dir']
+    symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
+    hist = hist
+
+    n_steps = n_steps
+    tipo_vela = tipo_vela
+    n_samples_train = 1000  # 30000-M10, 60000-M5
+    validation_split = 0.2
+
+    n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela, timeframe)
+    num_entradas = n_steps * n_cols
+    n_epochs = 2
+
+    print(f'n_steps = {n_steps}, tipo_vela = {tipo_vela}, n_samples_train = {n_samples_train}')
+    print(f'validation_split = {validation_split}, n_epochs = {n_epochs} layer_type = {layer_type}')
+
+    # horizontally stack columns
+    dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
+
+    # convert into input/output
+    X_train, y_train = split_sequences(dataset_train, n_steps)
+    print(X_train.shape, y_train.shape)
+
+    # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
+    # features to expect for each input sample.
+
+    n_features = X_train.shape[2]
+
+    # define model
+    model = Sequential()
+    model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(MaxPooling1D(pool_size=2, padding='same'))
+    model.add(Flatten())
+
+    if sum(layer_type) > 0:
+        for i in range(len(layer_type)):
+            if layer_type[i] != 0:
+                model.add(Dense(layer_type[i], activation='relu'))
+    model.add(Dense(1))
+    model.compile(optimizer='adam', loss='mse')
+
+    X_train = np.asarray(X_train).astype(np.float32)
+    y_train = np.asarray(y_train).astype(np.float32)
+    model.fit(X_train, y_train, epochs=n_epochs, verbose=0, validation_split=validation_split)
+
+    whole_set_train_loss_eval = model.evaluate(X_train, y_train, verbose=0)
+    print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
+
+    n_samples_test = 1000
+    samples_index_start = n_samples_train
+    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
+
+    X_test, y_test = split_sequences(dataset_test, n_steps)
+    X_test = np.asarray(X_test).astype(np.float32)
+    y_test = np.asarray(y_test).astype(np.float32)
+
+    test_loss_eval = model.evaluate(X_test, y_test, verbose=0)
+    print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
+
+    train_configs = {'symbol_out': symbol_out,
+                     'tipo_vela': tipo_vela,
+                     'timeframe': hist.timeframe,
+                     'n_steps': n_steps,
+                     'n_symbols': n_symbols,
+                     'n_features': n_features,
+                     'num_entradas': num_entradas,
+                     'n_samples_train': n_samples_train,
+                     'validation_split': validation_split,
+                     'n_epochs': n_epochs,
+                     'layer_type': list(layer_type),
+                     'whole_set_train_loss_eval': whole_set_train_loss_eval,
+                     'n_samples_test': n_samples_test,
+                     'test_loss_eval': test_loss_eval}
+
+    return train_configs
+
+
+def test_models():
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
+
+    hist = HistMulti(directory=csv_dir)
+    n_steps = 2
+    tipo_vela = 'OHLCV'
+    n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela, timeframe)
+    num_entradas = n_steps * n_cols
+
+    import itertools as it
+
+    min_n_neurons = 0
+    max_n_neurons = num_entradas
+    step = 30
+    _list_n_neurons = list(range(min_n_neurons, max_n_neurons+1, step))
+    n_layers = 3
+    layers_comb = list(it.combinations_with_replacement(_list_n_neurons, n_layers))
+
+    if os.path.exists('test_models.json'):
+        with open('test_models.json', 'r') as file:
+            _list_train_configs = json.load(file)
+            i_start = len(_list_train_configs)
+    else:
+        _list_train_configs = []
+        i_start = 0
+
+    max_n_neurons = num_entradas
+    wait = 10
+    _len_layers_comb = len(layers_comb)
+    for i in range(i_start, len(layers_comb)):
+        _layer_type = sorted(list(layers_comb[i]), reverse=True)
+        print(f'testando modelo com _layer_type = {_layer_type}, len_layers_comb = {_len_layers_comb}. '
+              f'({100*i/_len_layers_comb:.2f} %)')
+        _out = train_model_return(setup, hist, n_steps, tipo_vela, _layer_type)
+        # _out = {'layer_comb': list(layers_comb[i])}
+
+        _list_train_configs.append(_out)
+        with open("test_models.json", "w") as file:
+            json.dump(_list_train_configs, file, indent=4)
+
+        print(f'esperando {wait} segundos')
+        time.sleep(wait)
 
 
 def evaluate_model():
@@ -493,7 +622,8 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    train_model()
+    test_models()
+    # train_model()
     # calculate_model_bias()
     # test_model_with_trader()
     # test_model_with_trader_interactive()

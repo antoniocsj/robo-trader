@@ -1,3 +1,4 @@
+import math
 import os
 
 
@@ -139,5 +140,46 @@ def test_06():
     pass
 
 
+def test_06_1():
+    import itertools as it
+
+    min_n_neurons = 0
+    max_n_neurons = 270
+    step = 30
+    _list_n_neurons = list(range(min_n_neurons, max_n_neurons+1, step))
+    n_layers = 3
+    c = list(it.combinations_with_replacement(_list_n_neurons, n_layers))
+    pass
+
+
+def test_07():
+    import json
+
+    with open('test_models.json', 'r') as file:
+        test_models = json.load(file)
+
+    # procurar pelo menor whole_set_train_loss_eval e
+    # procurar pelo menor test_loss_eval
+    train_loss_min = math.inf
+    i_train_loss_min = 0
+    test_loss_min = math.inf
+    i_test_loss_min = 0
+    for i in range(len(test_models)):
+        train_loss = test_models[i]['whole_set_train_loss_eval']
+        if train_loss < train_loss_min:
+            train_loss_min = train_loss
+            i_train_loss_min = i
+        test_loss = test_models[i]['test_loss_eval']
+        if test_loss < test_loss_min:
+            test_loss_min = test_loss
+            i_test_loss_min = i
+
+    print('train_loss_min:')
+    print(test_models[i_train_loss_min])
+    print()
+    print('test_loss_min:')
+    print(test_models[i_test_loss_min])
+
+
 if __name__ == '__main__':
-    test_06()
+    test_06_1()
