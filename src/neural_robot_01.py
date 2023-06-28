@@ -273,14 +273,13 @@ def test_models():
         i_start = 0
 
     max_n_neurons = num_entradas
-    wait = 10
+    wait = 1
     _len_layers_comb = len(layers_comb)
     for i in range(i_start, len(layers_comb)):
         _layer_type = sorted(list(layers_comb[i]), reverse=True)
         print(f'testando modelo com _layer_type = {_layer_type}, len_layers_comb = {_len_layers_comb}. '
               f'({100*i/_len_layers_comb:.2f} %)')
         _out = train_model_return(setup, hist, n_steps, tipo_vela, _layer_type)
-        # _out = {'layer_comb': list(layers_comb[i])}
 
         _list_train_configs.append(_out)
         with open("test_models.json", "w") as file:

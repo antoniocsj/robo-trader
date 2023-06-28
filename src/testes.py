@@ -182,4 +182,4 @@ def test_07():
 
 
 if __name__ == '__main__':
-    test_06_1()
+    test_07()
