@@ -198,6 +198,8 @@ def test_08():
     hist = HistMulti(directory=csv_dir)
 
     pairs = list(it.combinations(hist.symbols, 2))
+    _set = set()
+    corr_min_abs = 0.9
     for symbol_a, symbol_b in pairs:
         data1: ndarray = hist.arr[f'{symbol_a}_{timeframe}'][:, 5]
         _data1 = data1.tolist()
@@ -205,9 +207,15 @@ def test_08():
         _data2 = data2.tolist()
         pearsons_corr, _ = pearsonr(_data1, _data2)
         spearmans_corr, _ = spearmanr(_data1, _data2)
-        if abs(pearsons_corr) > 0.75 and abs(spearmans_corr) > 0.75:
+        if abs(pearsons_corr) > corr_min_abs and abs(spearmans_corr) > corr_min_abs:
             print(f'{symbol_a}-{symbol_b}: correlations: Pearsons = {pearsons_corr:.3f}, '
                   f'Spearmans = {spearmans_corr:.3f}')
+            if 'EURUSD' in symbol_a or 'EURUSD' in symbol_b:
+                _set.add(symbol_a)
+                _set.add(symbol_b)
+
+    print(len(_set))
+    print(_set)
 
 
 if __name__ == '__main__':
