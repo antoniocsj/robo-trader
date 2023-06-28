@@ -1,6 +1,3 @@
-import math
-import os
-
 
 def test_01():
     import os
@@ -154,6 +151,7 @@ def test_06_1():
 
 def test_07():
     import json
+    import math
 
     with open('test_models.json', 'r') as file:
         test_models = json.load(file)
@@ -181,5 +179,36 @@ def test_07():
     print(test_models[i_test_loss_min])
 
 
+def test_08():
+    import numpy as np
+    from numpy import ndarray
+    import json
+    from utils import HistMulti
+    import itertools as it
+    from scipy.stats import pearsonr, spearmanr
+    from sklearn.preprocessing import MinMaxScaler
+
+    with open('setup.json', 'r') as file:
+        setup = json.load(file)
+    print(f'setup.json: {setup}')
+
+    csv_dir = setup['csv_dir']
+    symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
+    hist = HistMulti(directory=csv_dir)
+
+    pairs = list(it.combinations(hist.symbols, 2))
+    for symbol_a, symbol_b in pairs:
+        data1: ndarray = hist.arr[f'{symbol_a}_{timeframe}'][:, 5]
+        _data1 = data1.tolist()
+        data2: ndarray = hist.arr[f'{symbol_b}_{timeframe}'][:, 5]
+        _data2 = data2.tolist()
+        pearsons_corr, _ = pearsonr(_data1, _data2)
+        spearmans_corr, _ = spearmanr(_data1, _data2)
+        if abs(pearsons_corr) > 0.75 and abs(spearmans_corr) > 0.75:
+            print(f'{symbol_a}-{symbol_b}: correlations: Pearsons = {pearsons_corr:.3f}, '
+                  f'Spearmans = {spearmans_corr:.3f}')
+
+
 if __name__ == '__main__':
-    test_07()
+    test_08()
