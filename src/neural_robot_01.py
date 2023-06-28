@@ -76,8 +76,8 @@ def train_model():
     max_n_epochs = num_entradas
     patience = int(max_n_epochs / 10)
 
-    print(f'n_steps = {n_steps}, tipo_vela = {tipo_vela}, n_samples_train = {n_samples_train} '
-          f'validation_split = {validation_split}')
+    print(f'n_steps = {n_steps}, tipo_vela = {tipo_vela}, n_samples_train = {n_samples_train}')
+    print(f'validation_split = {validation_split}, max_n_epochs = {max_n_epochs}, patience = {patience}')
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
