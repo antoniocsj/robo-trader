@@ -66,15 +66,15 @@ def train_model():
     timeframe = setup['timeframe']
     hist = HistMulti(directory=csv_dir)
 
-    n_steps = 2
+    n_steps = 16
     tipo_vela = 'OHLCV'
     n_samples_train = 60000  # 30000-M10, 60000-M5
     validation_split = 0.2
 
     n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela, timeframe)
     num_entradas = n_steps * n_cols
-    max_n_epochs = num_entradas * 3
-    patience = int(max_n_epochs / 10) * 2
+    max_n_epochs = num_entradas * 5
+    patience = int(max_n_epochs / 10)
 
     print(f'n_steps = {n_steps}, tipo_vela = {tipo_vela}, n_samples_train = {n_samples_train}')
     print(f'validation_split = {validation_split}, max_n_epochs = {max_n_epochs}, patience = {patience}')
@@ -96,6 +96,7 @@ def train_model():
     model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
+    model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse')
@@ -452,7 +453,7 @@ def test_model_with_trader():
 
         # _tp = 0.5
         # _sl = 0.5
-        # _k = 0.00050
+        # _k = 0.00020
         # if _tp <= trader.profit <= -_sl:
         #     trader.close_position()
         # else:
