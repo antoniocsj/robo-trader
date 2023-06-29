@@ -73,8 +73,8 @@ def train_model():
 
     n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela, timeframe)
     num_entradas = n_steps * n_cols
-    max_n_epochs = 1000
-    patience = int(max_n_epochs / 10)
+    max_n_epochs = num_entradas * 3
+    patience = int(max_n_epochs / 10) * 2
 
     print(f'n_steps = {n_steps}, tipo_vela = {tipo_vela}, n_samples_train = {n_samples_train}')
     print(f'validation_split = {validation_split}, max_n_epochs = {max_n_epochs}, patience = {patience}')
@@ -96,7 +96,7 @@ def train_model():
     model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
-    # model.add(Dense(5, activation='relu'))
+    model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse')
     model_config = model.get_config()
@@ -621,8 +621,8 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    test_models()
-    # train_model()
+    # test_models()
+    train_model()
     # calculate_model_bias()
     # test_model_with_trader()
     # test_model_with_trader_interactive()
