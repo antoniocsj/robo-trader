@@ -66,14 +66,14 @@ def train_model():
     timeframe = setup['timeframe']
     hist = HistMulti(directory=csv_dir)
 
-    n_steps = 16
+    n_steps = 2
     tipo_vela = 'OHLCV'
     n_samples_train = 60000  # 30000-M10, 60000-M5
-    validation_split = 0.2
+    validation_split = 0.5
 
     n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela, timeframe)
     num_entradas = n_steps * n_cols
-    max_n_epochs = num_entradas * 5
+    max_n_epochs = num_entradas
     patience = int(max_n_epochs / 10)
 
     print(f'n_steps = {n_steps}, tipo_vela = {tipo_vela}, n_samples_train = {n_samples_train}')
@@ -96,8 +96,8 @@ def train_model():
     model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
-    model.add(Dense(num_entradas, activation='relu'))
-    model.add(Dense(num_entradas, activation='relu'))
+    model.add(Dense(n_features, activation='relu'))
+    model.add(Dense(n_features, activation='relu'))
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse')
     model_config = model.get_config()
