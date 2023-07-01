@@ -113,45 +113,45 @@ class Sheet:
             return False
         else:
             self.current_row += 1
-            self.previous_close = self.df.iloc[self.current_row - 1]['<CLOSE>']
+            self.previous_close = self.df.iloc[self.current_row - 1]['CLOSE']
             if self.current_row == len(self.df) - 1:
                 self.is_on_the_last_row = True
             return True
 
     def go_to_next_day(self):
-        _date_prev = self.df.iloc[0]['<DATE>']
+        _date_prev = self.df.iloc[0]['DATE']
         df: DataFrame = self.df
         self.current_row += 1
 
         while True:
             row = df.iloc[self.current_row]
-            _date = row['<DATE>']
+            _date = row['DATE']
 
             if _date != _date_prev:
                 break
 
             _date_prev = _date
             self.current_row += 1
-            self.previous_close = self.df.iloc[self.current_row - 1]['<CLOSE>']
+            self.previous_close = self.df.iloc[self.current_row - 1]['CLOSE']
 
     def print_current_row(self):
         row = self.df.iloc[self.current_row]
-        _date, _time = row['<DATE>'], row['<TIME>']
-        _O, _H, _L, _C, _V = row['<OPEN>'], row['<HIGH>'], row['<LOW>'], row['<CLOSE>'], row['<TICKVOL>']
+        _date, _time = row['DATE'], row['TIME']
+        _O, _H, _L, _C, _V = row['OPEN'], row['HIGH'], row['LOW'], row['CLOSE'], row['TICKVOL']
         print(f'{self.symbol} {_date} {_time} (linha = {self.current_row}) '
               f'OHLCV = {_O} {_H} {_L} {_C} {_V}')
 
     def print_last_row(self):
         print(f'a última linha de {self.symbol}. ({len(self.df)} linhas)')
         row = self.df.iloc[-1]
-        _date, _time = row['<DATE>'], row['<TIME>']
-        _O, _H, _L, _C, _V = row['<OPEN>'], row['<HIGH>'], row['<LOW>'], row['<CLOSE>'], row['<TICKVOL>']
+        _date, _time = row['DATE'], row['TIME']
+        _O, _H, _L, _C, _V = row['OPEN'], row['HIGH'], row['LOW'], row['CLOSE'], row['TICKVOL']
         print(f'{self.symbol} {_date} {_time} OHLCV = {_O} {_H} {_L} {_C} {_V}')
 
     def get_datetime_last_row(self) -> datetime:
         row = self.df.iloc[-1]
-        _date = row['<DATE>'].replace('.', '-')
-        _time = row['<TIME>']
+        _date = row['DATE'].replace('.', '-')
+        _time = row['TIME']
         _date_time_str = f"{_date}T{_time}"
         _date_time = datetime.fromisoformat(_date_time_str)
 
@@ -255,8 +255,8 @@ class DirectoryCorrection:
         _date_time_list = []
         for s in self.sheets:
             row = s.df.iloc[0]
-            _date = row['<DATE>'].replace('.', '-')
-            _time = row['<TIME>']
+            _date = row['DATE'].replace('.', '-')
+            _time = row['TIME']
             _date_time_str = f"{_date}T{_time}"
             _date_time = datetime.fromisoformat(_date_time_str)
             _datetime_sheet_list.append((_date_time, s))
@@ -291,8 +291,8 @@ class DirectoryCorrection:
                 i = 0
                 while True:
                     row = s.df.iloc[i]
-                    _date = row['<DATE>'].replace('.', '-')
-                    _time = row['<TIME>']
+                    _date = row['DATE'].replace('.', '-')
+                    _time = row['TIME']
                     _date_time_str = f"{_date}T{_time}"
                     _date_time = datetime.fromisoformat(_date_time_str)
                     if _date_time == _highest_datetime_sheet[0]:
@@ -317,8 +317,8 @@ class DirectoryCorrection:
             i = 0
             while True:
                 row = s.df.iloc[i]
-                _date = row['<DATE>'].replace('.', '-')
-                _time = row['<TIME>']
+                _date = row['DATE'].replace('.', '-')
+                _time = row['TIME']
                 _date_time_str = f"{_date}T{_time}"
                 _date_time = datetime.fromisoformat(_date_time_str)
                 if _date_time == _highest_datetime_sheet[0]:
@@ -414,8 +414,8 @@ class DirectoryCorrection:
         _date_time_list = []
         for s in self.sheets:
             row = s.df.iloc[s.current_row]
-            _date = row['<DATE>'].replace('.', '-')
-            _time = row['<TIME>']
+            _date = row['DATE'].replace('.', '-')
+            _time = row['TIME']
             _date_time_str = f"{_date}T{_time}"
             _date_time = datetime.fromisoformat(_date_time_str)
             _datetime_sheet_list.append((_date_time, s))
@@ -435,8 +435,8 @@ class DirectoryCorrection:
         # então essa planilha sofrerá inserções de novas linhas até que esteja sincronizada.
         for s in self.sheets:
             _row = s.df.iloc[s.current_row]
-            _date = _row['<DATE>'].replace('.', '-')
-            _time = _row['<TIME>']
+            _date = _row['DATE'].replace('.', '-')
+            _time = _row['TIME']
             _date_time_str = f"{_date}T{_time}"
             _date_time = datetime.fromisoformat(_date_time_str)
 
@@ -445,7 +445,7 @@ class DirectoryCorrection:
                 print(f'{s.symbol} {_date_time} > {_lower_datetime} ({_lower_sheet.symbol}) '
                       f'(linha atual = {s.current_row}) (index_proc = {self.index_proc})')
                 _previous_row = s.df.iloc[s.current_row - 1]
-                _previous_close = _previous_row['<CLOSE>']
+                _previous_close = _previous_row['CLOSE']
 
                 # faz as inserções de novas linhas até _date_time. os datetime's das linhas inseridas
                 # começam em _lower_datetime e vão até (mas não incluindo) _date_time.
@@ -491,8 +491,8 @@ class DirectoryCorrection:
                 if i > len(s.df) - 1:
                     break
                 row = s.df.iloc[i]
-                _date = row['<DATE>'].replace('.', '-')
-                _time = row['<TIME>']
+                _date = row['DATE'].replace('.', '-')
+                _time = row['TIME']
                 _date_time_str = f"{_date}T{_time}"
                 _date_time = datetime.fromisoformat(_date_time_str)
                 _date_time_list.append(_date_time)
@@ -570,13 +570,13 @@ class DirectoryCorrection:
         if finished:
             s: Sheet = self.sheets[0]
             row = s.df.iloc[0]
-            _date = row['<DATE>'].replace('.', '-')
-            _time = row['<TIME>']
+            _date = row['DATE'].replace('.', '-')
+            _time = row['TIME']
             _datetime_start_str = f'{_date}T{_time}'
             self.cp['start'] = _datetime_start_str
             row = s.df.iloc[-1]
-            _date = row['<DATE>'].replace('.', '-')
-            _time = row['<TIME>']
+            _date = row['DATE'].replace('.', '-')
+            _time = row['TIME']
             _datetime_end_str = f'{_date}T{_time}'
             self.cp['end'] = _datetime_end_str
             _datetime_start_str = _datetime_start_str.replace('-', '').replace(':', '')
@@ -621,8 +621,8 @@ class DirectoryCorrection:
 
         for s in self.sheets:
             row = s.df.iloc[s.current_row]
-            _date = row['<DATE>'].replace('.', '-')
-            _time = row['<TIME>']
+            _date = row['DATE'].replace('.', '-')
+            _time = row['TIME']
             _datetime_str = f"{_date}T{_time}"
             _rows_set.add(s.current_row)
             _datetime_set.add(_datetime_str)
@@ -658,14 +658,14 @@ class DirectoryCorrection:
         for s in self.sheets:
             print(s.symbol)
             row = s.df.iloc[0]
-            _date = row['<DATE>'].replace('.', '-')
-            _time = row['<TIME>']
+            _date = row['DATE'].replace('.', '-')
+            _time = row['TIME']
             _datetime_str = f"{_date}T{_time}"
             _datetime_previous = datetime.fromisoformat(_datetime_str)
             for i in range(1, len(s.df)):
                 row = s.df.iloc[i]
-                _date = row['<DATE>'].replace('.', '-')
-                _time = row['<TIME>']
+                _date = row['DATE'].replace('.', '-')
+                _time = row['TIME']
                 _datetime_str = f"{_date}T{_time}"
                 _datetime_current = datetime.fromisoformat(_datetime_str)
                 if _datetime_current <= _datetime_previous:
