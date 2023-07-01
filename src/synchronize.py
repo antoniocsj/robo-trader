@@ -36,18 +36,8 @@ def synchronize(data: dict):
 
 
 def test_01():
-    data = read_json('request.json')
-
-    last_datetime = datetime.fromisoformat(data['last_datetime'])
-    trade_server_datetime = datetime.fromisoformat(data['trade_server_datetime'])
-    print(f'last_datetime = {last_datetime}, trade_server_datetime = {trade_server_datetime}')
-
-    timeframe = data['timeframe']
-    n_symbols = data['n_symbols']
-    rates_count = data['rates_count']
-    start_pos = data['start_pos']
-    print(f'timeframe = {timeframe}, n_symbols = {n_symbols}, '
-          f'rates_count = {rates_count}, start_pos = {start_pos} ')
+    data = read_json('request_0.json')
+    synchronize(data)
 
 
 if __name__ == '__main__':
