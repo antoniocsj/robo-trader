@@ -1,8 +1,5 @@
-from flask import Flask, request
 import json
 from datetime import datetime
-
-app = Flask(__name__)
 
 
 def write_json(_filename: str, _dict: dict):
@@ -16,11 +13,30 @@ def read_json(_filename: str) -> dict:
     return _dict
 
 
-@app.route('/', methods=['POST'])
-def make_prediction():
-    print('make_prediction()')
-    data = request.json
-    print(data)
+def synchronize(data: dict):
+    """
+    Sincroniza as velas.
+    :param data:
+    :return:
+    """
+    print('synchronize()')
+
+    last_datetime = datetime.fromisoformat(data['last_datetime'])
+    trade_server_datetime = datetime.fromisoformat(data['trade_server_datetime'])
+    print(f'last_datetime = {last_datetime}, trade_server_datetime = {trade_server_datetime}')
+
+    timeframe = data['timeframe']
+    n_symbols = data['n_symbols']
+    rates_count = data['rates_count']
+    start_pos = data['start_pos']
+    print(f'timeframe = {timeframe}, n_symbols = {n_symbols}, '
+          f'rates_count = {rates_count}, start_pos = {start_pos} ')
+    
+    pass
+
+
+def test_01():
+    data = read_json('request.json')
 
     last_datetime = datetime.fromisoformat(data['last_datetime'])
     trade_server_datetime = datetime.fromisoformat(data['trade_server_datetime'])
@@ -33,11 +49,6 @@ def make_prediction():
     print(f'timeframe = {timeframe}, n_symbols = {n_symbols}, '
           f'rates_count = {rates_count}, start_pos = {start_pos} ')
 
-    write_json('request.json', data)
-    d = read_json('request.json')
-
-    return "OK"
-
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000)
+    test_01()
