@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 from pandas import DataFrame
 import multiprocessing as mp
-from utils import get_list_sync_files
+from utils import get_list_sync_files, read_json
 
 
 def search_symbols_in_directory(directory: str, timeframe: str) -> list[str]:
@@ -731,18 +731,6 @@ def remove_sync_cp_files(_list_sync_files: list[str]):
             exit(-1)
 
 
-def load_setup():
-    _filename = 'setup.json'
-    _setup = {}
-    if os.path.exists(_filename):
-        with open('setup.json', 'r') as file:
-            _setup = json.load(file)
-        return _setup
-    else:
-        print(f'ERRO. Não foi encontrado o arquivo {_filename}')
-        exit(-1)
-
-
 def make_backup(src_dir: str, dst_dir: str):
     from utils import are_dir_trees_equal
 
@@ -823,7 +811,7 @@ def choose_n_procs_start(_n_symbols: int):
 
 
 def main():
-    setup = load_setup()
+    setup = read_json('setup.json')
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
     timeframe = setup['timeframe']

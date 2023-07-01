@@ -27,8 +27,12 @@ def write_json(_filename: str, _dict: dict):
 
 
 def read_json(_filename: str) -> dict:
-    with open(_filename, 'r') as file:
-        _dict = json.load(file)
+    if os.path.exists(_filename):
+        with open(_filename, 'r') as file:
+            _dict = json.load(file)
+    else:
+        print(f'ERRO. O arquivo {_filename} não foi encontrado.')
+        exit(-1)
     return _dict
 
 
