@@ -121,7 +121,7 @@ class Sheet:
         return _date_time
 
 
-class DirectoryCorrection:
+class DirectorySynchronization:
     """
     Realiza a correção/sincronização de todos os arquivos CSVs contidos no diretório indicado.
     Quando realiza inserções de linhas, faz do seguinte modo:
@@ -283,7 +283,7 @@ class DirectoryCorrection:
                     break
                 i += 1
 
-    def correct_directory(self):
+    def synchronize_directory(self):
         _len_symbols = len(self.symbols)
         if _len_symbols == 0:
             print('Não há arquivos para sincronizar.')
@@ -581,8 +581,8 @@ class DirectoryCorrection:
 
 
 def main():
-    dir_cor = DirectoryCorrection('../csv')
-    dir_cor.correct_directory()
+    dir_cor = DirectorySynchronization('../csv')
+    dir_cor.synchronize_directory()
     # dir_cor.check()
 
 
