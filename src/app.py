@@ -16,13 +16,16 @@ def make_prediction():
     data = request.json
     print(data)
 
-    print(data['last_datetime'])
-    _last_datetime = datetime.fromisoformat(data['last_datetime'])
-    print(f'last_datetime = {_last_datetime}')
+    last_datetime = datetime.fromisoformat(data['last_datetime'])
+    trade_server_datetime = datetime.fromisoformat(data['trade_server_datetime'])
+    print(f'last_datetime = {last_datetime}, trade_server_datetime = {trade_server_datetime}')
 
-    print(data['trade_server_datetime'])
-    _trade_server_datetime = datetime.fromisoformat(data['trade_server_datetime'])
-    print(f'trade_server_datetime = {_trade_server_datetime}')
+    timeframe = data['timeframe']
+    n_symbols = data['n_symbols']
+    rates_count = data['rates_count']
+    start_pos = data['start_pos']
+    print(f'timeframe = {timeframe}, n_symbols = {n_symbols}, '
+          f'rates_count = {rates_count}, start_pos = {start_pos} ')
 
     write_json('request.json', data)
     return "OK"
