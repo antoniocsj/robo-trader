@@ -21,6 +21,17 @@ class NpEncoder(json.JSONEncoder):
         return super(NpEncoder, self).default(obj)
 
 
+def write_json(_filename: str, _dict: dict):
+    with open(_filename, 'w') as file:
+        json.dump(_dict, file, indent=4)
+
+
+def read_json(_filename: str) -> dict:
+    with open(_filename, 'r') as file:
+        _dict = json.load(file)
+    return _dict
+
+
 # usada na GP
 def formar_entradas(arr: np.ndarray, index: int, _num_velas: int, _tipo_vela: str) -> list[float]:
     """
@@ -325,7 +336,7 @@ def calc_n_inputs(directory: str, tipo_vela: str, timeframe: str):
     count = 0
     symbols_names, symbols_paths = search_symbols(directory, timeframe)
     for s in symbols_names:
-        if s.endswith('@T') or s. endswith('@DT'):
+        if s.endswith('@T') or s.endswith('@DT'):
             count += 1
         else:
             count += len(tipo_vela)
@@ -485,7 +496,7 @@ def save_train_configs(_train_configs: dict):
 
 # usada nas criação de amostra de treinamento das redes neurais
 def prepare_train_data_multi_0(_hist: HistMulti, _symbol_out: str, _start_index: int,
-                             _num_velas: int, _tipo_vela: str) -> ndarray:
+                               _num_velas: int, _tipo_vela: str) -> ndarray:
     _data = []
     _timeframe = _hist.timeframe
     _symbol_tf_out = f'{_symbol_out}_{_timeframe}'

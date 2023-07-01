@@ -36,7 +36,8 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 tf.keras.utils.set_random_seed(1)
 
-from utils import denorm_close_price, save_train_configs, prepare_train_data_multi, split_sequences, calc_n_inputs
+from utils import denorm_close_price, save_train_configs, prepare_train_data_multi, split_sequences, calc_n_inputs, \
+    read_json, write_json
 
 
 # Multivariate CNN Models
@@ -57,8 +58,7 @@ from utils import denorm_close_price, save_train_configs, prepare_train_data_mul
 # We can demonstrate this with a simple example of two parallel input time series where the output series
 # is the simple addition of the input series.
 def train_model():
-    with open('setup.json', 'r') as file:
-        setup = json.load(file)
+    setup = read_json('setup.json')
     print(f'setup.json: {setup}')
 
     csv_dir = setup['csv_dir']
@@ -242,8 +242,7 @@ def train_model_return(setup: dict, hist: HistMulti, n_steps: int, tipo_vela: st
 
 
 def test_models():
-    with open('setup.json', 'r') as file:
-        setup = json.load(file)
+    setup = read_json('setup.json')
     print(f'setup.json: {setup}')
 
     csv_dir = setup['csv_dir']
@@ -291,8 +290,7 @@ def test_models():
 
 
 def evaluate_model():
-    with open('setup.json', 'r') as file:
-        setup = json.load(file)
+    setup = read_json('setup.json')
     print(f'setup.json: {setup}')
 
     csv_dir = setup['csv_dir']
@@ -324,8 +322,7 @@ def evaluate_model():
 
 
 def calculate_model_bias():
-    with open('setup.json', 'r') as file:
-        setup = json.load(file)
+    setup = read_json('setup.json')
     print(f'setup.json: {setup}')
 
     csv_dir = setup['csv_dir']
@@ -383,8 +380,7 @@ def calculate_model_bias():
 def test_model_with_trader():
     from TraderSimMultiNoPrints import TraderSimMulti
 
-    with open('setup.json', 'r') as file:
-        setup = json.load(file)
+    setup = read_json('setup.json')
     print(f'setup.json: {setup}')
 
     csv_dir = setup['csv_dir']
@@ -511,8 +507,7 @@ def test_model_with_trader():
 def test_model_with_trader_interactive():
     from TraderSimMultiNoPrints import TraderSimMulti
 
-    with open('setup.json', 'r') as file:
-        setup = json.load(file)
+    setup = read_json('setup.json')
     print(f'setup.json: {setup}')
 
     csv_dir = setup['csv_dir']

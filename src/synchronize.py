@@ -1,16 +1,6 @@
 import json
 from datetime import datetime
-
-
-def write_json(_filename: str, _dict: dict):
-    with open(_filename, 'w') as file:
-        json.dump(_dict, file, indent=4)
-
-
-def read_json(_filename: str) -> dict:
-    with open(_filename, 'r') as file:
-        _dict = json.load(file)
-    return _dict
+from utils import read_json, write_json
 
 
 def synchronize(data: dict):
