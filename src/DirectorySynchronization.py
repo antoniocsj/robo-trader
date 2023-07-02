@@ -585,8 +585,8 @@ def main():
     setup = read_json('setup.json')
     csv_dir = setup['csv_dir']
 
-    dir_cor = DirectorySynchronization(csv_dir)
-    dir_cor.synchronize_directory()
+    dir_sync = DirectorySynchronization(csv_dir)
+    dir_sync.synchronize_directory()
     # dir_cor.check()
 
 

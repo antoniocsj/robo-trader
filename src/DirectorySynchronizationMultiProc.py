@@ -858,13 +858,13 @@ def main():
             i_proc = i % n_procs
             symbols_to_sync_per_proc[i_proc].append(symbols[i])
 
-        dir_cor_l: list[DirectorySynchronization] = []
+        dir_sync_l: list[DirectorySynchronization] = []
         for i in range(n_procs):
-            dir_cor = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
-            dir_cor_l.append(dir_cor)
+            dir_sync = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
+            dir_sync_l.append(dir_sync)
 
         for i in range(n_procs):
-            pool.apply_async(dir_cor_l[i].synchronize_directory, args=(i,))
+            pool.apply_async(dir_sync_l[i].synchronize_directory, args=(i,))
         pool.close()
         pool.join()
     else:
@@ -907,13 +907,13 @@ def main():
                 for i in range(n_procs):
                     create_sync_cp_file(i, symbols_to_sync_per_proc[i], timeframe)
 
-                dir_cor_l: list[DirectorySynchronization] = []
+                dir_sync_l: list[DirectorySynchronization] = []
                 for i in range(n_procs):
-                    dir_cor = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
-                    dir_cor_l.append(dir_cor)
+                    dir_sync = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
+                    dir_sync_l.append(dir_sync)
 
                 for i in range(n_procs):
-                    pool.apply_async(dir_cor_l[i].synchronize_directory, args=(i,))
+                    pool.apply_async(dir_sync_l[i].synchronize_directory, args=(i,))
                 pool.close()
                 pool.join()
 
@@ -929,13 +929,13 @@ def main():
             for i in range(n_procs):
                 symbols_to_sync_per_proc[i] = get_symbols_to_sync(list_sync_files[i])
 
-            dir_cor_l: list[DirectorySynchronization] = []
+            dir_sync_l: list[DirectorySynchronization] = []
             for i in range(n_procs):
-                dir_cor = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
-                dir_cor_l.append(dir_cor)
+                dir_sync = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
+                dir_sync_l.append(dir_sync)
 
             for i in range(n_procs):
-                pool.apply_async(dir_cor_l[i].synchronize_directory, args=(i,))
+                pool.apply_async(dir_sync_l[i].synchronize_directory, args=(i,))
             pool.close()
             pool.join()
 
