@@ -1,9 +1,28 @@
 import os
 import json
+import shutil
 from datetime import datetime, timedelta
 import pandas as pd
 from pandas import DataFrame
 from utils import read_json
+
+
+def make_backup(src_dir: str, dst_dir: str):
+    from utils import are_dir_trees_equal
+
+    print(f'copiando os arquivos sincronizadoo para o diretório {dst_dir}')
+    if os.path.exists(dst_dir):
+        print(f'o diretório {dst_dir} já existe. será substituído.')
+        shutil.rmtree(dst_dir)
+    shutil.copytree(src_dir, dst_dir)
+    if are_dir_trees_equal(src_dir, dst_dir):
+        print('Backup efetuado e verificado com SUCESSO!')
+        # aproveita e copia o arquivo final de checkpoint de sincronização 'sync_cp.json' para dst_dir também
+        _sync_filename = 'sync_cp.json'
+        _sync_filepath_copy = f'{dst_dir}/{_sync_filename}'
+        shutil.copy(_sync_filename, _sync_filepath_copy)
+    else:
+        print('ERRO ao fazer o backup.')
 
 
 class Sheet:
@@ -276,6 +295,10 @@ class DirectorySynchronization:
                 i += 1
 
     def synchronize_directory(self):
+        setup = read_json('setup.json')
+        csv_dir = setup['csv_dir']
+        csv_s_dir = setup['csv_s_dir']
+
         _len_symbols = len(self.symbols)
         if _len_symbols == 0:
             print('Não há arquivos para sincronizar.')
@@ -289,7 +312,8 @@ class DirectorySynchronization:
             print(f'checkpoint carregado. linha atual = {_current_row}')
 
             if finished:
-                print(f'checkpoint indica que símbolos já estão sincronizados.')
+                print(f'o checkpoint indica que os símbolos já estão sincronizados.')
+                make_backup(csv_dir, csv_s_dir)
                 return
             else:
                 self.sheets_set_current_row(_current_row)
@@ -486,7 +510,7 @@ class DirectorySynchronization:
             s.current_row = _current_row
 
     def open_checkpoint(self):
-        _filename = f'sync_cp.json'
+        _filename = 'sync_cp.json'
         if os.path.exists(_filename):
             with open(_filename, 'r') as file:
                 self.cp = json.load(file)
@@ -525,7 +549,7 @@ class DirectorySynchronization:
         self.cp['n_symbols'] = len(self.symbols)
         self.cp['symbols_to_sync'] = self.symbols
 
-        _filename = f'sync_cp.json'
+        _filename = 'sync_cp.json'
         with open(_filename, 'w') as file:
             json.dump(self.cp, file, indent=4)
         print(f'checkpoint {_filename} gravado. linha atual = {_current_row}\n')

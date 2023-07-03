@@ -741,7 +741,7 @@ def make_backup(src_dir: str, dst_dir: str):
     shutil.copytree(src_dir, dst_dir)
     if are_dir_trees_equal(src_dir, dst_dir):
         print('Backup efetuado e verificado com SUCESSO!')
-        # aproveita e copia o arquivo final de checkpoint de sincronização 'sync_cp_0.pkl' para dst_dir também
+        # aproveita e copia o arquivo final de checkpoint de sincronização 'sync_cp_0.json' para dst_dir também
         _list = get_list_sync_files('.')
         _sync_filename = _list[0]
         _sync_filepath_copy = f'{dst_dir}/{_sync_filename}'
