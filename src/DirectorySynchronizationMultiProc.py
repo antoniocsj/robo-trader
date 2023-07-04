@@ -552,6 +552,8 @@ class DirectorySynchronization:
         self.cp['finished'] = finished
         self.cp['current_row'] = _current_row
         self.cp['timeframe'] = self.timeframe
+        self.cp['start'] = ''
+        self.cp['end'] = ''
 
         if finished:
             s: Sheet = self.sheets[0]
