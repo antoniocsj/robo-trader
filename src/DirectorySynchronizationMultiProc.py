@@ -119,43 +119,41 @@ class Sheet:
             return True
 
     def go_to_next_day(self):
-        _date_prev = self.df.iloc[0]['DATE']
+        _datetime_prev = self.df.iloc[0]['DATETIME']
         df: DataFrame = self.df
         self.current_row += 1
 
         while True:
             row = df.iloc[self.current_row]
-            _date = row['DATE']
+            _datetime = row['DATETIME']
 
-            if _date != _date_prev:
+            if _datetime != _datetime_prev:
                 break
 
-            _date_prev = _date
+            _datetime_prev = _datetime
             self.current_row += 1
             self.previous_close = self.df.iloc[self.current_row - 1]['CLOSE']
 
     def print_current_row(self):
         row = self.df.iloc[self.current_row]
-        _date, _time = row['DATE'], row['TIME']
+        _datetime = row['DATETIME']
         _O, _H, _L, _C, _V = row['OPEN'], row['HIGH'], row['LOW'], row['CLOSE'], row['TICKVOL']
-        print(f'{self.symbol} {_date} {_time} (linha = {self.current_row}) '
+        print(f'{self.symbol} {_datetime} (linha = {self.current_row}) '
               f'OHLCV = {_O} {_H} {_L} {_C} {_V}')
 
     def print_last_row(self):
         print(f'a última linha de {self.symbol}. ({len(self.df)} linhas)')
         row = self.df.iloc[-1]
-        _date, _time = row['DATE'], row['TIME']
+        _datetime = row['DATETIME']
         _O, _H, _L, _C, _V = row['OPEN'], row['HIGH'], row['LOW'], row['CLOSE'], row['TICKVOL']
-        print(f'{self.symbol} {_date} {_time} OHLCV = {_O} {_H} {_L} {_C} {_V}')
+        print(f'{self.symbol} {_datetime} OHLCV = {_O} {_H} {_L} {_C} {_V}')
 
     def get_datetime_last_row(self) -> datetime:
         row = self.df.iloc[-1]
-        _date = row['DATE'].replace('.', '-')
-        _time = row['TIME']
-        _date_time_str = f"{_date}T{_time}"
-        _date_time = datetime.fromisoformat(_date_time_str)
+        _datetime_str = row['DATETIME']
+        _datetime = datetime.fromisoformat(_datetime_str)
 
-        return _date_time
+        return _datetime
 
 
 class DirectorySynchronization:
@@ -252,19 +250,17 @@ class DirectorySynchronization:
         #  analisando a primeira linha de cada planilha.
         s: Sheet
         _datetime_sheet_list = []
-        _date_time_list = []
+        _datetime_list = []
         for s in self.sheets:
             row = s.df.iloc[0]
-            _date = row['DATE'].replace('.', '-')
-            _time = row['TIME']
-            _date_time_str = f"{_date}T{_time}"
-            _date_time = datetime.fromisoformat(_date_time_str)
-            _datetime_sheet_list.append((_date_time, s))
+            _datetime_str = row['DATETIME']
+            _datetime = datetime.fromisoformat(_datetime_str)
+            _datetime_sheet_list.append((_datetime, s))
 
-        _date_time_list = [t[0] for t in _datetime_sheet_list]
-        _date_time_set = set(_date_time_list)
+        _datetime_list = [t[0] for t in _datetime_sheet_list]
+        _datetime_set = set(_datetime_list)
 
-        if len(_date_time_set) == 1:
+        if len(_datetime_set) == 1:
             # todas as planilhas estão sincronizadas nesta linha.
             # se todas as planilhas começam na mesma data e horário, então apenas retorne.
             # pois todas as planilhas já tem o current_row ajustado para 0 inicialmente.
@@ -275,11 +271,11 @@ class DirectorySynchronization:
             return
 
         print('nem todas as planilhas começam na mesma data e horário.')
-        print(f'datas/horários encontrados na primeira linha de todas as planilhas: {_date_time_set}')
+        print(f'datas/horários encontrados na primeira linha de todas as planilhas: {_datetime_set}')
 
         # buscando uma nova linha que será o novo começo.
         # para que uma data ou horário sejam válidos, tem que estar presente em todas as planilhas.
-        # _highest_datetime = max(_date_time_set)
+        # _highest_datetime = max(_datetime_set)
         # _highest_datetime_sheet = max(_datetime_sheet_list)
         _highest_datetime_sheet = self._calc_max(_datetime_sheet_list)
 
@@ -291,16 +287,14 @@ class DirectorySynchronization:
                 i = 0
                 while True:
                     row = s.df.iloc[i]
-                    _date = row['DATE'].replace('.', '-')
-                    _time = row['TIME']
-                    _date_time_str = f"{_date}T{_time}"
-                    _date_time = datetime.fromisoformat(_date_time_str)
-                    if _date_time == _highest_datetime_sheet[0]:
+                    _datetime_str = row['DATETIME']
+                    _datetime = datetime.fromisoformat(_datetime_str)
+                    if _datetime == _highest_datetime_sheet[0]:
                         _counter += 1
-                        _candidates_list.append((_date_time, s))
+                        _candidates_list.append((_datetime, s))
                         break
-                    elif _date_time > _highest_datetime_sheet[0]:
-                        _candidates_list.append((_date_time, s))
+                    elif _datetime > _highest_datetime_sheet[0]:
+                        _candidates_list.append((_datetime, s))
                         break
                     i += 1
 
@@ -317,11 +311,9 @@ class DirectorySynchronization:
             i = 0
             while True:
                 row = s.df.iloc[i]
-                _date = row['DATE'].replace('.', '-')
-                _time = row['TIME']
-                _date_time_str = f"{_date}T{_time}"
-                _date_time = datetime.fromisoformat(_date_time_str)
-                if _date_time == _highest_datetime_sheet[0]:
+                _datetime_str = row['DATETIME']
+                _datetime = datetime.fromisoformat(_datetime_str)
+                if _datetime == _highest_datetime_sheet[0]:
                     s.df.drop(s.df.index[0:i], inplace=True)
                     s.df.sort_index(ignore_index=True, inplace=True)
                     s.df.reset_index(drop=True)
@@ -411,93 +403,87 @@ class DirectorySynchronization:
         # verifique se a linha atual de cada planilha contém a mesma data e horário.
         s: Sheet
         _datetime_sheet_list = []
-        _date_time_list = []
+        _datetime_list = []
         for s in self.sheets:
             row = s.df.iloc[s.current_row]
-            _date = row['DATE'].replace('.', '-')
-            _time = row['TIME']
-            _date_time_str = f"{_date}T{_time}"
-            _date_time = datetime.fromisoformat(_date_time_str)
-            _datetime_sheet_list.append((_date_time, s))
+            _datetime_str = row['DATETIME']
+            _datetime = datetime.fromisoformat(_datetime_str)
+            _datetime_sheet_list.append((_datetime, s))
 
-        _date_time_list = [t[0] for t in _datetime_sheet_list]
-        _date_time_set = set(_date_time_list)
-        if len(_date_time_set) == 1:
+        _datetime_list = [t[0] for t in _datetime_sheet_list]
+        _datetime_set = set(_datetime_list)
+        if len(_datetime_set) == 1:
             # todas as planilhas estão sincronizadas nesta linha.
             return
 
         # nem todas as planilhas estão sincronizadas nesta linha.
         # descubra qual planilha possui o menor 'datetime'.
-        # _lower_datetime = min(_date_time_list)
+        # _lower_datetime = min(_datetime_list)
         _lower_datetime_sheet = self._calc_min(_datetime_sheet_list)
 
         # o menor datetime será a referência. se alguma planilha tiver um datetime maior,
         # então essa planilha sofrerá inserções de novas linhas até que esteja sincronizada.
         for s in self.sheets:
             _row = s.df.iloc[s.current_row]
-            _date = _row['DATE'].replace('.', '-')
-            _time = _row['TIME']
-            _date_time_str = f"{_date}T{_time}"
-            _date_time = datetime.fromisoformat(_date_time_str)
+            _datetime_str = _row['DATETIME']
+            _datetime = datetime.fromisoformat(_datetime_str)
 
-            if _date_time > _lower_datetime_sheet[0]:
+            if _datetime > _lower_datetime_sheet[0]:
                 _lower_datetime, _lower_sheet = _lower_datetime_sheet[0], _lower_datetime_sheet[1]
-                print(f'{s.symbol} {_date_time} > {_lower_datetime} ({_lower_sheet.symbol}) '
+                print(f'{s.symbol} {_datetime} > {_lower_datetime} ({_lower_sheet.symbol}) '
                       f'(linha atual = {s.current_row}) (index_proc = {self.index_proc})')
                 _previous_row = s.df.iloc[s.current_row - 1]
                 _previous_close = _previous_row['CLOSE']
 
-                # faz as inserções de novas linhas até _date_time. os datetime's das linhas inseridas
-                # começam em _lower_datetime e vão até (mas não incluindo) _date_time.
-                _new_date_time = _lower_datetime
+                # faz as inserções de novas linhas até _datetime. os datetime's das linhas inseridas
+                # começam em _lower_datetime e vão até (mas não incluindo) _datetime.
+                _new_datetime = _lower_datetime
                 _index_start = s.current_row
                 _index_new_row = s.current_row - 0.5
 
-                while _new_date_time < _date_time:
-                    is_present = self.is_present_inother_sheets(_new_date_time,
+                while _new_datetime < _datetime:
+                    is_present = self.is_present_inother_sheets(_new_datetime,
                                                                 _lower_datetime_sheet[1].current_row,
                                                                 s.current_row)
                     if not is_present:
-                        _new_date_time += s.timedelta
+                        _new_datetime += s.timedelta
                         continue
 
-                    _index_new_row = self.insert_new_row(_index_new_row, _new_date_time,
+                    _index_new_row = self.insert_new_row(_index_new_row, _new_datetime,
                                                          _previous_close, s)
 
-                    _new_date_time += s.timedelta
+                    _new_datetime += s.timedelta
 
                 self.num_insertions_done += 1
                 s.current_row = _index_start
 
-    def insert_new_row(self, _index_new_row, _new_date_time, _previous_close, s):
+    def insert_new_row(self, _index_new_row, _new_datetime, _previous_close, s):
         # print(f'{s.symbol} inserindo nova linha {_new_date_time}')
-        _date = _new_date_time.strftime('%Y.%m.%d')
-        _time = _new_date_time.strftime('%H:%M')
+        _datetime = _new_datetime.strftime('%Y-%m-%dT%H:%M')
         _O = _H = _L = _C = _previous_close
         # insere a nova linha. que será uma vela com O=H=L=C igual a _previous_close e V=0
         # s.df.loc[_index_new_row] = [_date, _time, _O, _H, _L, _C, 0, 0, 0]
-        s.df.loc[_index_new_row] = [_date, _time, _O, _H, _L, _C, 0]
+        # s.df.loc[_index_new_row] = [_date, _time, _O, _H, _L, _C, 0]
+        s.df.loc[_index_new_row] = [_datetime, _O, _H, _L, _C, 0]
         s.df.sort_index(ignore_index=True, inplace=True)
         s.df.reset_index(drop=True)
         s.current_row += 1
         _index_new_row = s.current_row - 0.5
         return _index_new_row
 
-    def is_present_inother_sheets(self, _new_date_time, _nrow_start, _nrow_end):
+    def is_present_inother_sheets(self, _new_datetime, _nrow_start, _nrow_end):
         s: Sheet
-        _date_time_list = []
+        _datetime_list = []
         for s in self.sheets:
             for i in range(_nrow_start, _nrow_end + 1):
                 if i > len(s.df) - 1:
                     break
                 row = s.df.iloc[i]
-                _date = row['DATE'].replace('.', '-')
-                _time = row['TIME']
-                _date_time_str = f"{_date}T{_time}"
-                _date_time = datetime.fromisoformat(_date_time_str)
-                _date_time_list.append(_date_time)
+                _datetime_str = row['DATETIME']
+                _datetime = datetime.fromisoformat(_datetime_str)
+                _datetime_list.append(_datetime)
 
-        _ret = _new_date_time in _date_time_list
+        _ret = _new_datetime in _datetime_list
         return _ret
 
     def sheets_exclude_last_rows(self, current_row):
@@ -511,13 +497,13 @@ class DirectorySynchronization:
             s.current_row = s.df.index[-1]
 
     def check_sheets_last_row(self) -> bool:
-        _date_time_set = set()
+        _datetime_set = set()
         _len_set = set()
         s: Sheet
         for s in self.sheets:
-            _date_time_set.add(s.get_datetime_last_row())
+            _datetime_set.add(s.get_datetime_last_row())
             _len_set.add(len(s.df))
-        if len(_date_time_set) == 1 and len(_len_set) == 1:
+        if len(_datetime_set) == 1 and len(_len_set) == 1:
             print('as últimas linhas estão sincronizadas')
             return True
         else:
@@ -570,14 +556,10 @@ class DirectorySynchronization:
         if finished:
             s: Sheet = self.sheets[0]
             row = s.df.iloc[0]
-            _date = row['DATE'].replace('.', '-')
-            _time = row['TIME']
-            _datetime_start_str = f'{_date}T{_time}'
+            _datetime_start_str = row['DATETIME']
             self.cp['start'] = _datetime_start_str
             row = s.df.iloc[-1]
-            _date = row['DATE'].replace('.', '-')
-            _time = row['TIME']
-            _datetime_end_str = f'{_date}T{_time}'
+            _datetime_end_str = row['DATETIME']
             self.cp['end'] = _datetime_end_str
             _datetime_start_str = _datetime_start_str.replace('-', '').replace(':', '')
             _datetime_end_str = _datetime_end_str.replace('-', '').replace(':', '')
@@ -621,9 +603,7 @@ class DirectorySynchronization:
 
         for s in self.sheets:
             row = s.df.iloc[s.current_row]
-            _date = row['DATE'].replace('.', '-')
-            _time = row['TIME']
-            _datetime_str = f"{_date}T{_time}"
+            _datetime_str = row['DATETIME']
             _rows_set.add(s.current_row)
             _datetime_set.add(_datetime_str)
 
@@ -658,15 +638,11 @@ class DirectorySynchronization:
         for s in self.sheets:
             print(s.symbol)
             row = s.df.iloc[0]
-            _date = row['DATE'].replace('.', '-')
-            _time = row['TIME']
-            _datetime_str = f"{_date}T{_time}"
+            _datetime_str = row['DATETIME']
             _datetime_previous = datetime.fromisoformat(_datetime_str)
             for i in range(1, len(s.df)):
                 row = s.df.iloc[i]
-                _date = row['DATE'].replace('.', '-')
-                _time = row['TIME']
-                _datetime_str = f"{_date}T{_time}"
+                _datetime_str = row['DATETIME']
                 _datetime_current = datetime.fromisoformat(_datetime_str)
                 if _datetime_current <= _datetime_previous:
                     print(f'erro em {s.symbol} {_datetime_current}')
