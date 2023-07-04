@@ -696,7 +696,7 @@ def create_sync_cp_file(index_proc: int, _symbols_to_sync: list[str], timeframe:
 
     _filename = f'sync_cp_{index_proc}.json'
     with open(_filename, 'w') as file:
-        json.dump(_cp, file)
+        json.dump(_cp, file, indent=4)
     print(f'checkpoint {_filename} criado.')
 
 
