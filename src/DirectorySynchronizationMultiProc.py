@@ -589,7 +589,7 @@ class DirectorySynchronization:
 
         _filename = f'sync_cp_{index_proc}.json'
         with open(_filename, 'w') as file:
-            json.dump(self.cp, file)
+            json.dump(self.cp, file, indent=4)
         print(f'checkpoint {_filename} criado.\n')
 
     def all_sheets_datetime_synced_this_row(self):
