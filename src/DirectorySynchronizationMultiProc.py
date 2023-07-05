@@ -349,23 +349,46 @@ class DirectorySynchronization:
         _max_len = max(_len_list)
 
         # percorre todas as linhas de todas as planilhas.
-        _sheet_reached_the_end: Sheet = None
         while True:
             s: Sheet
-
-            if _sheet_reached_the_end:
-                print('a sincronização está concluída')
-                break
-
             self.insert_rows()
 
+            _list_s_r = []
+            _set_r = set()
             for s in self.sheets:
                 _r = s.go_to_next_row()
                 _current_row = s.current_row
-                if _r is False:
-                    _sheet_reached_the_end = s
-                    self.sheets_exclude_last_rows(s.current_row)
-                    break
+                _list_s_r.append((s, _r))
+                _set_r.add(_r)
+
+            # todas as planilhas avançaram para a próxima linha?
+            # se todas NÃO avançaram, então chegamos ao final da sincronização;
+            # se todas avançaram, basta continuar normalmente;
+            # pode ocorrer de algumas avançarem e outras não, isso significa que algumas chegaram no
+            # final precocemente. Nesse caso, as últimas deve receber novas linhas inseridas de modo a alcançarem
+            # as outras que avançaram.
+            if len(_set_r) == 1 and list(_set_r)[0] is False:
+                print('fim da sincronização.')
+                break
+            elif len(_set_r) == 2:
+                # crie 2 listas: uma de quem conseguiu avançar para a próxima linha e outra de quem não conseguiu.
+                _ss_managed_to_advance = []
+                _ss_failed_to_advance = []
+                for s, _r in _list_s_r:
+                    if _r is True:
+                        _ss_managed_to_advance.append(s)
+                    else:
+                        _ss_failed_to_advance.append(s)
+
+                # qual é a nova linha atual de quem conseguiu avançar para a próxima linha?
+                _new_current_row = _ss_managed_to_advance[0].current_row
+
+                # enquanto tiver planilhas que não conseguem avançar ao mesmo tempo que outras conseguem, então
+                # não estamos no final verdadeiro. as planilhas que não estão conseguindo avançar para a próxima linha
+                # estão tendo um final precoce. insira linhas no final delas até elas atingirem a mesma linha das
+                # outras que avançaram.
+                for s in _ss_failed_to_advance:
+                    self.append_rows_until(s, _new_current_row)
 
             if _current_row % 20000 == 0 and _current_row > 0:
                 self.save_sheets(print_row='current')
@@ -458,6 +481,14 @@ class DirectorySynchronization:
                 s.current_row = _index_start
 
     def insert_new_row(self, _index_new_row, _new_datetime, _previous_close, s):
+        """
+        Insere um nova linha no dataframe. insere no meio, não no final. Para adicionar no final use append_new_row.
+        :param _index_new_row:
+        :param _new_datetime:
+        :param _previous_close:
+        :param s:
+        :return:
+        """
         # print(f'{s.symbol} inserindo nova linha {_new_date_time}')
         _datetime = _new_datetime.strftime('%Y-%m-%dT%H:%M')
         _O = _H = _L = _C = _previous_close
@@ -469,6 +500,26 @@ class DirectorySynchronization:
         s.df.reset_index(drop=True)
         s.current_row += 1
         _index_new_row = s.current_row - 0.5
+        return _index_new_row
+
+    def append_new_row(self, _index_new_row, _new_datetime, _previous_close, s):
+        """
+        Adiciona uma nova linha no final.
+        :param _index_new_row:
+        :param _new_datetime:
+        :param _previous_close:
+        :param s:
+        :return:
+        """
+        # print(f'{s.symbol} inserindo nova linha {_new_date_time}')
+        _datetime = _new_datetime.strftime('%Y-%m-%dT%H:%M')
+        _O = _H = _L = _C = _previous_close
+        # insere a nova linha. que será uma vela com O=H=L=C igual a _previous_close e V=0
+        s.df.loc[_index_new_row] = [_datetime, _O, _H, _L, _C, 0]
+        s.df.sort_index(ignore_index=True, inplace=True)
+        s.df.reset_index(drop=True)
+        s.current_row += 1
+        _index_new_row = s.current_row + 0.5
         return _index_new_row
 
     def is_present_inother_sheets(self, _new_datetime, _nrow_start, _nrow_end):
@@ -649,6 +700,29 @@ class DirectorySynchronization:
                 if _datetime_current <= _datetime_previous:
                     print(f'erro em {s.symbol} {_datetime_current}')
                 _datetime_previous = _datetime_current
+
+    def append_rows_until(self, s: Sheet, _new_current_row: int):
+        _row = s.df.iloc[s.current_row]
+        _datetime_str = _row['DATETIME']
+        _datetime = datetime.fromisoformat(_datetime_str)
+
+        _previous_close = _row['CLOSE']
+
+        # faz as inserções de novas linhas até _datetime. os datetime's das linhas inseridas
+        # começam em _lower_datetime e vão até (mas não incluindo) _datetime.
+        _new_date_time = _datetime + s.timedelta
+        _index_new_row = s.current_row + 0.5
+
+        while s.current_row < _new_current_row:
+            is_present = self.is_present_inother_sheets(_new_date_time,
+                                                        s.current_row,
+                                                        _new_current_row)
+            if not is_present:
+                _new_date_time += s.timedelta
+                continue
+
+            _index_new_row = self.append_new_row(_index_new_row, _new_date_time, _previous_close, s)
+            _new_date_time += s.timedelta
 
 
 def get_sync_status(_filename: str):
