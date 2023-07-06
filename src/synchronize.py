@@ -1,6 +1,6 @@
 from datetime import datetime
 from utils import read_json
-from Sheet import SheetRates
+from Sheet import Sheet
 
 
 def search_symbols_in_dict(_dict: dict, timeframe: str) -> list[str]:
@@ -80,9 +80,9 @@ class SymbolsSynchronization:
     def load_sheets(self):
         for _symbol in self.symbols:
             d = self.symbols_rates[f'{_symbol}_{self.timeframe}']
-            self.sheets.append(SheetRates(d, _symbol, self.timeframe))
+            self.sheets.append(Sheet(d, _symbol, self.timeframe))
 
-    def check_is_trading(self, s: SheetRates):
+    def check_is_trading(self, s: Sheet):
         row = s.df.iloc[-1]
         _datetime_str = row['DATETIME']
         _datetime = datetime.fromisoformat(_datetime_str)
@@ -92,7 +92,7 @@ class SymbolsSynchronization:
             s.is_trading = False
 
     def synchronize_symbols(self):
-        s: SheetRates
+        s: Sheet
         print(f'server_datetime = {self.server_datetime}')
 
         # verificar quais símbolos estão (ou não) operando
