@@ -316,6 +316,10 @@ def search_symbols(directory: str, timeframe: str):
                 print(f'ERRO. o símbolo {_symbol} aparece repetido no mesmo diretório')
                 exit(-1)
 
+    if len(timeframes) == 0:
+        print(f'ERRO. Não foram encontrados símbolos válidos no diretório {directory}')
+        exit(-1)
+
     if len(timeframes) > 1:
         print(f'ERRO. Há mais de 1 timeframe no diretório {directory}')
         exit(-1)
