@@ -2,6 +2,7 @@ from datetime import datetime
 from utils import read_json
 from Sheet import Sheet
 from utils import search_symbols_in_dict
+from HistMulti import HistMulti
 
 
 class SymbolsSynchronization:
@@ -18,7 +19,7 @@ class SymbolsSynchronization:
         self.symbols = []
         self.timeframe = timeframe
         self.server_datetime = server_datetime
-        self.sheets = []
+        self.sheets = {}
         self.num_insertions_done = 0
         self.exclude_first_rows = False
         self.new_start_row_datetime: datetime = None
@@ -51,10 +52,16 @@ class SymbolsSynchronization:
 
         self.symbols = sorted(symbols)
 
+    # def load_sheets_(self):
+    #     for _symbol in self.symbols:
+    #         d = self.symbols_rates[f'{_symbol}_{self.timeframe}']
+    #         self.sheets.append(Sheet(d, _symbol, self.timeframe))
+
     def load_sheets(self):
         for _symbol in self.symbols:
-            d = self.symbols_rates[f'{_symbol}_{self.timeframe}']
-            self.sheets.append(Sheet(d, _symbol, self.timeframe))
+            key = f'{_symbol}_{self.timeframe}'
+            d = self.symbols_rates[key]
+            self.sheets[key] = Sheet(d, _symbol, self.timeframe)
 
     def check_is_trading(self, s: Sheet):
         row = s.df.iloc[-1]
@@ -70,11 +77,13 @@ class SymbolsSynchronization:
         print(f'server_datetime = {self.server_datetime}')
 
         # verificar quais símbolos estão (ou não) operando
-        for s in self.sheets:
+        for k in self.sheets:
+            s = self.sheets[k]
             self.check_is_trading(s)
             print(f'{s.symbol} is trading: {s.is_trading}')
 
-        for s in self.sheets:
+        for k in self.sheets:
+            s = self.sheets[k]
             if s.is_trading:
                 # se está operando, então descarte a vela em formação (última)
                 # e mantenha apenas as N (n_steps) últimas velas.
@@ -150,6 +159,7 @@ def synchronize(data: dict):
     n_steps = 2
     symb_sync = SymbolsSynchronization(symbols_rates, timeframe, trade_server_datetime, n_steps)
     symb_sync.synchronize_symbols()
+    hist = HistMulti(symb_sync.sheets, timeframe)
     pass
 
 
