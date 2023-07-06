@@ -1,33 +1,7 @@
 from datetime import datetime
 from utils import read_json
 from Sheet import Sheet
-
-
-def search_symbols_in_dict(_dict: dict, timeframe: str) -> list[str]:
-    """
-    Procurando pelos símbolos presentes num dicionário contendo velas de vários ativos.
-    Todos os arquivos devem ser do mesmo timeframe.
-    :return: lista dos símbolos
-    """
-    # passe por todos as chaves do dicionário e descubra o symbol e timeframe
-    symbols = []
-
-    for symbol_tf in _dict:
-        _symbol = symbol_tf.split('_')[0]
-        _timeframe = symbol_tf.split('_')[1]
-
-        if _symbol not in symbols:
-            symbols.append(_symbol)
-        else:
-            print(f'erro. o símbolo {_symbol} aparece repetido.')
-            exit(-1)
-
-        if _timeframe != timeframe:
-            print(f'ERRO. o timeframe {_timeframe} é diferente do especificado {timeframe}.')
-            exit(-1)
-
-    symbols = sorted(symbols)
-    return symbols
+from utils import search_symbols_in_dict
 
 
 class SymbolsSynchronization:
@@ -167,7 +141,7 @@ def synchronize(data: dict):
     symbols = search_symbols_in_dict(symbols_rates, timeframe)
     _len_symbols = len(symbols)
     if _len_symbols == 0:
-        print('ERRO. Não há símbolos a serem sincronizados.')
+        print('ERRO. Não foram encontrados símbolos no dicionário.')
         exit(-1)
     elif _len_symbols == 1:
         print('Há apenas 1 símbolo. Portanto, ele será considerado sincronizado.')

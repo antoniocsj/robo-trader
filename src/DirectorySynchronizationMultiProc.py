@@ -6,38 +6,7 @@ from datetime import datetime
 import multiprocessing as mp
 from utils import get_list_sync_files, read_json
 from Sheet import Sheet
-
-
-def search_symbols_in_directory(directory: str, timeframe: str) -> list[str]:
-    """
-    Procurando pelos símbolos presentes num diretório contendo arquivos csv.
-    Todos os arquivos devem ser do mesmo timeframe
-    :return: lista dos símbolos
-    """
-    # passe por todos os arquivos csv e descubra o symbol e timeframe
-    symbols = []
-    all_files = os.listdir(directory)
-
-    for filename in all_files:
-        if filename.endswith('.csv'):
-            _symbol = filename.split('_')[0]
-            _timeframe = filename.split('_')[1]
-            if _timeframe.endswith('.csv'):
-                _timeframe = _timeframe.replace('.csv', '')
-
-            if _symbol not in symbols:
-                symbols.append(_symbol)
-            else:
-                print(f'erro. o símbolo {_symbol} aparece repetido no mesmo diretório')
-                exit(-1)
-
-            if _timeframe != timeframe:
-                print(f'ERRO. timeframe {_timeframe} diferente do especificado {timeframe} foi '
-                      f'encontrado no diretório {directory}')
-                exit(-1)
-
-    symbols = sorted(symbols)
-    return symbols
+from utils import search_symbols_in_directory
 
 
 class DirectorySynchronization:

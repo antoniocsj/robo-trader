@@ -36,6 +36,65 @@ def read_json(_filename: str) -> dict:
     return _dict
 
 
+def search_symbols_in_directory(directory: str, timeframe: str) -> list[str]:
+    """
+    Procurando pelos símbolos presentes num diretório contendo arquivos csv.
+    Todos os arquivos devem ser do timeframe especificado.
+    :return: lista dos símbolos
+    """
+    # passe por todos os arquivos csv e descubra o symbol e timeframe
+    symbols = []
+    all_files = os.listdir(directory)
+
+    for filename in all_files:
+        if filename.endswith('.csv'):
+            _symbol = filename.split('_')[0]
+            _timeframe = filename.split('_')[1]
+            if _timeframe.endswith('.csv'):
+                _timeframe = _timeframe.replace('.csv', '')
+
+            if _symbol not in symbols:
+                symbols.append(_symbol)
+            else:
+                print(f'erro. o símbolo {_symbol} aparece repetido no mesmo diretório')
+                exit(-1)
+
+            if _timeframe != timeframe:
+                print(f'ERRO. timeframe {_timeframe} diferente do especificado {timeframe} foi '
+                      f'encontrado no diretório {directory}')
+                exit(-1)
+
+    symbols = sorted(symbols)
+    return symbols
+
+
+def search_symbols_in_dict(_dict: dict, timeframe: str) -> list[str]:
+    """
+    Procurando pelos símbolos presentes num dicionário contendo velas de vários ativos.
+    Todos os arquivos devem ser do mesmo timeframe.
+    :return: lista dos símbolos
+    """
+    # passe por todos as chaves do dicionário e descubra o symbol e timeframe
+    symbols = []
+
+    for symbol_tf in _dict:
+        _symbol = symbol_tf.split('_')[0]
+        _timeframe = symbol_tf.split('_')[1]
+
+        if _symbol not in symbols:
+            symbols.append(_symbol)
+        else:
+            print(f'erro. o símbolo {_symbol} aparece repetido.')
+            exit(-1)
+
+        if _timeframe != timeframe:
+            print(f'ERRO. o timeframe {_timeframe} é diferente do especificado {timeframe}.')
+            exit(-1)
+
+    symbols = sorted(symbols)
+    return symbols
+
+
 # usada na GP
 def formar_entradas(arr: np.ndarray, index: int, _num_velas: int, _tipo_vela: str) -> list[float]:
     """

@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 from Sheet import Sheet
-# sheets: list[SheetRates]
 
 
 class HistMulti:
@@ -176,7 +175,7 @@ if __name__ == '__main__':
 
     csv_dir = setup['csv_dir']
     symbol_out = setup['symbol_out']
-    _timeframe = setup['timeframe']
+    _tf = setup['timeframe']
 
-    hist = HistMulti(csv_dir, _timeframe)
+    hist = HistMulti(csv_dir, _tf)
     hist.print_hist()
