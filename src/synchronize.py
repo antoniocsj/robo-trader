@@ -42,6 +42,7 @@ class Sheet:
         self.previous_close = 0.0
         self.df: DataFrame = self.create_df_from_rates()
         self.is_on_the_last_row = False
+        self.is_trading = False
 
         if self.df.isnull().sum().values.sum() != 0:
             print(f'Há dados faltando no dataframe {symbol}_{timeframe}')
@@ -159,21 +160,23 @@ class Sheet:
 
 class SymbolsSynchronization:
     """
-    Realiza a correção/sincronização de todos os arquivos CSVs contidos no diretório indicado.
+    Realiza a correção/sincronização de todos os símbolos contidos no dicionário.
     Quando realiza inserções de linhas, faz do seguinte modo:
     - Obtém o valor de fechamento da última vela conhecida (C');
     - as velas inseridas terão O=H=L=C=C' e V=0;
     Todas as planilhas são sincronizadas simultaneamente em apenas 1 processo.
     """
 
-    def __init__(self, symbols_rates: dict, timeframe: str):
+    def __init__(self, symbols_rates: dict, timeframe: str, server_datetime: datetime, n_steps: int):
         self.symbols_rates = symbols_rates
         self.symbols = []
         self.timeframe = timeframe
+        self.server_datetime = server_datetime
         self.sheets = []
         self.num_insertions_done = 0
         self.exclude_first_rows = False
         self.new_start_row_datetime: datetime = None
+        self.n_steps = n_steps
 
         self.search_symbols()
         self.load_sheets()
@@ -207,8 +210,29 @@ class SymbolsSynchronization:
             d = self.symbols_rates[f'{_symbol}_{self.timeframe}']
             self.sheets.append(Sheet(d, _symbol, self.timeframe))
 
+    def check_is_trading(self, s: Sheet):
+        row = s.df.iloc[-1]
+        _datetime_str = row['DATETIME']
+        _datetime = datetime.fromisoformat(_datetime_str)
+        if _datetime + s.timedelta > self.server_datetime:
+            s.is_trading = True
+        else:
+            s.is_trading = False
+
     def synchronize_symbols(self):
-        pass
+        s: Sheet
+        print(f'server_datetime = {self.server_datetime}')
+
+        # verificar quais símbolos estão (ou não) operando
+        for s in self.sheets:
+            self.check_is_trading(s)
+            print(f'{s.symbol} is trading: {s.is_trading}')
+
+        # se está operando, então descarte a vela em formação (última)
+        # e obtenha as N (n_steps) últimas velas.
+        for s in self.sheets:
+            if s.is_trading:
+                pass
 
 
 def synchronize(data: dict):
@@ -221,13 +245,18 @@ def synchronize(data: dict):
 
     setup = read_json('setup.json')
     csv_dir = setup['csv_dir']
-    timeframe = setup['timeframe']
+    setup_timeframe = setup['timeframe']
 
     last_datetime = datetime.fromisoformat(data['last_datetime'])
     trade_server_datetime = datetime.fromisoformat(data['trade_server_datetime'])
     print(f'last_datetime = {last_datetime}, trade_server_datetime = {trade_server_datetime}')
 
     timeframe = data['timeframe']
+    if timeframe != setup_timeframe:
+        print(f'o timeframe da requisição ({timeframe}) é diferente do timeframe definido no arquivo '
+              f'setup.json ({setup_timeframe})')
+        exit(-1)
+
     n_symbols = data['n_symbols']
     rates_count = data['rates_count']
     start_pos = data['start_pos']
@@ -244,13 +273,14 @@ def synchronize(data: dict):
         print('Há apenas 1 símbolo. Portanto, ele será considerado sincronizado.')
         return
 
-    symb_sync = SymbolsSynchronization(symbols_rates, timeframe)
+    n_steps = 2
+    symb_sync = SymbolsSynchronization(symbols_rates, timeframe, trade_server_datetime, n_steps)
     symb_sync.synchronize_symbols()
     pass
 
 
 def test_01():
-    data = read_json('request_0.json')
+    data = read_json('request_3.json')
     synchronize(data)
 
 
