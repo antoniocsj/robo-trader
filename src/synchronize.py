@@ -228,11 +228,39 @@ class SymbolsSynchronization:
             self.check_is_trading(s)
             print(f'{s.symbol} is trading: {s.is_trading}')
 
-        # se está operando, então descarte a vela em formação (última)
-        # e obtenha as N (n_steps) últimas velas.
         for s in self.sheets:
             if s.is_trading:
-                pass
+                # se está operando, então descarte a vela em formação (última)
+                # e mantenha apenas as N (n_steps) últimas velas.
+                if len(s.df) < self.n_steps + 1:
+                    print(f'o tamanho da planilha {s.symbol} ({len(s.df)}) é menor do que n_steps + 1 '
+                          f'({self.n_steps + 1})')
+                    exit(-1)
+                s.df.drop(s.df.index[-1], inplace=True)
+                s.df.sort_index(ignore_index=True, inplace=True)
+                s.df.reset_index(drop=True)
+                s.df.drop(s.df.index[:-self.n_steps], inplace=True)
+                s.df.sort_index(ignore_index=True, inplace=True)
+                s.df.reset_index(drop=True)
+            else:
+                # se não está operando, então todas as vela são velas concluídas e antigas;
+                # mantenha apenas as (n_steps) últimas velas;
+                # obtenha o preço de fechamento da última vela (C') e aplique nos OHLCs da (n_steps) últimas velas;
+                if len(s.df) < self.n_steps:
+                    print(f'o tamanho da planilha {s.symbol} ({len(s.df)}) é menor do que n_steps '
+                          f'({self.n_steps})')
+                    exit(-1)
+                s.df.drop(s.df.index[:-self.n_steps], inplace=True)
+                s.df.sort_index(ignore_index=True, inplace=True)
+                s.df.reset_index(drop=True)
+
+                _close = s.df.iloc[-1]['CLOSE']
+                for i in range(self.n_steps - 1, -1, -1):
+                    s.df.loc[i, 'OPEN'] = _close
+                    s.df.loc[i, 'HIGH'] = _close
+                    s.df.loc[i, 'LOW'] = _close
+                    s.df.loc[i, 'CLOSE'] = _close
+                    s.df.loc[i, 'TICKVOL'] = 0
 
 
 def synchronize(data: dict):
