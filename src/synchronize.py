@@ -1,7 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from utils import read_json
-import pandas as pd
-from pandas import DataFrame
+from Sheet import SheetRates
 
 
 def search_symbols_in_dict(_dict: dict, timeframe: str) -> list[str]:
@@ -29,84 +28,6 @@ def search_symbols_in_dict(_dict: dict, timeframe: str) -> list[str]:
 
     symbols = sorted(symbols)
     return symbols
-
-
-class Sheet:
-    def __init__(self, rates: list, symbol: str, timeframe: str):
-        print(f'criando planilha para {symbol}_{timeframe}')
-        self.rates = rates
-        self.symbol = symbol
-        self.timeframe = timeframe
-        self.timedelta: timedelta = self.get_timedelta()
-        self.current_row = 0
-        self.previous_close = 0.0
-        self.df: DataFrame = self.create_df_from_rates()
-        self.is_on_the_last_row = False
-        self.is_trading = False
-
-        if self.df.isnull().sum().values.sum() != 0:
-            print(f'Há dados faltando no dataframe {symbol}_{timeframe}')
-            exit(-1)
-
-    def create_df_from_rates(self) -> pd.DataFrame:
-        _df: pd.DataFrame
-        _list_ = []
-        for rate in self.rates:
-            _row = [rate['DATETIME'], rate['OPEN'], rate['HIGH'], rate['LOW'], rate['CLOSE'], rate['TICKVOL']]
-            _list_.append(_row)
-        _df = pd.DataFrame(_list_)
-        _df.columns = ['DATETIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'TICKVOL']
-        return _df
-
-    def get_timedelta(self) -> timedelta:
-        tf = self.timeframe
-        ret: timedelta
-
-        if tf == 'M1':
-            ret = timedelta(minutes=1)
-        elif tf == 'M2':
-            ret = timedelta(minutes=2)
-        elif tf == 'M3':
-            ret = timedelta(minutes=3)
-        elif tf == 'M4':
-            ret = timedelta(minutes=4)
-        elif tf == 'M5':
-            ret = timedelta(minutes=5)
-        elif tf == 'M6':
-            ret = timedelta(minutes=6)
-        elif tf == 'M10':
-            ret = timedelta(minutes=10)
-        elif tf == 'M12':
-            ret = timedelta(minutes=12)
-        elif tf == 'M15':
-            ret = timedelta(minutes=15)
-        elif tf == 'M20':
-            ret = timedelta(minutes=20)
-        elif tf == 'M30':
-            ret = timedelta(minutes=30)
-        elif tf == 'H1':
-            ret = timedelta(hours=1)
-        elif tf == 'H2':
-            ret = timedelta(hours=2)
-        elif tf == 'H3':
-            ret = timedelta(hours=3)
-        elif tf == 'H4':
-            ret = timedelta(hours=4)
-        elif tf == 'H6':
-            ret = timedelta(hours=6)
-        elif tf == 'H8':
-            ret = timedelta(hours=8)
-        elif tf == 'H12':
-            ret = timedelta(hours=12)
-        elif tf == 'D1':
-            ret = timedelta(days=1)
-        elif tf == 'W1':
-            ret = timedelta(weeks=1)
-        else:
-            print('erro. get_timedelta. timeframe inválido.')
-            exit(-1)
-
-        return ret
 
 
 class SymbolsSynchronization:
@@ -159,9 +80,9 @@ class SymbolsSynchronization:
     def load_sheets(self):
         for _symbol in self.symbols:
             d = self.symbols_rates[f'{_symbol}_{self.timeframe}']
-            self.sheets.append(Sheet(d, _symbol, self.timeframe))
+            self.sheets.append(SheetRates(d, _symbol, self.timeframe))
 
-    def check_is_trading(self, s: Sheet):
+    def check_is_trading(self, s: SheetRates):
         row = s.df.iloc[-1]
         _datetime_str = row['DATETIME']
         _datetime = datetime.fromisoformat(_datetime_str)
@@ -171,7 +92,7 @@ class SymbolsSynchronization:
             s.is_trading = False
 
     def synchronize_symbols(self):
-        s: Sheet
+        s: SheetRates
         print(f'server_datetime = {self.server_datetime}')
 
         # verificar quais símbolos estão (ou não) operando

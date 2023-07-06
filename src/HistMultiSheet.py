@@ -1,12 +1,11 @@
 import os
-import csv
-import numpy as np
 import pandas as pd
 from pandas import DataFrame
+from Sheet import SheetRates
 
 
-class HistMulti:
-    def __init__(self, sheets: list):
+class HistMultiSheet:
+    def __init__(self, sheets: list[SheetRates]):
         self.sheets = sheets  # diretório onde se encontra os arquivos csv
         self.all_files = []
         self.csv_files = {}  # guarda os nomes dos arquivos csv conforme seu 'simbolo' e 'timeframe'
