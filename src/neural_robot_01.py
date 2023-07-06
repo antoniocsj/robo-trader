@@ -64,7 +64,7 @@ def train_model():
     csv_dir = setup['csv_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
-    hist = HistMulti(directory=csv_dir)
+    hist = HistMulti(csv_dir, timeframe)
 
     if hist.timeframe != timeframe:
         print(f'o timeframe do diretório {csv_dir} ({hist.timeframe}) é diferente do timeframe especificado '
@@ -254,7 +254,7 @@ def test_models():
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
 
-    hist = HistMulti(directory=csv_dir)
+    hist = HistMulti(csv_dir, timeframe)
     n_steps = 2
     tipo_vela = 'OHLCV'
     n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela, timeframe)
@@ -299,7 +299,8 @@ def evaluate_model():
     print(f'setup.json: {setup}')
 
     csv_dir = setup['csv_dir']
-    hist = HistMulti(directory=csv_dir)
+    timeframe = setup['timeframe']
+    hist = HistMulti(csv_dir, timeframe)
 
     with open("train_configs.json", "r") as file:
         train_configs = json.load(file)
@@ -331,7 +332,8 @@ def calculate_model_bias():
     print(f'setup.json: {setup}')
 
     csv_dir = setup['csv_dir']
-    hist = HistMulti(directory=csv_dir)
+    timeframe = setup['timeframe']
+    hist = HistMulti(csv_dir, timeframe)
 
     with open("train_configs.json", "r") as file:
         train_configs = json.load(file)
@@ -389,7 +391,8 @@ def test_model_with_trader():
     print(f'setup.json: {setup}')
 
     csv_dir = setup['csv_dir']
-    hist = HistMulti(directory=csv_dir)
+    timeframe = setup['timeframe']
+    hist = HistMulti(csv_dir, timeframe)
 
     with open("train_configs.json", "r") as file:
         train_configs = json.load(file)
@@ -516,7 +519,8 @@ def test_model_with_trader_interactive():
     print(f'setup.json: {setup}')
 
     csv_dir = setup['csv_dir']
-    hist = HistMulti(directory=csv_dir)
+    timeframe = setup['timeframe']
+    hist = HistMulti(csv_dir, timeframe)
 
     with open("train_configs.json", "r") as file:
         train_configs = json.load(file)

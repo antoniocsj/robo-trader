@@ -195,15 +195,15 @@ def test_08():
     csv_dir = setup['csv_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
-    hist = HistMulti(directory=csv_dir)
+    hist = HistMulti(csv_dir, timeframe)
 
     pairs = list(it.combinations(hist.symbols, 2))
     _set = set()
     corr_min_abs = 0.9
     for symbol_a, symbol_b in pairs:
-        data1: ndarray = hist.arr[f'{symbol_a}_{timeframe}'][:, 5]
+        data1: ndarray = hist.arr[f'{symbol_a}_{timeframe}'][:, 4]
         _data1 = data1.tolist()
-        data2: ndarray = hist.arr[f'{symbol_b}_{timeframe}'][:, 5]
+        data2: ndarray = hist.arr[f'{symbol_b}_{timeframe}'][:, 4]
         _data2 = data2.tolist()
         pearsons_corr, _ = pearsonr(_data1, _data2)
         spearmans_corr, _ = spearmanr(_data1, _data2)

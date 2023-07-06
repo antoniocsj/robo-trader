@@ -4,6 +4,7 @@ import pickle
 import numpy as np
 from HistMulti import HistMulti
 from sklearn.preprocessing import MinMaxScaler
+from utils import read_json
 
 
 def denorm_close_price(_c, trans: MinMaxScaler):
@@ -13,12 +14,16 @@ def denorm_close_price(_c, trans: MinMaxScaler):
 
 
 class TraderSimMulti:
-    dir_csv = '../csv'
+    def __init__(self, initial_deposit: float):
+        setup = read_json('setup.json')
+        # print(f'setup.json: {setup}')
 
-    def __init__(self, initial_deposit: float) -> None:
+        csv_dir = setup['csv_dir']
+        timeframe = setup['timeframe']
+
         self.symbols = []  # financial assets
-        self.timeframe = ''
-        self.hist = HistMulti(TraderSimMulti.dir_csv)
+        self.timeframe = timeframe
+        self.hist = HistMulti(csv_dir, timeframe)
         self.open_position = ('', '')
         self.candlestick_count = 0  # contagem de velas desde a abertura da posição
         self.max_candlestick_count = 5  # contagem máxima permitida de velas desde a abertura da posição
