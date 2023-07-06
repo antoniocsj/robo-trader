@@ -66,9 +66,14 @@ def train_model():
     timeframe = setup['timeframe']
     hist = HistMulti(directory=csv_dir)
 
+    if hist.timeframe != timeframe:
+        print(f'o timeframe do diretório {csv_dir} ({hist.timeframe}) é diferente do timeframe especificado '
+              f'em setup.json ({timeframe})')
+        exit(-1)
+
     n_steps = 2
     tipo_vela = 'OHLCV'
-    n_samples_train = 60000  # 30000-M10, 60000-M5
+    n_samples_train = 500  # 30000-M10, 60000-M5
     validation_split = 0.5
 
     n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela, timeframe)
@@ -616,7 +621,7 @@ def show_tf():
 
 
 if __name__ == '__main__':
-    show_tf()
+    # show_tf()
     # test_models()
     train_model()
     # calculate_model_bias()

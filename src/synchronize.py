@@ -6,7 +6,7 @@ from pandas import DataFrame
 
 def search_symbols_in_dict(_dict: dict, timeframe: str) -> list[str]:
     """
-    Procurando pelos símbolos presentes num diretório contendo arquivos csv.
+    Procurando pelos símbolos presentes num dicionário contendo velas de vários ativos.
     Todos os arquivos devem ser do mesmo timeframe.
     :return: lista dos símbolos
     """
@@ -107,55 +107,6 @@ class Sheet:
             exit(-1)
 
         return ret
-
-    def go_to_next_row(self):
-        if self.current_row == len(self.df) - 1:
-            return False
-        else:
-            self.current_row += 1
-            self.previous_close = self.df.iloc[self.current_row - 1]['CLOSE']
-            if self.current_row == len(self.df) - 1:
-                self.is_on_the_last_row = True
-            return True
-
-    def go_to_next_day(self):
-        _date_prev = self.df.iloc[0]['DATE']
-        df: DataFrame = self.df
-        self.current_row += 1
-
-        while True:
-            row = df.iloc[self.current_row]
-            _date = row['DATE']
-
-            if _date != _date_prev:
-                break
-
-            _date_prev = _date
-            self.current_row += 1
-            self.previous_close = self.df.iloc[self.current_row - 1]['CLOSE']
-
-    def print_current_row(self):
-        row = self.df.iloc[self.current_row]
-        _date, _time = row['DATE'], row['TIME']
-        _O, _H, _L, _C, _V = row['OPEN'], row['HIGH'], row['LOW'], row['CLOSE'], row['TICKVOL']
-        print(f'{self.symbol} {_date} {_time} (linha = {self.current_row}) '
-              f'OHLCV = {_O} {_H} {_L} {_C} {_V}')
-
-    def print_last_row(self):
-        print(f'a última linha de {self.symbol}. ({len(self.df)} linhas)')
-        row = self.df.iloc[-1]
-        _date, _time = row['DATE'], row['TIME']
-        _O, _H, _L, _C, _V = row['OPEN'], row['HIGH'], row['LOW'], row['CLOSE'], row['TICKVOL']
-        print(f'{self.symbol} {_date} {_time} OHLCV = {_O} {_H} {_L} {_C} {_V}')
-
-    def get_datetime_last_row(self) -> datetime:
-        row = self.df.iloc[-1]
-        _date = row['DATE'].replace('.', '-')
-        _time = row['TIME']
-        _date_time_str = f"{_date}T{_time}"
-        _date_time = datetime.fromisoformat(_date_time_str)
-
-        return _date_time
 
 
 class SymbolsSynchronization:
