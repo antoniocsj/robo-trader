@@ -1,4 +1,7 @@
 import json
+import pickle
+
+import numpy as np
 from numpy import ndarray
 from datetime import datetime
 from Sheet import Sheet
@@ -6,6 +9,7 @@ from HistMulti import HistMulti
 from utils_filesystem import read_json
 from utils_symbols import search_symbols_in_dict
 from utils_nn import prepare_data_for_prediction
+from utils_ops import denorm_close_price, normalize_symbols
 
 
 class SymbolsSynchronization:
@@ -194,27 +198,43 @@ def synchronize(data: dict) -> ndarray:
     # ainda pode faltar a normalização ou outras operações antes de usar os dados históricos no modelo para previsão.
     # depende do setup usado.
 
-    x_input = prepare_data_for_prediction(hist, n_steps, tipo_vela)
-    x_input = x_input.reshape((1, n_steps, n_features))
+    # supondo que foi usado o setup_01, apenas normalizar todos os símbolos.
+    # deve-se usar o mesmo objeto MinMaxScaler que foi usado na normalização do conjunto de treinamento.
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+    normalize_symbols(hist, scalers)
 
-    return x_input
+    X = prepare_data_for_prediction(hist, n_steps, tipo_vela)
+    X = np.asarray(X).astype(np.float32)
+    X = X.reshape((1, n_steps, n_features))
+
+    return X
 
 
 def test_01():
     from keras.models import load_model
 
+    setup = read_json('setup.json')
+    symbol_out = setup['symbol_out']
+    timeframe = setup['timeframe']
+    _symbol_tf = f'{symbol_out}_{timeframe}'
+
     with open("train_configs.json", "r") as file:
         train_configs = json.load(file)
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
 
     data = read_json('request_3.json')
     x_input = synchronize(data)
 
     model = load_model('model.h5')
-
     close_pred_norm = model.predict(x_input)
 
     bias = train_configs['bias']
-    # close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, trans)
+    scaler = scalers[_symbol_tf]
+    close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, scaler)
+    pass
 
 
 if __name__ == '__main__':

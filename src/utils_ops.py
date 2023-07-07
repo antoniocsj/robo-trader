@@ -1,3 +1,4 @@
+from typing import Any
 import numpy as np
 import pandas as pd
 import pickle
@@ -38,6 +39,22 @@ def normalize_directory(directory: str):
 
     print(f'todos os símbolos do diretório {directory} foram normalizados.')
     print('o arquivo scalers.pkl, que guarda as informações da normalização, foi salvo.')
+
+
+def normalize_symbols(hist: HistMulti, scalers: dict):
+    for _symbol in hist.symbols:
+        print(_symbol)
+        _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
+        arr = hist.arr[_symbol_timeframe]
+        data = arr[:, 1:6]
+        scaler = scalers[_symbol_timeframe]
+        data = scaler.transform(data)
+        dataf = pd.DataFrame(data)
+        dataf.insert(0, 0, arr[:, 0], True)
+        dataf.columns = range(dataf.columns.size)
+        hist.arr[_symbol_timeframe] = dataf.to_numpy(copy=True)
+
+    print(f'todos os símbolos de {type(hist)} foram normalizados.')
 
 
 def denormalize__directory(directory: str):

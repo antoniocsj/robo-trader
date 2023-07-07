@@ -101,6 +101,13 @@ class HistMulti:
         else:
             print('os dados históricos não foram carregados ainda.')
 
+    def update_sheets(self):
+        """
+        Atualia o dicionários self.sheets para refletir os dados de self.arr
+        :return:
+        """
+        pass
+
 
 class HistMultiOriginal:
     def __init__(self, directory: str):
