@@ -52,7 +52,7 @@ def denormalize__directory(directory: str):
     for _symbol in hist.symbols:
         _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
         arr = hist.arr[_symbol_timeframe]
-        data = arr[:, 2:7]
+        data = arr[:, 1:6]
         trans: MinMaxScaler = scalers[_symbol_timeframe]
         data_inv = trans.inverse_transform(data)
         print(f'{_symbol} {data_inv[0]}')
@@ -72,11 +72,10 @@ def differentiate_directory(directory: str):
         print(_symbol)
         _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
         arr = hist.arr[_symbol_timeframe]
-        data = arr[:, 2:7]
+        data = arr[:, 1:6]
         data = np.diff(data, axis=0)
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[1:, 0], True)
-        dataf.insert(1, 1, arr[1:, 1], True)
         dataf.columns = range(dataf.columns.size)
         _filepath = hist.get_csv_filepath(_symbol_timeframe)
         dataf.to_csv(_filepath, index=False, sep='\t')
@@ -91,11 +90,10 @@ def differentiate_files(filepath_list: list[str], directory: str):
         print(_filepath)
         df: pd.DataFrame = pd.read_csv(_filepath, sep='\t')
         arr = df.to_numpy()
-        data = arr[:, 2:7]
+        data = arr[:, 1:6]
         data = np.diff(data, axis=0)
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[1:, 0], True)
-        dataf.insert(1, 1, arr[1:, 1], True)
         dataf.columns = range(dataf.columns.size)
         dataf.to_csv(_filepath, index=False, sep='\t')
 
@@ -115,11 +113,10 @@ def transform_directory(directory: str, transform_str: str):
             print(_symbol)
             _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
             arr = hist.arr[_symbol_timeframe]
-            data = (arr[:, 5] - arr[:, 2]) * arr[:, 6]
+            data = (arr[:, 4] - arr[:, 1]) * arr[:, 5]
             data = np.reshape(data, (len(data), 1))
             dataf = pd.DataFrame(data)
             dataf.insert(0, 0, arr[:, 0], True)
-            dataf.insert(1, 1, arr[:, 1], True)
             dataf.columns = range(dataf.columns.size)
             _filepath = hist.get_csv_filepath(_symbol_timeframe)
             dataf.to_csv(_filepath, index=False, sep='\t')
@@ -128,11 +125,10 @@ def transform_directory(directory: str, transform_str: str):
             print(_symbol)
             _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
             arr = hist.arr[_symbol_timeframe]
-            data = arr[:, 5] * arr[:, 6]
+            data = arr[:, 4] * arr[:, 5]
             data = np.reshape(data, (len(data), 1))
             dataf = pd.DataFrame(data)
             dataf.insert(0, 0, arr[:, 0], True)
-            dataf.insert(1, 1, arr[:, 1], True)
             dataf.columns = range(dataf.columns.size)
             _filepath = hist.get_csv_filepath(_symbol_timeframe)
             dataf.to_csv(_filepath, index=False, sep='\t')
@@ -151,11 +147,10 @@ def transform_files(filepath_list: list[str], directory: str, transform_str: str
             print(_filepath)
             df: pd.DataFrame = pd.read_csv(_filepath, sep='\t')
             arr = df.to_numpy()
-            data = (arr[:, 5] - arr[:, 2]) * arr[:, 6]
+            data = (arr[:, 4] - arr[:, 1]) * arr[:, 5]
             data = np.reshape(data, (len(data), 1))
             dataf = pd.DataFrame(data)
             dataf.insert(0, 0, arr[:, 0], True)
-            dataf.insert(1, 1, arr[:, 1], True)
             dataf.columns = range(dataf.columns.size)
             dataf.to_csv(_filepath, index=False, sep='\t')
     else:
