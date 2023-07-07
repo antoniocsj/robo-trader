@@ -1,4 +1,5 @@
 import json
+from numpy import ndarray
 from datetime import datetime
 from Sheet import Sheet
 from HistMulti import HistMulti
@@ -120,11 +121,18 @@ class SymbolsSynchronization:
                     s.df.loc[i, 'TICKVOL'] = 0
 
 
-def synchronize(data: dict):
+def synchronize(data: dict) -> ndarray:
     """
-    Sincroniza as velas.
-    :param data:
-    :return:
+    Prepara os dados históricos para seu uso no modelo (rede neural). Faz todos os ajustes necessários para retornar
+    um array pronto para ser apresentado ao modelo para obter uma previsão.
+    Entre os ajustes estão a remoção de todos os símbolos desnessários, pois a requisição pode possuir um conjunto de
+    símbolos maior do que aquele que foi usado no treinamento da rede neural.
+    Outro ajuste importante é a remoção da última vela que pode estar em formação, no caso dos símbolos que estão
+    operando.
+    Outro ajuste é feito nas velas dos símbolos que não estão operando. Nessas velas é feito O=H=L=C=C' e V=0.
+    Também deverá ser implementada a sincronização de todos os símbolos.
+    :param data: dados históricos provenientes de uma requisição feita pelo MT5.
+    :return: array pronto para ser aplicado no modelo
     """
     print('synchronize()')
 
@@ -187,17 +195,26 @@ def synchronize(data: dict):
     # depende do setup usado.
 
     x_input = prepare_data_for_prediction(hist, n_steps, tipo_vela)
-
     x_input = x_input.reshape((1, n_steps, n_features))
-    # close_pred_norm = model.predict(x_input)
-    # close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, trans)
 
-    pass
+    return x_input
 
 
 def test_01():
+    from keras.models import load_model
+
+    with open("train_configs.json", "r") as file:
+        train_configs = json.load(file)
+
     data = read_json('request_3.json')
-    synchronize(data)
+    x_input = synchronize(data)
+
+    model = load_model('model.h5')
+
+    close_pred_norm = model.predict(x_input)
+
+    bias = train_configs['bias']
+    # close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, trans)
 
 
 if __name__ == '__main__':
