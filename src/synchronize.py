@@ -4,7 +4,7 @@ from Sheet import Sheet
 from HistMulti import HistMulti
 from utils_filesystem import read_json
 from utils_symbols import search_symbols_in_dict
-from utils_nn import prepare_train_data_multi, split_sequences
+from utils_nn import prepare_eval_data_multi
 
 
 class SymbolsSynchronization:
@@ -176,9 +176,7 @@ def synchronize(data: dict):
     n_samples_train = train_configs['n_samples_train']
     tipo_vela = train_configs['tipo_vela']
 
-    dataset_test = prepare_train_data_multi(hist, symbol_out, 0, 1, tipo_vela)
-    X_, y_ = split_sequences(dataset_test, n_steps)
-    print(X_.shape, y_.shape)
+    dataset_test = prepare_eval_data_multi(hist, symbol_out, 0, n_steps, tipo_vela)
     pass
 
 
