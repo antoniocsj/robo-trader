@@ -19,7 +19,7 @@ from scoop import futures
 
 # -------------------------------------------------------------------
 from TraderSimNoPrints import TraderSim
-from utils import formar_entradas, renameArguments
+from utils_gp import formar_entradas, renameArguments
 
 # configurações para a programação genética
 n_population = 500

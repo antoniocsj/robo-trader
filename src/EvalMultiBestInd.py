@@ -15,7 +15,7 @@ from scoop import futures
 # -------------------------------------------------------------------
 # from TraderSim import TraderSim
 from TraderSimMultiNoPrints import TraderSimMulti
-from utils import formar_entradas_multi
+from utils_gp import formar_entradas_multi
 from GPMultiTradeExp import candlesticks_quantity as candlesticks_quantity_train
 from GPMultiTradeExp import num_velas_anteriores as num_velas_anteriores_train
 from GPMultiTradeExp import tipo_vela as tipo_vela_train

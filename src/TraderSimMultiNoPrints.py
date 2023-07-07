@@ -4,7 +4,7 @@ import pickle
 import numpy as np
 from HistMulti import HistMulti
 from sklearn.preprocessing import MinMaxScaler
-from utils import read_json
+from utils_filesystem import read_json
 
 
 def denorm_close_price(_c, trans: MinMaxScaler):

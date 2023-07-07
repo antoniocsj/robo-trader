@@ -1,49 +1,10 @@
-import json
 import os
-import csv
 from typing import Any
-
-import numpy as np
 import pandas as pd
 from pandas import DataFrame
 from Sheet import Sheet
-
-
-def read_json(_filename: str) -> dict:
-    if os.path.exists(_filename):
-        with open(_filename, 'r') as file:
-            _dict = json.load(file)
-    else:
-        print(f'ERRO. O arquivo {_filename} não foi encontrado.')
-        exit(-1)
-    return _dict
-
-
-def search_symbols_in_dict(_dict: dict, timeframe: str) -> list[str]:
-    """
-    Procurando pelos símbolos presentes num dicionário contendo velas de vários ativos.
-    Todos os arquivos devem ser do mesmo timeframe.
-    :return: lista dos símbolos
-    """
-    # passe por todos as chaves do dicionário e descubra o symbol e timeframe
-    symbols = []
-
-    for symbol_tf in _dict:
-        _symbol = symbol_tf.split('_')[0]
-        _timeframe = symbol_tf.split('_')[1]
-
-        if _symbol not in symbols:
-            symbols.append(_symbol)
-        else:
-            print(f'erro. o símbolo {_symbol} aparece repetido.')
-            exit(-1)
-
-        if _timeframe != timeframe:
-            print(f'ERRO. o timeframe {_timeframe} é diferente do especificado {timeframe}.')
-            exit(-1)
-
-    symbols = sorted(symbols)
-    return symbols
+from utils_filesystem import read_json
+from utils_symbols import search_symbols_in_dict
 
 
 class HistMulti:

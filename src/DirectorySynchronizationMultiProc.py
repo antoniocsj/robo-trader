@@ -4,9 +4,9 @@ import math
 import json
 from datetime import datetime
 import multiprocessing as mp
-from utils import get_list_sync_files, read_json
+from utils_filesystem import get_list_sync_files, read_json, are_dir_trees_equal
+from utils_symbols import search_symbols_in_directory
 from Sheet import Sheet
-from utils import search_symbols_in_directory
 
 
 class DirectorySynchronization:
@@ -637,8 +637,6 @@ def remove_sync_cp_files(_list_sync_files: list[str]):
 
 
 def make_backup(src_dir: str, dst_dir: str):
-    from utils import are_dir_trees_equal
-
     print(f'copiando os arquivos sincronizadoo para o diretório {dst_dir}')
     if os.path.exists(dst_dir):
         print(f'o diretório {dst_dir} já existe. será substituído.')

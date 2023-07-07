@@ -1,16 +1,9 @@
 import os
 import pickle
-
-import numpy as np
 from HistMulti import HistMulti
 from sklearn.preprocessing import MinMaxScaler
-from utils import read_json
-
-
-def denorm_close_price(_c, trans: MinMaxScaler):
-    c_denorm = trans.inverse_transform(np.array([0, 0, 0, _c, 0], dtype=object).reshape(1, -1))
-    c_denorm = c_denorm[0][3]
-    return c_denorm
+from utils_filesystem import read_json
+from utils_ops import denorm_close_price
 
 
 class TraderSimMulti:

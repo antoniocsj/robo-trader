@@ -15,7 +15,7 @@ from scoop import futures
 # -------------------------------------------------------------------
 # from TraderSim import TraderSim
 from TraderSimNoPrints import TraderSim
-from utils import formar_entradas
+from utils_gp import formar_entradas
 from GPTradeExp import symbol as symbol_train
 from GPTradeExp import timeframe as timeframe_train
 from GPTradeExp import candlesticks_quantity as candlesticks_quantity_train

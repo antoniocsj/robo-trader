@@ -2,13 +2,11 @@ import os
 import json
 import shutil
 from datetime import datetime
-from utils import read_json
+from utils_filesystem import read_json, are_dir_trees_equal
 from Sheet import Sheet
 
 
 def make_backup(src_dir: str, dst_dir: str):
-    from utils import are_dir_trees_equal
-
     print(f'copiando os arquivos sincronizadoo para o diretório {dst_dir}')
     if os.path.exists(dst_dir):
         print(f'o diretório {dst_dir} já existe. será substituído.')
