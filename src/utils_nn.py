@@ -163,19 +163,17 @@ def split_sequences(sequences, n_steps):
 
 
 # usada nas criação de amostra de treinamento das redes neurais
-def prepare_eval_data_multi(_hist: HistMulti, _symbol_out: str, _start_index: int,
-                            _num_velas: int, _tipo_vela: str) -> ndarray:
+def prepare_data_for_prediction(_hist: HistMulti, _num_velas: int, _tipo_vela: str) -> ndarray:
     _data = []
     _timeframe = _hist.timeframe
-    _symbol_tf_out = f'{_symbol_out}_{_timeframe}'
 
     if _tipo_vela == 'C':
         for _symbol in _hist.symbols:
             _symbol_timeframe = f'{_symbol}_{_timeframe}'
             if _hist.arr[_symbol_timeframe].shape[1] == 2:
-                _data_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 1]
+                _data_in = _hist.arr[_symbol_timeframe][0:_num_velas][:, 1]
             else:
-                _data_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 4]
+                _data_in = _hist.arr[_symbol_timeframe][0:_num_velas][:, 4]
             _data_in = _data_in.reshape(len(_data_in), 1)
             if len(_data) == 0:
                 _data = _data_in
@@ -185,10 +183,10 @@ def prepare_eval_data_multi(_hist: HistMulti, _symbol_out: str, _start_index: in
         for _symbol in _hist.symbols:
             _symbol_timeframe = f'{_symbol}_{_timeframe}'
             if _hist.arr[_symbol_timeframe].shape[1] == 2:
-                _data_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 1]
+                _data_in = _hist.arr[_symbol_timeframe][0:_num_velas][:, 1]
                 _data_in = _data_in.reshape(len(_data_in), 1)
             else:
-                _data_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 4:6]
+                _data_in = _hist.arr[_symbol_timeframe][0:_num_velas][:, 4:6]
             if len(_data) == 0:
                 _data = _data_in
             else:
@@ -197,10 +195,10 @@ def prepare_eval_data_multi(_hist: HistMulti, _symbol_out: str, _start_index: in
         for _symbol in _hist.symbols:
             _symbol_timeframe = f'{_symbol}_{_timeframe}'
             if _hist.arr[_symbol_timeframe].shape[1] == 2:
-                _data_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 1]
+                _data_in = _hist.arr[_symbol_timeframe][0:_num_velas][:, 1]
                 _data_in = _data_in.reshape(len(_data_in), 1)
             else:
-                _data_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 1:5]
+                _data_in = _hist.arr[_symbol_timeframe][0:_num_velas][:, 1:5]
             if len(_data) == 0:
                 _data = _data_in
             else:
@@ -209,10 +207,10 @@ def prepare_eval_data_multi(_hist: HistMulti, _symbol_out: str, _start_index: in
         for _symbol in _hist.symbols:
             _symbol_timeframe = f'{_symbol}_{_timeframe}'
             if _hist.arr[_symbol_timeframe].shape[1] == 2:
-                _data_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 1]
+                _data_in = _hist.arr[_symbol_timeframe][0:_num_velas][:, 1]
                 _data_in = _data_in.reshape(len(_data_in), 1)
             else:
-                _data_in = _hist.arr[_symbol_timeframe][_start_index:_start_index + _num_velas][:, 1:6]
+                _data_in = _hist.arr[_symbol_timeframe][0:_num_velas][:, 1:6]
             if len(_data) == 0:
                 _data = _data_in
             else:

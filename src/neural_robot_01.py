@@ -161,8 +161,8 @@ def train_model():
                      'n_samples_test': n_samples_test,
                      'test_loss_eval': test_loss_eval,
                      'losses': losses,
-                     'model_config': model_config,
                      'symbols': hist.symbols,
+                     'model_config': model_config,
                      'history': history.history,
                      'bias': 0.0}
 
@@ -243,7 +243,8 @@ def train_model_return(setup: dict, hist: HistMulti, n_steps: int, tipo_vela: st
                      'layer_type': list(layer_type),
                      'whole_set_train_loss_eval': whole_set_train_loss_eval,
                      'n_samples_test': n_samples_test,
-                     'test_loss_eval': test_loss_eval}
+                     'test_loss_eval': test_loss_eval,
+                     'symbols': hist.symbols}
 
     return train_configs
 
@@ -536,7 +537,7 @@ def test_model_with_trader_interactive():
     n_samples_train = train_configs['n_samples_train']
     bias = train_configs['bias']
     tipo_vela = train_configs['tipo_vela']
-    n_samples_test = 1500
+    n_samples_test = 500
     samples_index_start = n_samples_train
 
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
@@ -629,7 +630,7 @@ def show_tf():
 if __name__ == '__main__':
     # show_tf()
     # test_models()
-    train_model()
+    # train_model()
     # calculate_model_bias()
-    # test_model_with_trader()
+    test_model_with_trader()
     # test_model_with_trader_interactive()

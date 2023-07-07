@@ -4,7 +4,7 @@ from Sheet import Sheet
 from HistMulti import HistMulti
 from utils_filesystem import read_json
 from utils_symbols import search_symbols_in_dict
-from utils_nn import prepare_eval_data_multi
+from utils_nn import prepare_data_for_prediction
 
 
 class SymbolsSynchronization:
@@ -151,18 +151,7 @@ def synchronize(data: dict):
 
     symbols_rates = data['symbols_rates']
     symbols = search_symbols_in_dict(symbols_rates, timeframe)
-    _len_symbols = len(symbols)
-    if _len_symbols == 0:
-        print('ERRO. Não foram encontrados símbolos no dicionário.')
-        exit(-1)
-    elif _len_symbols == 1:
-        print('Há apenas 1 símbolo. Portanto, ele será considerado sincronizado.')
-        return
-
-    n_steps = 2
-    symb_sync = SymbolsSynchronization(symbols_rates, timeframe, trade_server_datetime, n_steps)
-    symb_sync.synchronize_symbols()
-    hist = HistMulti(symb_sync.sheets, timeframe)
+    symbols_present_in_the_request = set(symbols)
 
     with open("train_configs.json", "r") as file:
         train_configs = json.load(file)
@@ -173,10 +162,36 @@ def synchronize(data: dict):
     n_steps = train_configs['n_steps']
     n_features = train_configs['n_features']
     symbol_out = train_configs['symbol_out']
+    symbols_used_in_training = set(train_configs['symbols'])
     n_samples_train = train_configs['n_samples_train']
     tipo_vela = train_configs['tipo_vela']
 
-    dataset_test = prepare_eval_data_multi(hist, symbol_out, 0, n_steps, tipo_vela)
+    # verifique se os símbolos usados no treinamento da rede neural estão presentes na requisição
+    if symbols_used_in_training.issubset(symbols_present_in_the_request):
+        # faça um novo symbols_rates contendo apenas os símbolos presentes no treinamento
+        _new_symbol_rates = {}
+        symbols_used_in_training = train_configs['symbols']  # use a lista, pois é garantido que está ordenada.
+        for _symbol in symbols_used_in_training:
+            key = f'{_symbol}_{timeframe}'
+            _new_symbol_rates[key] = symbols_rates[key]
+        symbols_rates = _new_symbol_rates
+    else:
+        print(f'ERRO. Nem todos os símbolos usados no treinamento da rede neural estão presentes na requisição.')
+        exit(-1)
+
+    symb_sync = SymbolsSynchronization(symbols_rates, timeframe, trade_server_datetime, n_steps)
+    symb_sync.synchronize_symbols()
+    hist = HistMulti(symb_sync.sheets, timeframe)
+
+    # ainda pode faltar a normalização ou outras operações antes de usar os dados históricos no modelo para previsão.
+    # depende do setup usado.
+
+    x_input = prepare_data_for_prediction(hist, n_steps, tipo_vela)
+
+    x_input = x_input.reshape((1, n_steps, n_features))
+    # close_pred_norm = model.predict(x_input)
+    # close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, trans)
+
     pass
 
 
