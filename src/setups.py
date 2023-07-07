@@ -3,9 +3,10 @@ import shutil
 import json
 
 import pandas as pd
-
-from utils import get_list_sync_files, load_sync_cp_file, search_symbols, \
-    differentiate_directory, normalize_directory, transform_directory, differentiate_files, transform_files
+from utils_filesystem import get_list_sync_files, load_sync_cp_file
+from utils_symbols import search_symbols
+from utils_ops import differentiate_directory, normalize_directory, transform_directory, differentiate_files, \
+    transform_files
 
 
 # As funções 'setup' buscam automatizar parte do trabalho feita na configuração e preparação de um experimento

@@ -274,7 +274,7 @@ class TraderSimMulti:
         :param _index:
         :return:
         """
-        close_price_col = 5
+        close_price_col = 4
         _symbol = f'{_symbol}_{self.timeframe}'
         _c = self.hist.arr[_symbol][_index, close_price_col]
 

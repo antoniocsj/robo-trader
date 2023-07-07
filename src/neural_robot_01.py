@@ -35,6 +35,7 @@ from keras.models import load_model
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 tf.keras.utils.set_random_seed(1)
+
 from utils_nn import prepare_train_data_multi, split_sequences
 from utils_filesystem import read_json, save_train_configs
 from utils_ops import denorm_close_price
@@ -132,7 +133,7 @@ def train_model():
     print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
 
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
-    n_samples_test = 1500
+    n_samples_test = 500
     samples_index_start = n_samples_train
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
 
@@ -315,7 +316,7 @@ def evaluate_model():
     n_samples_train = train_configs['n_samples_train']
     tipo_vela = train_configs['tipo_vela']
 
-    n_samples_test = 1000
+    n_samples_test = 500
     samples_index_start = n_samples_train
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
 
@@ -407,7 +408,7 @@ def test_model_with_trader():
     n_samples_train = train_configs['n_samples_train']
     bias = train_configs['bias']
     tipo_vela = train_configs['tipo_vela']
-    n_samples_test = 1500
+    n_samples_test = 500
     samples_index_start = n_samples_train
 
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
@@ -628,7 +629,7 @@ def show_tf():
 if __name__ == '__main__':
     # show_tf()
     # test_models()
-    train_model()
+    # train_model()
     # calculate_model_bias()
-    # test_model_with_trader()
+    test_model_with_trader()
     # test_model_with_trader_interactive()

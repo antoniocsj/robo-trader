@@ -23,12 +23,11 @@ def normalize_directory(directory: str):
         print(_symbol)
         _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
         arr = hist.arr[_symbol_timeframe]
-        data = arr[:, 2:7]
+        data = arr[:, 1:6]
         trans = MinMaxScaler()
         data = trans.fit_transform(data)
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[:, 0], True)
-        dataf.insert(1, 1, arr[:, 1], True)
         dataf.columns = range(dataf.columns.size)
         _filepath = hist.get_csv_filepath(_symbol_timeframe)
         dataf.to_csv(_filepath, index=False, sep='\t')

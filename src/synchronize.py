@@ -1,8 +1,10 @@
+import json
 from datetime import datetime
-from utils_filesystem import read_json
-from utils_symbols import search_symbols_in_dict
 from Sheet import Sheet
 from HistMulti import HistMulti
+from utils_filesystem import read_json
+from utils_symbols import search_symbols_in_dict
+from utils_nn import prepare_train_data_multi, split_sequences
 
 
 class SymbolsSynchronization:
@@ -128,6 +130,7 @@ def synchronize(data: dict):
 
     setup = read_json('setup.json')
     csv_dir = setup['csv_dir']
+    symbol_out = setup['symbol_out']
     setup_timeframe = setup['timeframe']
 
     last_datetime = datetime.fromisoformat(data['last_datetime'])
@@ -160,6 +163,22 @@ def synchronize(data: dict):
     symb_sync = SymbolsSynchronization(symbols_rates, timeframe, trade_server_datetime, n_steps)
     symb_sync.synchronize_symbols()
     hist = HistMulti(symb_sync.sheets, timeframe)
+
+    with open("train_configs.json", "r") as file:
+        train_configs = json.load(file)
+
+    print(f'train_configs:')
+    print(f'{train_configs}')
+
+    n_steps = train_configs['n_steps']
+    n_features = train_configs['n_features']
+    symbol_out = train_configs['symbol_out']
+    n_samples_train = train_configs['n_samples_train']
+    tipo_vela = train_configs['tipo_vela']
+
+    dataset_test = prepare_train_data_multi(hist, symbol_out, 0, 1, tipo_vela)
+    X_, y_ = split_sequences(dataset_test, n_steps)
+    print(X_.shape, y_.shape)
     pass
 
 
