@@ -162,7 +162,7 @@ def split_sequences(sequences, n_steps):
     return np.array(X), np.array(y)
 
 
-# usada nas criação de amostra de treinamento das redes neurais
+# usada nas preparação dos dados históricos de entrada da rede neural para previsão
 def prepare_data_for_prediction(_hist: HistMulti, _num_velas: int, _tipo_vela: str) -> ndarray:
     _data = []
     _timeframe = _hist.timeframe

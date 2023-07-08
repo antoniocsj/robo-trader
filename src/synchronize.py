@@ -12,13 +12,13 @@ from utils_nn import prepare_data_for_prediction
 from utils_ops import denorm_close_price, normalize_symbols
 
 
-class SymbolsSynchronization:
+class SymbolsPreparation:
     """
-    Realiza a correção/sincronização de todos os símbolos contidos no dicionário.
+    Realiza a preparação/correção/sincronização de todos os símbolos contidos no dicionário.
     Quando realiza inserções de linhas, faz do seguinte modo:
     - Obtém o valor de fechamento da última vela conhecida (C');
     - as velas inseridas terão O=H=L=C=C' e V=0;
-    Todas as planilhas são sincronizadas simultaneamente em apenas 1 processo.
+    Todas as planilhas são preparadas/sincronizadas simultaneamente em apenas 1 processo.
     """
 
     def __init__(self, symbols_rates: dict, timeframe: str, server_datetime: datetime, n_steps: int):
@@ -79,15 +79,21 @@ class SymbolsSynchronization:
         else:
             s.is_trading = False
 
-    def synchronize_symbols(self):
+    def prepare_symbols(self):
         s: Sheet
         print(f'server_datetime = {self.server_datetime}')
 
         # verificar quais símbolos estão (ou não) operando
-        for k in self.sheets:
-            s = self.sheets[k]
+        _who_is_trading = []
+        for s in list(self.sheets.values()):
             self.check_is_trading(s)
             print(f'{s.symbol} is trading: {s.is_trading}')
+            if s.is_trading:
+                _who_is_trading.append(s.symbol)
+
+        if len(_who_is_trading) == 0:
+            print('nenhum símbolo está operando agora.')
+            exit(-1)
 
         for k in self.sheets:
             s = self.sheets[k]
@@ -125,7 +131,7 @@ class SymbolsSynchronization:
                     s.df.loc[i, 'TICKVOL'] = 0
 
 
-def synchronize(data: dict) -> ndarray:
+def prepare_data(data: dict) -> ndarray:
     """
     Prepara os dados históricos para seu uso no modelo (rede neural). Faz todos os ajustes necessários para retornar
     um array pronto para ser apresentado ao modelo para obter uma previsão.
@@ -138,7 +144,7 @@ def synchronize(data: dict) -> ndarray:
     :param data: dados históricos provenientes de uma requisição feita pelo MT5.
     :return: array pronto para ser aplicado no modelo
     """
-    print('synchronize()')
+    print('prepare_data()')
 
     setup = read_json('setup.json')
     csv_dir = setup['csv_dir']
@@ -191,8 +197,8 @@ def synchronize(data: dict) -> ndarray:
         print(f'ERRO. Nem todos os símbolos usados no treinamento da rede neural estão presentes na requisição.')
         exit(-1)
 
-    symb_sync = SymbolsSynchronization(symbols_rates, timeframe, trade_server_datetime, n_steps)
-    symb_sync.synchronize_symbols()
+    symb_sync = SymbolsPreparation(symbols_rates, timeframe, trade_server_datetime, n_steps)
+    symb_sync.prepare_symbols()
     hist = HistMulti(symb_sync.sheets, timeframe)
 
     # ainda pode faltar a normalização ou outras operações antes de usar os dados históricos no modelo para previsão.
@@ -226,7 +232,7 @@ def test_01():
         scalers = pickle.load(file)
 
     data = read_json('request_3.json')
-    x_input = synchronize(data)
+    x_input = prepare_data(data)
 
     model = load_model('model.h5')
     close_pred_norm = model.predict(x_input)

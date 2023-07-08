@@ -1,4 +1,4 @@
-from typing import Any
+from numpy import ndarray
 import numpy as np
 import pandas as pd
 import pickle
@@ -7,10 +7,16 @@ from sklearn.preprocessing import MinMaxScaler
 from utils_filesystem import read_json
 
 
-def denorm_close_price(_c, trans: MinMaxScaler):
-    c_denorm = trans.inverse_transform(np.array([0, 0, 0, _c, 0], dtype=object).reshape(1, -1))
+def denorm_close_price(_c, scaler: MinMaxScaler):
+    c_denorm = scaler.inverse_transform(np.array([0, 0, 0, _c, 0], dtype=object).reshape(1, -1))
     c_denorm = c_denorm[0][3]
     return c_denorm
+
+
+def denorm_output_array(_a: ndarray, scaler: MinMaxScaler) -> ndarray:
+    output = scaler.inverse_transform(_a)
+    output = output[0]
+    return output
 
 
 def normalize_directory(directory: str):
@@ -23,16 +29,21 @@ def normalize_directory(directory: str):
     for _symbol in hist.symbols:
         print(_symbol)
         _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
-        arr = hist.arr[_symbol_timeframe]
-        data = arr[:, 1:6]
-        trans = MinMaxScaler()
-        data = trans.fit_transform(data)
+
+        arr: ndarray = hist.arr[_symbol_timeframe]
+        if arr.shape[1] == 2:
+            data = arr[:, 1]
+        else:
+            data = arr[:, 1:6]
+        
+        scaler = MinMaxScaler()
+        data = scaler.fit_transform(data)
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[:, 0], True)
         dataf.columns = range(dataf.columns.size)
         _filepath = hist.get_csv_filepath(_symbol_timeframe)
         dataf.to_csv(_filepath, index=False, sep='\t')
-        scalers[_symbol_timeframe] = trans
+        scalers[_symbol_timeframe] = scaler
 
     with open('scalers.pkl', 'wb') as file:
         pickle.dump(scalers, file)
@@ -45,8 +56,13 @@ def normalize_symbols(hist: HistMulti, scalers: dict):
     for _symbol in hist.symbols:
         print(_symbol)
         _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
-        arr = hist.arr[_symbol_timeframe]
-        data = arr[:, 1:6]
+
+        arr: ndarray = hist.arr[_symbol_timeframe]
+        if arr.shape[1] == 2:
+            data = arr[:, 1]
+        else:
+            data = arr[:, 1:6]
+
         scaler = scalers[_symbol_timeframe]
         data = scaler.transform(data)
         dataf = pd.DataFrame(data)
