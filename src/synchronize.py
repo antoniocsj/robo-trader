@@ -131,7 +131,7 @@ class SymbolsPreparation:
                     s.df.loc[i, 'TICKVOL'] = 0
 
 
-def prepare_data(data: dict) -> ndarray:
+def prepare_data_for_model(data: dict) -> ndarray:
     """
     Prepara os dados históricos para seu uso no modelo (rede neural). Faz todos os ajustes necessários para retornar
     um array pronto para ser apresentado ao modelo para obter uma previsão.
@@ -144,7 +144,7 @@ def prepare_data(data: dict) -> ndarray:
     :param data: dados históricos provenientes de uma requisição feita pelo MT5.
     :return: array pronto para ser aplicado no modelo
     """
-    print('prepare_data()')
+    print('prepare_data_for_model()')
 
     setup = read_json('setup.json')
     csv_dir = setup['csv_dir']
@@ -182,7 +182,8 @@ def prepare_data(data: dict) -> ndarray:
     symbol_out = train_configs['symbol_out']
     symbols_used_in_training = set(train_configs['symbols'])
     n_samples_train = train_configs['n_samples_train']
-    tipo_vela = train_configs['tipo_vela']
+    candle_input_type = setup['candle_input_type']
+    candle_output_type = setup['candle_output_type']
 
     # verifique se os símbolos usados no treinamento da rede neural estão presentes na requisição
     if symbols_used_in_training.issubset(symbols_present_in_the_request):
@@ -210,7 +211,7 @@ def prepare_data(data: dict) -> ndarray:
         scalers = pickle.load(file)
     normalize_symbols(hist, scalers)
 
-    X = prepare_data_for_prediction(hist, n_steps, tipo_vela)
+    X = prepare_data_for_prediction(hist, n_steps, candle_input_type)
     X = np.asarray(X).astype(np.float32)
     X = X.reshape((1, n_steps, n_features))
 
@@ -232,7 +233,7 @@ def test_01():
         scalers = pickle.load(file)
 
     data = read_json('request_3.json')
-    x_input = prepare_data(data)
+    x_input = prepare_data_for_model(data)
 
     model = load_model('model.h5')
     output_norm = model.predict(x_input)
@@ -241,7 +242,7 @@ def test_01():
     candle_output_type = train_configs['candle_output_type']
     scaler = scalers[_symbol_tf]
     close_pred_denorm = denorm_close_price(output_norm[0][0] + bias, scaler)
-    output_denorm = denorm_output(output_norm, bias, 'C', scaler)
+    output_denorm = denorm_output(output_norm, bias, candle_output_type, scaler)
     pass
 
 
