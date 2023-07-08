@@ -2,5 +2,7 @@
     "symbol_out": "EURUSD",
     "timeframe": "M5",
     "csv_dir": "../csv",
-    "csv_s_dir": "../csv_s"
+    "csv_s_dir": "../csv_s",
+    "candle_input_type": "OHLCV",
+    "candle_output_type": "C"
 }

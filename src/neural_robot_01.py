@@ -66,6 +66,8 @@ def train_model():
     csv_dir = setup['csv_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
+    candle_input_type = setup['candle_input_type']
+    candle_output_type = setup['candle_output_type']
     hist = HistMulti(csv_dir, timeframe)
 
     if hist.timeframe != timeframe:
@@ -74,28 +76,27 @@ def train_model():
         exit(-1)
 
     n_steps = 2
-    tipo_vela = 'OHLCV'
+    tipo_vela = candle_input_type
     n_samples_train = 500  # 30000-M10, 60000-M5
     validation_split = 0.5
 
-    n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela, timeframe)
+    n_cols, n_symbols = calc_n_inputs(csv_dir, candle_input_type, timeframe)
     num_entradas = n_steps * n_cols
     max_n_epochs = num_entradas
     patience = int(max_n_epochs / 10)
 
-    print(f'n_steps = {n_steps}, tipo_vela = {tipo_vela}, n_samples_train = {n_samples_train}')
-    print(f'validation_split = {validation_split}, max_n_epochs = {max_n_epochs}, patience = {patience}')
+    print(f'n_steps = {n_steps}, tipo_vela_entrada = {candle_input_type}, tipo_vela_saída = {candle_output_type}, '
+          f'n_samples_train = {n_samples_train}, validation_split = {validation_split}, max_n_epochs = {max_n_epochs}, '
+          f'patience = {patience}')
 
     # horizontally stack columns
-    dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
+    dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, candle_input_type)
 
     # convert into input/output
     X_train, y_train = split_sequences(dataset_train, n_steps)
-    print(X_train.shape, y_train.shape)
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
     # features to expect for each input sample.
-
     n_features = X_train.shape[2]
 
     # define model
@@ -135,7 +136,7 @@ def train_model():
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
     n_samples_test = 500
     samples_index_start = n_samples_train
-    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
+    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
 
     X_test, y_test = split_sequences(dataset_test, n_steps)
     X_test = np.asarray(X_test).astype(np.float32)
@@ -146,9 +147,10 @@ def train_model():
     print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
 
     train_configs = {'symbol_out': symbol_out,
-                     'tipo_vela': tipo_vela,
                      'timeframe': hist.timeframe,
                      'n_steps': n_steps,
+                     'candle_input_type': candle_input_type,
+                     'candle_output_type': candle_output_type,
                      'n_symbols': n_symbols,
                      'n_features': n_features,
                      'num_entradas': num_entradas,
@@ -169,26 +171,28 @@ def train_model():
     save_train_configs(train_configs)
 
 
-def train_model_return(setup: dict, hist: HistMulti, n_steps: int, tipo_vela: str, layer_type: list):
+def train_model_return(setup: dict, hist: HistMulti, n_steps: int, layer_type: list):
     csv_dir = setup['csv_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
+    candle_input_type = setup['candle_input_type']
+    candle_output_type = setup['candle_output_type']
     hist = hist
 
     n_steps = n_steps
-    tipo_vela = tipo_vela
     n_samples_train = 1000  # 30000-M10, 60000-M5
     validation_split = 0.2
 
-    n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela, timeframe)
+    n_cols, n_symbols = calc_n_inputs(csv_dir, candle_input_type, timeframe)
     num_entradas = n_steps * n_cols
     n_epochs = 2
 
-    print(f'n_steps = {n_steps}, tipo_vela = {tipo_vela}, n_samples_train = {n_samples_train}')
-    print(f'validation_split = {validation_split}, n_epochs = {n_epochs} layer_type = {layer_type}')
+    print(f'n_steps = {n_steps}, tipo_vela_entrada = {candle_input_type}, tipo_vela_saída = {candle_output_type}, '
+          f'n_samples_train = {n_samples_train}, validation_split = {validation_split}, n_epochs = {n_epochs} '
+          f'layer_type = {layer_type}')
 
     # horizontally stack columns
-    dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, tipo_vela)
+    dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, candle_input_type)
 
     # convert into input/output
     X_train, y_train = split_sequences(dataset_train, n_steps)
@@ -221,7 +225,7 @@ def train_model_return(setup: dict, hist: HistMulti, n_steps: int, tipo_vela: st
 
     n_samples_test = 1000
     samples_index_start = n_samples_train
-    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
+    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
 
     X_test, y_test = split_sequences(dataset_test, n_steps)
     X_test = np.asarray(X_test).astype(np.float32)
@@ -231,9 +235,10 @@ def train_model_return(setup: dict, hist: HistMulti, n_steps: int, tipo_vela: st
     print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
 
     train_configs = {'symbol_out': symbol_out,
-                     'tipo_vela': tipo_vela,
                      'timeframe': hist.timeframe,
                      'n_steps': n_steps,
+                     'candle_input_type': candle_input_type,
+                     'candle_output_type': candle_output_type,
                      'n_symbols': n_symbols,
                      'n_features': n_features,
                      'num_entradas': num_entradas,
@@ -256,11 +261,12 @@ def test_models():
     csv_dir = setup['csv_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
+    candle_input_type = setup['candle_input_type']
+    candle_output_type = setup['candle_output_type']
 
     hist = HistMulti(csv_dir, timeframe)
     n_steps = 2
-    tipo_vela = 'OHLCV'
-    n_cols, n_symbols = calc_n_inputs(csv_dir, tipo_vela, timeframe)
+    n_cols, n_symbols = calc_n_inputs(csv_dir, candle_input_type, timeframe)
     num_entradas = n_steps * n_cols
 
     import itertools as it
@@ -287,7 +293,7 @@ def test_models():
         _layer_type = sorted(list(layers_comb[i]), reverse=True)
         print(f'testando modelo com _layer_type = {_layer_type}, len_layers_comb = {_len_layers_comb}. '
               f'({100*i/_len_layers_comb:.2f} %)')
-        _out = train_model_return(setup, hist, n_steps, tipo_vela, _layer_type)
+        _out = train_model_return(setup, hist, n_steps, _layer_type)
 
         _list_train_configs.append(_out)
         with open("test_models.json", "w") as file:
@@ -315,11 +321,11 @@ def evaluate_model():
     n_features = train_configs['n_features']
     symbol_out = train_configs['symbol_out']
     n_samples_train = train_configs['n_samples_train']
-    tipo_vela = train_configs['tipo_vela']
+    candle_input_type = train_configs['candle_input_type']
 
     n_samples_test = 500
     samples_index_start = n_samples_train
-    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
+    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
 
     X_test, y_test = split_sequences(dataset_test, n_steps)
     X_test = np.asarray(X_test).astype(np.float32)
@@ -348,15 +354,14 @@ def calculate_model_bias():
     n_features = train_configs['n_features']
     symbol_out = train_configs['symbol_out']
     n_samples_train = train_configs['n_samples_train']
-    tipo_vela = train_configs['tipo_vela']
+    candle_input_type = train_configs['candle_input_type']
     validation_split = train_configs['validation_split']
     istart_samples_test = int(n_samples_train * validation_split)
     n_samples_test = int(n_samples_train * validation_split)
     print(f'calculando o bias do modelo. (n_samples_test = {n_samples_test})')
 
-    dataset_test = prepare_train_data_multi(hist, symbol_out, istart_samples_test, n_samples_test, tipo_vela)
+    dataset_test = prepare_train_data_multi(hist, symbol_out, istart_samples_test, n_samples_test, candle_input_type)
     X_, y_ = split_sequences(dataset_test, n_steps)
-    print(X_.shape, y_.shape)
 
     model = load_model('model.h5')
 
@@ -408,13 +413,12 @@ def test_model_with_trader():
     symbol_out = train_configs['symbol_out']
     n_samples_train = train_configs['n_samples_train']
     bias = train_configs['bias']
-    tipo_vela = train_configs['tipo_vela']
+    candle_input_type = train_configs['candle_input_type']
     n_samples_test = 500
     samples_index_start = n_samples_train
 
-    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
+    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
     X_, y_ = split_sequences(dataset_test, n_steps)
-    print(X_.shape, y_.shape)
 
     model = load_model('model.h5')
 
@@ -536,13 +540,12 @@ def test_model_with_trader_interactive():
     symbol_out = train_configs['symbol_out']
     n_samples_train = train_configs['n_samples_train']
     bias = train_configs['bias']
-    tipo_vela = train_configs['tipo_vela']
+    candle_input_type = train_configs['candle_input_type']
     n_samples_test = 500
     samples_index_start = n_samples_train
 
-    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, tipo_vela)
+    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
     X_, y_ = split_sequences(dataset_test, n_steps)
-    print(X_.shape, y_.shape)
 
     model = load_model('model.h5')
 
@@ -630,7 +633,7 @@ def show_tf():
 if __name__ == '__main__':
     # show_tf()
     # test_models()
-    # train_model()
+    train_model()
     # calculate_model_bias()
-    test_model_with_trader()
+    # test_model_with_trader()
     # test_model_with_trader_interactive()

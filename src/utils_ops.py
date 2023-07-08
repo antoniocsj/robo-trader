@@ -1,3 +1,5 @@
+from typing import Any
+
 from numpy import ndarray
 import numpy as np
 import pandas as pd
@@ -16,6 +18,91 @@ def denorm_close_price(_c, scaler: MinMaxScaler):
 def denorm_output_array(_a: ndarray, scaler: MinMaxScaler) -> ndarray:
     output = scaler.inverse_transform(_a)
     output = output[0]
+    return output
+
+
+def denorm_output_(_out: Any, candle_type: str, scaler: MinMaxScaler) -> Any:
+    if isinstance(_out, ndarray):
+        if candle_type == 'OHLCV':
+            output = scaler.inverse_transform(_out)
+            output = output[0]
+        elif candle_type == 'OHLC':
+            _O, _H, _L, _C = _out[0], _out[1], _out[2], _out[3]
+            output = scaler.inverse_transform(np.array([_O, _H, _L, _C, 0], dtype=object).reshape(1, -1))
+            output = output[0]
+        elif candle_type == 'HLCV':
+            _H, _L, _C, _V = _out[0], _out[1], _out[2], _out[3]
+            output = scaler.inverse_transform(np.array([0, _H, _L, _C, _V], dtype=object).reshape(1, -1))
+            output = output[0]
+        elif candle_type == 'HLC':
+            _H, _L, _C = _out[0], _out[1], _out[2]
+            output = scaler.inverse_transform(np.array([0, _H, _L, _C, 0], dtype=object).reshape(1, -1))
+            output = output[0]
+        elif candle_type == 'HLV':
+            _H, _L, _V = _out[0], _out[1], _out[2]
+            output = scaler.inverse_transform(np.array([0, _H, _L, 0, _V], dtype=object).reshape(1, -1))
+            output = output[0]
+        elif candle_type == 'HL':
+            _H, _L = _out[0], _out[1]
+            output = scaler.inverse_transform(np.array([0, _H, _L, 0, 0], dtype=object).reshape(1, -1))
+            output = output[0]
+        elif candle_type == 'CV':
+            _C, _V = _out[0], _out[1]
+            output = scaler.inverse_transform(np.array([0, 0, 0, _C, _V], dtype=object).reshape(1, -1))
+            output = output[0]
+        else:
+            print(f'ERRO. denorm_output(). tipo de vela não suportado ({candle_type}).')
+            exit(-1)
+    else:
+        if candle_type == 'C':
+            _C = _out
+            output = scaler.inverse_transform(np.array([0, 0, 0, _C, 0], dtype=object).reshape(1, -1))
+            output = output[0][3]
+        else:
+            print(f'ERRO. denorm_output(). tipo de vela não suportado ({candle_type}).')
+            exit(-1)
+
+    return output
+
+
+def denorm_output(arr: ndarray, bias: Any, candle_type: str, scaler: MinMaxScaler) -> Any:
+    arr = arr[0] + bias
+
+    if candle_type == 'OHLCV':
+        output = scaler.inverse_transform(arr)
+        output = output[0]
+    elif candle_type == 'OHLC':
+        _O, _H, _L, _C = arr[0], arr[1], arr[2], arr[3]
+        output = scaler.inverse_transform(np.array([_O, _H, _L, _C, 0], dtype=object).reshape(1, -1))
+        output = output[0]
+    elif candle_type == 'HLCV':
+        _H, _L, _C, _V = arr[0], arr[1], arr[2], arr[3]
+        output = scaler.inverse_transform(np.array([0, _H, _L, _C, _V], dtype=object).reshape(1, -1))
+        output = output[0]
+    elif candle_type == 'HLC':
+        _H, _L, _C = arr[0], arr[1], arr[2]
+        output = scaler.inverse_transform(np.array([0, _H, _L, _C, 0], dtype=object).reshape(1, -1))
+        output = output[0]
+    elif candle_type == 'HLV':
+        _H, _L, _V = arr[0], arr[1], arr[2]
+        output = scaler.inverse_transform(np.array([0, _H, _L, 0, _V], dtype=object).reshape(1, -1))
+        output = output[0]
+    elif candle_type == 'HL':
+        _H, _L = arr[0], arr[1]
+        output = scaler.inverse_transform(np.array([0, _H, _L, 0, 0], dtype=object).reshape(1, -1))
+        output = output[0]
+    elif candle_type == 'CV':
+        _C, _V = arr[0], arr[1]
+        output = scaler.inverse_transform(np.array([0, 0, 0, _C, _V], dtype=object).reshape(1, -1))
+        output = output[0]
+    elif candle_type == 'C':
+        _C = arr[0]
+        output = scaler.inverse_transform(np.array([0, 0, 0, _C, 0], dtype=object).reshape(1, -1))
+        output = output[0][3]
+    else:
+        print(f'ERRO. denorm_output(). tipo de vela não suportado ({candle_type}).')
+        exit(-1)
+
     return output
 
 

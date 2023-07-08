@@ -9,7 +9,7 @@ from HistMulti import HistMulti
 from utils_filesystem import read_json
 from utils_symbols import search_symbols_in_dict
 from utils_nn import prepare_data_for_prediction
-from utils_ops import denorm_close_price, normalize_symbols
+from utils_ops import denorm_close_price, denorm_output, normalize_symbols
 
 
 class SymbolsPreparation:
@@ -235,11 +235,13 @@ def test_01():
     x_input = prepare_data(data)
 
     model = load_model('model.h5')
-    close_pred_norm = model.predict(x_input)
+    output_norm = model.predict(x_input)
 
     bias = train_configs['bias']
+    candle_output_type = train_configs['candle_output_type']
     scaler = scalers[_symbol_tf]
-    close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, scaler)
+    close_pred_denorm = denorm_close_price(output_norm[0][0] + bias, scaler)
+    output_denorm = denorm_output(output_norm, bias, 'C', scaler)
     pass
 
 
