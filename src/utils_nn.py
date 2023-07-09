@@ -191,7 +191,6 @@ def prepare_train_data2(hist: HistMulti, symbol_out: str, start_index: int, num_
             data_out = data_out.reshape(len(data_out), 1)
         elif candle_output_type == 'CV':
             data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 4:6]
-            data_out = data_out.reshape(len(data_out), 1)
         else:
             print(f'ERRO. candle_output_type ({candle_output_type}) não suportado para candle_input_type = '
                   f'{candle_input_type}')
@@ -217,10 +216,8 @@ def prepare_train_data2(hist: HistMulti, symbol_out: str, start_index: int, num_
             data_out = data_out.reshape(len(data_out), 1)
         elif candle_output_type == 'HL':
             data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:4]
-            data_out = data_out.reshape(len(data_out), 1)
         elif candle_output_type == 'HLC':
             data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:5]
-            data_out = data_out.reshape(len(data_out), 1)
         else:
             print(f'ERRO. candle_output_type ({candle_output_type}) não suportado para candle_input_type = '
                   f'{candle_input_type}')
@@ -246,16 +243,18 @@ def prepare_train_data2(hist: HistMulti, symbol_out: str, start_index: int, num_
             data_out = data_out.reshape(len(data_out), 1)
         elif candle_output_type == 'CV':
             data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 4:6]
-            data_out = data_out.reshape(len(data_out), 1)
         elif candle_output_type == 'HL':
             data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:4]
-            data_out = data_out.reshape(len(data_out), 1)
+        elif candle_output_type == 'HLV':
+            # data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:4 e 5]
+            a = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:4]
+            b = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 5]
+            b = b.reshape(len(b), 1)
+            data_out = np.hstack((a, b))
         elif candle_output_type == 'HLC':
             data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:5]
-            data_out = data_out.reshape(len(data_out), 1)
         elif candle_output_type == 'HLCV':
             data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:6]
-            data_out = data_out.reshape(len(data_out), 1)
         else:
             print(f'ERRO. candle_output_type ({candle_output_type}) não suportado para candle_input_type = '
                   f'{candle_input_type}')
@@ -281,10 +280,10 @@ def prepare_train_data2(hist: HistMulti, symbol_out: str, start_index: int, num_
             data_out = data_out.reshape(len(data_out), 1)
         elif candle_output_type == 'HL':
             data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:4]
-            data_out = data_out.reshape(len(data_out), 1)
         elif candle_output_type == 'HLC':
             data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:5]
-            data_out = data_out.reshape(len(data_out), 1)
+        elif candle_output_type == 'OHLC':
+            data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 1:5]
         else:
             print(f'ERRO. candle_output_type ({candle_output_type}) não suportado para candle_input_type = '
                   f'{candle_input_type}')
@@ -310,16 +309,20 @@ def prepare_train_data2(hist: HistMulti, symbol_out: str, start_index: int, num_
             data_out = data_out.reshape(len(data_out), 1)
         elif candle_output_type == 'CV':
             data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 4:6]
-            data_out = data_out.reshape(len(data_out), 1)
         elif candle_output_type == 'HL':
             data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:4]
-            data_out = data_out.reshape(len(data_out), 1)
+        elif candle_output_type == 'HLV':
+            # data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:4 e 5]
+            a = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:4]
+            b = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 5]
+            b = b.reshape(len(b), 1)
+            data_out = np.hstack((a, b))
         elif candle_output_type == 'HLC':
             data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:5]
-            data_out = data_out.reshape(len(data_out), 1)
         elif candle_output_type == 'HLCV':
             data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 2:6]
-            data_out = data_out.reshape(len(data_out), 1)
+        elif candle_output_type == 'OHLCV':
+            data_out = hist.arr[symbol_tf_out][start_index + 1:start_index + num_candles + 1][:, 1:6]
         else:
             print(f'ERRO. candle_output_type ({candle_output_type}) não suportado para candle_input_type = '
                   f'{candle_input_type}')

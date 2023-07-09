@@ -89,13 +89,13 @@ def train_model():
           f'patience = {patience}')
 
     # horizontally stack columns
-    dataset_train = prepare_train_data(hist, symbol_out, 0, n_samples_train, candle_input_type)
-    dataset_train2 = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type,
-                                         candle_output_type)
+    # dataset_train = prepare_train_data(hist, symbol_out, 0, n_samples_train, candle_input_type)
+    dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type,
+                                        candle_output_type)
 
     # convert into input/output samples
-    X_train, y_train = split_sequences1(dataset_train, n_steps)
-    X_train2, y_train2 = split_sequences2(dataset_train, n_steps, candle_output_type)
+    # X_train, y_train = split_sequences1(dataset_train, n_steps)
+    X_train, y_train = split_sequences2(dataset_train, n_steps, candle_output_type)
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
     # features to expect for each input sample.
@@ -276,7 +276,7 @@ def test_models():
     min_n_neurons = 0
     max_n_neurons = num_entradas
     step = 30
-    _list_n_neurons = list(range(min_n_neurons, max_n_neurons+1, step))
+    _list_n_neurons = list(range(min_n_neurons, max_n_neurons + 1, step))
     n_layers = 3
     layers_comb = list(it.combinations_with_replacement(_list_n_neurons, n_layers))
 
@@ -294,7 +294,7 @@ def test_models():
     for i in range(i_start, len(layers_comb)):
         _layer_type = sorted(list(layers_comb[i]), reverse=True)
         print(f'testando modelo com _layer_type = {_layer_type}, len_layers_comb = {_len_layers_comb}. '
-              f'({100*i/_len_layers_comb:.2f} %)')
+              f'({100 * i / _len_layers_comb:.2f} %)')
         _out = train_model_return(setup, hist, n_steps, _layer_type)
 
         _list_train_configs.append(_out)
