@@ -144,10 +144,11 @@ def prepare_train_data_multi(_hist: HistMulti, _symbol_out: str, _start_index: i
     return _data
 
 
-# split a multivariate sequence into samples.
-# We can define a function named split_sequences() that will take a dataset as we have defined it with rows for
+# Multiple Input Series
+# split a multivariate sequence into input/output samples.
+# We can define a function named split_sequences1() that will take a dataset as we have defined it with rows for
 # time steps and columns for parallel series and return input/output samples.
-def split_sequences(sequences, n_steps):
+def split_sequences1(sequences, n_steps):
     X, y = list(), list()
     for i in range(len(sequences)):
         # find the end of this pattern

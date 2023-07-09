@@ -36,7 +36,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 tf.keras.utils.set_random_seed(1)
 
-from utils_nn import prepare_train_data_multi, split_sequences
+from utils_nn import prepare_train_data_multi, split_sequences1
 from utils_filesystem import read_json, save_train_configs
 from utils_ops import denorm_close_price
 from utils_symbols import calc_n_inputs
@@ -76,7 +76,6 @@ def train_model():
         exit(-1)
 
     n_steps = 2
-    tipo_vela = candle_input_type
     n_samples_train = 500  # 30000-M10, 60000-M5
     validation_split = 0.5
 
@@ -92,8 +91,8 @@ def train_model():
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, candle_input_type)
 
-    # convert into input/output
-    X_train, y_train = split_sequences(dataset_train, n_steps)
+    # convert into input/output samples
+    X_train, y_train = split_sequences1(dataset_train, n_steps)
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
     # features to expect for each input sample.
@@ -138,7 +137,7 @@ def train_model():
     samples_index_start = n_samples_train
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
 
-    X_test, y_test = split_sequences(dataset_test, n_steps)
+    X_test, y_test = split_sequences1(dataset_test, n_steps)
     X_test = np.asarray(X_test).astype(np.float32)
     y_test = np.asarray(y_test).astype(np.float32)
 
@@ -195,7 +194,7 @@ def train_model_return(setup: dict, hist: HistMulti, n_steps: int, layer_type: l
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, candle_input_type)
 
     # convert into input/output
-    X_train, y_train = split_sequences(dataset_train, n_steps)
+    X_train, y_train = split_sequences1(dataset_train, n_steps)
     print(X_train.shape, y_train.shape)
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
@@ -227,7 +226,7 @@ def train_model_return(setup: dict, hist: HistMulti, n_steps: int, layer_type: l
     samples_index_start = n_samples_train
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
 
-    X_test, y_test = split_sequences(dataset_test, n_steps)
+    X_test, y_test = split_sequences1(dataset_test, n_steps)
     X_test = np.asarray(X_test).astype(np.float32)
     y_test = np.asarray(y_test).astype(np.float32)
 
@@ -327,7 +326,7 @@ def evaluate_model():
     samples_index_start = n_samples_train
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
 
-    X_test, y_test = split_sequences(dataset_test, n_steps)
+    X_test, y_test = split_sequences1(dataset_test, n_steps)
     X_test = np.asarray(X_test).astype(np.float32)
     y_test = np.asarray(y_test).astype(np.float32)
 
@@ -361,7 +360,7 @@ def calculate_model_bias():
     print(f'calculando o bias do modelo. (n_samples_test = {n_samples_test})')
 
     dataset_test = prepare_train_data_multi(hist, symbol_out, istart_samples_test, n_samples_test, candle_input_type)
-    X_, y_ = split_sequences(dataset_test, n_steps)
+    X_, y_ = split_sequences1(dataset_test, n_steps)
 
     model = load_model('model.h5')
 
@@ -418,7 +417,7 @@ def test_model_with_trader():
     samples_index_start = n_samples_train
 
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
-    X_, y_ = split_sequences(dataset_test, n_steps)
+    X_, y_ = split_sequences1(dataset_test, n_steps)
 
     model = load_model('model.h5')
 
@@ -545,7 +544,7 @@ def test_model_with_trader_interactive():
     samples_index_start = n_samples_train
 
     dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
-    X_, y_ = split_sequences(dataset_test, n_steps)
+    X_, y_ = split_sequences1(dataset_test, n_steps)
 
     model = load_model('model.h5')
 
