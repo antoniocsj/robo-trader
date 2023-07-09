@@ -36,7 +36,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 tf.keras.utils.set_random_seed(1)
 
-from utils_nn import prepare_train_data_multi, split_sequences1, split_sequences2, prepare_train_data_multi2
+from utils_nn import prepare_train_data, split_sequences1, split_sequences2, prepare_train_data2
 from utils_filesystem import read_json, save_train_configs
 from utils_ops import denorm_close_price
 from utils_symbols import calc_n_inputs
@@ -89,13 +89,13 @@ def train_model():
           f'patience = {patience}')
 
     # horizontally stack columns
-    dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, candle_input_type)
-    dataset_train2 = prepare_train_data_multi2(hist, symbol_out, 0, n_samples_train, candle_input_type,
-                                               candle_output_type)
+    dataset_train = prepare_train_data(hist, symbol_out, 0, n_samples_train, candle_input_type)
+    dataset_train2 = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type,
+                                         candle_output_type)
 
     # convert into input/output samples
-    # X_train, y_train = split_sequences1(dataset_train, n_steps)
-    X_train, y_train = split_sequences2(dataset_train, n_steps, candle_output_type)
+    X_train, y_train = split_sequences1(dataset_train, n_steps)
+    X_train2, y_train2 = split_sequences2(dataset_train, n_steps, candle_output_type)
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
     # features to expect for each input sample.
@@ -138,7 +138,7 @@ def train_model():
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
     n_samples_test = 500
     samples_index_start = n_samples_train
-    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
+    dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
 
     X_test, y_test = split_sequences1(dataset_test, n_steps)
     X_test = np.asarray(X_test).astype(np.float32)
@@ -194,7 +194,7 @@ def train_model_return(setup: dict, hist: HistMulti, n_steps: int, layer_type: l
           f'layer_type = {layer_type}')
 
     # horizontally stack columns
-    dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, candle_input_type)
+    dataset_train = prepare_train_data(hist, symbol_out, 0, n_samples_train, candle_input_type)
 
     # convert into input/output
     X_train, y_train = split_sequences1(dataset_train, n_steps)
@@ -227,7 +227,7 @@ def train_model_return(setup: dict, hist: HistMulti, n_steps: int, layer_type: l
 
     n_samples_test = 1000
     samples_index_start = n_samples_train
-    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
+    dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
 
     X_test, y_test = split_sequences1(dataset_test, n_steps)
     X_test = np.asarray(X_test).astype(np.float32)
@@ -327,7 +327,7 @@ def evaluate_model():
 
     n_samples_test = 500
     samples_index_start = n_samples_train
-    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
+    dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
 
     X_test, y_test = split_sequences1(dataset_test, n_steps)
     X_test = np.asarray(X_test).astype(np.float32)
@@ -362,7 +362,7 @@ def calculate_model_bias():
     n_samples_test = int(n_samples_train * validation_split)
     print(f'calculando o bias do modelo. (n_samples_test = {n_samples_test})')
 
-    dataset_test = prepare_train_data_multi(hist, symbol_out, istart_samples_test, n_samples_test, candle_input_type)
+    dataset_test = prepare_train_data(hist, symbol_out, istart_samples_test, n_samples_test, candle_input_type)
     X_, y_ = split_sequences1(dataset_test, n_steps)
 
     model = load_model('model.h5')
@@ -419,7 +419,7 @@ def test_model_with_trader():
     n_samples_test = 500
     samples_index_start = n_samples_train
 
-    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
+    dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
     X_, y_ = split_sequences1(dataset_test, n_steps)
 
     model = load_model('model.h5')
@@ -546,7 +546,7 @@ def test_model_with_trader_interactive():
     n_samples_test = 500
     samples_index_start = n_samples_train
 
-    dataset_test = prepare_train_data_multi(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
+    dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
     X_, y_ = split_sequences1(dataset_test, n_steps)
 
     model = load_model('model.h5')
