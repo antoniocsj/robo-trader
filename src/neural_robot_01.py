@@ -36,7 +36,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 tf.keras.utils.set_random_seed(1)
 
-from utils_nn import prepare_train_data_multi, split_sequences1, split_sequences2
+from utils_nn import prepare_train_data_multi, split_sequences1, split_sequences2, prepare_train_data_multi2
 from utils_filesystem import read_json, save_train_configs
 from utils_ops import denorm_close_price
 from utils_symbols import calc_n_inputs
@@ -90,6 +90,8 @@ def train_model():
 
     # horizontally stack columns
     dataset_train = prepare_train_data_multi(hist, symbol_out, 0, n_samples_train, candle_input_type)
+    dataset_train2 = prepare_train_data_multi2(hist, symbol_out, 0, n_samples_train, candle_input_type,
+                                               candle_output_type)
 
     # convert into input/output samples
     # X_train, y_train = split_sequences1(dataset_train, n_steps)
