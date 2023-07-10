@@ -243,6 +243,7 @@ def test_01():
     scaler = scalers[_symbol_tf]
     # close_pred_denorm = denorm_close_price(output_norm[0][0] + bias, scaler)
     output_denorm = denorm_output(output_norm, bias, candle_output_type, scaler)
+    print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
     pass
 
 
