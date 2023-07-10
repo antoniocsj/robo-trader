@@ -183,7 +183,7 @@ def test_08():
     import numpy as np
     from numpy import ndarray
     import json
-    from utils import HistMulti
+    from HistMulti import HistMulti
     import itertools as it
     from scipy.stats import pearsonr, spearmanr
     from sklearn.preprocessing import MinMaxScaler
@@ -218,5 +218,21 @@ def test_08():
     print(_set)
 
 
+def test_09():
+    import numpy as np
+
+    yr = np.array([1, 2, 3, 4, 5])
+    yp = np.array([1.2, 2.3, 3.1, 4.25, 5.35])
+    diffs = []
+
+    for i in range(len(yr)):
+        diff = yr[i] - yp[i]
+        diffs.append(diff)
+
+    diffs = np.asarray(diffs)
+    bias = np.sum(diffs) / len(diffs)
+    print(f'bias = {bias}')
+
+
 if __name__ == '__main__':
-    test_08()
+    test_09()

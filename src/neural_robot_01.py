@@ -108,7 +108,7 @@ def train_model():
     model.add(Flatten())
     model.add(Dense(n_features, activation='relu'))
     model.add(Dense(n_features, activation='relu'))
-    model.add(Dense(1))
+    model.add(Dense(len(candle_output_type)))
     model.compile(optimizer='adam', loss='mse')
     model_config = model.get_config()
 
@@ -138,9 +138,12 @@ def train_model():
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
     n_samples_test = 500
     samples_index_start = n_samples_train
-    dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
+    # dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
+    dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
+                                       candle_output_type)
 
-    X_test, y_test = split_sequences1(dataset_test, n_steps)
+    # X_test, y_test = split_sequences1(dataset_test, n_steps)
+    X_test, y_test = split_sequences2(dataset_test, n_steps, candle_output_type)
     X_test = np.asarray(X_test).astype(np.float32)
     y_test = np.asarray(y_test).astype(np.float32)
 
@@ -166,9 +169,10 @@ def train_model():
                      'test_loss_eval': test_loss_eval,
                      'losses': losses,
                      'symbols': hist.symbols,
+                     'bias': 0.0,
+                     'n_samples_test_for_calc_bias': 0,
                      'model_config': model_config,
-                     'history': history.history,
-                     'bias': 0.0}
+                     'history': history.history}
 
     save_train_configs(train_configs)
 
@@ -357,13 +361,18 @@ def calculate_model_bias():
     symbol_out = train_configs['symbol_out']
     n_samples_train = train_configs['n_samples_train']
     candle_input_type = train_configs['candle_input_type']
+    candle_output_type = train_configs['candle_output_type']
     validation_split = train_configs['validation_split']
     istart_samples_test = int(n_samples_train * validation_split)
     n_samples_test = int(n_samples_train * validation_split)
     print(f'calculando o bias do modelo. (n_samples_test = {n_samples_test})')
 
-    dataset_test = prepare_train_data(hist, symbol_out, istart_samples_test, n_samples_test, candle_input_type)
-    X_, y_ = split_sequences1(dataset_test, n_steps)
+    # dataset_test = prepare_train_data(hist, symbol_out, istart_samples_test, n_samples_test, candle_input_type)
+    dataset_test = prepare_train_data2(hist, symbol_out, istart_samples_test, n_samples_test, candle_input_type,
+                                       candle_output_type)
+
+    # X_, y_ = split_sequences1(dataset_test, n_steps)
+    X_, y_ = split_sequences2(dataset_test, n_steps, candle_output_type)
 
     model = load_model('model.h5')
 
@@ -377,7 +386,10 @@ def calculate_model_bias():
         x_input = X_[i]
         x_input = x_input.reshape((1, n_steps, n_features))
         y_pred = model.predict(x_input)
-        diff = y_[i] - y_pred[0][0]
+        if len(y_pred[0]) == 1:
+            diff = y_[i] - y_pred[0][0]
+        else:
+            diff = y_[i] - y_pred[0]
         diffs.append(diff)
         if i % 3000 == 0 and i > 0:
             _t = 60

@@ -69,7 +69,8 @@ def denorm_output(arr: ndarray, bias: Any, candle_type: str, scaler: MinMaxScale
     arr = arr[0] + bias
 
     if candle_type == 'OHLCV':
-        output = scaler.inverse_transform(arr)
+        _O, _H, _L, _C, _V = arr[0], arr[1], arr[2], arr[3], arr[4]
+        output = scaler.inverse_transform(np.array([_O, _H, _L, _C, _V], dtype=object).reshape(1, -1))
         output = output[0]
     elif candle_type == 'OHLC':
         _O, _H, _L, _C = arr[0], arr[1], arr[2], arr[3]

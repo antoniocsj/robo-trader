@@ -241,7 +241,7 @@ def test_01():
     bias = train_configs['bias']
     candle_output_type = train_configs['candle_output_type']
     scaler = scalers[_symbol_tf]
-    close_pred_denorm = denorm_close_price(output_norm[0][0] + bias, scaler)
+    # close_pred_denorm = denorm_close_price(output_norm[0][0] + bias, scaler)
     output_denorm = denorm_output(output_norm, bias, candle_output_type, scaler)
     pass
 
