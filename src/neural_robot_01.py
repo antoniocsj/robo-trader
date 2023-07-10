@@ -397,7 +397,7 @@ def calculate_model_bias():
             time.sleep(_t)
 
     diffs = np.asarray(diffs)
-    bias = np.sum(diffs) / len(diffs)
+    bias = np.mean(diffs, axis=0)
     print(f'bias = {bias}')
 
     train_configs['bias'] = bias
