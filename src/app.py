@@ -1,6 +1,8 @@
 from flask import Flask, request
 import json
 from datetime import datetime
+from synchronize import predict_next_candle
+
 
 app = Flask(__name__)
 
@@ -34,7 +36,8 @@ def make_prediction():
           f'rates_count = {rates_count}, start_pos = {start_pos} ')
 
     write_json('request.json', data)
-    d = read_json('request.json')
+
+    predict_next_candle(data)
 
     return "OK"
 

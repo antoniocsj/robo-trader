@@ -218,7 +218,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
     return X
 
 
-def test_01():
+def predict_next_candle(data: dict):
     from keras.models import load_model
 
     setup = read_json('setup.json')
@@ -232,7 +232,6 @@ def test_01():
     with open('scalers.pkl', 'rb') as file:
         scalers = pickle.load(file)
 
-    data = read_json('request_3.json')
     x_input = prepare_data_for_model(data)
 
     model = load_model('model.h5')
@@ -244,7 +243,11 @@ def test_01():
     # close_pred_denorm = denorm_close_price(output_norm[0][0] + bias, scaler)
     output_denorm = denorm_output(output_norm, bias, candle_output_type, scaler)
     print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
-    pass
+
+
+def test_01():
+    data = read_json('request_3.json')
+    predict_next_candle(data)
 
 
 if __name__ == '__main__':
