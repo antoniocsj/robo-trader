@@ -645,9 +645,9 @@ def show_tf():
 
 
 if __name__ == '__main__':
-    # show_tf()
+    show_tf()
     # test_models()
-    train_model()
-    # calculate_model_bias()
+    # train_model()
+    calculate_model_bias()
     # test_model_with_trader()
     # test_model_with_trader_interactive()
