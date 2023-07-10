@@ -76,7 +76,7 @@ def train_model():
         exit(-1)
 
     n_steps = 2
-    n_samples_train = 500  # 30000-M10, 60000-M5
+    n_samples_train = 60000  # 30000-M10, 60000-M5
     validation_split = 0.5
 
     n_cols, n_symbols = calc_n_inputs(csv_dir, candle_input_type, timeframe)
@@ -136,7 +136,7 @@ def train_model():
     print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
 
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
-    n_samples_test = 500
+    n_samples_test = 3000
     samples_index_start = n_samples_train
     # dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
     dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
