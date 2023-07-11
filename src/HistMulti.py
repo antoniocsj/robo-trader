@@ -1,5 +1,6 @@
 import os
 from typing import Any
+from numpy import ndarray
 import pandas as pd
 from pandas import DataFrame
 from Sheet import Sheet
@@ -17,7 +18,7 @@ class HistMulti:
         """
         self.symbols = []
         self.timeframe = timeframe
-        self.arr = {}  # guarda os arrays dos dados históricos conforme seu 'simbolo' e 'timeframe'
+        self.arr: dict[str, ndarray] = {}  # guarda os arrays dos dados históricos conforme seu 'simbolo' e 'timeframe'
         self.source_is_dir = False
 
         if isinstance(source, str):
@@ -103,10 +104,15 @@ class HistMulti:
 
     def update_sheets(self):
         """
-        Atualia o dicionários self.sheets para refletir os dados de self.arr
+        Atualia o dicionário self.sheets para refletir os dados de self.arr
         :return:
         """
-        pass
+        if not self.source_is_dir:
+            for symbol in self.symbols:
+                _symbol_tf = f'{symbol}_{self.timeframe}'
+                arr = self.arr[_symbol_tf]
+                s: Sheet = Sheet(arr, symbol, self.timeframe)
+                self.sheets[_symbol_tf] = s
 
 
 class HistMultiOriginal:

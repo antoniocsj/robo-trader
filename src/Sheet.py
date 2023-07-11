@@ -3,6 +3,7 @@ from typing import Any
 
 import pandas as pd
 from pandas import DataFrame
+from numpy import ndarray
 
 
 class Sheet:
@@ -29,6 +30,9 @@ class Sheet:
             self.rates: list[dict] = source
             print(f'criando planilha para {symbol}_{timeframe} a partir de uma lista')
             self.df: DataFrame = self.create_df_from_rates()
+        elif isinstance(source, ndarray):
+            print(f'criando planilha para {symbol}_{timeframe} a partir de um ndarray')
+            self.df: DataFrame = pd.DataFrame(source)
 
         if self.df.isnull().sum().values.sum() != 0:
             print(f'Há dados faltando no arquivo {self.filepath}')

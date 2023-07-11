@@ -158,6 +158,7 @@ def normalize_symbols(hist: HistMulti, scalers: dict):
         dataf.columns = range(dataf.columns.size)
         hist.arr[_symbol_timeframe] = dataf.to_numpy(copy=True)
 
+    hist.update_sheets()
     print(f'todos os símbolos de {type(hist)} foram normalizados.')
 
 

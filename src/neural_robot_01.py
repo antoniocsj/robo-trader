@@ -25,10 +25,6 @@ from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Flatten
-from keras.layers import Dropout
-from keras.constraints import MaxNorm
-from keras.layers import LSTM
-from keras.layers import TimeDistributed
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
 from keras.models import load_model
@@ -75,8 +71,8 @@ def train_model():
               f'em setup.json ({timeframe})')
         exit(-1)
 
-    n_steps = 4
-    n_samples_train = 60000  # 30000-M10, 60000-M5
+    n_steps = 2
+    n_samples_train = 500  # 30000-M10, 60000-M5
     validation_split = 0.2
 
     n_cols, n_symbols = calc_n_inputs(csv_dir, candle_input_type, timeframe)
