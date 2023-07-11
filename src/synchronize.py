@@ -1,6 +1,5 @@
 import json
 import pickle
-
 import numpy as np
 from numpy import ndarray
 from datetime import datetime
@@ -209,6 +208,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
     # deve-se usar o mesmo objeto MinMaxScaler que foi usado na normalização do conjunto de treinamento.
     with open('scalers.pkl', 'rb') as file:
         scalers = pickle.load(file)
+
     normalize_symbols(hist, scalers)
 
     X = prepare_data_for_prediction(hist, n_steps, candle_input_type)
