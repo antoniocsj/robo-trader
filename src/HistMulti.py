@@ -194,8 +194,8 @@ class HistMultiOriginal:
 
 
 if __name__ == '__main__':
-    setup = read_json('setup.json')
-    print(f'setup.json: {setup}')
+    setup = read_json('settings.json')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     symbol_out = setup['symbol_out']

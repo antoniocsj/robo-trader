@@ -145,7 +145,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
     """
     print('prepare_data_for_model()')
 
-    setup = read_json('setup.json')
+    setup = read_json('settings.json')
     csv_dir = setup['csv_dir']
     symbol_out = setup['symbol_out']
     setup_timeframe = setup['timeframe']
@@ -157,7 +157,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
     timeframe = data['timeframe']
     if timeframe != setup_timeframe:
         print(f'o timeframe da requisição ({timeframe}) é diferente do timeframe definido no arquivo '
-              f'setup.json ({setup_timeframe})')
+              f'settings.json ({setup_timeframe})')
         exit(-1)
 
     n_symbols = data['n_symbols']
@@ -221,7 +221,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
 def predict_next_candle(data: dict):
     from keras.models import load_model
 
-    setup = read_json('setup.json')
+    setup = read_json('settings.json')
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
     _symbol_tf = f'{symbol_out}_{timeframe}'

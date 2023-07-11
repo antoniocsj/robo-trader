@@ -122,9 +122,9 @@ def test_06():
     import json
     from utils import search_symbols
 
-    with open('setup.json', 'r') as file:
+    with open('settings.json', 'r') as file:
         setup = json.load(file)
-    print(f'setup.json: {setup}')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     symbol_out = setup['symbol_out']
@@ -188,9 +188,9 @@ def test_08():
     from scipy.stats import pearsonr, spearmanr
     from sklearn.preprocessing import MinMaxScaler
 
-    with open('setup.json', 'r') as file:
+    with open('settings.json', 'r') as file:
         setup = json.load(file)
-    print(f'setup.json: {setup}')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     symbol_out = setup['symbol_out']

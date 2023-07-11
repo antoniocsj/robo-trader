@@ -56,8 +56,8 @@ from utils_symbols import calc_n_inputs
 # We can demonstrate this with a simple example of two parallel input time series where the output series
 # is the simple addition of the input series.
 def train_model():
-    setup = read_json('setup.json')
-    print(f'setup.json: {setup}')
+    setup = read_json('settings.json')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     symbol_out = setup['symbol_out']
@@ -68,7 +68,7 @@ def train_model():
 
     if hist.timeframe != timeframe:
         print(f'o timeframe do diretório {csv_dir} ({hist.timeframe}) é diferente do timeframe especificado '
-              f'em setup.json ({timeframe})')
+              f'em settings.json ({timeframe})')
         exit(-1)
 
     n_steps = 2
@@ -258,8 +258,8 @@ def train_model_return(setup: dict, hist: HistMulti, n_steps: int, layer_type: l
 
 
 def test_models():
-    setup = read_json('setup.json')
-    print(f'setup.json: {setup}')
+    setup = read_json('settings.json')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     symbol_out = setup['symbol_out']
@@ -307,8 +307,8 @@ def test_models():
 
 
 def evaluate_model():
-    setup = read_json('setup.json')
-    print(f'setup.json: {setup}')
+    setup = read_json('settings.json')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     timeframe = setup['timeframe']
@@ -340,8 +340,8 @@ def evaluate_model():
 
 
 def calculate_model_bias():
-    setup = read_json('setup.json')
-    print(f'setup.json: {setup}')
+    setup = read_json('settings.json')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     timeframe = setup['timeframe']
@@ -406,8 +406,8 @@ def calculate_model_bias():
 def test_model_with_trader():
     from TraderSimMultiNoPrints import TraderSimMulti
 
-    setup = read_json('setup.json')
-    print(f'setup.json: {setup}')
+    setup = read_json('settings.json')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     timeframe = setup['timeframe']
@@ -533,8 +533,8 @@ def test_model_with_trader():
 def test_model_with_trader_interactive():
     from TraderSimMultiNoPrints import TraderSimMulti
 
-    setup = read_json('setup.json')
-    print(f'setup.json: {setup}')
+    setup = read_json('settings.json')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     timeframe = setup['timeframe']

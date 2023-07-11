@@ -714,7 +714,7 @@ def choose_n_procs_start(_n_symbols: int):
 
 
 def main():
-    setup = read_json('setup.json')
+    setup = read_json('settings.json')
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
     timeframe = setup['timeframe']

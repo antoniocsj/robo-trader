@@ -179,7 +179,7 @@ class DirectorySynchronization:
                 i += 1
 
     def synchronize_directory(self):
-        setup = read_json('setup.json')
+        setup = read_json('settings.json')
         csv_dir = setup['csv_dir']
         csv_s_dir = setup['csv_s_dir']
 
@@ -570,7 +570,7 @@ class DirectorySynchronization:
 
 
 def main():
-    setup = read_json('setup.json')
+    setup = read_json('settings.json')
     csv_dir = setup['csv_dir']
 
     dir_sync = DirectorySynchronization(csv_dir)

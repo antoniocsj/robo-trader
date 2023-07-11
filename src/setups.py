@@ -19,7 +19,7 @@ def check_base_ok():
     """
     O objetivo desta função é verificar se os diretórios csv e csv_s estão prontos para os experimentos a serem
     definidos nas funções 'setup'.
-    1) Lê arquivo de setup.json para obter as configurações gerais do experimento.
+    1) Lê arquivo de settings.json para obter as configurações gerais do experimento.
     2) Reseta o diretório csv, deletando-o e recriando-o novamente.
     3) verifica se a sincronização já está finalizada. caso esteja, verifica se os símbolos presentes no
        diretório csv_s coincidem com a lista de símbolos presente no arquivo de checkpoint final sincronização.
@@ -28,9 +28,9 @@ def check_base_ok():
        corretos.
     :return: True se tudo está OK, False, caso contrário.
     """
-    with open('setup.json', 'r') as file:
+    with open('settings.json', 'r') as file:
         setup = json.load(file)
-    print(f'setup.json: {setup}')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
@@ -111,9 +111,9 @@ def setup_01():
         print('abortando setup.')
         exit(-1)
 
-    with open('setup.json', 'r') as file:
+    with open('settings.json', 'r') as file:
         setup = json.load(file)
-    print(f'setup.json: {setup}')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
@@ -143,9 +143,9 @@ def setup_02():
         print('abortando setup.')
         exit(-1)
 
-    with open('setup.json', 'r') as file:
+    with open('settings.json', 'r') as file:
         setup = json.load(file)
-    print(f'setup.json: {setup}')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
@@ -189,9 +189,9 @@ def setup_03():
         print('abortando setup.')
         exit(-1)
 
-    with open('setup.json', 'r') as file:
+    with open('settings.json', 'r') as file:
         setup = json.load(file)
-    print(f'setup.json: {setup}')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
@@ -235,9 +235,9 @@ def setup_04():
         print('abortando setup.')
         exit(-1)
 
-    with open('setup.json', 'r') as file:
+    with open('settings.json', 'r') as file:
         setup = json.load(file)
-    print(f'setup.json: {setup}')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
@@ -282,9 +282,9 @@ def setup_05():
         print('abortando setup.')
         exit(-1)
 
-    with open('setup.json', 'r') as file:
+    with open('settings.json', 'r') as file:
         setup = json.load(file)
-    print(f'setup.json: {setup}')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
@@ -324,9 +324,9 @@ def setup_06():
         print('abortando setup.')
         exit(-1)
 
-    with open('setup.json', 'r') as file:
+    with open('settings.json', 'r') as file:
         setup = json.load(file)
-    print(f'setup.json: {setup}')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
@@ -369,9 +369,9 @@ def setup_07():
         print('abortando setup.')
         exit(-1)
 
-    with open('setup.json', 'r') as file:
+    with open('settings.json', 'r') as file:
         setup = json.load(file)
-    print(f'setup.json: {setup}')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
@@ -434,9 +434,9 @@ def setup_08():
         print('abortando setup.')
         exit(-1)
 
-    with open('setup.json', 'r') as file:
+    with open('settings.json', 'r') as file:
         setup = json.load(file)
-    print(f'setup.json: {setup}')
+    print(f'settings.json: {setup}')
 
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']

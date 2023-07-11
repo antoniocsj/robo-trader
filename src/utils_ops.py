@@ -108,7 +108,7 @@ def denorm_output(arr: ndarray, bias: Any, candle_type: str, scaler: MinMaxScale
 
 
 def normalize_directory(directory: str):
-    setup = read_json('setup.json')
+    setup = read_json('settings.json')
     timeframe = setup['timeframe']
 
     hist = HistMulti(directory, timeframe)
@@ -172,7 +172,7 @@ def normalize_symbols(hist: HistMulti, scalers: dict, symbols: list[str] = None)
 def differentiate_directory(directory: str):
     print(f'diferenciando diretório {directory}')
 
-    setup = read_json('setup.json')
+    setup = read_json('settings.json')
     timeframe = setup['timeframe']
 
     hist = HistMulti(directory, timeframe)
@@ -269,7 +269,7 @@ def apply_transform_str(arr: ndarray, transform_str: str) -> ndarray:
 def transform_directory(directory: str, transform_str: str):
     print(f'transformando diretório {directory}')
 
-    setup = read_json('setup.json')
+    setup = read_json('settings.json')
     timeframe = setup['timeframe']
     hist = HistMulti(directory, timeframe)
 
@@ -290,7 +290,7 @@ def transform_directory(directory: str, transform_str: str):
 def transform_directory_(directory: str, transform_str: str):
     print(f'transformando diretório {directory}')
 
-    setup = read_json('setup.json')
+    setup = read_json('settings.json')
     timeframe = setup['timeframe']
 
     hist = HistMulti(directory, timeframe)

@@ -8,8 +8,8 @@ from utils_ops import denorm_close_price
 
 class TraderSimMulti:
     def __init__(self, initial_deposit: float):
-        setup = read_json('setup.json')
-        print(f'setup.json: {setup}')
+        setup = read_json('settings.json')
+        print(f'settings.json: {setup}')
 
         csv_dir = setup['csv_dir']
         timeframe = setup['timeframe']
