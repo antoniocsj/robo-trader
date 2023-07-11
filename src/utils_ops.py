@@ -169,26 +169,6 @@ def normalize_symbols(hist: HistMulti, scalers: dict, symbols: list[str] = None)
         print(f'todos os símbolos de {type(hist)} foram normalizados.')
 
 
-def denormalize__directory(directory: str):
-    with open('scalers.pkl', 'rb') as file:
-        scalers = pickle.load(file)
-
-    setup = read_json('setup.json')
-    timeframe = setup['timeframe']
-
-    hist = HistMulti(directory, timeframe)
-
-    for _symbol in hist.symbols:
-        _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
-        arr = hist.arr[_symbol_timeframe]
-        data = arr[:, 1:6]
-        trans: MinMaxScaler = scalers[_symbol_timeframe]
-        data_inv = trans.inverse_transform(data)
-        print(f'{_symbol} {data_inv[0]}')
-
-    print(f'todos os símbolos do diretório {directory} foram desnormalizados.')
-
-
 def differentiate_directory(directory: str):
     print(f'diferenciando diretório {directory}')
 
@@ -200,8 +180,13 @@ def differentiate_directory(directory: str):
     for _symbol in hist.symbols:
         print(_symbol)
         _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
+
         arr = hist.arr[_symbol_timeframe]
-        data = arr[:, 1:6]
+        if arr.shape[1] == 2:
+            data = arr[:, 1]
+        else:
+            data = arr[:, 1:6]
+
         data = np.diff(data, axis=0)
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[1:, 0], True)
@@ -219,7 +204,12 @@ def differentiate_files(filepath_list: list[str], directory: str):
         print(_filepath)
         df: pd.DataFrame = pd.read_csv(_filepath, sep='\t')
         arr = df.to_numpy()
-        data = arr[:, 1:6]
+
+        if arr.shape[1] == 2:
+            data = arr[:, 1]
+        else:
+            data = arr[:, 1:6]
+
         data = np.diff(data, axis=0)
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[1:, 0], True)
@@ -229,7 +219,75 @@ def differentiate_files(filepath_list: list[str], directory: str):
     print(f'{len(filepath_list)} símbolos do diretório {directory} foram diferenciados: {filepath_list}')
 
 
+def differentiate_symbols(hist: HistMulti, symbols: list[str] = None):
+    print(f'diferenciando alguns símbolos do objeto hist {type(hist)}')
+
+    for symbol in hist.symbols:
+        if symbols and symbol not in symbols:
+            continue
+
+        print(symbol)
+        _symbol_timeframe = f'{symbol}_{hist.timeframe}'
+
+        arr = hist.arr[_symbol_timeframe]
+        if arr.shape[1] == 2:
+            data = arr[:, 1]
+        else:
+            data = arr[:, 1:6]
+
+        data = np.diff(data, axis=0)
+        dataf = pd.DataFrame(data)
+        dataf.insert(0, 0, arr[1:, 0], True)
+        dataf.columns = range(dataf.columns.size)
+        hist.arr[_symbol_timeframe] = dataf.to_numpy(copy=True)
+
+    if symbols:
+        print(f'os símbolos {symbols} de {type(hist)} foram diferenciados.')
+        hist.update_sheets(symbols)
+    else:
+        hist.update_sheets()
+        print(f'todos os símbolos de {type(hist)} foram diferenciados.')
+
+
+def apply_transform_str(arr: ndarray, transform_str: str) -> ndarray:
+    if arr.shape[2] != 6:
+        print('ERRO. apply_transform_str(). arr.shape[2] != 6.')
+        exit(-1)
+
+    if transform_str == '(C-O)*V':
+        out_arr = (arr[:, 4] - arr[:, 1]) * arr[:, 5]
+    elif transform_str == 'C*V':
+        out_arr = arr[:, 4] * arr[:, 5]
+    else:
+        print(f'ERRO. a tranformação {transform_str} não está implementada')
+        exit(-1)
+
+    out_arr = np.reshape(out_arr, (len(out_arr), 1))
+    return out_arr
+
+
 def transform_directory(directory: str, transform_str: str):
+    print(f'transformando diretório {directory}')
+
+    setup = read_json('setup.json')
+    timeframe = setup['timeframe']
+    hist = HistMulti(directory, timeframe)
+
+    for _symbol in hist.symbols:
+        print(_symbol)
+        _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
+        arr = hist.arr[_symbol_timeframe]
+        data = apply_transform_str(arr, transform_str)
+        dataf = pd.DataFrame(data)
+        dataf.insert(0, 0, arr[:, 0], True)
+        dataf.columns = range(dataf.columns.size)
+        _filepath = hist.get_csv_filepath(_symbol_timeframe)
+        dataf.to_csv(_filepath, index=False, sep='\t')
+
+    print(f'todos os símbolos do diretório {directory} foram transformados: {transform_str}.')
+
+
+def transform_directory_(directory: str, transform_str: str):
     print(f'transformando diretório {directory}')
 
     setup = read_json('setup.json')
