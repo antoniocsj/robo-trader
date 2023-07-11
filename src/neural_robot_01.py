@@ -82,7 +82,7 @@ def train_model():
     n_cols, n_symbols = calc_n_inputs(csv_dir, candle_input_type, timeframe)
     num_entradas = n_steps * n_cols
     max_n_epochs = num_entradas
-    patience = int(max_n_epochs / 10) * 0 + 10
+    patience = int(max_n_epochs / 10)
 
     print(f'n_steps = {n_steps}, tipo_vela_entrada = {candle_input_type}, tipo_vela_saída = {candle_output_type}, '
           f'n_samples_train = {n_samples_train}, validation_split = {validation_split}, max_n_epochs = {max_n_epochs}, '
@@ -106,6 +106,7 @@ def train_model():
     model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
     model.add(Flatten())
+    model.add(Dense(n_features, activation='relu'))
     model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(len(candle_output_type), activation='relu'))
