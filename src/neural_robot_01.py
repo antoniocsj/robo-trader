@@ -103,7 +103,7 @@ def train_model():
 
     # define model
     model = Sequential()
-    model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(Conv1D(filters=64, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=2, padding='same'))
     model.add(Flatten())
     model.add(Dense(num_entradas, activation='relu'))
