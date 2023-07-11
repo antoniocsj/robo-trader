@@ -75,14 +75,14 @@ def train_model():
               f'em setup.json ({timeframe})')
         exit(-1)
 
-    n_steps = 2
+    n_steps = 4
     n_samples_train = 60000  # 30000-M10, 60000-M5
     validation_split = 0.2
 
     n_cols, n_symbols = calc_n_inputs(csv_dir, candle_input_type, timeframe)
     num_entradas = n_steps * n_cols
     max_n_epochs = num_entradas
-    patience = int(max_n_epochs / 10)
+    patience = int(max_n_epochs / 10) * 0 + 10
 
     print(f'n_steps = {n_steps}, tipo_vela_entrada = {candle_input_type}, tipo_vela_saída = {candle_output_type}, '
           f'n_samples_train = {n_samples_train}, validation_split = {validation_split}, max_n_epochs = {max_n_epochs}, '
@@ -103,13 +103,12 @@ def train_model():
 
     # define model
     model = Sequential()
-    model.add(Conv1D(filters=64, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
-    model.add(MaxPooling1D(pool_size=2, padding='same'))
+    model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
     model.add(Flatten())
     model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(num_entradas, activation='relu'))
-    model.add(Dense(num_entradas, activation='relu'))
-    model.add(Dense(len(candle_output_type)))
+    model.add(Dense(len(candle_output_type), activation='relu'))
     model.compile(optimizer='adam', loss='mse')
     model_config = model.get_config()
 
