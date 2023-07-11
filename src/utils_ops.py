@@ -140,10 +140,13 @@ def normalize_directory(directory: str):
     print('o arquivo scalers.pkl, que guarda as informações da normalização, foi salvo.')
 
 
-def normalize_symbols(hist: HistMulti, scalers: dict):
-    for _symbol in hist.symbols:
-        print(_symbol)
-        _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
+def normalize_symbols(hist: HistMulti, scalers: dict, symbols: list[str] = None):
+    for symbol in hist.symbols:
+        if symbols and symbol not in symbols:
+            continue
+
+        print(symbol)
+        _symbol_timeframe = f'{symbol}_{hist.timeframe}'
 
         arr: ndarray = hist.arr[_symbol_timeframe]
         if arr.shape[1] == 2:
@@ -158,8 +161,12 @@ def normalize_symbols(hist: HistMulti, scalers: dict):
         dataf.columns = range(dataf.columns.size)
         hist.arr[_symbol_timeframe] = dataf.to_numpy(copy=True)
 
-    hist.update_sheets()
-    print(f'todos os símbolos de {type(hist)} foram normalizados.')
+    if symbols:
+        print(f'os símbolos {symbols} de {type(hist)} foram normalizados.')
+        hist.update_sheets(symbols)
+    else:
+        hist.update_sheets()
+        print(f'todos os símbolos de {type(hist)} foram normalizados.')
 
 
 def denormalize__directory(directory: str):

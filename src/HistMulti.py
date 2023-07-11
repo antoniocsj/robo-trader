@@ -102,17 +102,21 @@ class HistMulti:
         else:
             print('os dados históricos não foram carregados ainda.')
 
-    def update_sheets(self):
+    def update_sheets(self, symbols: list[str] = None):
         """
         Atualia o dicionário self.sheets para refletir os dados de self.arr
         :return:
         """
-        if not self.source_is_dir:
-            for symbol in self.symbols:
-                _symbol_tf = f'{symbol}_{self.timeframe}'
-                arr = self.arr[_symbol_tf]
-                s: Sheet = Sheet(arr, symbol, self.timeframe)
-                self.sheets[_symbol_tf] = s
+        if self.source_is_dir:
+            return
+
+        for symbol in self.symbols:
+            if symbols and symbol not in symbols:
+                continue
+            _symbol_tf = f'{symbol}_{self.timeframe}'
+            arr = self.arr[_symbol_tf]
+            s: Sheet = Sheet(arr, symbol, self.timeframe)
+            self.sheets[_symbol_tf] = s
 
 
 class HistMultiOriginal:
