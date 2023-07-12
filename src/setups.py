@@ -133,6 +133,7 @@ def setup_directory_01():
     # normaliza todos os symbolos de csv.
     normalize_directory(csv_dir)
     update_settings('setup_code', 1)
+    update_settings('setup_uses_differentiation', False)
 
 
 def setup_symbols_01(hist: HistMulti) -> HistMulti:
@@ -201,6 +202,7 @@ def setup_directory_02():
     # normaliza todos os symbolos de csv.
     normalize_directory(csv_dir)
     update_settings('setup_code', 2)
+    update_settings('setup_uses_differentiation', True)
 
 
 def setup_symbols_02(hist: HistMulti) -> HistMulti:
@@ -278,6 +280,7 @@ def setup_directory_03():
     # symbol_out também, mas delete do arquivo que está em csv apenas.
     csv_delete_first_row(_dst)
     update_settings('setup_code', 3)
+    update_settings('setup_uses_differentiation', True)
 
 
 def setup_directory_04():
@@ -327,6 +330,7 @@ def setup_directory_04():
     # normaliza todos os symbolos de csv.
     normalize_directory(csv_dir)
     update_settings('setup_code', 4)
+    update_settings('setup_uses_differentiation', True)
 
 
 def setup_directory_05():
@@ -334,7 +338,7 @@ def setup_directory_05():
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) symbol_out transformado e normalizado (1 coluna Y: (C-O)*V);
-    -> 3) demais símbolos transformados e normalizado (1 coluna Y: (C-O)*V);
+    -> 3) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
     print('setup_directory_05.')
@@ -369,6 +373,7 @@ def setup_directory_05():
     # normaliza todos os symbolos de csv.
     normalize_directory(csv_dir)
     update_settings('setup_code', 5)
+    update_settings('setup_uses_differentiation', False)
 
 
 def setup_directory_06():
@@ -377,7 +382,7 @@ def setup_directory_06():
     -> 1) symbol_out normalizado;
     -> 2) symbol_out transformado e normalizado (1 coluna Y: (C-O)*V);
     -> 3) demais símbolos normalizados;
-    -> 4) demais símbolos transformados e normalizado (1 coluna Y: (C-O)*V);
+    -> 4) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
     print('setup_directory_06.')
@@ -413,6 +418,7 @@ def setup_directory_06():
     # normaliza todos os symbolos de csv.
     normalize_directory(csv_dir)
     update_settings('setup_code', 6)
+    update_settings('setup_uses_differentiation', False)
 
 
 def setup_directory_07():
@@ -423,7 +429,7 @@ def setup_directory_07():
     -> 3) symbol_out diferenciado e normalizado;
     -> 4) demais símbolos normalizados;
     -> 5) demais símbolos diferenciados e normalizados;
-    -> 4) demais símbolos transformados e normalizado (1 coluna Y: (C-O)*V);
+    -> 4) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
     print('setup_directory_07.')
@@ -483,6 +489,7 @@ def setup_directory_07():
         csv_delete_first_row(_filepath)
 
     update_settings('setup_code', 7)
+    update_settings('setup_uses_differentiation', True)
 
 
 def setup_directory_08():
@@ -533,6 +540,7 @@ def setup_directory_08():
     # symbol_out também, mas delete do arquivo que está em csv.
     csv_delete_first_row(_dst)
     update_settings('setup_code', 8)
+    update_settings('setup_uses_differentiation', True)
 
 
 if __name__ == '__main__':

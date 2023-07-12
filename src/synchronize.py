@@ -147,10 +147,35 @@ def prepare_data_for_model(data: dict) -> ndarray:
     print('prepare_data_for_model()')
 
     settings = read_json('settings.json')
+    print('settings:')
+    print(f'{settings}')
+
     csv_dir = settings['csv_dir']
     symbol_out = settings['symbol_out']
     settings_timeframe = settings['timeframe']
     setup_code = settings['setup_code']
+    setup_uses_differentiation = settings['setup_uses_differentiation']
+
+    train_configs = read_json('train_configs.json')
+    print('train_configs:')
+    print(f'{train_configs}')
+
+    n_steps = train_configs['n_steps']
+    n_features = train_configs['n_features']
+    symbol_out = train_configs['symbol_out']
+    symbols_used_in_training = set(train_configs['symbols'])
+    n_samples_train = train_configs['n_samples_train']
+    candle_input_type = settings['candle_input_type']
+    candle_output_type = settings['candle_output_type']
+
+    if setup_code < 1:
+        print(f'ERRO. setup_code = {setup_code} indica que não foi feito nenhum setup.')
+        exit(-1)
+
+    if setup_uses_differentiation:
+        num_candles = n_steps + 1
+    else:
+        num_candles = n_steps
 
     last_datetime = datetime.fromisoformat(data['last_datetime'])
     trade_server_datetime = datetime.fromisoformat(data['trade_server_datetime'])
@@ -172,20 +197,6 @@ def prepare_data_for_model(data: dict) -> ndarray:
     symbols = search_symbols_in_dict(symbols_rates, timeframe)
     symbols_present_in_the_request = set(symbols)
 
-    with open("train_configs.json", "r") as file:
-        train_configs = json.load(file)
-
-    print(f'train_configs:')
-    print(f'{train_configs}')
-
-    n_steps = train_configs['n_steps']
-    n_features = train_configs['n_features']
-    symbol_out = train_configs['symbol_out']
-    symbols_used_in_training = set(train_configs['symbols'])
-    n_samples_train = train_configs['n_samples_train']
-    candle_input_type = settings['candle_input_type']
-    candle_output_type = settings['candle_output_type']
-
     # verifique se os símbolos usados no treinamento da rede neural estão presentes na requisição
     if symbols_used_in_training.issubset(symbols_present_in_the_request):
         # faça um novo symbols_rates contendo apenas os símbolos presentes no treinamento
@@ -201,7 +212,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
 
     # se o settings usa alguma diferenciação, então n_steps deve ser n_steps + 1 em SymbolsPreparation
     
-    symb_sync = SymbolsPreparation(symbols_rates, timeframe, trade_server_datetime, n_steps+1)
+    symb_sync = SymbolsPreparation(symbols_rates, timeframe, trade_server_datetime, num_candles)
     symb_sync.prepare_symbols()
     hist = HistMulti(symb_sync.sheets, timeframe)
     hist2 = setup_symbols_02(hist)
