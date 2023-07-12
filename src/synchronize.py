@@ -9,6 +9,7 @@ from utils_filesystem import read_json
 from utils_symbols import search_symbols_in_dict
 from utils_nn import prepare_data_for_prediction
 from utils_ops import denorm_close_price, denorm_output, normalize_symbols
+from setups import setup_symbols_01, setup_symbols_02
 
 
 class SymbolsPreparation:
@@ -197,21 +198,12 @@ def prepare_data_for_model(data: dict) -> ndarray:
         print(f'ERRO. Nem todos os símbolos usados no treinamento da rede neural estão presentes na requisição.')
         exit(-1)
 
-    symb_sync = SymbolsPreparation(symbols_rates, timeframe, trade_server_datetime, n_steps)
+    symb_sync = SymbolsPreparation(symbols_rates, timeframe, trade_server_datetime, n_steps+1)
     symb_sync.prepare_symbols()
     hist = HistMulti(symb_sync.sheets, timeframe)
+    hist2 = setup_symbols_02(hist)
 
-    # ainda pode faltar a normalização ou outras operações antes de usar os dados históricos no modelo para previsão.
-    # depende do setup usado.
-
-    # supondo que foi usado o setup_directory_01, apenas normalizar todos os símbolos.
-    # deve-se usar o mesmo objeto MinMaxScaler que foi usado na normalização do conjunto de treinamento.
-    with open('scalers.pkl', 'rb') as file:
-        scalers = pickle.load(file)
-
-    normalize_symbols(hist, scalers)
-
-    X = prepare_data_for_prediction(hist, n_steps, candle_input_type)
+    X = prepare_data_for_prediction(hist2, n_steps, candle_input_type)
     X = np.asarray(X).astype(np.float32)
     X = X.reshape((1, n_steps, n_features))
 
@@ -246,7 +238,7 @@ def predict_next_candle(data: dict):
 
 
 def test_01():
-    data = read_json('request_3.json')
+    data = read_json('request_4.json')
     predict_next_candle(data)
 
 

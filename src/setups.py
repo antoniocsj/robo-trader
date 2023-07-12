@@ -1,12 +1,15 @@
 import os
+import pickle
 import shutil
 import json
+import copy
 
 import pandas as pd
+from HistMulti import HistMulti
 from utils_filesystem import get_list_sync_files, load_sync_cp_file
 from utils_symbols import search_symbols
-from utils_ops import differentiate_directory, normalize_directory, transform_directory, differentiate_files, \
-    transform_files
+from utils_ops import transform_directory, transform_files, normalize_directory, normalize_symbols, \
+    differentiate_directory, differentiate_files, differentiate_symbols
 
 
 # As funções 'setup' buscam automatizar parte do trabalho feita na configuração e preparação de um experimento
@@ -131,6 +134,28 @@ def setup_directory_01():
     normalize_directory(csv_dir)
 
 
+def setup_symbols_01(hist: HistMulti) -> HistMulti:
+    """
+    O histórico terá os seguintes símbolos:
+    -> 1) symbol_out normalizado;
+    -> 2) demais símbolos normalizados.
+    :return:
+    """
+    with open('settings.json', 'r') as file:
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
+
+    symbol_out = settings['symbol_out']
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+
+    _hist = copy.deepcopy(hist)
+    normalize_symbols(_hist, scalers)
+
+    return _hist
+
+
 def setup_directory_02():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
@@ -174,6 +199,37 @@ def setup_directory_02():
 
     # normaliza todos os symbolos de csv.
     normalize_directory(csv_dir)
+
+
+def setup_symbols_02(hist: HistMulti) -> HistMulti:
+    """
+    O histórico terá os seguintes símbolos:
+    -> 1) symbol_out normalizado;
+    -> 2) demais símbolos diferenciados e normalizados.
+    :return:
+    """
+    with open('settings.json', 'r') as file:
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
+
+    symbol_out = settings['symbol_out']
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+
+    _hist = copy.deepcopy(hist)
+    _hist.remove_symbol(symbol_out)
+
+    _hist.rename_symbols_adding_suffix('@D')
+    differentiate_symbols(_hist)
+
+    _hist.add_symbol(symbol_out, hist)
+    _hist.delete_first_row_symbol(symbol_out)
+    _hist.sort_symbols()
+
+    normalize_symbols(_hist, scalers)
+
+    return _hist
 
 
 def setup_directory_03():
@@ -471,4 +527,4 @@ def setup_directory_08():
 
 
 if __name__ == '__main__':
-    setup_directory_01()
+    setup_directory_02()

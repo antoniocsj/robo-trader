@@ -1,5 +1,8 @@
+import copy
 import os
 from typing import Any
+
+import numpy as np
 from numpy import ndarray
 import pandas as pd
 from pandas import DataFrame
@@ -32,7 +35,7 @@ class HistMulti:
         elif isinstance(source, dict):
             self.source_is_dir = False
             print(f'obtendo dados históricos a partir de um dicionário de planilhas')
-            self.sheets: dict = source
+            self.sheets: dict[str, Sheet] = source
             self.symbols = search_symbols_in_dict(self.sheets, self.timeframe)
 
         self.load_symbols()
@@ -118,6 +121,77 @@ class HistMulti:
             s: Sheet = Sheet(arr, symbol, self.timeframe)
             self.sheets[_symbol_tf] = s
 
+    def add_symbol(self, symbol_name: str, other_hist: "HistMulti"):
+        if self.source_is_dir:
+            print('ERRO. add_symbol(). esta função não pode ser usada quando a fonte é um diretório.')
+            exit(-1)
+
+        symbol_tf = f'{symbol_name}_{self.timeframe}'
+        if symbol_name in self.symbols:
+            print(f'ERRO. add_symbol(). tentativa de adicionar o símbolo {symbol_name} que já existe no hist.')
+            exit(-1)
+
+        symbol_sheet = other_hist.sheets[symbol_tf]
+        symbols_arr = other_hist.arr[symbol_tf]
+
+        self.symbols.append(symbol_name)
+        self.sheets[symbol_tf] = copy.deepcopy(symbol_sheet)
+        self.arr[symbol_tf] = copy.deepcopy(symbols_arr)
+
+    def remove_symbol(self, symbol_name: str):
+        symbol_tf = f'{symbol_name}_{self.timeframe}'
+
+        if symbol_name not in self.symbols:
+            print(f'ERRO. add_symbol(). tentativa de remover o símbolo {symbol_name} que não existe no hist.')
+            exit(-1)
+
+        self.symbols.remove(symbol_name)
+        del self.sheets[symbol_tf]
+        del self.arr[symbol_tf]
+
+    def rename_symbol(self, old_name: str, new_name: str):
+        if old_name not in self.symbols:
+            print(f'ERRO. rename_symbol(). tentativa de renomar o símbolo {old_name} que não existe no hist.')
+            exit(-1)
+
+        old_symbol_tf = f'{old_name}_{self.timeframe}'
+        new_symbol_tf = f'{new_name}_{self.timeframe}'
+
+        self.symbols.remove(old_name)
+        self.symbols.append(new_name)
+        self.sheets[new_symbol_tf] = self.sheets.pop(old_symbol_tf)
+        self.arr[new_symbol_tf] = self.arr.pop(old_symbol_tf)
+
+    def rename_symbols_adding_suffix(self, suffix: str):
+        new_symbols = []
+        for symbol in self.symbols[:]:
+            new_symbol = f'{symbol}{suffix}'
+            new_symbols.append(new_symbol)
+            self.rename_symbol(symbol, new_symbol)
+        self.symbols = sorted(new_symbols)
+
+    def sort_symbols(self):
+        self.symbols = sorted(self.symbols)
+
+    def delete_first_row_symbol(self, symbol_name: str):
+        symbol_tf = f'{symbol_name}_{self.timeframe}'
+
+        if symbol_name not in self.symbols:
+            print(f'ERRO. delete_first_row_symbol(). tentativa de remover primeira linha do símbolo {symbol_name} '
+                  f'que não existe no hist.')
+            exit(-1)
+
+        s: Sheet = self.sheets[symbol_tf]
+        df: DataFrame = s.df
+        df.drop(df.index[0], inplace=True)
+        df.sort_index(ignore_index=True, inplace=True)
+        df.reset_index(drop=True)
+        self.arr[symbol_tf] = np.delete(self.arr[symbol_tf], 0, axis=0)
+
+    def delete_first_row_symbols(self):
+        for symbol in self.symbols:
+            self.delete_first_row_symbol(symbol)
+
 
 class HistMultiOriginal:
     def __init__(self, directory: str):
@@ -201,5 +275,5 @@ if __name__ == '__main__':
     symbol_out = setup['symbol_out']
     _tf = setup['timeframe']
 
-    hist = HistMulti(csv_dir, _tf)
-    hist.print_hist()
+    _hist = HistMulti(csv_dir, _tf)
+    _hist.print_hist()
