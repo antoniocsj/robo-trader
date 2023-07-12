@@ -6,7 +6,7 @@ import copy
 
 import pandas as pd
 from HistMulti import HistMulti
-from utils_filesystem import get_list_sync_files, load_sync_cp_file
+from utils_filesystem import get_list_sync_files, load_sync_cp_file, update_settings
 from utils_symbols import search_symbols
 from utils_ops import transform_directory, transform_files, normalize_directory, normalize_symbols, \
     differentiate_directory, differentiate_files, differentiate_symbols
@@ -132,6 +132,7 @@ def setup_directory_01():
 
     # normaliza todos os symbolos de csv.
     normalize_directory(csv_dir)
+    update_settings('setup', 1)
 
 
 def setup_symbols_01(hist: HistMulti) -> HistMulti:
@@ -199,6 +200,7 @@ def setup_directory_02():
 
     # normaliza todos os symbolos de csv.
     normalize_directory(csv_dir)
+    update_settings('setup', 2)
 
 
 def setup_symbols_02(hist: HistMulti) -> HistMulti:
@@ -275,6 +277,7 @@ def setup_directory_03():
     # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
     # symbol_out também, mas delete do arquivo que está em csv apenas.
     csv_delete_first_row(_dst)
+    update_settings('setup', 3)
 
 
 def setup_directory_04():
@@ -323,6 +326,7 @@ def setup_directory_04():
 
     # normaliza todos os symbolos de csv.
     normalize_directory(csv_dir)
+    update_settings('setup', 4)
 
 
 def setup_directory_05():
@@ -364,6 +368,7 @@ def setup_directory_05():
 
     # normaliza todos os symbolos de csv.
     normalize_directory(csv_dir)
+    update_settings('setup', 5)
 
 
 def setup_directory_06():
@@ -407,6 +412,7 @@ def setup_directory_06():
 
     # normaliza todos os symbolos de csv.
     normalize_directory(csv_dir)
+    update_settings('setup', 6)
 
 
 def setup_directory_07():
@@ -476,6 +482,8 @@ def setup_directory_07():
     for _filepath in _list:
         csv_delete_first_row(_filepath)
 
+    update_settings('setup', 7)
+
 
 def setup_directory_08():
     """
@@ -524,6 +532,7 @@ def setup_directory_08():
     # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
     # symbol_out também, mas delete do arquivo que está em csv.
     csv_delete_first_row(_dst)
+    update_settings('setup', 8)
 
 
 if __name__ == '__main__':

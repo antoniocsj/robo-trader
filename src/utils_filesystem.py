@@ -1,5 +1,7 @@
 import os
 import filecmp
+from typing import Any
+
 import numpy as np
 import json
 
@@ -28,6 +30,12 @@ def read_json(_filename: str) -> dict:
         print(f'ERRO. O arquivo {_filename} não foi encontrado.')
         exit(-1)
     return _dict
+
+
+def update_settings(key: str, value: Any):
+    settings = read_json('settings.json')
+    settings[key] = value
+    write_json('settings.json', settings)
 
 
 def are_dir_trees_equal(dir1, dir2):
