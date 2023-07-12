@@ -283,6 +283,17 @@ def setup_directory_03():
     update_settings('setup_uses_differentiation', True)
 
 
+def setup_symbols_03(hist: HistMulti) -> HistMulti:
+    """
+    O histórico terá os seguintes símbolos (arquivos CSVs):
+    -> 1) symbol_out normalizado;
+    -> 2) symbol_out diferenciado e normalizado;
+    -> 3) demais símbolos diferenciados e normalizados;
+    :return:
+    """
+    pass
+
+
 def setup_directory_04():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
@@ -333,6 +344,18 @@ def setup_directory_04():
     update_settings('setup_uses_differentiation', True)
 
 
+def setup_symbols_04(hist: HistMulti) -> HistMulti:
+    """
+    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    -> 1) symbol_out normalizado;
+    -> 2) symbol_out diferenciado e normalizado;
+    -> 3) demais símbolos normalizados;
+    -> 4) demais símbolos diferenciados e normalizados;
+    :return:
+    """
+    pass
+
+
 def setup_directory_05():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
@@ -374,6 +397,17 @@ def setup_directory_05():
     normalize_directory(csv_dir)
     update_settings('setup_code', 5)
     update_settings('setup_uses_differentiation', False)
+
+
+def setup_symbols_05(hist: HistMulti) -> HistMulti:
+    """
+    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    -> 1) symbol_out normalizado;
+    -> 2) symbol_out transformado e normalizado (1 coluna Y: (C-O)*V);
+    -> 3) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
+    :return:
+    """
+    pass
 
 
 def setup_directory_06():
@@ -421,6 +455,18 @@ def setup_directory_06():
     update_settings('setup_uses_differentiation', False)
 
 
+def setup_symbols_06(hist: HistMulti) -> HistMulti:
+    """
+    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    -> 1) symbol_out normalizado;
+    -> 2) symbol_out transformado e normalizado (1 coluna Y: (C-O)*V);
+    -> 3) demais símbolos normalizados;
+    -> 4) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
+    :return:
+    """
+    pass
+
+
 def setup_directory_07():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
@@ -429,7 +475,7 @@ def setup_directory_07():
     -> 3) symbol_out diferenciado e normalizado;
     -> 4) demais símbolos normalizados;
     -> 5) demais símbolos diferenciados e normalizados;
-    -> 4) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
+    -> 6) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
     print('setup_directory_07.')
@@ -492,12 +538,26 @@ def setup_directory_07():
     update_settings('setup_uses_differentiation', True)
 
 
+def setup_symbols_07(hist: HistMulti) -> HistMulti:
+    """
+    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    -> 1) symbol_out normalizado;
+    -> 2) symbol_out transformado e normalizado (1 coluna Y: (C-O)*V);
+    -> 3) symbol_out diferenciado e normalizado;
+    -> 4) demais símbolos normalizados;
+    -> 5) demais símbolos diferenciados e normalizados;
+    -> 6) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
+    :return:
+    """
+    pass
+
+
 def setup_directory_08():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) symbol_out diferenciado, transformado e normalizado (1 coluna Y: C*V);
-    -> 4) demais símbolos diferenciados, transformados e normalizados (1 coluna Y: C*V);
+    -> 3) demais símbolos diferenciados, transformados e normalizados (1 coluna Y: C*V);
     :return:
     """
     print('setup_directory_08.')
@@ -541,6 +601,27 @@ def setup_directory_08():
     csv_delete_first_row(_dst)
     update_settings('setup_code', 8)
     update_settings('setup_uses_differentiation', True)
+
+
+def setup_symbols_08(hist: HistMulti) -> HistMulti:
+    """
+    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    -> 1) symbol_out normalizado;
+    -> 2) symbol_out diferenciado, transformado e normalizado (1 coluna Y: C*V);
+    -> 3) demais símbolos diferenciados, transformados e normalizados (1 coluna Y: C*V);
+    :return:
+    """
+    pass
+
+
+def apply_setup_symbols(hist: HistMulti, code: int) -> HistMulti:
+    if code == 1:
+        return setup_symbols_01(hist)
+    elif code == 2:
+        return setup_symbols_02(hist)
+    else:
+        print(F'ERRO. setup_code ({code}) inválido.')
+        exit(-1)
 
 
 if __name__ == '__main__':

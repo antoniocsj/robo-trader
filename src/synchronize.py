@@ -9,7 +9,7 @@ from utils_filesystem import read_json
 from utils_symbols import search_symbols_in_dict
 from utils_nn import prepare_data_for_prediction
 from utils_ops import denorm_close_price, denorm_output, normalize_symbols
-from setups import setup_symbols_01, setup_symbols_02
+from setups import apply_setup_symbols
 
 
 class SymbolsPreparation:
@@ -215,7 +215,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
     symb_sync = SymbolsPreparation(symbols_rates, timeframe, trade_server_datetime, num_candles)
     symb_sync.prepare_symbols()
     hist = HistMulti(symb_sync.sheets, timeframe)
-    hist2 = setup_symbols_02(hist)
+    hist2 = apply_setup_symbols(hist, setup_code)
 
     X = prepare_data_for_prediction(hist2, n_steps, candle_input_type)
     X = np.asarray(X).astype(np.float32)
