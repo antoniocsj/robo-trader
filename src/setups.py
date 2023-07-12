@@ -29,13 +29,13 @@ def check_base_ok():
     :return: True se tudo está OK, False, caso contrário.
     """
     with open('settings.json', 'r') as file:
-        setup = json.load(file)
-    print(f'settings.json: {setup}')
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    csv_s_dir = setup['csv_s_dir']
-    symbol_out = setup['symbol_out']
-    timeframe = setup['timeframe']
+    csv_dir = settings['csv_dir']
+    csv_s_dir = settings['csv_s_dir']
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
 
     if os.path.exists(csv_dir):
         print(f'o diretório {csv_dir} já existe. deletando todo seu conteúdo.')
@@ -99,26 +99,26 @@ def csv_delete_first_row(_filepath: str):
     df.to_csv(_filepath, sep='\t', index=False)
 
 
-def setup_01():
+def setup_directory_01():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) demais símbolos normalizados.
     :return:
     """
-    print('setup_01.')
+    print('setup_directory_01.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
 
     with open('settings.json', 'r') as file:
-        setup = json.load(file)
-    print(f'settings.json: {setup}')
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    csv_s_dir = setup['csv_s_dir']
-    symbol_out = setup['symbol_out']
-    timeframe = setup['timeframe']
+    csv_dir = settings['csv_dir']
+    csv_s_dir = settings['csv_s_dir']
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos de csv_s_dir para csv_dir
@@ -131,26 +131,26 @@ def setup_01():
     normalize_directory(csv_dir)
 
 
-def setup_02():
+def setup_directory_02():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) demais símbolos diferenciados e normalizados.
     :return:
     """
-    print('setup_02.')
+    print('setup_directory_02.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
 
     with open('settings.json', 'r') as file:
-        setup = json.load(file)
-    print(f'settings.json: {setup}')
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    csv_s_dir = setup['csv_s_dir']
-    symbol_out = setup['symbol_out']
-    timeframe = setup['timeframe']
+    csv_dir = settings['csv_dir']
+    csv_s_dir = settings['csv_s_dir']
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos, menos symbol_out, de csv_s_dir para csv_dir
@@ -176,7 +176,7 @@ def setup_02():
     normalize_directory(csv_dir)
 
 
-def setup_03():
+def setup_directory_03():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
@@ -184,19 +184,19 @@ def setup_03():
     -> 3) demais símbolos diferenciados e normalizados;
     :return:
     """
-    print('setup_03.')
+    print('setup_directory_03.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
 
     with open('settings.json', 'r') as file:
-        setup = json.load(file)
-    print(f'settings.json: {setup}')
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    csv_s_dir = setup['csv_s_dir']
-    symbol_out = setup['symbol_out']
-    timeframe = setup['timeframe']
+    csv_dir = settings['csv_dir']
+    csv_s_dir = settings['csv_s_dir']
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos de csv_s_dir para csv_dir
@@ -221,7 +221,7 @@ def setup_03():
     csv_delete_first_row(_dst)
 
 
-def setup_04():
+def setup_directory_04():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
@@ -230,19 +230,19 @@ def setup_04():
     -> 4) demais símbolos diferenciados e normalizados;
     :return:
     """
-    print('setup_04.')
+    print('setup_directory_04.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
 
     with open('settings.json', 'r') as file:
-        setup = json.load(file)
-    print(f'settings.json: {setup}')
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    csv_s_dir = setup['csv_s_dir']
-    symbol_out = setup['symbol_out']
-    timeframe = setup['timeframe']
+    csv_dir = settings['csv_dir']
+    csv_s_dir = settings['csv_s_dir']
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta D no final).
@@ -269,7 +269,7 @@ def setup_04():
     normalize_directory(csv_dir)
 
 
-def setup_05():
+def setup_directory_05():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
@@ -277,19 +277,19 @@ def setup_05():
     -> 3) demais símbolos transformados e normalizado (1 coluna Y: (C-O)*V);
     :return:
     """
-    print('setup_05.')
+    print('setup_directory_05.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
 
     with open('settings.json', 'r') as file:
-        setup = json.load(file)
-    print(f'settings.json: {setup}')
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    csv_s_dir = setup['csv_s_dir']
-    symbol_out = setup['symbol_out']
-    timeframe = setup['timeframe']
+    csv_dir = settings['csv_dir']
+    csv_s_dir = settings['csv_s_dir']
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @T no final).
@@ -310,7 +310,7 @@ def setup_05():
     normalize_directory(csv_dir)
 
 
-def setup_06():
+def setup_directory_06():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
@@ -319,19 +319,19 @@ def setup_06():
     -> 4) demais símbolos transformados e normalizado (1 coluna Y: (C-O)*V);
     :return:
     """
-    print('setup_06.')
+    print('setup_directory_06.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
 
     with open('settings.json', 'r') as file:
-        setup = json.load(file)
-    print(f'settings.json: {setup}')
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    csv_s_dir = setup['csv_s_dir']
-    symbol_out = setup['symbol_out']
-    timeframe = setup['timeframe']
+    csv_dir = settings['csv_dir']
+    csv_s_dir = settings['csv_s_dir']
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @T no final).
@@ -353,7 +353,7 @@ def setup_06():
     normalize_directory(csv_dir)
 
 
-def setup_07():
+def setup_directory_07():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
@@ -364,19 +364,19 @@ def setup_07():
     -> 4) demais símbolos transformados e normalizado (1 coluna Y: (C-O)*V);
     :return:
     """
-    print('setup_07.')
+    print('setup_directory_07.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
 
     with open('settings.json', 'r') as file:
-        setup = json.load(file)
-    print(f'settings.json: {setup}')
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    csv_s_dir = setup['csv_s_dir']
-    symbol_out = setup['symbol_out']
-    timeframe = setup['timeframe']
+    csv_dir = settings['csv_dir']
+    csv_s_dir = settings['csv_s_dir']
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @T no final).
@@ -421,7 +421,7 @@ def setup_07():
         csv_delete_first_row(_filepath)
 
 
-def setup_08():
+def setup_directory_08():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
@@ -429,19 +429,19 @@ def setup_08():
     -> 4) demais símbolos diferenciados, transformados e normalizados (1 coluna Y: C*V);
     :return:
     """
-    print('setup_08.')
+    print('setup_directory_08.')
     if not check_base_ok():
         print('abortando setup.')
         exit(-1)
 
     with open('settings.json', 'r') as file:
-        setup = json.load(file)
-    print(f'settings.json: {setup}')
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    csv_s_dir = setup['csv_s_dir']
-    symbol_out = setup['symbol_out']
-    timeframe = setup['timeframe']
+    csv_dir = settings['csv_dir']
+    csv_s_dir = settings['csv_s_dir']
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
     # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @ no final).
@@ -471,4 +471,4 @@ def setup_08():
 
 
 if __name__ == '__main__':
-    setup_01()
+    setup_directory_01()

@@ -204,7 +204,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
     # ainda pode faltar a normalização ou outras operações antes de usar os dados históricos no modelo para previsão.
     # depende do setup usado.
 
-    # supondo que foi usado o setup_01, apenas normalizar todos os símbolos.
+    # supondo que foi usado o setup_directory_01, apenas normalizar todos os símbolos.
     # deve-se usar o mesmo objeto MinMaxScaler que foi usado na normalização do conjunto de treinamento.
     with open('scalers.pkl', 'rb') as file:
         scalers = pickle.load(file)
