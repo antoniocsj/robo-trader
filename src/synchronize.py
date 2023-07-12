@@ -198,8 +198,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
         print(f'ERRO. Nem todos os símbolos usados no treinamento da rede neural estão presentes na requisição.')
         exit(-1)
 
-    # se o setup usa alguma diferenciação, então n_steps deve ser n_steps + 1
-
+    # se o setup usa alguma diferenciação, então n_steps deve ser n_steps + 1 em SymbolsPreparation
     symb_sync = SymbolsPreparation(symbols_rates, timeframe, trade_server_datetime, n_steps+1)
     symb_sync.prepare_symbols()
     hist = HistMulti(symb_sync.sheets, timeframe)
