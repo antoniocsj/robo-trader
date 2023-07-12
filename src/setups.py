@@ -222,9 +222,10 @@ def setup_symbols_02(hist: HistMulti) -> HistMulti:
         scalers = pickle.load(file)
 
     _hist = copy.deepcopy(hist)
-    _hist.remove_symbol(symbol_out)
 
+    _hist.remove_symbol(symbol_out)
     _hist.rename_symbols_adding_suffix('@D')
+
     differentiate_symbols(_hist)
 
     _hist.add_symbol(symbol_out, hist)
@@ -291,7 +292,19 @@ def setup_symbols_03(hist: HistMulti) -> HistMulti:
     -> 3) demais símbolos diferenciados e normalizados;
     :return:
     """
-    pass
+    with open('settings.json', 'r') as file:
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
+
+    symbol_out = settings['symbol_out']
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+
+    _hist = copy.deepcopy(hist)
+    #
+    #
+    return _hist
 
 
 def setup_directory_04():
@@ -353,7 +366,19 @@ def setup_symbols_04(hist: HistMulti) -> HistMulti:
     -> 4) demais símbolos diferenciados e normalizados;
     :return:
     """
-    pass
+    with open('settings.json', 'r') as file:
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
+
+    symbol_out = settings['symbol_out']
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+
+    _hist = copy.deepcopy(hist)
+    #
+    #
+    return _hist
 
 
 def setup_directory_05():
@@ -407,7 +432,19 @@ def setup_symbols_05(hist: HistMulti) -> HistMulti:
     -> 3) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
-    pass
+    with open('settings.json', 'r') as file:
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
+
+    symbol_out = settings['symbol_out']
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+
+    _hist = copy.deepcopy(hist)
+    #
+    #
+    return _hist
 
 
 def setup_directory_06():
@@ -464,7 +501,19 @@ def setup_symbols_06(hist: HistMulti) -> HistMulti:
     -> 4) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
-    pass
+    with open('settings.json', 'r') as file:
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
+
+    symbol_out = settings['symbol_out']
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+
+    _hist = copy.deepcopy(hist)
+    #
+    #
+    return _hist
 
 
 def setup_directory_07():
@@ -549,7 +598,19 @@ def setup_symbols_07(hist: HistMulti) -> HistMulti:
     -> 6) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
-    pass
+    with open('settings.json', 'r') as file:
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
+
+    symbol_out = settings['symbol_out']
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+
+    _hist = copy.deepcopy(hist)
+    #
+    #
+    return _hist
 
 
 def setup_directory_08():
@@ -611,7 +672,19 @@ def setup_symbols_08(hist: HistMulti) -> HistMulti:
     -> 3) demais símbolos diferenciados, transformados e normalizados (1 coluna Y: C*V);
     :return:
     """
-    pass
+    with open('settings.json', 'r') as file:
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
+
+    symbol_out = settings['symbol_out']
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+
+    _hist = copy.deepcopy(hist)
+    #
+    #
+    return _hist
 
 
 def apply_setup_symbols(hist: HistMulti, code: int) -> HistMulti:
