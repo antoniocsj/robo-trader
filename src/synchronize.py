@@ -198,6 +198,8 @@ def prepare_data_for_model(data: dict) -> ndarray:
         print(f'ERRO. Nem todos os símbolos usados no treinamento da rede neural estão presentes na requisição.')
         exit(-1)
 
+    # se o setup usa alguma diferenciação, então n_steps deve ser n_steps + 1
+
     symb_sync = SymbolsPreparation(symbols_rates, timeframe, trade_server_datetime, n_steps+1)
     symb_sync.prepare_symbols()
     hist = HistMulti(symb_sync.sheets, timeframe)
@@ -232,7 +234,7 @@ def predict_next_candle(data: dict):
     bias = train_configs['bias']
     candle_output_type = train_configs['candle_output_type']
     scaler = scalers[_symbol_tf]
-    # close_pred_denorm = denorm_close_price(output_norm[0][0] + bias, scaler)
+
     output_denorm = denorm_output(output_norm, bias, candle_output_type, scaler)
     print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
 

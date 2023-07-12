@@ -36,8 +36,7 @@ def make_prediction():
           f'rates_count = {rates_count}, start_pos = {start_pos} ')
 
     write_json('request_4.json', data)
-
-    # predict_next_candle(data)
+    predict_next_candle(data)
 
     return "OK"
 
