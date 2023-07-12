@@ -274,12 +274,13 @@ def setup_directory_03():
     _dst = f'{csv_dir}/{symbol_out}_{timeframe}.csv'
     shutil.copy(_src, _dst)
 
-    # normaliza todos os symbolos de csv.
-    normalize_directory(csv_dir)
-
     # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
     # symbol_out também, mas delete do arquivo que está em csv apenas.
     csv_delete_first_row(_dst)
+
+    # normaliza todos os symbolos de csv.
+    normalize_directory(csv_dir)
+
     update_settings('setup_code', 3)
     update_settings('setup_uses_differentiation', True)
 
@@ -302,8 +303,17 @@ def setup_symbols_03(hist: HistMulti) -> HistMulti:
         scalers = pickle.load(file)
 
     _hist = copy.deepcopy(hist)
-    #
-    #
+
+    _hist.rename_symbols_adding_suffix('@D')
+
+    differentiate_symbols(_hist)
+
+    _hist.add_symbol(symbol_out, hist)
+    _hist.delete_first_row_symbol(symbol_out)
+    _hist.sort_symbols()
+
+    normalize_symbols(_hist, scalers)
+
     return _hist
 
 
@@ -692,10 +702,12 @@ def apply_setup_symbols(hist: HistMulti, code: int) -> HistMulti:
         return setup_symbols_01(hist)
     elif code == 2:
         return setup_symbols_02(hist)
+    elif code == 3:
+        return setup_symbols_03(hist)
     else:
         print(F'ERRO. setup_code ({code}) inválido.')
         exit(-1)
 
 
 if __name__ == '__main__':
-    setup_directory_02()
+    setup_directory_03()

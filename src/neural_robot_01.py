@@ -77,8 +77,8 @@ def train_model():
 
     n_cols, n_symbols = calc_n_inputs(csv_dir, candle_input_type, timeframe)
     num_entradas = n_steps * n_cols
-    max_n_epochs = num_entradas
-    patience = int(max_n_epochs / 10)
+    max_n_epochs = num_entradas * 0 + 5
+    patience = int(max_n_epochs / 10) * 0 + 5
 
     print(f'n_steps = {n_steps}, tipo_vela_entrada = {candle_input_type}, tipo_vela_saída = {candle_output_type}, '
           f'n_samples_train = {n_samples_train}, validation_split = {validation_split}, max_n_epochs = {max_n_epochs}, '
@@ -133,7 +133,7 @@ def train_model():
     print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
 
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
-    n_samples_test = 3000
+    n_samples_test = 500
     samples_index_start = n_samples_train
     # dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
     dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
@@ -642,7 +642,7 @@ def show_tf():
 
 
 if __name__ == '__main__':
-    show_tf()
+    # show_tf()
     # test_models()
     train_model()
     # calculate_model_bias()

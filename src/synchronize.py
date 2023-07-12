@@ -163,7 +163,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
     n_steps = train_configs['n_steps']
     n_features = train_configs['n_features']
     symbol_out = train_configs['symbol_out']
-    symbols_used_in_training = set(train_configs['symbols'])
+    symbols_used_in_training: list[str] = train_configs['symbols']
     n_samples_train = train_configs['n_samples_train']
     candle_input_type = settings['candle_input_type']
     candle_output_type = settings['candle_output_type']
@@ -195,27 +195,41 @@ def prepare_data_for_model(data: dict) -> ndarray:
 
     symbols_rates = data['symbols_rates']
     symbols = search_symbols_in_dict(symbols_rates, timeframe)
-    symbols_present_in_the_request = set(symbols)
+    symbols_present_in_the_request_set = set(symbols)
+
+    # deixe na lista pure_symbols_used_in_training_set apenas os símbolos puros, ou seja, não modificados
+    # (sem '@' no nome)
+    pure_symbols_used_in_training_set = set()
+    name: str
+    for name in symbols_used_in_training:
+        index = name.find('@')
+        if index == -1:
+            pure_name = name
+        else:
+            pure_name = name[0:index]
+        pure_symbols_used_in_training_set.add(pure_name)
 
     # verifique se os símbolos usados no treinamento da rede neural estão presentes na requisição
-    if symbols_used_in_training.issubset(symbols_present_in_the_request):
+    if pure_symbols_used_in_training_set.issubset(symbols_present_in_the_request_set):
         # faça um novo symbols_rates contendo apenas os símbolos presentes no treinamento
         _new_symbol_rates = {}
-        symbols_used_in_training = train_configs['symbols']  # use a lista, pois é garantido que está ordenada.
-        for _symbol in symbols_used_in_training:
+        pure_symbols_used_in_training = sorted(list(pure_symbols_used_in_training_set))
+        for _symbol in pure_symbols_used_in_training:
             key = f'{_symbol}_{timeframe}'
             _new_symbol_rates[key] = symbols_rates[key]
         symbols_rates = _new_symbol_rates
     else:
         print(f'ERRO. Nem todos os símbolos usados no treinamento da rede neural estão presentes na requisição.')
         exit(-1)
-
-    # se o settings usa alguma diferenciação, então n_steps deve ser n_steps + 1 em SymbolsPreparation
     
     symb_sync = SymbolsPreparation(symbols_rates, timeframe, trade_server_datetime, num_candles)
     symb_sync.prepare_symbols()
     hist = HistMulti(symb_sync.sheets, timeframe)
     hist2 = apply_setup_symbols(hist, setup_code)
+
+    if hist2.symbols != symbols_used_in_training:
+        print(f'ERRO. hist2.symbols != symbols_used_in_training.')
+        exit(-1)
 
     X = prepare_data_for_prediction(hist2, n_steps, candle_input_type)
     X = np.asarray(X).astype(np.float32)
