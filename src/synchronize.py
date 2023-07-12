@@ -146,19 +146,20 @@ def prepare_data_for_model(data: dict) -> ndarray:
     """
     print('prepare_data_for_model()')
 
-    setup = read_json('settings.json')
-    csv_dir = setup['csv_dir']
-    symbol_out = setup['symbol_out']
-    setup_timeframe = setup['timeframe']
+    settings = read_json('settings.json')
+    csv_dir = settings['csv_dir']
+    symbol_out = settings['symbol_out']
+    settings_timeframe = settings['timeframe']
+    setup_code = settings['setup_code']
 
     last_datetime = datetime.fromisoformat(data['last_datetime'])
     trade_server_datetime = datetime.fromisoformat(data['trade_server_datetime'])
     print(f'last_datetime = {last_datetime}, trade_server_datetime = {trade_server_datetime}')
 
     timeframe = data['timeframe']
-    if timeframe != setup_timeframe:
+    if timeframe != settings_timeframe:
         print(f'o timeframe da requisição ({timeframe}) é diferente do timeframe definido no arquivo '
-              f'settings.json ({setup_timeframe})')
+              f'settings.json ({settings_timeframe})')
         exit(-1)
 
     n_symbols = data['n_symbols']
@@ -182,8 +183,8 @@ def prepare_data_for_model(data: dict) -> ndarray:
     symbol_out = train_configs['symbol_out']
     symbols_used_in_training = set(train_configs['symbols'])
     n_samples_train = train_configs['n_samples_train']
-    candle_input_type = setup['candle_input_type']
-    candle_output_type = setup['candle_output_type']
+    candle_input_type = settings['candle_input_type']
+    candle_output_type = settings['candle_output_type']
 
     # verifique se os símbolos usados no treinamento da rede neural estão presentes na requisição
     if symbols_used_in_training.issubset(symbols_present_in_the_request):
@@ -198,7 +199,8 @@ def prepare_data_for_model(data: dict) -> ndarray:
         print(f'ERRO. Nem todos os símbolos usados no treinamento da rede neural estão presentes na requisição.')
         exit(-1)
 
-    # se o setup usa alguma diferenciação, então n_steps deve ser n_steps + 1 em SymbolsPreparation
+    # se o settings usa alguma diferenciação, então n_steps deve ser n_steps + 1 em SymbolsPreparation
+    
     symb_sync = SymbolsPreparation(symbols_rates, timeframe, trade_server_datetime, n_steps+1)
     symb_sync.prepare_symbols()
     hist = HistMulti(symb_sync.sheets, timeframe)
@@ -214,9 +216,9 @@ def prepare_data_for_model(data: dict) -> ndarray:
 def predict_next_candle(data: dict):
     from keras.models import load_model
 
-    setup = read_json('settings.json')
-    symbol_out = setup['symbol_out']
-    timeframe = setup['timeframe']
+    settings = read_json('settings.json')
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
     _symbol_tf = f'{symbol_out}_{timeframe}'
 
     with open("train_configs.json", "r") as file:
@@ -239,7 +241,7 @@ def predict_next_candle(data: dict):
 
 
 def test_01():
-    data = read_json('request_4.json')
+    data = read_json('request_3.json')
     predict_next_candle(data)
 
 
