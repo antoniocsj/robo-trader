@@ -8,7 +8,8 @@ import pandas as pd
 from HistMulti import HistMulti
 from utils_filesystem import get_list_sync_files, load_sync_cp_file, update_settings
 from utils_symbols import search_symbols
-from utils_ops import transform_directory, transform_files, normalize_directory, normalize_symbols, \
+from utils_ops import transform_directory, transform_files, transform_symbols, \
+    normalize_directory, normalize_symbols, \
     differentiate_directory, differentiate_files, differentiate_symbols
 
 
@@ -386,8 +387,16 @@ def setup_symbols_04(hist: HistMulti) -> HistMulti:
         scalers = pickle.load(file)
 
     _hist = copy.deepcopy(hist)
-    #
-    #
+
+    _hist.rename_symbols_adding_suffix('@D')
+    differentiate_symbols(_hist)
+
+    _hist.add_symbols(hist)
+    _hist.delete_first_row_symbols(excepting_pattern='@D')
+    _hist.sort_symbols()
+
+    normalize_symbols(_hist, scalers)
+
     return _hist
 
 
@@ -452,8 +461,14 @@ def setup_symbols_05(hist: HistMulti) -> HistMulti:
         scalers = pickle.load(file)
 
     _hist = copy.deepcopy(hist)
-    #
-    #
+
+    _hist.rename_symbols_adding_suffix('@T')
+    transform_symbols(_hist, '(C-O)*V')
+    _hist.add_symbol(symbol_out, hist)
+    _hist.sort_symbols()
+
+    normalize_symbols(_hist, scalers)
+
     return _hist
 
 
@@ -704,10 +719,14 @@ def apply_setup_symbols(hist: HistMulti, code: int) -> HistMulti:
         return setup_symbols_02(hist)
     elif code == 3:
         return setup_symbols_03(hist)
+    elif code == 4:
+        return setup_symbols_04(hist)
+    elif code == 5:
+        return setup_symbols_05(hist)
     else:
         print(F'ERRO. setup_code ({code}) inválido.')
         exit(-1)
 
 
 if __name__ == '__main__':
-    setup_directory_03()
+    setup_directory_05()

@@ -120,7 +120,8 @@ def normalize_directory(directory: str):
 
         arr: ndarray = hist.arr[_symbol_timeframe]
         if arr.shape[1] == 2:
-            data = arr[:, 1]
+            data: ndarray = arr[:, 1]
+            data = data.reshape(len(data), 1)
         else:
             data = arr[:, 1:6]
         
@@ -150,7 +151,8 @@ def normalize_symbols(hist: HistMulti, scalers: dict, symbols: list[str] = None)
 
         arr: ndarray = hist.arr[_symbol_timeframe]
         if arr.shape[1] == 2:
-            data = arr[:, 1]
+            data: ndarray = arr[:, 1]
+            data = data.reshape(len(data), 1)
         else:
             data = arr[:, 1:6]
 
@@ -231,7 +233,8 @@ def differentiate_symbols(hist: HistMulti, symbols: list[str] = None):
 
         arr = hist.arr[_symbol_timeframe]
         if arr.shape[1] == 2:
-            data = arr[:, 1]
+            data: ndarray = arr[:, 1]
+            data = data.reshape(len(data), 1)
         else:
             data = arr[:, 1:6]
 
@@ -250,7 +253,7 @@ def differentiate_symbols(hist: HistMulti, symbols: list[str] = None):
 
 
 def apply_transform_str(arr: ndarray, transform_str: str) -> ndarray:
-    if arr.shape[2] != 6:
+    if arr.shape[1] != 6:
         print('ERRO. apply_transform_str(). arr.shape[2] != 6.')
         exit(-1)
 
@@ -345,3 +348,20 @@ def transform_files(filepath_list: list[str], directory: str, transform_str: str
         exit(-1)
 
     print(f'{len(filepath_list)} símbolos do diretório {directory} foram transformados: {filepath_list}.')
+
+
+def transform_symbols(hist: HistMulti, transform_str: str):
+    print(f'transformando símbolos do objeto hist {type(hist)}')
+
+    for _symbol in hist.symbols:
+        print(_symbol)
+        _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
+        arr = hist.arr[_symbol_timeframe]
+        data = apply_transform_str(arr, transform_str)
+        dataf = pd.DataFrame(data)
+        dataf.insert(0, 0, arr[:, 0], True)
+        dataf.columns = range(dataf.columns.size)
+        hist.arr[_symbol_timeframe] = dataf.to_numpy(copy=True)
+
+    hist.update_sheets()
+    print(f'todos os símbolos de {type(hist)} foram tranformados.')

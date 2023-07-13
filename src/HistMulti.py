@@ -138,6 +138,10 @@ class HistMulti:
         self.sheets[symbol_tf] = copy.deepcopy(symbol_sheet)
         self.arr[symbol_tf] = copy.deepcopy(symbols_arr)
 
+    def add_symbols(self, other_hist: "HistMulti"):
+        for symbol in other_hist.symbols:
+            self.add_symbol(symbol, other_hist)
+
     def remove_symbol(self, symbol_name: str):
         symbol_tf = f'{symbol_name}_{self.timeframe}'
 
@@ -188,9 +192,15 @@ class HistMulti:
         df.reset_index(drop=True)
         self.arr[symbol_tf] = np.delete(self.arr[symbol_tf], 0, axis=0)
 
-    def delete_first_row_symbols(self):
-        for symbol in self.symbols:
-            self.delete_first_row_symbol(symbol)
+    def delete_first_row_symbols(self, excepting_pattern=None):
+        if excepting_pattern:
+            for symbol in self.symbols:
+                if excepting_pattern in symbol:
+                    continue
+                self.delete_first_row_symbol(symbol)
+        else:
+            for symbol in self.symbols:
+                self.delete_first_row_symbol(symbol)
 
 
 class HistMultiOriginal:
