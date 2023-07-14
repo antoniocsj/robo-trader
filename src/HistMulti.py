@@ -22,6 +22,7 @@ class HistMulti:
         self.symbols = []
         self.timeframe = timeframe
         self.arr: dict[str, ndarray] = {}  # guarda os arrays dos dados históricos conforme seu 'simbolo' e 'timeframe'
+        self.sheets: dict[str, Sheet] = {}
         self.source_is_dir = False
 
         if isinstance(source, str):
@@ -35,7 +36,8 @@ class HistMulti:
         elif isinstance(source, dict):
             self.source_is_dir = False
             print(f'obtendo dados históricos a partir de um dicionário de planilhas')
-            self.sheets: dict[str, Sheet] = source
+            # self.sheets: dict[str, Sheet] = source
+            self.sheets = source
             self.symbols = search_symbols_in_dict(self.sheets, self.timeframe)
 
         self.load_symbols()
@@ -74,14 +76,15 @@ class HistMulti:
         _filepath = self.directory + '/' + self.csv_files[_symbol_timeframe]
         return _filepath
 
-    def add_hist_data(self, _symbol: str, _timeframe: str):
-        key = f'{_symbol}_{_timeframe}'
+    def add_hist_data(self, symbol: str, timeframe: str):
+        key = f'{symbol}_{timeframe}'
         df: DataFrame
 
         if self.source_is_dir:
-            _filepath = self.get_csv_filepath(f'{_symbol}_{_timeframe}')
+            _filepath = self.get_csv_filepath(f'{symbol}_{timeframe}')
             df = pd.read_csv(_filepath, delimiter='\t')
             # df.drop(columns=['<VOL>', '<SPREAD>'], inplace=True)
+            self.sheets[key] = Sheet(_filepath, symbol, timeframe)
         else:
             s: Sheet = self.sheets[key]
             df = s.df

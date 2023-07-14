@@ -38,6 +38,11 @@ class Sheet:
             print(f'Há dados faltando no arquivo {self.filepath}')
             exit(-1)
 
+        if len(self.df.columns) == 2:
+            self.df.columns = ['DATETIME', 'T']
+        else:
+            self.df.columns = ['DATETIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'TICKVOL']
+
     def create_df_from_rates(self) -> pd.DataFrame:
         _df: pd.DataFrame
         _list_ = []
