@@ -193,6 +193,10 @@ def prepare_data_for_model(data: dict) -> ndarray:
     print(f'timeframe = {timeframe}, n_symbols = {n_symbols}, '
           f'rates_count = {rates_count}, start_pos = {start_pos} ')
 
+    if num_candles > rates_count - 1:
+        print(f'ERRO. o número de velas presentes na requisição não é suficiente para o modelo.')
+        exit(-1)
+
     symbols_rates = data['symbols_rates']
     symbols = search_symbols_in_dict(symbols_rates, timeframe)
     symbols_present_in_the_request_set = set(symbols)

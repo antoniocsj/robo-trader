@@ -350,12 +350,16 @@ def transform_files(filepath_list: list[str], directory: str, transform_str: str
     print(f'{len(filepath_list)} símbolos do diretório {directory} foram transformados: {filepath_list}.')
 
 
-def transform_symbols(hist: HistMulti, transform_str: str):
+def transform_symbols(hist: HistMulti, transform_str: str, symbols: list[str] = None):
     print(f'transformando símbolos do objeto hist {type(hist)}')
 
-    for _symbol in hist.symbols:
-        print(_symbol)
-        _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
+    for symbol in hist.symbols:
+        if symbols and symbol not in symbols:
+            continue
+
+        print(symbol)
+        _symbol_timeframe = f'{symbol}_{hist.timeframe}'
+
         arr = hist.arr[_symbol_timeframe]
         data = apply_transform_str(arr, transform_str)
         dataf = pd.DataFrame(data)

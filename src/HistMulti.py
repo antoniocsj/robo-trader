@@ -121,32 +121,38 @@ class HistMulti:
             s: Sheet = Sheet(arr, symbol, self.timeframe)
             self.sheets[_symbol_tf] = s
 
-    def add_symbol(self, symbol_name: str, other_hist: "HistMulti"):
+    def copy_symbol(self, symbol_name_src: str, other_hist: "HistMulti", symbol_name_dst: str = None):
         if self.source_is_dir:
-            print('ERRO. add_symbol(). esta função não pode ser usada quando a fonte é um diretório.')
+            print('ERRO. copy_symbol(). esta função não pode ser usada quando a fonte é um diretório.')
             exit(-1)
 
-        symbol_tf = f'{symbol_name}_{self.timeframe}'
-        if symbol_name in self.symbols:
-            print(f'ERRO. add_symbol(). tentativa de adicionar o símbolo {symbol_name} que já existe no hist.')
+        symbol_tf_src = f'{symbol_name_src}_{self.timeframe}'
+        if symbol_name_dst:
+            symbol_tf_dst = f'{symbol_name_dst}_{self.timeframe}'
+        else:
+            symbol_name_dst = symbol_name_src
+            symbol_tf_dst = symbol_tf_src
+
+        if symbol_name_dst in self.symbols:
+            print(f'ERRO. copy_symbol(). tentativa de adicionar o símbolo {symbol_name_dst} que já existe no hist.')
             exit(-1)
 
-        symbol_sheet = other_hist.sheets[symbol_tf]
-        symbols_arr = other_hist.arr[symbol_tf]
+        symbol_sheet = other_hist.sheets[symbol_tf_src]
+        symbols_arr = other_hist.arr[symbol_tf_src]
 
-        self.symbols.append(symbol_name)
-        self.sheets[symbol_tf] = copy.deepcopy(symbol_sheet)
-        self.arr[symbol_tf] = copy.deepcopy(symbols_arr)
+        self.symbols.append(symbol_name_dst)
+        self.sheets[symbol_tf_dst] = copy.deepcopy(symbol_sheet)
+        self.arr[symbol_tf_dst] = copy.deepcopy(symbols_arr)
 
-    def add_symbols(self, other_hist: "HistMulti"):
+    def copy_symbols(self, other_hist: "HistMulti"):
         for symbol in other_hist.symbols:
-            self.add_symbol(symbol, other_hist)
+            self.copy_symbol(symbol, other_hist)
 
     def remove_symbol(self, symbol_name: str):
         symbol_tf = f'{symbol_name}_{self.timeframe}'
 
         if symbol_name not in self.symbols:
-            print(f'ERRO. add_symbol(). tentativa de remover o símbolo {symbol_name} que não existe no hist.')
+            print(f'ERRO. copy_symbol(). tentativa de remover o símbolo {symbol_name} que não existe no hist.')
             exit(-1)
 
         self.symbols.remove(symbol_name)

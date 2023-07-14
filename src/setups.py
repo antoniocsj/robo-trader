@@ -196,12 +196,13 @@ def setup_directory_02():
     _dst = f'{csv_dir}/{symbol_out}_{timeframe}.csv'
     shutil.copy(_src, _dst)
 
+    # normaliza todos os symbolos de csv.
+    normalize_directory(csv_dir)
+
     # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
     # symbol_out também, mas delete do arquivo que está em csv.
     csv_delete_first_row(_dst)
 
-    # normaliza todos os symbolos de csv.
-    normalize_directory(csv_dir)
     update_settings('setup_code', 2)
     update_settings('setup_uses_differentiation', True)
 
@@ -226,14 +227,14 @@ def setup_symbols_02(hist: HistMulti) -> HistMulti:
 
     _hist.remove_symbol(symbol_out)
     _hist.rename_symbols_adding_suffix('@D')
-
     differentiate_symbols(_hist)
 
-    _hist.add_symbol(symbol_out, hist)
-    _hist.delete_first_row_symbol(symbol_out)
-    _hist.sort_symbols()
+    _hist.copy_symbol(symbol_out, hist)
 
+    _hist.sort_symbols()
     normalize_symbols(_hist, scalers)
+
+    _hist.delete_first_row_symbol(symbol_out)
 
     return _hist
 
@@ -275,12 +276,12 @@ def setup_directory_03():
     _dst = f'{csv_dir}/{symbol_out}_{timeframe}.csv'
     shutil.copy(_src, _dst)
 
+    # normaliza todos os symbolos de csv.
+    normalize_directory(csv_dir)
+
     # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
     # symbol_out também, mas delete do arquivo que está em csv apenas.
     csv_delete_first_row(_dst)
-
-    # normaliza todos os symbolos de csv.
-    normalize_directory(csv_dir)
 
     update_settings('setup_code', 3)
     update_settings('setup_uses_differentiation', True)
@@ -306,14 +307,13 @@ def setup_symbols_03(hist: HistMulti) -> HistMulti:
     _hist = copy.deepcopy(hist)
 
     _hist.rename_symbols_adding_suffix('@D')
-
     differentiate_symbols(_hist)
+    _hist.copy_symbol(symbol_out, hist)
 
-    _hist.add_symbol(symbol_out, hist)
-    _hist.delete_first_row_symbol(symbol_out)
     _hist.sort_symbols()
-
     normalize_symbols(_hist, scalers)
+    
+    _hist.delete_first_row_symbol(symbol_out)
 
     return _hist
 
@@ -358,12 +358,16 @@ def setup_directory_04():
         _src = symbols_paths[f'{symbol}_{timeframe}']
         _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
         shutil.copy(_src, _dst)
-        # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha,
-        # delete a 1a linha do de cada símbolo também, mas delete do arquivo que está em csv apenas.
-        csv_delete_first_row(_dst)
 
     # normaliza todos os symbolos de csv.
     normalize_directory(csv_dir)
+
+    # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha,
+    # delete a 1a linha do de cada símbolo também, mas delete do arquivo que está em csv apenas.
+    for symbol in symbols_names:
+        _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
+        csv_delete_first_row(_dst)
+
     update_settings('setup_code', 4)
     update_settings('setup_uses_differentiation', True)
 
@@ -391,11 +395,11 @@ def setup_symbols_04(hist: HistMulti) -> HistMulti:
     _hist.rename_symbols_adding_suffix('@D')
     differentiate_symbols(_hist)
 
-    _hist.add_symbols(hist)
-    _hist.delete_first_row_symbols(excepting_pattern='@D')
     _hist.sort_symbols()
-
     normalize_symbols(_hist, scalers)
+
+    _hist.copy_symbols(hist)
+    _hist.delete_first_row_symbols(excepting_pattern='@D')
 
     return _hist
 
@@ -464,7 +468,7 @@ def setup_symbols_05(hist: HistMulti) -> HistMulti:
 
     _hist.rename_symbols_adding_suffix('@T')
     transform_symbols(_hist, '(C-O)*V')
-    _hist.add_symbol(symbol_out, hist)
+    _hist.copy_symbol(symbol_out, hist)
     _hist.sort_symbols()
 
     normalize_symbols(_hist, scalers)
@@ -536,8 +540,15 @@ def setup_symbols_06(hist: HistMulti) -> HistMulti:
         scalers = pickle.load(file)
 
     _hist = copy.deepcopy(hist)
-    #
-    #
+
+    _hist.rename_symbols_adding_suffix('@T')
+    transform_symbols(_hist, '(C-O)*V')
+
+    _hist.copy_symbols(hist)
+    _hist.sort_symbols()
+
+    normalize_symbols(_hist, scalers)
+
     return _hist
 
 
@@ -633,8 +644,29 @@ def setup_symbols_07(hist: HistMulti) -> HistMulti:
         scalers = pickle.load(file)
 
     _hist = copy.deepcopy(hist)
-    #
-    #
+
+    _hist.rename_symbols_adding_suffix('@T')
+    _transformed = _hist.symbols[:]
+    transform_symbols(_hist, '(C-O)*V')
+
+    _normals = hist.symbols[:]
+    _hist.copy_symbols(hist)
+
+    _differentiated = []
+    for symbol_name_src in hist.symbols:
+        symbol_name_dst = f'{symbol_name_src}@D'
+        _hist.copy_symbol(symbol_name_src, hist, symbol_name_dst)
+        _differentiated.append(symbol_name_dst)
+
+    differentiate_symbols(_hist, _differentiated)
+
+    _hist.sort_symbols()
+    normalize_symbols(_hist, scalers)
+
+    _list = _transformed + _normals
+    for s in _list:
+        _hist.delete_first_row_symbol(s)
+
     return _hist
 
 
@@ -642,8 +674,8 @@ def setup_directory_08():
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
-    -> 2) symbol_out diferenciado, transformado e normalizado (1 coluna Y: C*V);
-    -> 3) demais símbolos diferenciados, transformados e normalizados (1 coluna Y: C*V);
+    -> 2) symbol_out diferenciado, transformado e normalizado (1 coluna Y: (C-O)*V);
+    -> 3) demais símbolos diferenciados, transformados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
     print('setup_directory_08.')
@@ -672,7 +704,7 @@ def setup_directory_08():
         _transformed.append(_dst)
 
     differentiate_directory(csv_dir)
-    transform_directory(csv_dir, 'C*V')
+    transform_directory(csv_dir, '(C-O)*V')
 
     # copiar symbol_out, de csv_s_dir para csv_dir
     _src = symbols_paths[f'{symbol_out}_{timeframe}']
@@ -693,8 +725,8 @@ def setup_symbols_08(hist: HistMulti) -> HistMulti:
     """
     O diretório csv terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
-    -> 2) symbol_out diferenciado, transformado e normalizado (1 coluna Y: C*V);
-    -> 3) demais símbolos diferenciados, transformados e normalizados (1 coluna Y: C*V);
+    -> 2) symbol_out diferenciado, transformado e normalizado (1 coluna Y: (C-O)*V);
+    -> 3) demais símbolos diferenciados, transformados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
     with open('settings.json', 'r') as file:
@@ -707,8 +739,100 @@ def setup_symbols_08(hist: HistMulti) -> HistMulti:
         scalers = pickle.load(file)
 
     _hist = copy.deepcopy(hist)
-    #
-    #
+
+    _hist.rename_symbols_adding_suffix('@DT')
+    differentiate_symbols(_hist)
+    transform_symbols(_hist, '(C-O)*V')
+
+    _hist.copy_symbol(symbol_out, hist)
+
+    _hist.sort_symbols()
+    normalize_symbols(_hist, scalers)
+
+    _hist.delete_first_row_symbol(symbol_out)
+
+    return _hist
+
+
+def setup_directory_09():
+    """
+    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    -> 1) symbol_out normalizado;
+    -> 2) symbol_out transformado, diferenciado e normalizado (1 coluna Y: (C-O)*V);
+    -> 3) demais símbolos transformados, diferenciados e normalizados (1 coluna Y: (C-O)*V);
+    :return:
+    """
+    print('setup_directory_09.')
+    if not check_base_ok():
+        print('abortando setup.')
+        exit(-1)
+
+    with open('settings.json', 'r') as file:
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
+
+    csv_dir = settings['csv_dir']
+    csv_s_dir = settings['csv_s_dir']
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
+    symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
+
+    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @ no final).
+    # isso é para poder ter dois arquivos do mesmo símbolo.
+    # símbolos que sofrerão uma transformação.
+    for symbol in symbols_names:
+        _src = symbols_paths[f'{symbol}_{timeframe}']
+        _dst = f'{csv_dir}/{symbol}@TD_{timeframe}.csv'
+        shutil.copy(_src, _dst)
+
+    transform_directory(csv_dir, '(C-O)*V')
+    differentiate_directory(csv_dir)
+
+    # copiar symbol_out, de csv_s_dir para csv_dir
+    _src = symbols_paths[f'{symbol_out}_{timeframe}']
+    _dst = f'{csv_dir}/{symbol_out}_{timeframe}.csv'
+    shutil.copy(_src, _dst)
+
+    # normaliza todos os symbolos de csv.
+    normalize_directory(csv_dir)
+
+    # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
+    # symbol_out também, mas delete do arquivo que está em csv.
+    csv_delete_first_row(_dst)
+    update_settings('setup_code', 9)
+    update_settings('setup_uses_differentiation', True)
+
+
+def setup_symbols_09(hist: HistMulti) -> HistMulti:
+    """
+    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    -> 1) symbol_out normalizado;
+    -> 2) symbol_out transformado, diferenciado e normalizado (1 coluna Y: (C-O)*V);
+    -> 3) demais símbolos transformados, diferenciados e normalizados (1 coluna Y: (C-O)*V);
+    :return:
+    """
+    with open('settings.json', 'r') as file:
+        settings = json.load(file)
+    print(f'settings.json: {settings}')
+
+    symbol_out = settings['symbol_out']
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
+
+    _hist = copy.deepcopy(hist)
+
+    _hist.rename_symbols_adding_suffix('@TD')
+    transform_symbols(_hist, '(C-O)*V')
+    differentiate_symbols(_hist)
+
+    _hist.copy_symbol(symbol_out, hist)
+
+    _hist.sort_symbols()
+    normalize_symbols(_hist, scalers)
+
+    _hist.delete_first_row_symbol(symbol_out)
+
     return _hist
 
 
@@ -723,10 +847,18 @@ def apply_setup_symbols(hist: HistMulti, code: int) -> HistMulti:
         return setup_symbols_04(hist)
     elif code == 5:
         return setup_symbols_05(hist)
+    elif code == 6:
+        return setup_symbols_06(hist)
+    elif code == 7:
+        return setup_symbols_07(hist)
+    elif code == 8:
+        return setup_symbols_08(hist)
+    elif code == 9:
+        return setup_symbols_09(hist)
     else:
         print(F'ERRO. setup_code ({code}) inválido.')
         exit(-1)
 
 
 if __name__ == '__main__':
-    setup_directory_05()
+    setup_directory_09()

@@ -5,6 +5,6 @@
     "csv_s_dir": "../csv_s",
     "candle_input_type": "OHLCV",
     "candle_output_type": "OHLCV",
-    "setup_code": 5,
-    "setup_uses_differentiation": false
+    "setup_code": 9,
+    "setup_uses_differentiation": true
 }

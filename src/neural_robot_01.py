@@ -80,9 +80,11 @@ def train_model():
     max_n_epochs = num_entradas * 0 + 5
     patience = int(max_n_epochs / 10) * 0 + 5
 
-    print(f'n_steps = {n_steps}, tipo_vela_entrada = {candle_input_type}, tipo_vela_saída = {candle_output_type}, '
-          f'n_samples_train = {n_samples_train}, validation_split = {validation_split}, max_n_epochs = {max_n_epochs}, '
-          f'patience = {patience}')
+    print(f'symbols = {hist.symbols}')
+    print(f'n_symbols = {n_symbols}, n_features (n_cols) = {n_cols}, n_steps = {n_steps}, '
+          f'tipo_vela_entrada = {candle_input_type}, tipo_vela_saída = {candle_output_type}, \n'
+          f'n_samples_train = {n_samples_train}, validation_split = {validation_split}, '
+          f'max_n_epochs = {max_n_epochs}, patience = {patience}')
 
     # horizontally stack columns
     # dataset_train = prepare_train_data(hist, symbol_out, 0, n_samples_train, candle_input_type)
@@ -96,6 +98,10 @@ def train_model():
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
     # features to expect for each input sample.
     n_features = X_train.shape[2]
+
+    if n_cols != n_features:
+        print(f'ERRO. n_cols ({n_cols}) != n_features ({n_features}).')
+        exit(-1)
 
     # define model
     model = Sequential()

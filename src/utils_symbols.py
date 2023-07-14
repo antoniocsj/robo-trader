@@ -109,20 +109,21 @@ def search_symbols(directory: str, timeframe: str):
     return symbols_names, symbols_paths
 
 
-def calc_n_inputs(directory: str, tipo_vela: str, timeframe: str):
+def calc_n_inputs(directory: str, candle_input_type: str, timeframe: str):
     """
     Faz uma varredura no diretório e retorna o número de colunas (além da data e horário) que há em cada arquivos
-    CSV e também retorna o número de símbolos/arquivos CSVs
+    CSV e também retorna o número de símbolos/arquivos CSVs.
+    número de colunas = n_features.
     :param directory:
-    :param tipo_vela:
+    :param candle_input_type:
     :param timeframe:
-    :return:
+    :return: n_features (n_cols), número de símbolos (CSVs)
     """
     count = 0
     symbols_names, symbols_paths = search_symbols(directory, timeframe)
     for s in symbols_names:
-        if s.endswith('@T') or s.endswith('@DT'):
+        if s.endswith('@T') or s.endswith('@DT') or s.endswith('@TD'):
             count += 1
         else:
-            count += len(tipo_vela)
+            count += len(candle_input_type)
     return count, len(symbols_names)
