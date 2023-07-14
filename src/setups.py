@@ -861,3 +861,16 @@ def apply_setup_symbols(hist: HistMulti, code: int) -> HistMulti:
 
 if __name__ == '__main__':
     setup_directory_09()
+
+#     string symbols_currencies_majors[] =  {"AUDUSD", "EURUSD", "GBPUSD", "USDCAD", "USDCHF", "USDJPY"};
+#     string symbols_currencies_crosses[] = {"AUDJPY", "AUDCAD", "AUDCHF", "EURAUD", "EURCHF", "EURGBP",
+#                                            "GBPAUD", "GBPCHF", "CADCHF", "CADJPY", "CHFJPY", "EURCAD",
+#                                            "EURJPY", "GBPCAD", "GBPJPY"
+#                                           };
+#     string symbols_commodities_gold[] = {"XAUUSD", "XAUAUD", "XAUCHF", "XAUEUR", "XAUGBP", "XAUJPY"};
+#     string symbols_commodities_silver[] = {"XAGAUD", "XAGEUR", "XAGUSD"};
+#     string symbols_indices_majors[] = {"AUS200", "EUSTX50", "FRA40", "GER40", "JPN225", "NAS100",
+#                                        "UK100", "US30", "US500"
+#                                       };
+#     string symbols_indices_minors[] = {"CA60", "SWI20", "US2000"};
+#     string symbols_indices_currency[] = {"EURX", "JPYX", "USDX"};
