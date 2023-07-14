@@ -860,7 +860,7 @@ def apply_setup_symbols(hist: HistMulti, code: int) -> HistMulti:
 
 
 if __name__ == '__main__':
-    setup_directory_09()
+    setup_directory_01()
 
 #     string symbols_currencies_majors[] =  {"AUDUSD", "EURUSD", "GBPUSD", "USDCAD", "USDCHF", "USDJPY"};
 #     string symbols_currencies_crosses[] = {"AUDJPY", "AUDCAD", "AUDCHF", "EURAUD", "EURCHF", "EURGBP",

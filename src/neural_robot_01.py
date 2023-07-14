@@ -72,13 +72,13 @@ def train_model():
         exit(-1)
 
     n_steps = 2
-    n_samples_train = 500  # 30000-M10, 60000-M5
+    n_samples_train = 60000  # 30000-M10, 60000-M5
     validation_split = 0.2
 
     n_cols, n_symbols = calc_n_inputs(csv_dir, candle_input_type, timeframe)
     num_entradas = n_steps * n_cols
-    max_n_epochs = num_entradas * 0 + 5
-    patience = int(max_n_epochs / 10) * 0 + 5
+    max_n_epochs = num_entradas
+    patience = int(max_n_epochs / 10)
 
     print(f'symbols = {hist.symbols}')
     print(f'n_symbols = {n_symbols}, n_features (n_cols) = {n_cols}, n_steps = {n_steps}, '
@@ -108,8 +108,6 @@ def train_model():
     model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
     model.add(Flatten())
-    model.add(Dense(n_features, activation='relu'))
-    model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(num_entradas, activation='relu'))
     model.add(Dense(len(candle_output_type), activation='relu'))
     model.compile(optimizer='adam', loss='mse')
@@ -139,7 +137,7 @@ def train_model():
     print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
 
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
-    n_samples_test = 500
+    n_samples_test = 3000
     samples_index_start = n_samples_train
     # dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
     dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
