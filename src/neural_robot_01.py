@@ -56,14 +56,14 @@ from utils_symbols import calc_n_inputs
 # We can demonstrate this with a simple example of two parallel input time series where the output series
 # is the simple addition of the input series.
 def train_model():
-    setup = read_json('settings.json')
-    print(f'settings.json: {setup}')
+    settings = read_json('settings.json')
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    symbol_out = setup['symbol_out']
-    timeframe = setup['timeframe']
-    candle_input_type = setup['candle_input_type']
-    candle_output_type = setup['candle_output_type']
+    csv_dir = settings['csv_dir']
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
+    candle_input_type = settings['candle_input_type']
+    candle_output_type = settings['candle_output_type']
     hist = HistMulti(csv_dir, timeframe)
 
     if hist.timeframe != timeframe:
@@ -264,14 +264,14 @@ def train_model_return(setup: dict, hist: HistMulti, n_steps: int, layer_type: l
 
 
 def test_models():
-    setup = read_json('settings.json')
-    print(f'settings.json: {setup}')
+    settings = read_json('settings.json')
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    symbol_out = setup['symbol_out']
-    timeframe = setup['timeframe']
-    candle_input_type = setup['candle_input_type']
-    candle_output_type = setup['candle_output_type']
+    csv_dir = settings['csv_dir']
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
+    candle_input_type = settings['candle_input_type']
+    candle_output_type = settings['candle_output_type']
 
     hist = HistMulti(csv_dir, timeframe)
     n_steps = 2
@@ -302,7 +302,7 @@ def test_models():
         _layer_type = sorted(list(layers_comb[i]), reverse=True)
         print(f'testando modelo com _layer_type = {_layer_type}, len_layers_comb = {_len_layers_comb}. '
               f'({100 * i / _len_layers_comb:.2f} %)')
-        _out = train_model_return(setup, hist, n_steps, _layer_type)
+        _out = train_model_return(settings, hist, n_steps, _layer_type)
 
         _list_train_configs.append(_out)
         with open("test_models.json", "w") as file:
@@ -313,11 +313,11 @@ def test_models():
 
 
 def evaluate_model():
-    setup = read_json('settings.json')
-    print(f'settings.json: {setup}')
+    settings = read_json('settings.json')
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    timeframe = setup['timeframe']
+    csv_dir = settings['csv_dir']
+    timeframe = settings['timeframe']
     hist = HistMulti(csv_dir, timeframe)
 
     with open("train_configs.json", "r") as file:
@@ -346,11 +346,11 @@ def evaluate_model():
 
 
 def calculate_model_bias():
-    setup = read_json('settings.json')
-    print(f'settings.json: {setup}')
+    settings = read_json('settings.json')
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    timeframe = setup['timeframe']
+    csv_dir = settings['csv_dir']
+    timeframe = settings['timeframe']
     hist = HistMulti(csv_dir, timeframe)
 
     with open("train_configs.json", "r") as file:
@@ -412,11 +412,11 @@ def calculate_model_bias():
 def test_model_with_trader():
     from TraderSimMultiNoPrints import TraderSimMulti
 
-    setup = read_json('settings.json')
-    print(f'settings.json: {setup}')
+    settings = read_json('settings.json')
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    timeframe = setup['timeframe']
+    csv_dir = settings['csv_dir']
+    timeframe = settings['timeframe']
     hist = HistMulti(csv_dir, timeframe)
 
     with open("train_configs.json", "r") as file:
@@ -539,11 +539,11 @@ def test_model_with_trader():
 def test_model_with_trader_interactive():
     from TraderSimMultiNoPrints import TraderSimMulti
 
-    setup = read_json('settings.json')
-    print(f'settings.json: {setup}')
+    settings = read_json('settings.json')
+    print(f'settings.json: {settings}')
 
-    csv_dir = setup['csv_dir']
-    timeframe = setup['timeframe']
+    csv_dir = settings['csv_dir']
+    timeframe = settings['timeframe']
     hist = HistMulti(csv_dir, timeframe)
 
     with open("train_configs.json", "r") as file:

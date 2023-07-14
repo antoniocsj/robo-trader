@@ -6,7 +6,7 @@ import copy
 
 import pandas as pd
 from HistMulti import HistMulti
-from utils_filesystem import get_list_sync_files, load_sync_cp_file, update_settings
+from utils_filesystem import read_json, get_list_sync_files, load_sync_cp_file, update_settings
 from utils_symbols import search_symbols
 from utils_ops import transform_directory, transform_files, transform_symbols, \
     normalize_directory, normalize_symbols, \
@@ -767,8 +767,7 @@ def setup_directory_09():
         print('abortando setup.')
         exit(-1)
 
-    with open('settings.json', 'r') as file:
-        settings = json.load(file)
+    settings = read_json('settings.json')
     print(f'settings.json: {settings}')
 
     csv_dir = settings['csv_dir']

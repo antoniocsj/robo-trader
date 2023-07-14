@@ -1,21 +1,10 @@
 from flask import Flask, request
-import json
 from datetime import datetime
+from utils_filesystem import write_json
 from prediction import predict_next_candle
 
 
 app = Flask(__name__)
-
-
-def write_json(_filename: str, _dict: dict):
-    with open(_filename, 'w') as file:
-        json.dump(_dict, file, indent=4)
-
-
-def read_json(_filename: str) -> dict:
-    with open(_filename, 'r') as file:
-        _dict = json.load(file)
-    return _dict
 
 
 @app.route('/', methods=['POST'])
