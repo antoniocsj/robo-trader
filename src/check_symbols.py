@@ -29,6 +29,7 @@ def check_symbols_timedelta():
         row = s.df.iloc[1]
         datetime_str = row['DATETIME']
         datetime_row_1 = datetime.fromisoformat(datetime_str)
+
         if datetime_row_1 != datetime_row_0 + s.timedelta:
             print(f'ERRO em {s.symbol}. o timedelta ({s.timedelta}) não é respeita entre as linha 0 e 1.')
             print(f'datetime linha 0 = {datetime_row_0}, datetime da linha 1 = {datetime_row_1}')
