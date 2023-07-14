@@ -77,7 +77,7 @@ def train_model():
 
     n_cols, n_symbols = calc_n_inputs(csv_dir, candle_input_type, timeframe)
     num_entradas = n_steps * n_cols
-    max_n_epochs = num_entradas
+    max_n_epochs = num_entradas * 3
     patience = int(max_n_epochs / 10)
 
     print(f'symbols = {hist.symbols}')
