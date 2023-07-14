@@ -8,7 +8,7 @@ from HistMulti import HistMulti
 from utils_filesystem import read_json
 from utils_symbols import search_symbols_in_dict
 from utils_nn import prepare_data_for_prediction
-from utils_ops import denorm_close_price, denorm_output, normalize_symbols
+from utils_ops import denorm_output
 from setups import apply_setup_symbols
 
 

@@ -1,7 +1,7 @@
 from flask import Flask, request
 import json
 from datetime import datetime
-from synchronize import predict_next_candle
+from prediction import predict_next_candle
 
 
 app = Flask(__name__)
