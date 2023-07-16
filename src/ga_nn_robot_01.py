@@ -1,12 +1,13 @@
 import array
 import random
-
 import numpy
 
 from deap import algorithms
 from deap import base
 from deap import creator
 from deap import tools
+
+from utils_train import train_model_return
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", array.array, typecode='b', fitness=creator.FitnessMax)

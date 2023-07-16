@@ -32,8 +32,8 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 tf.keras.utils.set_random_seed(1)
 
-from utils_nn import prepare_train_data, split_sequences1, split_sequences2, prepare_train_data2
-from utils_filesystem import read_json, save_train_configs
+from utils_nn import prepare_train_data, split_sequences2, prepare_train_data2
+from utils_filesystem import read_json, write_train_config, read_train_config
 from utils_ops import denorm_close_price
 from utils_symbols import calc_n_inputs
 
@@ -72,12 +72,13 @@ def train_model():
         exit(-1)
 
     n_steps = 2
-    n_samples_train = 60000  # 30000-M10, 60000-M5
+    n_samples_train = 100  # 30000-M10, 60000-M5 Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
+    n_samples_test = 100  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
 
     n_cols, n_symbols = calc_n_inputs(csv_dir, candle_input_type, timeframe)
-    num_entradas = n_steps * n_cols
-    max_n_epochs = num_entradas * 3
+    n_inputs = n_steps * n_cols
+    max_n_epochs = n_inputs
     patience = int(max_n_epochs / 10)
 
     print(f'symbols = {hist.symbols}')
@@ -87,12 +88,9 @@ def train_model():
           f'max_n_epochs = {max_n_epochs}, patience = {patience}')
 
     # horizontally stack columns
-    # dataset_train = prepare_train_data(hist, symbol_out, 0, n_samples_train, candle_input_type)
-    dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type,
-                                        candle_output_type)
+    dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
 
     # convert into input/output samples
-    # X_train, y_train = split_sequences1(dataset_train, n_steps)
     X_train, y_train = split_sequences2(dataset_train, n_steps, candle_output_type)
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
@@ -108,7 +106,7 @@ def train_model():
     model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
     model.add(Flatten())
-    model.add(Dense(num_entradas, activation='relu'))
+    model.add(Dense(n_inputs, activation='relu'))
     model.add(Dense(len(candle_output_type), activation='relu'))
     model.compile(optimizer='adam', loss='mse')
     model_config = model.get_config()
@@ -117,8 +115,7 @@ def train_model():
     print(f'treinando o modelo em parte das amostras de treinamento.')
     print(f'n_samples_train * validation_split = {n_samples_train} * {validation_split} = '
           f'{int(n_samples_train * validation_split)}).')
-    X_train = np.asarray(X_train).astype(np.float32)
-    y_train = np.asarray(y_train).astype(np.float32)
+
     callbacks = [EarlyStopping(monitor='val_loss', patience=patience, verbose=1),
                  ModelCheckpoint(filepath='model.h5', monitor='val_loss', save_best_only=True, verbose=1)]
     history = model.fit(X_train, y_train, epochs=max_n_epochs, verbose=1,
@@ -137,29 +134,24 @@ def train_model():
     print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
 
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
-    n_samples_test = 3000
     samples_index_start = n_samples_train
-    # dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
     dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
                                        candle_output_type)
 
-    # X_test, y_test = split_sequences1(dataset_test, n_steps)
     X_test, y_test = split_sequences2(dataset_test, n_steps, candle_output_type)
-    X_test = np.asarray(X_test).astype(np.float32)
-    y_test = np.asarray(y_test).astype(np.float32)
 
     saved_model = load_model('model.h5')
     test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)
     print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
 
-    train_configs = {'symbol_out': symbol_out,
+    train_config = {'symbol_out': symbol_out,
                      'timeframe': hist.timeframe,
                      'n_steps': n_steps,
                      'candle_input_type': candle_input_type,
                      'candle_output_type': candle_output_type,
                      'n_symbols': n_symbols,
                      'n_features': n_features,
-                     'num_entradas': num_entradas,
+                     'n_inputs': n_inputs,
                      'n_samples_train': n_samples_train,
                      'validation_split': validation_split,
                      'effective_n_epochs': effective_n_epochs,
@@ -175,15 +167,15 @@ def train_model():
                      'model_config': model_config,
                      'history': history.history}
 
-    save_train_configs(train_configs)
+    write_train_config(train_config)
 
 
-def train_model_return(setup: dict, hist: HistMulti, n_steps: int, layer_type: list):
-    csv_dir = setup['csv_dir']
-    symbol_out = setup['symbol_out']
-    timeframe = setup['timeframe']
-    candle_input_type = setup['candle_input_type']
-    candle_output_type = setup['candle_output_type']
+def train_model_return(settings: dict, hist: HistMulti, n_steps: int, layer_type: list):
+    csv_dir = settings['csv_dir']
+    symbol_out = settings['symbol_out']
+    timeframe = settings['timeframe']
+    candle_input_type = settings['candle_input_type']
+    candle_output_type = settings['candle_output_type']
     hist = hist
 
     n_steps = n_steps
@@ -191,24 +183,27 @@ def train_model_return(setup: dict, hist: HistMulti, n_steps: int, layer_type: l
     validation_split = 0.2
 
     n_cols, n_symbols = calc_n_inputs(csv_dir, candle_input_type, timeframe)
-    num_entradas = n_steps * n_cols
+    n_inputs = n_steps * n_cols
     n_epochs = 2
 
-    print(f'n_steps = {n_steps}, tipo_vela_entrada = {candle_input_type}, tipo_vela_saída = {candle_output_type}, '
-          f'n_samples_train = {n_samples_train}, validation_split = {validation_split}, n_epochs = {n_epochs} '
-          f'layer_type = {layer_type}')
+    print(f'n_steps = {n_steps}, candle_input_type = {candle_input_type}, candle_output_type = {candle_output_type}, '
+          f'n_inputs = {n_inputs}, n_samples_train = {n_samples_train}, validation_split = {validation_split}, '
+          f'n_epochs = {n_epochs}, layer_type = {layer_type}')
 
     # horizontally stack columns
-    dataset_train = prepare_train_data(hist, symbol_out, 0, n_samples_train, candle_input_type)
+    dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
 
     # convert into input/output
-    X_train, y_train = split_sequences1(dataset_train, n_steps)
+    X_train, y_train = split_sequences2(dataset_train, n_steps, candle_output_type)
     print(X_train.shape, y_train.shape)
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
     # features to expect for each input sample.
-
     n_features = X_train.shape[2]
+
+    if n_cols != n_features:
+        print(f'ERRO. n_cols ({n_cols}) != n_features ({n_features}).')
+        exit(-1)
 
     # define model
     model = Sequential()
@@ -223,32 +218,28 @@ def train_model_return(setup: dict, hist: HistMulti, n_steps: int, layer_type: l
     model.add(Dense(1))
     model.compile(optimizer='adam', loss='mse')
 
-    X_train = np.asarray(X_train).astype(np.float32)
-    y_train = np.asarray(y_train).astype(np.float32)
     model.fit(X_train, y_train, epochs=n_epochs, verbose=0, validation_split=validation_split)
 
     whole_set_train_loss_eval = model.evaluate(X_train, y_train, verbose=0)
     print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
 
-    n_samples_test = 1000
+    n_samples_test = 100
     samples_index_start = n_samples_train
-    dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
-
-    X_test, y_test = split_sequences1(dataset_test, n_steps)
-    X_test = np.asarray(X_test).astype(np.float32)
-    y_test = np.asarray(y_test).astype(np.float32)
+    dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
+                                       candle_output_type)
+    X_test, y_test = split_sequences2(dataset_test, n_steps, candle_output_type)
 
     test_loss_eval = model.evaluate(X_test, y_test, verbose=0)
     print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
 
-    train_configs = {'symbol_out': symbol_out,
+    train_config = {'symbol_out': symbol_out,
                      'timeframe': hist.timeframe,
                      'n_steps': n_steps,
                      'candle_input_type': candle_input_type,
                      'candle_output_type': candle_output_type,
                      'n_symbols': n_symbols,
                      'n_features': n_features,
-                     'num_entradas': num_entradas,
+                     'n_inputs': n_inputs,
                      'n_samples_train': n_samples_train,
                      'validation_split': validation_split,
                      'n_epochs': n_epochs,
@@ -258,7 +249,7 @@ def train_model_return(setup: dict, hist: HistMulti, n_steps: int, layer_type: l
                      'test_loss_eval': test_loss_eval,
                      'symbols': hist.symbols}
 
-    return train_configs
+    return train_config
 
 
 def test_models():
@@ -287,10 +278,10 @@ def test_models():
 
     if os.path.exists('test_models.json'):
         with open('test_models.json', 'r') as file:
-            _list_train_configs = json.load(file)
-            i_start = len(_list_train_configs)
+            train_configs = json.load(file)
+            i_start = len(train_configs)
     else:
-        _list_train_configs = []
+        train_configs = []
         i_start = 0
 
     max_n_neurons = num_entradas
@@ -302,9 +293,9 @@ def test_models():
               f'({100 * i / _len_layers_comb:.2f} %)')
         _out = train_model_return(settings, hist, n_steps, _layer_type)
 
-        _list_train_configs.append(_out)
+        train_configs.append(_out)
         with open("test_models.json", "w") as file:
-            json.dump(_list_train_configs, file, indent=4)
+            json.dump(train_configs, file, indent=4)
 
         print(f'esperando {wait} segundos')
         time.sleep(wait)
@@ -318,25 +309,24 @@ def evaluate_model():
     timeframe = settings['timeframe']
     hist = HistMulti(csv_dir, timeframe)
 
-    with open("train_configs.json", "r") as file:
-        train_configs = json.load(file)
+    train_config = read_train_config()
 
-    print(f'train_configs:')
-    print(f'{train_configs}')
+    print(f'train_config:')
+    print(f'{train_config}')
 
-    n_steps = train_configs['n_steps']
-    n_features = train_configs['n_features']
-    symbol_out = train_configs['symbol_out']
-    n_samples_train = train_configs['n_samples_train']
-    candle_input_type = train_configs['candle_input_type']
+    n_steps = train_config['n_steps']
+    n_features = train_config['n_features']
+    symbol_out = train_config['symbol_out']
+    n_samples_train = train_config['n_samples_train']
+    candle_input_type = train_config['candle_input_type']
+    candle_output_type = settings['candle_output_type']
 
-    n_samples_test = 500
+    n_samples_test = 100
     samples_index_start = n_samples_train
-    dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
+    dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
+                                       candle_output_type)
 
-    X_test, y_test = split_sequences1(dataset_test, n_steps)
-    X_test = np.asarray(X_test).astype(np.float32)
-    y_test = np.asarray(y_test).astype(np.float32)
+    X_test, y_test = split_sequences2(dataset_test, n_steps, candle_output_type)
 
     saved_model = load_model('model.h5')
     test_acc = saved_model.evaluate(X_test, y_test, verbose=0)
@@ -351,46 +341,42 @@ def calculate_model_bias():
     timeframe = settings['timeframe']
     hist = HistMulti(csv_dir, timeframe)
 
-    with open("train_configs.json", "r") as file:
-        train_configs = json.load(file)
+    with open("train_config.json", "r") as file:
+        train_config = json.load(file)
 
-    print(f'train_configs:')
-    print(f'{train_configs}')
+    print(f'train_config:')
+    print(f'{train_config}')
 
-    n_steps = train_configs['n_steps']
-    n_features = train_configs['n_features']
-    symbol_out = train_configs['symbol_out']
-    n_samples_train = train_configs['n_samples_train']
-    candle_input_type = train_configs['candle_input_type']
-    candle_output_type = train_configs['candle_output_type']
-    validation_split = train_configs['validation_split']
+    n_steps = train_config['n_steps']
+    n_features = train_config['n_features']
+    symbol_out = train_config['symbol_out']
+    n_samples_train = train_config['n_samples_train']
+    candle_input_type = train_config['candle_input_type']
+    candle_output_type = train_config['candle_output_type']
+    validation_split = train_config['validation_split']
     istart_samples_test = int(n_samples_train * validation_split)
     n_samples_test = int(n_samples_train * validation_split)
+
     print(f'calculando o bias do modelo. (n_samples_test = {n_samples_test})')
 
-    # dataset_test = prepare_train_data(hist, symbol_out, istart_samples_test, n_samples_test, candle_input_type)
     dataset_test = prepare_train_data2(hist, symbol_out, istart_samples_test, n_samples_test, candle_input_type,
                                        candle_output_type)
 
-    # X_, y_ = split_sequences1(dataset_test, n_steps)
-    X_, y_ = split_sequences2(dataset_test, n_steps, candle_output_type)
+    X, y = split_sequences2(dataset_test, n_steps, candle_output_type)
 
     model = load_model('model.h5')
 
-    X_ = np.asarray(X_).astype(np.float32)
-    y_ = np.asarray(y_).astype(np.float32)
-
     diffs = []
-    len_X_ = len(X_)
+    len_X_ = len(X)
     for i in range(len_X_):
         print(f'{100 * i / len_X_:.2f} %')
-        x_input = X_[i]
+        x_input = X[i]
         x_input = x_input.reshape((1, n_steps, n_features))
         y_pred = model.predict(x_input)
         if len(y_pred[0]) == 1:
-            diff = y_[i] - y_pred[0][0]
+            diff = y[i] - y_pred[0][0]
         else:
-            diff = y_[i] - y_pred[0]
+            diff = y[i] - y_pred[0]
         diffs.append(diff)
         if i % 3000 == 0 and i > 0:
             _t = 60
@@ -401,10 +387,10 @@ def calculate_model_bias():
     bias = np.mean(diffs, axis=0)
     print(f'bias = {bias}')
 
-    train_configs['bias'] = bias
-    train_configs['n_samples_test_for_calc_bias'] = n_samples_test
-    save_train_configs(train_configs)
-    print('bias salvo em train_configs.json')
+    train_config['bias'] = bias
+    train_config['n_samples_test_for_calc_bias'] = n_samples_test
+    write_train_config(train_config)
+    print('bias salvo em train_config.json')
 
 
 def test_model_with_trader():
@@ -417,23 +403,24 @@ def test_model_with_trader():
     timeframe = settings['timeframe']
     hist = HistMulti(csv_dir, timeframe)
 
-    with open("train_configs.json", "r") as file:
-        train_configs = json.load(file)
+    with open("train_config.json", "r") as file:
+        train_config = json.load(file)
 
-    print(f'train_configs:')
-    print(f'{train_configs}')
+    print(f'train_config:')
+    print(f'{train_config}')
 
-    n_steps = train_configs['n_steps']
-    n_features = train_configs['n_features']
-    symbol_out = train_configs['symbol_out']
-    n_samples_train = train_configs['n_samples_train']
-    bias = train_configs['bias']
-    candle_input_type = train_configs['candle_input_type']
-    n_samples_test = 500
+    n_steps = train_config['n_steps']
+    n_features = train_config['n_features']
+    symbol_out = train_config['symbol_out']
+    n_samples_train = train_config['n_samples_train']
+    bias = train_config['bias']
+    candle_input_type = train_config['candle_input_type']
+    candle_output_type = train_config['candle_output_type']
+    n_samples_test = 100
     samples_index_start = n_samples_train
 
     dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
-    X_, y_ = split_sequences1(dataset_test, n_steps)
+    X, y = split_sequences2(dataset_test, n_steps, candle_output_type)
 
     model = load_model('model.h5')
 
@@ -442,9 +429,6 @@ def test_model_with_trader():
 
     _symbol_timeframe = f'{symbol_out}_{hist.timeframe}'
     trans: MinMaxScaler = scalers[_symbol_timeframe]
-
-    X_ = np.asarray(X_).astype(np.float32)
-    # y_ = np.asarray(y_).astype(np.float32)
 
     initial_deposit = 1000.0
 
@@ -466,7 +450,7 @@ def test_model_with_trader():
 
         # aqui a rede neural faz a previsão do valor de fechamento da próxima vela
         j = i - samples_index_start - n_steps + 1
-        x_input = X_[j]
+        x_input = X[j]
         x_input = x_input.reshape((1, n_steps, n_features))
         close_pred_norm = model.predict(x_input)
         close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, trans)
@@ -544,23 +528,25 @@ def test_model_with_trader_interactive():
     timeframe = settings['timeframe']
     hist = HistMulti(csv_dir, timeframe)
 
-    with open("train_configs.json", "r") as file:
-        train_configs = json.load(file)
+    with open("train_config.json", "r") as file:
+        train_config = json.load(file)
 
-    print(f'train_configs:')
-    print(f'{train_configs}')
+    print(f'train_config:')
+    print(f'{train_config}')
 
-    n_steps = train_configs['n_steps']
-    n_features = train_configs['n_features']
-    symbol_out = train_configs['symbol_out']
-    n_samples_train = train_configs['n_samples_train']
-    bias = train_configs['bias']
-    candle_input_type = train_configs['candle_input_type']
-    n_samples_test = 500
+    n_steps = train_config['n_steps']
+    n_features = train_config['n_features']
+    symbol_out = train_config['symbol_out']
+    n_samples_train = train_config['n_samples_train']
+    bias = train_config['bias']
+    candle_input_type = train_config['candle_input_type']
+    candle_output_type = train_config['candle_output_type']
+    n_samples_test = 100
     samples_index_start = n_samples_train
 
-    dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
-    X_, y_ = split_sequences1(dataset_test, n_steps)
+    dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
+                                       candle_output_type)
+    X_, y_ = split_sequences2(dataset_test, n_steps, candle_output_type)
 
     model = load_model('model.h5')
 
@@ -569,9 +555,6 @@ def test_model_with_trader_interactive():
 
     _symbol_timeframe = f'{symbol_out}_{hist.timeframe}'
     trans: MinMaxScaler = scalers[_symbol_timeframe]
-
-    X_ = np.asarray(X_).astype(np.float32)
-    # y_ = np.asarray(y_).astype(np.float32)
 
     initial_deposit = 1000.0
 
@@ -648,7 +631,8 @@ def show_tf():
 if __name__ == '__main__':
     # show_tf()
     # test_models()
-    train_model()
+    # train_model()
     # calculate_model_bias()
+    evaluate_model()
     # test_model_with_trader()
     # test_model_with_trader_interactive()

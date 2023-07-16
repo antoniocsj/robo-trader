@@ -353,6 +353,10 @@ def split_sequences1(sequences: ndarray, n_steps: int) -> tuple[ndarray, ndarray
         seq_x, seq_y = sequences[i:end_ix, :-1], sequences[end_ix - 1, -1]
         X.append(seq_x)
         y.append(seq_y)
+
+    X = np.asarray(X).astype(np.float32)
+    y = np.asarray(y).astype(np.float32)
+
     return np.array(X), np.array(y)
 
 
@@ -382,7 +386,11 @@ def split_sequences2(sequences: ndarray, n_steps: int, candle_output_type: str) 
 
         X.append(seq_x)
         y.append(seq_y)
-    return np.array(X), np.array(y)
+
+    X = np.asarray(X).astype(np.float32)
+    y = np.asarray(y).astype(np.float32)
+
+    return X, y
 
 
 # usada nas preparação dos dados históricos de entrada da rede neural para previsão
