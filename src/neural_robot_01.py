@@ -145,27 +145,27 @@ def train_model():
     print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
 
     train_config = {'symbol_out': symbol_out,
-                     'timeframe': hist.timeframe,
-                     'n_steps': n_steps,
-                     'candle_input_type': candle_input_type,
-                     'candle_output_type': candle_output_type,
-                     'n_symbols': n_symbols,
-                     'n_features': n_features,
-                     'n_inputs': n_inputs,
-                     'n_samples_train': n_samples_train,
-                     'validation_split': validation_split,
-                     'effective_n_epochs': effective_n_epochs,
-                     'max_n_epochs': max_n_epochs,
-                     'patience': patience,
-                     'whole_set_train_loss_eval': whole_set_train_loss_eval,
-                     'n_samples_test': n_samples_test,
-                     'test_loss_eval': test_loss_eval,
-                     'losses': losses,
-                     'symbols': hist.symbols,
-                     'bias': 0.0,
-                     'n_samples_test_for_calc_bias': 0,
-                     'model_config': model_config,
-                     'history': history.history}
+                    'timeframe': hist.timeframe,
+                    'n_steps': n_steps,
+                    'candle_input_type': candle_input_type,
+                    'candle_output_type': candle_output_type,
+                    'n_symbols': n_symbols,
+                    'n_features': n_features,
+                    'n_inputs': n_inputs,
+                    'n_samples_train': n_samples_train,
+                    'validation_split': validation_split,
+                    'effective_n_epochs': effective_n_epochs,
+                    'max_n_epochs': max_n_epochs,
+                    'patience': patience,
+                    'whole_set_train_loss_eval': whole_set_train_loss_eval,
+                    'n_samples_test': n_samples_test,
+                    'test_loss_eval': test_loss_eval,
+                    'losses': losses,
+                    'symbols': hist.symbols,
+                    'bias': 0.0,
+                    'n_samples_test_for_calc_bias': 0,
+                    'model_config': model_config,
+                    'history': history.history}
 
     write_train_config(train_config)
 
@@ -233,21 +233,21 @@ def train_model_return(settings: dict, hist: HistMulti, n_steps: int, layer_type
     print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
 
     train_config = {'symbol_out': symbol_out,
-                     'timeframe': hist.timeframe,
-                     'n_steps': n_steps,
-                     'candle_input_type': candle_input_type,
-                     'candle_output_type': candle_output_type,
-                     'n_symbols': n_symbols,
-                     'n_features': n_features,
-                     'n_inputs': n_inputs,
-                     'n_samples_train': n_samples_train,
-                     'validation_split': validation_split,
-                     'n_epochs': n_epochs,
-                     'layer_type': list(layer_type),
-                     'whole_set_train_loss_eval': whole_set_train_loss_eval,
-                     'n_samples_test': n_samples_test,
-                     'test_loss_eval': test_loss_eval,
-                     'symbols': hist.symbols}
+                    'timeframe': hist.timeframe,
+                    'n_steps': n_steps,
+                    'candle_input_type': candle_input_type,
+                    'candle_output_type': candle_output_type,
+                    'n_symbols': n_symbols,
+                    'n_features': n_features,
+                    'n_inputs': n_inputs,
+                    'n_samples_train': n_samples_train,
+                    'validation_split': validation_split,
+                    'n_epochs': n_epochs,
+                    'layer_type': list(layer_type),
+                    'whole_set_train_loss_eval': whole_set_train_loss_eval,
+                    'n_samples_test': n_samples_test,
+                    'test_loss_eval': test_loss_eval,
+                    'symbols': hist.symbols}
 
     return train_config
 
@@ -341,8 +341,7 @@ def calculate_model_bias():
     timeframe = settings['timeframe']
     hist = HistMulti(csv_dir, timeframe)
 
-    with open("train_config.json", "r") as file:
-        train_config = json.load(file)
+    train_config = read_train_config()
 
     print(f'train_config:')
     print(f'{train_config}')
@@ -403,9 +402,7 @@ def test_model_with_trader():
     timeframe = settings['timeframe']
     hist = HistMulti(csv_dir, timeframe)
 
-    with open("train_config.json", "r") as file:
-        train_config = json.load(file)
-
+    train_config = read_train_config()
     print(f'train_config:')
     print(f'{train_config}')
 
@@ -528,9 +525,7 @@ def test_model_with_trader_interactive():
     timeframe = settings['timeframe']
     hist = HistMulti(csv_dir, timeframe)
 
-    with open("train_config.json", "r") as file:
-        train_config = json.load(file)
-
+    train_config = read_train_config()
     print(f'train_config:')
     print(f'{train_config}')
 
@@ -546,7 +541,7 @@ def test_model_with_trader_interactive():
 
     dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
                                        candle_output_type)
-    X_, y_ = split_sequences2(dataset_test, n_steps, candle_output_type)
+    X, y = split_sequences2(dataset_test, n_steps, candle_output_type)
 
     model = load_model('model.h5')
 
@@ -574,7 +569,7 @@ def test_model_with_trader_interactive():
 
         # aqui a rede neural faz a previsão do valor de fechamento da próxima vela
         j = i - samples_index_start - n_steps + 1
-        x_input = X_[j]
+        x_input = X[j]
         x_input = x_input.reshape((1, n_steps, n_features))
         close_pred_norm = model.predict(x_input)
         close_pred_denorm = denorm_close_price(close_pred_norm[0][0] + bias, trans)
@@ -631,8 +626,8 @@ def show_tf():
 if __name__ == '__main__':
     # show_tf()
     # test_models()
-    # train_model()
+    train_model()
     # calculate_model_bias()
-    evaluate_model()
+    # evaluate_model()
     # test_model_with_trader()
     # test_model_with_trader_interactive()
