@@ -7,18 +7,17 @@ from deap import base
 from deap import creator
 from deap import tools
 
-from utils_train import train_model_return
 
-creator.create("FitnessMax", base.Fitness, weights=(1.0,))
-creator.create("Individual", array.array, typecode='b', fitness=creator.FitnessMax)
+creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
+creator.create("Individual", array.array, typecode='L', fitness=creator.FitnessMin)
 
 toolbox = base.Toolbox()
 
 # Attribute generator
-toolbox.register("attr_bool", random.randint, 0, 1)
+toolbox.register("attr_uint", random.randint, 0, 1000)
 
 # Structure initializers
-toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_bool, 100)
+toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_uint, 20)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 
