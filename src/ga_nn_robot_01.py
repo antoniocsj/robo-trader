@@ -48,7 +48,7 @@ hist = HistMulti(csv_dir, timeframe)
 n_features = hist.calc_n_features(candle_input_type)
 
 
-def convert_ind_to_params(ind):
+def individual_to_hyperparameters(ind):
     n_steps = int(''.join(str(x) for x in ind[0:5]), 2)
     if n_steps == 0:
         n_steps = 1
@@ -68,7 +68,7 @@ def convert_ind_to_params(ind):
 
 
 def evaluate(ind):
-    params = convert_ind_to_params(ind)
+    params = individual_to_hyperparameters(ind)
     print(params)
     loss = train_model_param(settings, hist, params)
     print(loss)
@@ -98,7 +98,7 @@ def main():
     print(f'HallOfFame:')
     print(hof[0])
     print()
-    print(convert_ind_to_params(hof[0]))
+    print(individual_to_hyperparameters(hof[0]))
     print()
     print(log)
 
