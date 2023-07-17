@@ -26,6 +26,7 @@ from keras.layers import Dense
 from keras.layers import Flatten
 from keras.layers.convolutional import Conv1D
 from keras.layers.convolutional import MaxPooling1D
+from keras.callbacks import EarlyStopping
 
 tf.keras.utils.set_random_seed(1)
 
@@ -40,7 +41,10 @@ def train_model_param(settings: dict, hist: HistMulti, params: dict) -> float:
 
     n_steps = params['n_steps']
     layer_type = params['layer_type']
-    n_epochs = params['n_epochs']
+    n_features = hist.calc_n_features(candle_input_type)
+    n_inputs = n_steps * n_features
+    max_n_epochs = n_inputs
+    patience = int(max_n_epochs / 10)
 
     n_samples_train = 1000  # 30000-M10, 60000-M5
     validation_split = 0.2
@@ -67,7 +71,10 @@ def train_model_param(settings: dict, hist: HistMulti, params: dict) -> float:
     model.add(Dense(len(candle_output_type), activation='relu'))
 
     model.compile(optimizer='adam', loss='mse')
-    model.fit(X_train, y_train, epochs=n_epochs, verbose=0, validation_split=validation_split)
+
+    callbacks = [EarlyStopping(monitor='val_loss', patience=patience, verbose=0)]
+    model.fit(X_train, y_train, epochs=max_n_epochs, verbose=0, validation_split=validation_split,
+              callbacks=callbacks)
 
     n_samples_test = 100
     samples_index_start = n_samples_train

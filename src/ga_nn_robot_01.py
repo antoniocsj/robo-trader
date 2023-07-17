@@ -10,6 +10,7 @@ import random
 random.seed(1)
 
 import array
+import time
 
 from deap import algorithms
 from deap import base
@@ -44,6 +45,7 @@ candle_input_type = settings['candle_input_type']
 candle_output_type = settings['candle_output_type']
 
 hist = HistMulti(csv_dir, timeframe)
+n_features = hist.calc_n_features(candle_input_type)
 
 
 def convert_ind_to_params(ind):
@@ -57,7 +59,7 @@ def convert_ind_to_params(ind):
     params = {
         'n_steps': n_steps,
         'layer_type': layer_type,
-        'n_epochs': 2
+        'n_epochs': n_features
     }
 
     return params
@@ -66,6 +68,7 @@ def convert_ind_to_params(ind):
 def evaluate(ind):
     params = convert_ind_to_params(ind)
     loss = train_model_param(settings, hist, params)
+    time.sleep(10)
     return loss,
 
 
@@ -78,7 +81,7 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 def main():
     random.seed(1)
 
-    pop = toolbox.population(n=4)
+    pop = toolbox.population(n=50)
     hof = tools.HallOfFame(1)
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", np.mean)
@@ -86,7 +89,7 @@ def main():
     stats.register("min", np.min)
     stats.register("max", np.max)
 
-    pop, log = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.2, ngen=2,
+    pop, log = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.2, ngen=10,
                                    stats=stats, halloffame=hof, verbose=True)
     print(f'HallOfFame:')
     print(hof[0])
