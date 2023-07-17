@@ -50,6 +50,9 @@ n_features = hist.calc_n_features(candle_input_type)
 
 def convert_ind_to_params(ind):
     n_steps = int(''.join(str(x) for x in ind[0:5]), 2)
+    if n_steps == 0:
+        n_steps = 1
+
     a = int(''.join(str(x) for x in ind[5:10]), 2)
     b = int(''.join(str(x) for x in ind[10:15]), 2)
     c = int(''.join(str(x) for x in ind[15:20]), 2)
@@ -58,8 +61,7 @@ def convert_ind_to_params(ind):
 
     params = {
         'n_steps': n_steps,
-        'layer_type': layer_type,
-        'n_epochs': n_features
+        'layer_type': layer_type
     }
 
     return params
@@ -67,7 +69,9 @@ def convert_ind_to_params(ind):
 
 def evaluate(ind):
     params = convert_ind_to_params(ind)
+    print(params)
     loss = train_model_param(settings, hist, params)
+    print(loss)
     time.sleep(10)
     return loss,
 
