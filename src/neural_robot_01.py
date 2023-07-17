@@ -5,15 +5,12 @@ os.environ['TF_CUDNN_DETERMINISM'] = str(1)
 os.environ['TF_DETERMINISTIC_OPS'] = str(1)
 
 import numpy as np
-
 np.random.seed(1)
 
 import random
-
 random.seed(1)
 
 import tensorflow as tf
-
 tf.random.set_seed(1)
 tf.keras.utils.set_random_seed(1)
 
@@ -34,7 +31,6 @@ tf.keras.utils.set_random_seed(1)
 from utils_nn import prepare_train_data, split_sequences2, prepare_train_data2
 from utils_filesystem import read_json, write_train_config, read_train_config
 from utils_ops import denorm_close_price
-from utils_symbols import calc_n_features
 
 
 # Multivariate CNN Models
