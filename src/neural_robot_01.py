@@ -34,7 +34,7 @@ tf.keras.utils.set_random_seed(1)
 from utils_nn import prepare_train_data, split_sequences2, prepare_train_data2
 from utils_filesystem import read_json, write_train_config, read_train_config
 from utils_ops import denorm_close_price
-from utils_symbols import calc_n_inputs
+from utils_symbols import calc_n_features
 
 
 # Multivariate CNN Models
@@ -75,17 +75,6 @@ def train_model():
     validation_split = 0.2
     n_samples_test = 100  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
 
-    n_cols, n_symbols = calc_n_inputs(csv_dir, candle_input_type, timeframe)
-    n_inputs = n_steps * n_cols
-    max_n_epochs = n_inputs
-    patience = int(max_n_epochs / 10)
-
-    print(f'symbols = {hist.symbols}')
-    print(f'n_symbols = {n_symbols}, n_features (n_cols) = {n_cols}, n_steps = {n_steps}, '
-          f'tipo_vela_entrada = {candle_input_type}, tipo_vela_saída = {candle_output_type}, \n'
-          f'n_samples_train = {n_samples_train}, validation_split = {validation_split}, '
-          f'max_n_epochs = {max_n_epochs}, patience = {patience}')
-
     # horizontally stack columns
     dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
 
@@ -95,10 +84,16 @@ def train_model():
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
     # features to expect for each input sample.
     n_features = X_train.shape[2]
+    n_inputs = n_steps * n_features
+    max_n_epochs = n_inputs
+    patience = int(max_n_epochs / 10)
+    n_symbols = len(hist.symbols)
 
-    if n_cols != n_features:
-        print(f'ERRO. n_cols ({n_cols}) != n_features ({n_features}).')
-        exit(-1)
+    print(f'symbols = {hist.symbols}')
+    print(f'n_symbols = {n_symbols}, n_features (n_cols) = {n_features}, n_steps = {n_steps}, '
+          f'tipo_vela_entrada = {candle_input_type}, tipo_vela_saída = {candle_output_type}, \n'
+          f'n_samples_train = {n_samples_train}, validation_split = {validation_split}, '
+          f'max_n_epochs = {max_n_epochs}, patience = {patience}')
 
     # define model
     model = Sequential()

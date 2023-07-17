@@ -211,6 +211,22 @@ class HistMulti:
             for symbol in self.symbols:
                 self.delete_first_row_symbol(symbol)
 
+    def calc_n_features(self, candle_input_type: str):
+        """
+        Faz uma varredura no histórico e retorna o número de colunas (além da data e horário) que há em cada
+        símbolo ou arquivo CSV.
+        número de colunas = n_features.
+        :param candle_input_type:
+        :return: n_features (n_cols)
+        """
+        count = 0
+        for s in self.symbols:
+            if s.endswith('@T') or s.endswith('@DT') or s.endswith('@TD'):
+                count += 1
+            else:
+                count += len(candle_input_type)
+        return count
+
 
 class HistMultiOriginal:
     def __init__(self, directory: str):

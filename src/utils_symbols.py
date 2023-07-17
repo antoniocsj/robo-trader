@@ -109,7 +109,7 @@ def search_symbols(directory: str, timeframe: str):
     return symbols_names, symbols_paths
 
 
-def calc_n_inputs(directory: str, candle_input_type: str, timeframe: str):
+def calc_n_features(directory: str, candle_input_type: str, timeframe: str):
     """
     Faz uma varredura no diretório e retorna o número de colunas (além da data e horário) que há em cada arquivos
     CSV e também retorna o número de símbolos/arquivos CSVs.
