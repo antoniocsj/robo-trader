@@ -31,18 +31,19 @@ tf.keras.utils.set_random_seed(1)
 
 from utils_nn import split_sequences2, prepare_train_data2
 from utils_filesystem import read_json
-from utils_symbols import calc_n_features
 
 
-def train_model_param(settings: dict, hist: HistMulti, n_steps: int, layer_type: list):
+def train_model_param(settings: dict, hist: HistMulti, params: dict) -> float:
     symbol_out = settings['symbol_out']
     candle_input_type = settings['candle_input_type']
     candle_output_type = settings['candle_output_type']
 
-    n_steps = n_steps
+    n_steps = params['n_steps']
+    layer_type = params['layer_type']
+    n_epochs = params['n_epochs']
+
     n_samples_train = 1000  # 30000-M10, 60000-M5
     validation_split = 0.2
-    n_epochs = 2
 
     # horizontally stack columns
     dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
@@ -77,12 +78,7 @@ def train_model_param(settings: dict, hist: HistMulti, n_steps: int, layer_type:
 
     test_loss_eval = model.evaluate(X_test, y_test, verbose=0)
 
-    config = {
-        'layer_type': layer_type,
-        'test_loss_eval': test_loss_eval
-    }
-
-    return config
+    return test_loss_eval
 
 
 def test_models():

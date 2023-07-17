@@ -16,8 +16,12 @@ from deap import base
 from deap import creator
 from deap import tools
 
+from utils_train import train_model_param
+from utils_filesystem import read_json
+from HistMulti import HistMulti
 
-creator.create("FitnessMin", base.Fitness, weights=(1.0,))
+
+creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", array.array, typecode='B', fitness=creator.FitnessMin)
 
 toolbox = base.Toolbox()
@@ -30,13 +34,39 @@ toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.att
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 
+settings = read_json('settings.json')
+print(f'settings.json: {settings}')
+
+csv_dir = settings['csv_dir']
+symbol_out = settings['symbol_out']
+timeframe = settings['timeframe']
+candle_input_type = settings['candle_input_type']
+candle_output_type = settings['candle_output_type']
+
+hist = HistMulti(csv_dir, timeframe)
+
+
+def convert_ind_to_params(ind):
+    n_steps = int(''.join(str(x) for x in ind[0:5]), 2)
+    a = int(''.join(str(x) for x in ind[5:10]), 2)
+    b = int(''.join(str(x) for x in ind[10:15]), 2)
+    c = int(''.join(str(x) for x in ind[15:20]), 2)
+
+    layer_type = sorted([a, b, c], reverse=True)
+
+    params = {
+        'n_steps': n_steps,
+        'layer_type': layer_type,
+        'n_epochs': 2
+    }
+
+    return params
+
+
 def evaluate(ind):
-    a = int(''.join(str(x) for x in ind[0:5]), 2)
-    b = int(''.join(str(x) for x in ind[5:10]), 2)
-    c = int(''.join(str(x) for x in ind[10:15]), 2)
-    d = int(''.join(str(x) for x in ind[15:20]), 2)
-    pass
-    return a*b/(c+1)-c//(a+d+1),
+    params = convert_ind_to_params(ind)
+    loss = train_model_param(settings, hist, params)
+    return loss,
 
 
 toolbox.register("evaluate", evaluate)
@@ -48,7 +78,7 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 def main():
     random.seed(1)
 
-    pop = toolbox.population(n=300)
+    pop = toolbox.population(n=4)
     hof = tools.HallOfFame(1)
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", np.mean)
@@ -56,10 +86,14 @@ def main():
     stats.register("min", np.min)
     stats.register("max", np.max)
 
-    pop, log = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.2, ngen=40,
+    pop, log = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.2, ngen=2,
                                    stats=stats, halloffame=hof, verbose=True)
     print(f'HallOfFame:')
     print(hof[0])
+    print()
+    print(convert_ind_to_params(hof[0]))
+    print()
+    print(log)
 
     return pop, log, hof
 
