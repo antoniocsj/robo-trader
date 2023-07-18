@@ -12,7 +12,7 @@ random.seed(1)
 import array
 import time
 
-from deap import algorithms
+from my_algorithms import eaSimple_WithCP2
 from deap import base
 from deap import creator
 from deap import tools
@@ -60,7 +60,7 @@ def individual_to_hyperparameters(ind):
     layer_type = sorted([a, b, c], reverse=True)
 
     params = {
-        'n_steps': n_steps,
+        'n_steps': 1,
         'layer_type': layer_type
     }
 
@@ -72,7 +72,7 @@ def evaluate(ind):
     print(params)
     loss = train_model_param(settings, hist, params)
     print(loss)
-    time.sleep(10)
+    # time.sleep(10)
     return loss,
 
 
@@ -84,8 +84,11 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 
 def main():
     random.seed(1)
+    freq = 1
+    mutpb = 0.2
+    n_generations = 5
 
-    pop = toolbox.population(n=50)
+    pop = toolbox.population(n=3)
     hof = tools.HallOfFame(1)
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", np.mean)
@@ -93,8 +96,13 @@ def main():
     stats.register("min", np.min)
     stats.register("max", np.max)
 
-    pop, log = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.2, ngen=10,
-                                   stats=stats, halloffame=hof, verbose=True)
+    # pop, log = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.2, ngen=10,
+    #                                stats=stats, halloffame=hof, verbose=True)
+    pop, log, hof = eaSimple_WithCP2(
+        population=pop, toolbox=toolbox, checkpoint='checkpoint.pkl', freq=freq,
+        cxpb=0.5, mutpb=mutpb, ngen=n_generations,
+        stats=stats, halloffame=hof, verbose=True)
+
     print(f'HallOfFame:')
     print(hof[0])
     print()

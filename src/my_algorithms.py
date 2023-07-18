@@ -163,3 +163,104 @@ def eaSimple_WithCP(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpoi
             print(f'checkpoint gravado. geração = {gen}')
 
     return population, logbook, halloffame
+
+
+def write_checkpoint(population, generation, halloffame, logbook):
+    cp = {'population': population,
+          'generation': generation,
+          'halloffame': halloffame,
+          'logbook': logbook,
+          'rndstate': random.getstate()
+          }
+
+    with open('checkpoint.pkl', 'wb') as cp_file:
+        pickle.dump(cp, cp_file)
+
+    print(f'checkpoint gravado. geração = {generation}')
+
+
+def read_checkpoint(checkpoint: str):
+    with open(checkpoint, 'rb') as cp_file:
+        cp = pickle.load(cp_file)
+
+    return cp
+
+
+def eaSimple_WithCP2(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpoint=None, freq=5,
+                     halloffame=None, verbose=__debug__):
+    if checkpoint and os.path.exists(checkpoint):
+        cp = read_checkpoint(checkpoint)
+        population = cp["population"]
+        start_gen = cp["generation"]
+        halloffame = cp["halloffame"]
+        logbook = cp["logbook"]
+        random.setstate(cp["rndstate"])
+    else:
+        # Start a new evolution
+        start_gen = 0
+        logbook = tools.Logbook()
+        logbook.header = ['gen', 'nevals'] + (stats.fields if stats else [])
+
+    # Evaluate the individuals with an invalid fitness
+    invalid_ind = [ind for ind in population if not ind.fitness.valid]
+    # fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+    # for ind, fit in zip(invalid_ind, fitnesses):
+    #     ind.fitness.values = fit
+    if len(invalid_ind) > 0:
+        for i in range(len(invalid_ind)):
+            print(f'i = {i} de {len(invalid_ind)}')
+            ind = invalid_ind[i]
+            if not ind.fitness.valid:
+                fit = toolbox.evaluate(ind)
+                ind.fitness.values = fit
+            write_checkpoint(population, start_gen, halloffame, logbook)
+
+    if halloffame is not None:
+        halloffame.update(population)
+
+    if start_gen < ngen:
+        record = stats.compile(population) if stats else {}
+        logbook.record(gen=start_gen, nevals=len(invalid_ind), **record)
+    if verbose:
+        print(logbook.stream)
+
+    # Begin the generational process
+    for gen in range(start_gen + 1, ngen + 1):
+        # Select the next generation individuals
+        offspring = toolbox.select(population, len(population))
+
+        # Vary the pool of individuals
+        offspring = varAnd(offspring, toolbox, cxpb, mutpb)
+
+        # Evaluate the individuals with an invalid fitness
+        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        # fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+        # for ind, fit in zip(invalid_ind, fitnesses):
+        #     ind.fitness.values = fit
+        if len(invalid_ind) > 0:
+            for i in range(len(invalid_ind)):
+                print(f'i = {i} de {len(invalid_ind)}')
+                ind = invalid_ind[i]
+                if not ind.fitness.valid:
+                    fit = toolbox.evaluate(ind)
+                    ind.fitness.values = fit
+                write_checkpoint(offspring, gen, halloffame, logbook)
+
+        # Update the hall of fame with the generated individuals
+        if halloffame is not None:
+            halloffame.update(offspring)
+
+        # Replace the current population by the offspring
+        population[:] = offspring
+        write_checkpoint(population, gen, halloffame, logbook)
+
+        # Append the current generation statistics to the logbook
+        record = stats.compile(population) if stats else {}
+        logbook.record(gen=gen, nevals=len(invalid_ind), **record)
+        if verbose:
+            print(logbook.stream)
+
+        if gen % freq == 0:
+            write_checkpoint(population, gen, halloffame, logbook)
+
+    return population, logbook, halloffame
