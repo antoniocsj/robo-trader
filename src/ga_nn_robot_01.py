@@ -60,7 +60,7 @@ def individual_to_hyperparameters(ind):
     layer_type = sorted([a, b, c], reverse=True)
 
     params = {
-        'n_steps': 1,
+        'n_steps': n_steps,
         'layer_type': layer_type
     }
 
