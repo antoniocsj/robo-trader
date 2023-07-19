@@ -62,7 +62,7 @@ def train_model_param(settings: dict, hist: HistMulti, params: dict) -> float:
     # define model
     model = Sequential()
     model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
-    model.add(MaxPooling1D(pool_size=2, padding='same'))
+    model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
     model.add(Flatten())
     if sum(layer_type) > 0:
         for i in range(len(layer_type)):

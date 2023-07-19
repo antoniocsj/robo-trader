@@ -31,7 +31,7 @@ toolbox = base.Toolbox()
 toolbox.register("attr_uint", random.randint, 0, 1)
 
 # Structure initializers
-toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_uint, 20)
+toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_uint, 36)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 
@@ -49,15 +49,15 @@ n_features = hist.calc_n_features(candle_input_type)
 
 
 def individual_to_hyperparameters(ind):
-    n_steps = int(''.join(str(x) for x in ind[0:5]), 2)
-    if n_steps == 0:
-        n_steps = 1
+    n_steps = int(''.join(str(x) for x in ind[0:3]), 2)
+    n_steps += 1
 
-    a = int(''.join(str(x) for x in ind[5:10]), 2)
-    b = int(''.join(str(x) for x in ind[10:15]), 2)
-    c = int(''.join(str(x) for x in ind[15:20]), 2)
+    a = int(''.join(str(x) for x in ind[4:12]), 2)
+    b = int(''.join(str(x) for x in ind[12:20]), 2)
+    c = int(''.join(str(x) for x in ind[20:28]), 2)
+    d = int(''.join(str(x) for x in ind[28:36]), 2)
 
-    layer_type = sorted([a, b, c], reverse=True)
+    layer_type = sorted([a, b, c, d], reverse=True)
 
     params = {
         'n_steps': n_steps,
@@ -72,7 +72,7 @@ def evaluate(ind):
     print(params)
     loss = train_model_param(settings, hist, params)
     print(loss)
-    time.sleep(10)
+    time.sleep(30)
     return loss,
 
 
@@ -86,9 +86,9 @@ def main():
     random.seed(1)
     freq = 1
     mutpb = 0.2
-    n_generations = 30
+    n_generations = 40
 
-    pop = toolbox.population(n=50)
+    pop = toolbox.population(n=100)
     hof = tools.HallOfFame(1)
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", np.mean)
