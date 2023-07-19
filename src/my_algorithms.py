@@ -213,7 +213,7 @@ def eaSimple_WithCP2(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpo
             if not ind.fitness.valid:
                 fit = toolbox.evaluate(ind)
                 ind.fitness.values = fit
-            write_checkpoint(population, start_gen, halloffame, logbook)
+                write_checkpoint(population, start_gen, halloffame, logbook)
 
     if halloffame is not None:
         halloffame.update(population)
@@ -244,7 +244,7 @@ def eaSimple_WithCP2(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpo
                 if not ind.fitness.valid:
                     fit = toolbox.evaluate(ind)
                     ind.fitness.values = fit
-                write_checkpoint(offspring, gen, halloffame, logbook)
+                    write_checkpoint(offspring, gen, halloffame, logbook)
 
         # Update the hall of fame with the generated individuals
         if halloffame is not None:
@@ -252,7 +252,6 @@ def eaSimple_WithCP2(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpo
 
         # Replace the current population by the offspring
         population[:] = offspring
-        write_checkpoint(population, gen, halloffame, logbook)
 
         # Append the current generation statistics to the logbook
         record = stats.compile(population) if stats else {}

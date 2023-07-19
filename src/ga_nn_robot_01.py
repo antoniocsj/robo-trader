@@ -72,7 +72,7 @@ def evaluate(ind):
     print(params)
     loss = train_model_param(settings, hist, params)
     print(loss)
-    # time.sleep(10)
+    time.sleep(10)
     return loss,
 
 
@@ -86,9 +86,9 @@ def main():
     random.seed(1)
     freq = 1
     mutpb = 0.2
-    n_generations = 5
+    n_generations = 30
 
-    pop = toolbox.population(n=3)
+    pop = toolbox.population(n=50)
     hof = tools.HallOfFame(1)
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", np.mean)
