@@ -19,7 +19,11 @@ from deap import tools
 
 from utils_train import train_model_param
 from utils_filesystem import read_json
+from utils_symbols import get_symbols
 from HistMulti import HistMulti
+
+
+individual_size = 36
 
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -31,7 +35,7 @@ toolbox = base.Toolbox()
 toolbox.register("attr_uint", random.randint, 0, 1)
 
 # Structure initializers
-toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_uint, 36)
+toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_uint, individual_size)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 
@@ -48,7 +52,7 @@ hist = HistMulti(csv_dir, timeframe)
 n_features = hist.calc_n_features(candle_input_type)
 
 
-def make_layer_type(n_layers: int, n_bits_per_layer: int, first_layer_bit_start: int, ind: array.array) -> list[int]:
+def make_layers_config(n_layers: int, n_bits_per_layer: int, first_layer_bit_start: int, ind: array.array) -> list[int]:
     a = first_layer_bit_start
     b = a + n_bits_per_layer
 
@@ -83,11 +87,11 @@ def individual_to_hyperparameters(ind):
     n_bits_per_layer = 8
     first_layer_bit_start = n_steps_bit_end
 
-    layer_type = make_layer_type(n_layers, n_bits_per_layer, first_layer_bit_start, ind)
+    layers_config = make_layers_config(n_layers, n_bits_per_layer, first_layer_bit_start, ind)
 
     params = {
         'n_steps': n_steps,
-        'layer_type': layer_type
+        'layers_config': layers_config
     }
 
     return params

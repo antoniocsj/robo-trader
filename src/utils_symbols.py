@@ -130,48 +130,54 @@ def calc_n_features(directory: str, candle_input_type: str, timeframe: str):
 
 
 def get_symbols(categories: str = None) -> list[str]:
-    symbols_currencies_majors = ['AUDUSD', 'EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY']
-    symbols_currencies_crosses = ['AUDJPY', 'AUDCAD', 'AUDCHF', 'EURAUD', 'EURCHF', 'EURGBP', 'GBPAUD', 'GBPCHF',
-                                  'CADCHF', 'CADJPY', 'CHFJPY', 'EURCAD', 'EURJPY', 'GBPCAD', 'GBPJPY']
-    symbols_commodities_gold = ['XAUUSD', 'XAUAUD', 'XAUCHF', 'XAUEUR', 'XAUGBP', 'XAUJPY']
-    symbols_commodities_silver = ['XAGAUD', 'XAGEUR', 'XAGUSD']
-    symbols_indices_majors = ['AUS200', 'EUSTX50', 'FRA40', 'GER40', 'JPN225', 'NAS100', 'UK100', 'US30', 'US500']
-    symbols_indices_minors = ['CA60', 'SWI20', 'US2000']
-    symbols_indices_currency = ['EURX', 'JPYX', 'USDX']
+    currencies_majors = ['AUDUSD', 'EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY']
+    currencies_crosses = ['AUDJPY', 'AUDCAD', 'AUDCHF', 'EURAUD', 'EURCHF', 'EURGBP', 'GBPAUD', 'GBPCHF',
+                          'CADCHF', 'CADJPY', 'CHFJPY', 'EURCAD', 'EURJPY', 'GBPCAD', 'GBPJPY']
+    commodities_gold = ['XAUUSD', 'XAUAUD', 'XAUCHF', 'XAUEUR', 'XAUGBP', 'XAUJPY']
+    commodities_silver = ['XAGAUD', 'XAGEUR', 'XAGUSD']
+    indices_majors = ['AUS200', 'EUSTX50', 'FRA40', 'GER40', 'JPN225', 'NAS100', 'UK100', 'US30', 'US500']
+    indices_minors = ['CA60', 'SWI20', 'US2000']
+    indices_currency = ['EURX', 'JPYX', 'USDX']
+
+    symbols_dict = {
+        'currencies_majors': currencies_majors,
+        'currencies_crosses': currencies_crosses,
+        'commodities_gold': commodities_gold,
+        'commodities_silver': commodities_silver,
+        'indices_majors': indices_majors,
+        'indices_minors': indices_minors,
+        'indices_currency': indices_currency
+    }
 
     if not categories:
-        all_symbols = symbols_currencies_majors + symbols_currencies_crosses
-        all_symbols += symbols_commodities_gold + symbols_commodities_silver
-        all_symbols += symbols_indices_majors + symbols_indices_minors + symbols_indices_currency
-        return sorted(all_symbols)
+        symbols = currencies_majors + currencies_crosses
+        symbols += commodities_gold + commodities_silver
+        symbols += indices_majors + indices_minors + indices_currency
+        return sorted(symbols)
+
     else:
-        if categories == 'currencies_majors':
-            all_symbols = sorted(symbols_currencies_majors)
-            return all_symbols
-        elif categories == 'currencies_crosses':
-            all_symbols = sorted(symbols_currencies_crosses)
-            return all_symbols
-        elif categories == 'commodities_gold':
-            all_symbols = sorted(symbols_commodities_gold)
-            return all_symbols
-        elif categories == 'commodities_silver':
-            all_symbols = sorted(symbols_commodities_silver)
-            return all_symbols
-        elif categories == 'indices_majors':
-            all_symbols = sorted(symbols_indices_majors)
-            return all_symbols
-        elif categories == 'indices_minors':
-            all_symbols = sorted(symbols_indices_minors)
-            return all_symbols
-        elif categories == 'indices_currency':
-            all_symbols = sorted(symbols_indices_currency)
-            return all_symbols
-        else:
-            print(f'ERRO. get_symbols(). categoria de símbolos não suportada: {categories}')
-            exit(-1)
+        categories = categories.lower()
+        keys = categories.split('+')
+
+        symbols = []
+        for key in keys:
+            symbols += symbols_dict[key]
+
+        return sorted(symbols)
 
 
 if __name__ == '__main__':
+    s = get_symbols()
+    print(s)
 
-    symbols = get_symbols()
-    print(symbols)
+    s = get_symbols('currencies_majors')
+    print(s)
+
+    s = get_symbols('currencies_crosses')
+    print(s)
+
+    s = get_symbols('currencies_majors+currencies_crosses')
+    print(s)
+
+    s = get_symbols('commodities_gold+indices_majors')
+    print(s)

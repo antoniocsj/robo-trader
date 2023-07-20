@@ -40,7 +40,7 @@ def train_model_param(settings: dict, hist: HistMulti, params: dict) -> float:
     candle_output_type = settings['candle_output_type']
 
     n_steps = params['n_steps']
-    layer_type = params['layer_type']
+    layers_config = params['layers_config']
     n_features = hist.calc_n_features(candle_input_type)
     n_inputs = n_steps * n_features
     max_n_epochs = n_inputs
@@ -64,10 +64,10 @@ def train_model_param(settings: dict, hist: HistMulti, params: dict) -> float:
     model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
     model.add(Flatten())
-    if sum(layer_type) > 0:
-        for i in range(len(layer_type)):
-            if layer_type[i] != 0:
-                model.add(Dense(layer_type[i], activation='relu'))
+    if sum(layers_config) > 0:
+        for i in range(len(layers_config)):
+            if layers_config[i] != 0:
+                model.add(Dense(layers_config[i], activation='relu'))
     model.add(Dense(len(candle_output_type), activation='relu'))
 
     model.compile(optimizer='adam', loss='mse')
