@@ -127,3 +127,51 @@ def calc_n_features(directory: str, candle_input_type: str, timeframe: str):
         else:
             count += len(candle_input_type)
     return count, len(symbols_names)
+
+
+def get_symbols(categories: str = None) -> list[str]:
+    symbols_currencies_majors = ['AUDUSD', 'EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY']
+    symbols_currencies_crosses = ['AUDJPY', 'AUDCAD', 'AUDCHF', 'EURAUD', 'EURCHF', 'EURGBP', 'GBPAUD', 'GBPCHF',
+                                  'CADCHF', 'CADJPY', 'CHFJPY', 'EURCAD', 'EURJPY', 'GBPCAD', 'GBPJPY']
+    symbols_commodities_gold = ['XAUUSD', 'XAUAUD', 'XAUCHF', 'XAUEUR', 'XAUGBP', 'XAUJPY']
+    symbols_commodities_silver = ['XAGAUD', 'XAGEUR', 'XAGUSD']
+    symbols_indices_majors = ['AUS200', 'EUSTX50', 'FRA40', 'GER40', 'JPN225', 'NAS100', 'UK100', 'US30', 'US500']
+    symbols_indices_minors = ['CA60', 'SWI20', 'US2000']
+    symbols_indices_currency = ['EURX', 'JPYX', 'USDX']
+
+    if not categories:
+        all_symbols = symbols_currencies_majors + symbols_currencies_crosses
+        all_symbols += symbols_commodities_gold + symbols_commodities_silver
+        all_symbols += symbols_indices_majors + symbols_indices_minors + symbols_indices_currency
+        return sorted(all_symbols)
+    else:
+        if categories == 'currencies_majors':
+            all_symbols = sorted(symbols_currencies_majors)
+            return all_symbols
+        elif categories == 'currencies_crosses':
+            all_symbols = sorted(symbols_currencies_crosses)
+            return all_symbols
+        elif categories == 'commodities_gold':
+            all_symbols = sorted(symbols_commodities_gold)
+            return all_symbols
+        elif categories == 'commodities_silver':
+            all_symbols = sorted(symbols_commodities_silver)
+            return all_symbols
+        elif categories == 'indices_majors':
+            all_symbols = sorted(symbols_indices_majors)
+            return all_symbols
+        elif categories == 'indices_minors':
+            all_symbols = sorted(symbols_indices_minors)
+            return all_symbols
+        elif categories == 'indices_currency':
+            all_symbols = sorted(symbols_indices_currency)
+            return all_symbols
+        else:
+            print(f'ERRO. get_symbols(). categoria de símbolos não suportada: {categories}')
+            exit(-1)
+
+
+if __name__ == '__main__':
+
+    symbols = get_symbols()
+    print(symbols)

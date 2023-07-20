@@ -48,6 +48,24 @@ hist = HistMulti(csv_dir, timeframe)
 n_features = hist.calc_n_features(candle_input_type)
 
 
+def make_layer_type(n_layers: int, n_bits_per_layer: int, first_layer_bit_start: int, ind: array.array) -> list[int]:
+    a = first_layer_bit_start
+    b = a + n_bits_per_layer
+
+    if first_layer_bit_start + n_layers * n_bits_per_layer > len(ind):
+        print('ERRO. first_layer_bit_start + n_layers * n_bits_per_layer > len(ind)')
+        exit(-1)
+
+    _list = []
+    for i in range(n_layers):
+        x = int(''.join(str(x) for x in ind[a:b]), 2)
+        _list.append(x)
+        a, b = a + n_bits_per_layer, b + n_bits_per_layer
+
+    _list = sorted(_list, reverse=True)
+    return _list
+
+
 def individual_to_hyperparameters(ind):
     # a escolha dos símbolos será assim:
     # haverão 45 bits (ex. 001001100101001....100101) cada bit representa um símbolo de uma lista
@@ -55,15 +73,17 @@ def individual_to_hyperparameters(ind):
     # é 1, o símbolo está presente.
     # Também haverão alguns outros bits que representam um número de 1 a 45, que representará o symbol_out.
 
-    n_steps = int(''.join(str(x) for x in ind[0:3]), 2)
+    n_steps_bit_start = 0
+    n_steps_bits_len = 4
+    n_steps_bit_end = n_steps_bit_start + n_steps_bits_len
+    n_steps = int(''.join(str(x) for x in ind[n_steps_bit_start:n_steps_bit_end]), 2)
     n_steps += 1
 
-    a = int(''.join(str(x) for x in ind[4:12]), 2)
-    b = int(''.join(str(x) for x in ind[12:20]), 2)
-    c = int(''.join(str(x) for x in ind[20:28]), 2)
-    d = int(''.join(str(x) for x in ind[28:36]), 2)
+    n_layers = 4
+    n_bits_per_layer = 8
+    first_layer_bit_start = n_steps_bit_end
 
-    layer_type = sorted([a, b, c, d], reverse=True)
+    layer_type = make_layer_type(n_layers, n_bits_per_layer, first_layer_bit_start, ind)
 
     params = {
         'n_steps': n_steps,
@@ -76,9 +96,10 @@ def individual_to_hyperparameters(ind):
 def evaluate(ind):
     params = individual_to_hyperparameters(ind)
     print(params)
-    loss = train_model_param(settings, hist, params)
-    print(loss)
-    time.sleep(30)
+    # loss = train_model_param(settings, hist, params)
+    # print(loss)
+    # time.sleep(30)
+    loss = sum(ind)
     return loss,
 
 

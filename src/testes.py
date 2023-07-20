@@ -234,5 +234,16 @@ def test_09():
     print(f'bias = {bias}')
 
 
+def test_10():
+    import array
+    a = array.array('B', [0, 1, 0, 1, 1])
+    b = ['a', 'b', 'c', 'd', 'e']
+    _list = []
+    for x, y in zip(a, b):
+        if x:
+            _list.append(y)
+    print(_list)
+
+
 if __name__ == '__main__':
-    test_09()
+    test_10()
