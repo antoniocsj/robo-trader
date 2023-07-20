@@ -49,6 +49,12 @@ n_features = hist.calc_n_features(candle_input_type)
 
 
 def individual_to_hyperparameters(ind):
+    # a escolha dos símbolos será assim:
+    # haverão 45 bits (ex. 001001100101001....100101) cada bit representa um símbolo de uma lista
+    # ordenada alfabeticamente de símbolos. quando o bit é 0, o símbolos não estão presente, e quando o bit
+    # é 1, o símbolo está presente.
+    # Também haverão alguns outros bits que representam um número de 1 a 45, que representará o symbol_out.
+
     n_steps = int(''.join(str(x) for x in ind[0:3]), 2)
     n_steps += 1
 
