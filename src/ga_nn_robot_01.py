@@ -9,7 +9,7 @@ np.random.seed(1)
 import random
 random.seed(1)
 
-import array
+import array as ar
 import time
 
 from my_algorithms import eaSimple_WithCP2
@@ -23,11 +23,11 @@ from utils_symbols import get_symbols
 from HistMulti import HistMulti
 
 
-individual_size = 36
+individual_size = 87
 
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
-creator.create("Individual", array.array, typecode='B', fitness=creator.FitnessMin)
+creator.create("Individual", ar.array, typecode='B', fitness=creator.FitnessMin)
 
 toolbox = base.Toolbox()
 
@@ -43,7 +43,6 @@ settings = read_json('settings.json')
 print(f'settings.json: {settings}')
 
 csv_dir = settings['csv_dir']
-symbol_out = settings['symbol_out']
 timeframe = settings['timeframe']
 candle_input_type = settings['candle_input_type']
 candle_output_type = settings['candle_output_type']
@@ -52,22 +51,52 @@ hist = HistMulti(csv_dir, timeframe)
 n_features = hist.calc_n_features(candle_input_type)
 
 
-def make_layers_config(n_layers: int, n_bits_per_layer: int, first_layer_bit_start: int, ind: array.array) -> list[int]:
-    a = first_layer_bit_start
+def make_layers_config(max_n_layers: int,
+                       n_bits_per_layer: int,
+                       layers_bit_start: int,
+                       ind: ar.array) -> list[int]:
+    a = layers_bit_start
     b = a + n_bits_per_layer
 
-    if first_layer_bit_start + n_layers * n_bits_per_layer > len(ind):
-        print('ERRO. first_layer_bit_start + n_layers * n_bits_per_layer > len(ind)')
+    if layers_bit_start + max_n_layers * n_bits_per_layer > len(ind):
+        print('ERRO. layers_bit_start + n_layers * n_bits_per_layer > len(ind)')
         exit(-1)
 
     _list = []
-    for i in range(n_layers):
+    for i in range(max_n_layers):
         x = int(''.join(str(x) for x in ind[a:b]), 2)
         _list.append(x)
         a, b = a + n_bits_per_layer, b + n_bits_per_layer
 
     _list = sorted(_list, reverse=True)
     return _list
+
+
+def get_symbols_from_bits_segment(segment: ar.array, all_symbols: list[str]):
+    if len(segment) != len(all_symbols):
+        print('ERRO. get_symbols_from_bits_segment(). len(segment) != len(all_symbols)')
+        exit(-1)
+
+    _list = []
+    for x, y in zip(segment, all_symbols):
+        if x:
+            _list.append(y)
+    return _list
+
+
+def get_symbolout_from_bits_segment(segment: ar.array, all_symbols: list[str]) -> str:
+    if 2 ** len(segment) < len(all_symbols):
+        print('ERRO. (len(segment) ** 2) - 1 < len(all_symbols)')
+        exit(-1)
+
+    symbol_idx = int(''.join(str(x) for x in segment), 2)
+
+    if symbol_idx > len(all_symbols) - 1:
+        symbol_idx = len(all_symbols) - 1
+
+    symbol = all_symbols[symbol_idx]
+
+    return symbol
 
 
 def individual_to_hyperparameters(ind):
@@ -83,15 +112,30 @@ def individual_to_hyperparameters(ind):
     n_steps = int(''.join(str(x) for x in ind[n_steps_bit_start:n_steps_bit_end]), 2)
     n_steps += 1
 
-    n_layers = 4
+    max_n_layers = 4
     n_bits_per_layer = 8
-    first_layer_bit_start = n_steps_bit_end
+    layers_bit_start = n_steps_bit_end
+    layers_bit_end = layers_bit_start + max_n_layers * n_bits_per_layer
 
-    layers_config = make_layers_config(n_layers, n_bits_per_layer, first_layer_bit_start, ind)
+    layers_config = make_layers_config(max_n_layers, n_bits_per_layer, layers_bit_start, ind)
+
+    all_symbols = get_symbols()
+
+    symbol_out_bit_start = layers_bit_end
+    symbol_out_bits_len = 6
+    symbol_out_bit_end = symbol_out_bit_start + symbol_out_bits_len
+    symbol_out = get_symbolout_from_bits_segment(ind[symbol_out_bit_start:symbol_out_bit_end], all_symbols)
+
+    symbols_bits_start = symbol_out_bit_end
+    symbols_bits_len = len(all_symbols)  # 45
+    symbols_bits_end = symbols_bits_start + symbols_bits_len
+    symbols = get_symbols_from_bits_segment(ind[symbols_bits_start:symbols_bits_end], all_symbols)
 
     params = {
         'n_steps': n_steps,
-        'layers_config': layers_config
+        'layers_config': layers_config,
+        'symbol_out': symbol_out,
+        'symbols': symbols
     }
 
     return params
