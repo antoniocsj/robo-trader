@@ -637,7 +637,7 @@ def remove_sync_cp_files(_list_sync_files: list[str]):
 
 
 def make_backup(src_dir: str, dst_dir: str):
-    print(f'copiando os arquivos sincronizadoo para o diretório {dst_dir}')
+    print(f'copiando os arquivos sincronizado para o diretório {dst_dir}')
     if os.path.exists(dst_dir):
         print(f'o diretório {dst_dir} já existe. será substituído.')
         shutil.rmtree(dst_dir)
@@ -713,7 +713,7 @@ def choose_n_procs_start(_n_symbols: int):
     return n_procs
 
 
-def main():
+def synchronize():
     setup = read_json('settings.json')
     csv_dir = setup['csv_dir']
     csv_s_dir = setup['csv_s_dir']
@@ -844,4 +844,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    synchronize()
