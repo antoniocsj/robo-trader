@@ -575,7 +575,6 @@ def main():
 
     dir_sync = DirectorySynchronization(csv_dir)
     dir_sync.synchronize_directory()
-    # dir_cor.check()
 
 
 if __name__ == '__main__':

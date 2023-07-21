@@ -245,5 +245,17 @@ def test_10():
     print(_list)
 
 
+def test_11():
+    import itertools as it
+    from utils_symbols import get_symbols
+    symbols = get_symbols('currencies_majors')
+    combs = []
+    for i in range(1, len(symbols) + 1):
+        comb = list(it.combinations(symbols, i))
+        combs.append(comb)
+    pass
+
+
 if __name__ == '__main__':
-    test_10()
+    # test_11()
+    pass
