@@ -150,7 +150,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
     print('settings:')
     print(f'{settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     symbol_out = settings['symbol_out']
     settings_timeframe = settings['timeframe']
     setup_code = settings['setup_code']

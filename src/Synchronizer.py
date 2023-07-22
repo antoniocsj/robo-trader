@@ -9,44 +9,45 @@ from utils_sync import *
 # synchronizer
 
 
-def synchronize():
+def synchronize(symbols_to_sync: list[str] = None) -> bool:
     setup = read_json('settings.json')
-    csv_dir = setup['csv_dir']
+    temp_dir = setup['temp_dir']
+    csv_o_dir = setup['csv_o_dir']
     csv_s_dir = setup['csv_s_dir']
     timeframe = setup['timeframe']
 
     # se o diretório csv não existe, então crie-o.
-    if not os.path.exists(csv_dir):
-        print('o diretório csv não existe. criando-o.')
-        os.mkdir(csv_dir)
-        _filename = f'{csv_dir}/.directory'
+    if not os.path.exists(temp_dir):
+        print('o diretório temp não existe. criando-o.')
+        os.mkdir(temp_dir)
+        _filename = f'{temp_dir}/.directory'
         _f = open(_filename, 'x')  # para manter o diretório no git
         _f.close()
 
-    symbols = search_symbols_in_directory(csv_dir, timeframe)
+    symbols = search_symbols_in_directory(temp_dir, timeframe)
     _len_symbols = len(symbols)
+
     if _len_symbols == 0:
         print('Não há arquivos CSVs para serem sincronizados.')
-        exit(-1)
+        return True
     elif _len_symbols == 1:
         print('Há apenas 1 arquivo CSV. Portanto, o arquivo será considerado já sincronizado.')
-        make_backup(csv_dir, csv_s_dir)
-        exit(0)
+        make_backup(temp_dir, csv_s_dir)
+        return True
 
     symbols_to_sync_per_proc = []
-
     list_sync_files = get_list_sync_files('.')
+
     if len(list_sync_files) == 0:
         print('iniciando a sincronização dos arquivos csv pela PRIMEIRA vez.')
 
         if _len_symbols == 0:
             print('Não há arquivos para sincronizar.')
-            return
+            return True
         elif _len_symbols == 1:
             print('Apenas 1 arquivo, portanto não há necessidade de sincronização.')
-            return
+            return True
 
-        # n_procs = DirectoryCorrection.n_procs_start
         n_procs = choose_n_procs_start(_len_symbols)
         pool = mp.Pool(n_procs)
 
@@ -59,13 +60,14 @@ def synchronize():
 
         dir_sync_l: list[DirectorySynchronization] = []
         for i in range(n_procs):
-            dir_sync = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
+            dir_sync = DirectorySynchronization(temp_dir, timeframe, i, symbols_to_sync_per_proc[i])
             dir_sync_l.append(dir_sync)
 
         for i in range(n_procs):
             pool.apply_async(dir_sync_l[i].synchronize_directory, args=(i,))
         pool.close()
         pool.join()
+
     else:
         print('pode haver sincronização em andamento.')
         print(f'checkpoints: {list_sync_files}')
@@ -84,7 +86,8 @@ def synchronize():
 
             if n_procs == 1:
                 print('a sincronização total está finalizada. parabéns!')
-                make_backup(csv_dir, csv_s_dir)
+                make_backup(temp_dir, csv_s_dir)
+                return True
             else:
                 print(f'iniciando a fusão de conjuntos de símbolos')
                 list_sync_cp_dic = get_all_sync_cp_dic(list_sync_files)
@@ -108,7 +111,7 @@ def synchronize():
 
                 dir_sync_l: list[DirectorySynchronization] = []
                 for i in range(n_procs):
-                    dir_sync = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
+                    dir_sync = DirectorySynchronization(temp_dir, timeframe, i, symbols_to_sync_per_proc[i])
                     dir_sync_l.append(dir_sync)
 
                 for i in range(n_procs):
@@ -130,7 +133,7 @@ def synchronize():
 
             dir_sync_l: list[DirectorySynchronization] = []
             for i in range(n_procs):
-                dir_sync = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
+                dir_sync = DirectorySynchronization(temp_dir, timeframe, i, symbols_to_sync_per_proc[i])
                 dir_sync_l.append(dir_sync)
 
             for i in range(n_procs):
@@ -138,9 +141,11 @@ def synchronize():
             pool.close()
             pool.join()
 
+    return False
+
 
 def main():
-    pass
+    synchronize()
 
 
 if __name__ == '__main__':

@@ -120,17 +120,17 @@ def test_05():
 def test_06():
     import itertools as it
     import json
-    from utils import search_symbols
+    from utils_symbols import search_symbols
 
     with open('settings.json', 'r') as file:
         setup = json.load(file)
     print(f'settings.json: {setup}')
 
-    csv_dir = setup['csv_dir']
+    temp_dir = setup['temp_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
 
-    symbols, symbols_paths = search_symbols(csv_dir, timeframe)
+    symbols, symbols_paths = search_symbols(temp_dir, timeframe)
     symbols.remove(symbol_out)
     for i in range(2, 5):
         c = list(it.combinations(symbols, i))
@@ -192,10 +192,10 @@ def test_08():
         setup = json.load(file)
     print(f'settings.json: {setup}')
 
-    csv_dir = setup['csv_dir']
+    temp_dir = setup['temp_dir']
     symbol_out = setup['symbol_out']
     timeframe = setup['timeframe']
-    hist = HistMulti(csv_dir, timeframe)
+    hist = HistMulti(temp_dir, timeframe)
 
     pairs = list(it.combinations(hist.symbols, 2))
     _set = set()

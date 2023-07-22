@@ -15,15 +15,15 @@ def denorm_close_price(_c, trans: MinMaxScaler):
 
 class TraderSimMulti:
     def __init__(self, initial_deposit: float):
-        setup = read_json('settings.json')
-        # print(f'settings.json: {setup}')
+        settings = read_json('settings.json')
+        # print(f'settings.json: {settings}')
 
-        csv_dir = setup['csv_dir']
-        timeframe = setup['timeframe']
+        temp_dir = settings['temp_dir']
+        timeframe = settings['timeframe']
 
         self.symbols = []  # financial assets
         self.timeframe = timeframe
-        self.hist = HistMulti(csv_dir, timeframe)
+        self.hist = HistMulti(temp_dir, timeframe)
         self.open_position = ('', '')
         self.candlestick_count = 0  # contagem de velas desde a abertura da posição
         self.max_candlestick_count = 5  # contagem máxima permitida de velas desde a abertura da posição

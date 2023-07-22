@@ -1,25 +1,9 @@
 import os
 import json
-import shutil
 from datetime import datetime
-from utils_filesystem import read_json, are_dir_trees_equal
+from utils_symbols import search_symbols_in_directory
+from utils_filesystem import read_json, make_backup
 from Sheet import Sheet
-
-
-def make_backup(src_dir: str, dst_dir: str):
-    print(f'copiando os arquivos sincronizadoo para o diretório {dst_dir}')
-    if os.path.exists(dst_dir):
-        print(f'o diretório {dst_dir} já existe. será substituído.')
-        shutil.rmtree(dst_dir)
-    shutil.copytree(src_dir, dst_dir)
-    if are_dir_trees_equal(src_dir, dst_dir):
-        print('Backup efetuado e verificado com SUCESSO!')
-        # aproveita e copia o arquivo final de checkpoint de sincronização 'sync_cp.json' para dst_dir também
-        _sync_filename = 'sync_cp.json'
-        _sync_filepath_copy = f'{dst_dir}/{_sync_filename}'
-        shutil.copy(_sync_filename, _sync_filepath_copy)
-    else:
-        print('ERRO ao fazer o backup.')
 
 
 class DirectorySynchronization:
@@ -180,7 +164,7 @@ class DirectorySynchronization:
 
     def synchronize_directory(self):
         setup = read_json('settings.json')
-        csv_dir = setup['csv_dir']
+        temp_dir = setup['temp_dir']
         csv_s_dir = setup['csv_s_dir']
 
         _len_symbols = len(self.symbols)
@@ -197,7 +181,7 @@ class DirectorySynchronization:
 
             if finished:
                 print(f'o checkpoint indica que os símbolos já estão sincronizados.')
-                make_backup(csv_dir, csv_s_dir)
+                make_backup(temp_dir, csv_s_dir)
                 return
             else:
                 self.sheets_set_current_row(_current_row)
@@ -569,13 +553,33 @@ class DirectorySynchronization:
             _new_date_time += s.timedelta
 
 
-def main():
-    setup = read_json('settings.json')
-    csv_dir = setup['csv_dir']
+def synchronize():
+    settings = read_json('settings.json')
+    temp_dir = settings['temp_dir']
+    csv_s_dir = settings['csv_s_dir']
+    timeframe = settings['timeframe']
 
-    dir_sync = DirectorySynchronization(csv_dir)
+    # se o diretório temp não existe, então crie-o.
+    if not os.path.exists(temp_dir):
+        print('o diretório temp não existe. criando-o.')
+        os.mkdir(temp_dir)
+        _filename = f'{temp_dir}/.directory'
+        _f = open(_filename, 'x')  # para manter o diretório no git
+        _f.close()
+
+    symbols = search_symbols_in_directory(temp_dir, timeframe)
+    _len_symbols = len(symbols)
+    if _len_symbols == 0:
+        print('Não há arquivos CSVs para serem sincronizados.')
+        exit(-1)
+    elif _len_symbols == 1:
+        print('Há apenas 1 arquivo CSV. Portanto, o arquivo será considerado já sincronizado.')
+        make_backup(temp_dir, csv_s_dir)
+        exit(0)
+
+    dir_sync = DirectorySynchronization(temp_dir)
     dir_sync.synchronize_directory()
 
 
 if __name__ == '__main__':
-    main()
+    synchronize()

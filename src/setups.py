@@ -21,7 +21,7 @@ from utils_ops import transform_directory, transform_files, transform_symbols, \
 
 def check_base_ok():
     """
-    O objetivo desta função é verificar se os diretórios csv e csv_s estão prontos para os experimentos a serem
+    O objetivo desta função é verificar se os diretórios temp e csv_s estão prontos para os experimentos a serem
     definidos nas funções 'setup'.
     1) Lê arquivo de settings.json para obter as configurações gerais do experimento.
     2) Reseta o diretório csv, deletando-o e recriando-o novamente.
@@ -36,22 +36,22 @@ def check_base_ok():
         settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
 
-    if os.path.exists(csv_dir):
-        print(f'o diretório {csv_dir} já existe. deletando todo seu conteúdo.')
-        shutil.rmtree(csv_dir)
-        os.mkdir(csv_dir)
-        _filename = f'{csv_dir}/.directory'
+    if os.path.exists(temp_dir):
+        print(f'o diretório {temp_dir} já existe. deletando todo seu conteúdo.')
+        shutil.rmtree(temp_dir)
+        os.mkdir(temp_dir)
+        _filename = f'{temp_dir}/.directory'
         _f = open(_filename, 'x')  # para manter o diretório no git
         _f.close()
     else:
-        print(f'o diretório {csv_dir} não existe. criando-o.')
-        os.mkdir(csv_dir)
-        _filename = f'{csv_dir}/.directory'
+        print(f'o diretório {temp_dir} não existe. criando-o.')
+        os.mkdir(temp_dir)
+        _filename = f'{temp_dir}/.directory'
         _f = open(_filename, 'x')  # para manter o diretório no git
         _f.close()
 
@@ -105,7 +105,7 @@ def csv_delete_first_row(_filepath: str):
 
 def setup_directory_01():
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O diretório temp terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) demais símbolos normalizados.
     :return:
@@ -119,20 +119,20 @@ def setup_directory_01():
         settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
-    # copiar todos os símbolos de csv_s_dir para csv_dir
+    # copiar todos os símbolos de csv_s_dir para temp_dir
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
+        _dst = f'{temp_dir}/{symbol}_{timeframe}.csv'
         shutil.copy(_src, _dst)
 
     # normaliza todos os symbolos de csv.
-    normalize_directory(csv_dir)
+    normalize_directory(temp_dir)
     update_settings('setup_code', 1)
     update_settings('setup_uses_differentiation', False)
 
@@ -161,7 +161,7 @@ def setup_symbols_01(hist: HistMulti) -> HistMulti:
 
 def setup_directory_02():
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O diretório temp terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) demais símbolos diferenciados e normalizados.
     :return:
@@ -175,29 +175,29 @@ def setup_directory_02():
         settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
-    # copiar todos os símbolos, menos symbol_out, de csv_s_dir para csv_dir
+    # copiar todos os símbolos, menos symbol_out, de csv_s_dir para temp_dir
     for symbol in symbols_names:
         if symbol != symbol_out:
             _src = symbols_paths[f'{symbol}_{timeframe}']
-            _dst = f'{csv_dir}/{symbol}@D_{timeframe}.csv'
+            _dst = f'{temp_dir}/{symbol}@D_{timeframe}.csv'
             shutil.copy(_src, _dst)
 
     # diferenciar os símbolos do diretório csv
-    differentiate_directory(csv_dir)
+    differentiate_directory(temp_dir)
 
-    # copiar symbol_out, de csv_s_dir para csv_dir
+    # copiar symbol_out, de csv_s_dir para temp_dir
     _src = symbols_paths[f'{symbol_out}_{timeframe}']
-    _dst = f'{csv_dir}/{symbol_out}_{timeframe}.csv'
+    _dst = f'{temp_dir}/{symbol_out}_{timeframe}.csv'
     shutil.copy(_src, _dst)
 
     # normaliza todos os symbolos de csv.
-    normalize_directory(csv_dir)
+    normalize_directory(temp_dir)
 
     # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
     # symbol_out também, mas delete do arquivo que está em csv.
@@ -241,7 +241,7 @@ def setup_symbols_02(hist: HistMulti) -> HistMulti:
 
 def setup_directory_03():
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O diretório temp terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) symbol_out diferenciado e normalizado;
     -> 3) demais símbolos diferenciados e normalizados;
@@ -256,28 +256,28 @@ def setup_directory_03():
         settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
-    # copiar todos os símbolos de csv_s_dir para csv_dir
+    # copiar todos os símbolos de csv_s_dir para temp_dir
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}@D_{timeframe}.csv'
+        _dst = f'{temp_dir}/{symbol}@D_{timeframe}.csv'
         shutil.copy(_src, _dst)
 
     # diferenciar os símbolos do diretório csv
-    differentiate_directory(csv_dir)
+    differentiate_directory(temp_dir)
 
-    # copiar symbol_out, de csv_s_dir para csv_dir
+    # copiar symbol_out, de csv_s_dir para temp_dir
     _src = symbols_paths[f'{symbol_out}_{timeframe}']
-    _dst = f'{csv_dir}/{symbol_out}_{timeframe}.csv'
+    _dst = f'{temp_dir}/{symbol_out}_{timeframe}.csv'
     shutil.copy(_src, _dst)
 
     # normaliza todos os symbolos de csv.
-    normalize_directory(csv_dir)
+    normalize_directory(temp_dir)
 
     # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
     # symbol_out também, mas delete do arquivo que está em csv apenas.
@@ -289,7 +289,7 @@ def setup_directory_03():
 
 def setup_symbols_03(hist: HistMulti) -> HistMulti:
     """
-    O histórico terá os seguintes símbolos (arquivos CSVs):
+    O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
     -> 2) symbol_out diferenciado e normalizado;
     -> 3) demais símbolos diferenciados e normalizados;
@@ -320,7 +320,7 @@ def setup_symbols_03(hist: HistMulti) -> HistMulti:
 
 def setup_directory_04():
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O diretório temp terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) symbol_out diferenciado e normalizado;
     -> 3) demais símbolos normalizados;
@@ -336,36 +336,36 @@ def setup_directory_04():
         settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
-    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta D no final).
+    # copiar todos os símbolos, de csv_s_dir para temp_dir, mudando o nome do símbolo (acrescenta D no final).
     # isso é para poder ter dois arquivos do mesmo símbolo. assim, um será diferenciado e normalizados,
     # enquanto que o outro será apenas normalizado.
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}@D_{timeframe}.csv'
+        _dst = f'{temp_dir}/{symbol}@D_{timeframe}.csv'
         shutil.copy(_src, _dst)
 
     # diferenciar os símbolos do diretório csv
-    differentiate_directory(csv_dir)
+    differentiate_directory(temp_dir)
 
-    # copiar todos os símbolos, de csv_s_dir para csv_dir
+    # copiar todos os símbolos, de csv_s_dir para temp_dir
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
+        _dst = f'{temp_dir}/{symbol}_{timeframe}.csv'
         shutil.copy(_src, _dst)
 
     # normaliza todos os symbolos de csv.
-    normalize_directory(csv_dir)
+    normalize_directory(temp_dir)
 
     # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha,
     # delete a 1a linha do de cada símbolo também, mas delete do arquivo que está em csv apenas.
     for symbol in symbols_names:
-        _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
+        _dst = f'{temp_dir}/{symbol}_{timeframe}.csv'
         csv_delete_first_row(_dst)
 
     update_settings('setup_code', 4)
@@ -374,7 +374,7 @@ def setup_directory_04():
 
 def setup_symbols_04(hist: HistMulti) -> HistMulti:
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
     -> 2) symbol_out diferenciado e normalizado;
     -> 3) demais símbolos normalizados;
@@ -406,7 +406,7 @@ def setup_symbols_04(hist: HistMulti) -> HistMulti:
 
 def setup_directory_05():
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O diretório temp terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) symbol_out transformado e normalizado (1 coluna Y: (C-O)*V);
     -> 3) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
@@ -421,35 +421,35 @@ def setup_directory_05():
         settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
-    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @T no final).
+    # copiar todos os símbolos, de csv_s_dir para temp_dir, mudando o nome do símbolo (acrescenta @T no final).
     # isso é para poder ter dois arquivos do mesmo símbolo.
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}@T_{timeframe}.csv'
+        _dst = f'{temp_dir}/{symbol}@T_{timeframe}.csv'
         shutil.copy(_src, _dst)
 
-    transform_directory(csv_dir, '(C-O)*V')
+    transform_directory(temp_dir, '(C-O)*V')
 
-    # copiar symbol_out, de csv_s_dir para csv_dir
+    # copiar symbol_out, de csv_s_dir para temp_dir
     _src = symbols_paths[f'{symbol_out}_{timeframe}']
-    _dst = f'{csv_dir}/{symbol_out}_{timeframe}.csv'
+    _dst = f'{temp_dir}/{symbol_out}_{timeframe}.csv'
     shutil.copy(_src, _dst)
 
     # normaliza todos os symbolos de csv.
-    normalize_directory(csv_dir)
+    normalize_directory(temp_dir)
     update_settings('setup_code', 5)
     update_settings('setup_uses_differentiation', False)
 
 
 def setup_symbols_05(hist: HistMulti) -> HistMulti:
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
     -> 2) symbol_out transformado e normalizado (1 coluna Y: (C-O)*V);
     -> 3) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
@@ -478,7 +478,7 @@ def setup_symbols_05(hist: HistMulti) -> HistMulti:
 
 def setup_directory_06():
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O diretório temp terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) symbol_out transformado e normalizado (1 coluna Y: (C-O)*V);
     -> 3) demais símbolos normalizados;
@@ -494,36 +494,36 @@ def setup_directory_06():
         settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
-    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @T no final).
+    # copiar todos os símbolos, de csv_s_dir para temp_dir, mudando o nome do símbolo (acrescenta @T no final).
     # isso é para poder ter dois arquivos do mesmo símbolo.
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}@T_{timeframe}.csv'
+        _dst = f'{temp_dir}/{symbol}@T_{timeframe}.csv'
         shutil.copy(_src, _dst)
 
-    transform_directory(csv_dir, '(C-O)*V')
+    transform_directory(temp_dir, '(C-O)*V')
 
-    # copiar todos os símbolos, de csv_s_dir para csv_dir
+    # copiar todos os símbolos, de csv_s_dir para temp_dir
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
+        _dst = f'{temp_dir}/{symbol}_{timeframe}.csv'
         shutil.copy(_src, _dst)
 
     # normaliza todos os symbolos de csv.
-    normalize_directory(csv_dir)
+    normalize_directory(temp_dir)
     update_settings('setup_code', 6)
     update_settings('setup_uses_differentiation', False)
 
 
 def setup_symbols_06(hist: HistMulti) -> HistMulti:
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
     -> 2) symbol_out transformado e normalizado (1 coluna Y: (C-O)*V);
     -> 3) demais símbolos normalizados;
@@ -554,7 +554,7 @@ def setup_symbols_06(hist: HistMulti) -> HistMulti:
 
 def setup_directory_07():
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O diretório temp terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) symbol_out transformado e normalizado (1 coluna Y: (C-O)*V);
     -> 3) symbol_out diferenciado e normalizado;
@@ -572,31 +572,31 @@ def setup_directory_07():
         settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
-    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @T no final).
+    # copiar todos os símbolos, de csv_s_dir para temp_dir, mudando o nome do símbolo (acrescenta @T no final).
     # isso é para poder ter dois arquivos do mesmo símbolo.
     # símbolos que sofrerão uma transformação.
     _transformed = []
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}@T_{timeframe}.csv'
+        _dst = f'{temp_dir}/{symbol}@T_{timeframe}.csv'
         shutil.copy(_src, _dst)
         _transformed.append(_dst)
 
-    # transform_directory(csv_dir, '(C-O)*V')
-    transform_files(_transformed, csv_dir, '(C-O)*V')
+    # transform_directory(temp_dir, '(C-O)*V')
+    transform_files(_transformed, temp_dir, '(C-O)*V')
 
-    # copiar todos os símbolos, de csv_s_dir para csv_dir
+    # copiar todos os símbolos, de csv_s_dir para temp_dir
     # símbolos normais, apenas serão normalizados depois.
     _normals = []
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}_{timeframe}.csv'
+        _dst = f'{temp_dir}/{symbol}_{timeframe}.csv'
         shutil.copy(_src, _dst)
         _normals.append(_dst)
 
@@ -604,14 +604,14 @@ def setup_directory_07():
     _differentiated = []
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}@D_{timeframe}.csv'
+        _dst = f'{temp_dir}/{symbol}@D_{timeframe}.csv'
         shutil.copy(_src, _dst)
         _differentiated.append(_dst)
 
-    differentiate_files(_differentiated, csv_dir)
+    differentiate_files(_differentiated, temp_dir)
 
     # normaliza todos os symbolos de csv.
-    normalize_directory(csv_dir)
+    normalize_directory(temp_dir)
 
     # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete também  a 1a linha dos
     # outros símbolos que não sofreram a operação diferenciação.
@@ -625,7 +625,7 @@ def setup_directory_07():
 
 def setup_symbols_07(hist: HistMulti) -> HistMulti:
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
     -> 2) symbol_out transformado e normalizado (1 coluna Y: (C-O)*V);
     -> 3) symbol_out diferenciado e normalizado;
@@ -672,7 +672,7 @@ def setup_symbols_07(hist: HistMulti) -> HistMulti:
 
 def setup_directory_08():
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O diretório temp terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) symbol_out diferenciado, transformado e normalizado (1 coluna Y: (C-O)*V);
     -> 3) demais símbolos diferenciados, transformados e normalizados (1 coluna Y: (C-O)*V);
@@ -687,32 +687,32 @@ def setup_directory_08():
         settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
-    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @ no final).
+    # copiar todos os símbolos, de csv_s_dir para temp_dir, mudando o nome do símbolo (acrescenta @ no final).
     # isso é para poder ter dois arquivos do mesmo símbolo.
     # símbolos que sofrerão uma transformação.
     _transformed = []
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}@DT_{timeframe}.csv'
+        _dst = f'{temp_dir}/{symbol}@DT_{timeframe}.csv'
         shutil.copy(_src, _dst)
         _transformed.append(_dst)
 
-    differentiate_directory(csv_dir)
-    transform_directory(csv_dir, '(C-O)*V')
+    differentiate_directory(temp_dir)
+    transform_directory(temp_dir, '(C-O)*V')
 
-    # copiar symbol_out, de csv_s_dir para csv_dir
+    # copiar symbol_out, de csv_s_dir para temp_dir
     _src = symbols_paths[f'{symbol_out}_{timeframe}']
-    _dst = f'{csv_dir}/{symbol_out}_{timeframe}.csv'
+    _dst = f'{temp_dir}/{symbol_out}_{timeframe}.csv'
     shutil.copy(_src, _dst)
 
     # normaliza todos os symbolos de csv.
-    normalize_directory(csv_dir)
+    normalize_directory(temp_dir)
 
     # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
     # symbol_out também, mas delete do arquivo que está em csv.
@@ -723,7 +723,7 @@ def setup_directory_08():
 
 def setup_symbols_08(hist: HistMulti) -> HistMulti:
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
     -> 2) symbol_out diferenciado, transformado e normalizado (1 coluna Y: (C-O)*V);
     -> 3) demais símbolos diferenciados, transformados e normalizados (1 coluna Y: (C-O)*V);
@@ -756,7 +756,7 @@ def setup_symbols_08(hist: HistMulti) -> HistMulti:
 
 def setup_directory_09():
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O diretório temp terá os seguintes símbolos (arquivos CSVs):
     -> 1) symbol_out normalizado;
     -> 2) symbol_out transformado, diferenciado e normalizado (1 coluna Y: (C-O)*V);
     -> 3) demais símbolos transformados, diferenciados e normalizados (1 coluna Y: (C-O)*V);
@@ -770,30 +770,30 @@ def setup_directory_09():
     settings = read_json('settings.json')
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
-    # copiar todos os símbolos, de csv_s_dir para csv_dir, mudando o nome do símbolo (acrescenta @ no final).
+    # copiar todos os símbolos, de csv_s_dir para temp_dir, mudando o nome do símbolo (acrescenta @ no final).
     # isso é para poder ter dois arquivos do mesmo símbolo.
     # símbolos que sofrerão uma transformação.
     for symbol in symbols_names:
         _src = symbols_paths[f'{symbol}_{timeframe}']
-        _dst = f'{csv_dir}/{symbol}@TD_{timeframe}.csv'
+        _dst = f'{temp_dir}/{symbol}@TD_{timeframe}.csv'
         shutil.copy(_src, _dst)
 
-    transform_directory(csv_dir, '(C-O)*V')
-    differentiate_directory(csv_dir)
+    transform_directory(temp_dir, '(C-O)*V')
+    differentiate_directory(temp_dir)
 
-    # copiar symbol_out, de csv_s_dir para csv_dir
+    # copiar symbol_out, de csv_s_dir para temp_dir
     _src = symbols_paths[f'{symbol_out}_{timeframe}']
-    _dst = f'{csv_dir}/{symbol_out}_{timeframe}.csv'
+    _dst = f'{temp_dir}/{symbol_out}_{timeframe}.csv'
     shutil.copy(_src, _dst)
 
     # normaliza todos os symbolos de csv.
-    normalize_directory(csv_dir)
+    normalize_directory(temp_dir)
 
     # como a diferenciação faz os arquivos CSVs (planilhas) perderem a 1a linha, delete a 1a linha do
     # symbol_out também, mas delete do arquivo que está em csv.
@@ -804,7 +804,7 @@ def setup_directory_09():
 
 def setup_symbols_09(hist: HistMulti) -> HistMulti:
     """
-    O diretório csv terá os seguintes símbolos (arquivos CSVs):
+    O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
     -> 2) symbol_out transformado, diferenciado e normalizado (1 coluna Y: (C-O)*V);
     -> 3) demais símbolos transformados, diferenciados e normalizados (1 coluna Y: (C-O)*V);

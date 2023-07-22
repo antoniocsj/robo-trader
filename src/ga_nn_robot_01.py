@@ -42,12 +42,12 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 settings = read_json('settings.json')
 print(f'settings.json: {settings}')
 
-csv_dir = settings['csv_dir']
+temp_dir = settings['temp_dir']
 timeframe = settings['timeframe']
 candle_input_type = settings['candle_input_type']
 candle_output_type = settings['candle_output_type']
 
-hist = HistMulti(csv_dir, timeframe)
+hist = HistMulti(temp_dir, timeframe)
 n_features = hist.calc_n_features(candle_input_type)
 
 

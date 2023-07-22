@@ -1,7 +1,6 @@
 import os
-import csv
-import numpy as np
 import pandas as pd
+from utils_filesystem import read_json
 
 
 class Hist:
@@ -67,7 +66,12 @@ class Hist:
 
 
 if __name__ == '__main__':
-    hist = Hist('../csv')
+    setup = read_json('settings.json')
+    print(f'settings.json: {setup}')
+
+    temp_dir = setup['temp_dir']
+
+    hist = Hist(temp_dir)
     hist.get_hist_data('XAUUSD', 'M5')
     hist.print_hist()
 

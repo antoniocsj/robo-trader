@@ -1,13 +1,17 @@
 from Hist import Hist
+from utils_filesystem import read_json
 
 
 class TraderSim:
-    dir_csv = '../csv'
+    settings = read_json('settings.json')
+    # print(f'settings.json: {settings}')
+
+    temp_dir = settings['temp_dir']
 
     def __init__(self, symbol: str, timeframe: str, initial_deposit: float) -> None:
         self.symbol = symbol  # financial asset, security or contract etc.
         self.timeframe = timeframe
-        self.hist = Hist(TraderSim.dir_csv)
+        self.hist = Hist(TraderSim.temp_dir)
         self.open_position = None
         self.candlestick_count = 0  # contagem de velas desde a abertura da posição
         self.max_candlestick_count = 5  # contagem máxima permitida de velas desde a abertura da posição

@@ -306,9 +306,9 @@ if __name__ == '__main__':
     setup = read_json('settings.json')
     print(f'settings.json: {setup}')
 
-    csv_dir = setup['csv_dir']
+    temp_dir = setup['temp_dir']
     symbol_out = setup['symbol_out']
     _tf = setup['timeframe']
 
-    _hist = HistMulti(csv_dir, _tf)
+    _hist = HistMulti(temp_dir, _tf)
     _hist.print_hist()

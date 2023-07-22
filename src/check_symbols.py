@@ -14,10 +14,10 @@ def check_symbols_timedelta():
     settings = read_json('settings.json')
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     timeframe = settings['timeframe']
 
-    hist = HistMulti(csv_dir, timeframe)
+    hist = HistMulti(temp_dir, timeframe)
 
     s: Sheet
     for s in list(hist.sheets.values()):

@@ -92,7 +92,7 @@ def test_models():
     settings = read_json('settings.json')
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    csv_dir = settings['temp_dir']
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     candle_input_type = settings['candle_input_type']

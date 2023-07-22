@@ -54,15 +54,15 @@ def train_model():
     settings = read_json('settings.json')
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     candle_input_type = settings['candle_input_type']
     candle_output_type = settings['candle_output_type']
-    hist = HistMulti(csv_dir, timeframe)
+    hist = HistMulti(temp_dir, timeframe)
 
     if hist.timeframe != timeframe:
-        print(f'o timeframe do diretório {csv_dir} ({hist.timeframe}) é diferente do timeframe especificado '
+        print(f'o timeframe do diretório {temp_dir} ({hist.timeframe}) é diferente do timeframe especificado '
               f'em settings.json ({timeframe})')
         exit(-1)
 
@@ -164,9 +164,9 @@ def evaluate_model():
     settings = read_json('settings.json')
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     timeframe = settings['timeframe']
-    hist = HistMulti(csv_dir, timeframe)
+    hist = HistMulti(temp_dir, timeframe)
 
     train_config = read_train_config()
 
@@ -196,9 +196,9 @@ def calculate_model_bias():
     settings = read_json('settings.json')
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     timeframe = settings['timeframe']
-    hist = HistMulti(csv_dir, timeframe)
+    hist = HistMulti(temp_dir, timeframe)
 
     train_config = read_train_config()
 
@@ -257,9 +257,9 @@ def test_model_with_trader():
     settings = read_json('settings.json')
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     timeframe = settings['timeframe']
-    hist = HistMulti(csv_dir, timeframe)
+    hist = HistMulti(temp_dir, timeframe)
 
     train_config = read_train_config()
     print(f'train_config:')
@@ -380,9 +380,9 @@ def test_model_with_trader_interactive():
     settings = read_json('settings.json')
     print(f'settings.json: {settings}')
 
-    csv_dir = settings['csv_dir']
+    temp_dir = settings['temp_dir']
     timeframe = settings['timeframe']
-    hist = HistMulti(csv_dir, timeframe)
+    hist = HistMulti(temp_dir, timeframe)
 
     train_config = read_train_config()
     print(f'train_config:')

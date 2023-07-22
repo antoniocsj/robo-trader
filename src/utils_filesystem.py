@@ -1,5 +1,6 @@
 import os
 import filecmp
+import shutil
 from typing import Any
 
 import numpy as np
@@ -71,7 +72,7 @@ def get_list_sync_files(directory: str):
     all_files = os.listdir(directory)
 
     for filename in all_files:
-        if filename.startswith('sync_cp_') and filename.endswith('.json'):
+        if filename.startswith('sync_cp') and filename.endswith('.json'):
             _list.append(filename)
 
     return sorted(_list)
@@ -102,6 +103,24 @@ def read_train_config() -> dict:
         print(f'ERRO. O arquivo {_filename} não foi encontrado.')
         exit(-1)
     return _dict
+
+
+def make_backup(src_dir: str, dst_dir: str):
+    print(f'copiando os arquivos sincronizado para o diretório {dst_dir}')
+    if os.path.exists(dst_dir):
+        print(f'o diretório {dst_dir} já existe. será substituído.')
+        shutil.rmtree(dst_dir)
+
+    shutil.copytree(src_dir, dst_dir)
+    if are_dir_trees_equal(src_dir, dst_dir):
+        print('Backup efetuado e verificado com SUCESSO!')
+        # aproveita e copia o arquivo final de checkpoint de sincronização 'sync_cp_0.json' para dst_dir também
+        _list = get_list_sync_files('.')
+        _sync_filename = _list[0]
+        _sync_filepath_copy = f'{dst_dir}/{_sync_filename}'
+        shutil.copy(_sync_filename, _sync_filepath_copy)
+    else:
+        print('ERRO ao fazer o backup.')
 
 
 if __name__ == '__main__':

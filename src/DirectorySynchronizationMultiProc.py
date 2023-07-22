@@ -1,10 +1,8 @@
-import os
 import shutil
 import math
-import json
 from datetime import datetime
 import multiprocessing as mp
-from utils_filesystem import get_list_sync_files, read_json, are_dir_trees_equal
+from utils_filesystem import get_list_sync_files, read_json, make_backup
 from utils_symbols import search_symbols_in_directory
 from utils_sync import *
 from Sheet import Sheet
@@ -579,23 +577,6 @@ class DirectorySynchronization:
             _new_date_time += s.timedelta
 
 
-def make_backup(src_dir: str, dst_dir: str):
-    print(f'copiando os arquivos sincronizado para o diretório {dst_dir}')
-    if os.path.exists(dst_dir):
-        print(f'o diretório {dst_dir} já existe. será substituído.')
-        shutil.rmtree(dst_dir)
-    shutil.copytree(src_dir, dst_dir)
-    if are_dir_trees_equal(src_dir, dst_dir):
-        print('Backup efetuado e verificado com SUCESSO!')
-        # aproveita e copia o arquivo final de checkpoint de sincronização 'sync_cp_0.json' para dst_dir também
-        _list = get_list_sync_files('.')
-        _sync_filename = _list[0]
-        _sync_filepath_copy = f'{dst_dir}/{_sync_filename}'
-        shutil.copy(_sync_filename, _sync_filepath_copy)
-    else:
-        print('ERRO ao fazer o backup.')
-
-
 def find_max_power2_less_half(n: int) -> int:
     i = 0
     power2 = 2 ** i
@@ -657,27 +638,27 @@ def choose_n_procs_start(_n_symbols: int):
 
 
 def synchronize():
-    setup = read_json('settings.json')
-    csv_dir = setup['csv_dir']
-    csv_s_dir = setup['csv_s_dir']
-    timeframe = setup['timeframe']
+    settings = read_json('settings.json')
+    temp_dir = settings['temp_dir']
+    csv_s_dir = settings['csv_s_dir']
+    timeframe = settings['timeframe']
 
-    # se o diretório csv não existe, então crie-o.
-    if not os.path.exists(csv_dir):
-        print('o diretório csv não existe. criando-o.')
-        os.mkdir(csv_dir)
-        _filename = f'{csv_dir}/.directory'
+    # se o diretório temp não existe, então crie-o.
+    if not os.path.exists(temp_dir):
+        print('o diretório temp não existe. criando-o.')
+        os.mkdir(temp_dir)
+        _filename = f'{temp_dir}/.directory'
         _f = open(_filename, 'x')  # para manter o diretório no git
         _f.close()
 
-    symbols = search_symbols_in_directory(csv_dir, timeframe)
+    symbols = search_symbols_in_directory(temp_dir, timeframe)
     _len_symbols = len(symbols)
     if _len_symbols == 0:
         print('Não há arquivos CSVs para serem sincronizados.')
         exit(-1)
     elif _len_symbols == 1:
         print('Há apenas 1 arquivo CSV. Portanto, o arquivo será considerado já sincronizado.')
-        make_backup(csv_dir, csv_s_dir)
+        make_backup(temp_dir, csv_s_dir)
         exit(0)
 
     symbols_to_sync_per_proc = []
@@ -706,7 +687,7 @@ def synchronize():
 
         dir_sync_l: list[DirectorySynchronization] = []
         for i in range(n_procs):
-            dir_sync = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
+            dir_sync = DirectorySynchronization(temp_dir, timeframe, i, symbols_to_sync_per_proc[i])
             dir_sync_l.append(dir_sync)
 
         for i in range(n_procs):
@@ -731,7 +712,13 @@ def synchronize():
 
             if n_procs == 1:
                 print('a sincronização total está finalizada. parabéns!')
-                make_backup(csv_dir, csv_s_dir)
+
+                # renomeie o arquivo final de checkpoint de sincronização para sync_cp.json
+                _sync_filename = list_sync_files[0]
+                shutil.move(_sync_filename, 'sync_cp.json')
+
+                make_backup(temp_dir, csv_s_dir)
+
             else:
                 print(f'iniciando a fusão de conjuntos de símbolos')
                 list_sync_cp_dic = get_all_sync_cp_dic(list_sync_files)
@@ -755,7 +742,7 @@ def synchronize():
 
                 dir_sync_l: list[DirectorySynchronization] = []
                 for i in range(n_procs):
-                    dir_sync = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
+                    dir_sync = DirectorySynchronization(temp_dir, timeframe, i, symbols_to_sync_per_proc[i])
                     dir_sync_l.append(dir_sync)
 
                 for i in range(n_procs):
@@ -777,7 +764,7 @@ def synchronize():
 
             dir_sync_l: list[DirectorySynchronization] = []
             for i in range(n_procs):
-                dir_sync = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
+                dir_sync = DirectorySynchronization(temp_dir, timeframe, i, symbols_to_sync_per_proc[i])
                 dir_sync_l.append(dir_sync)
 
             for i in range(n_procs):
