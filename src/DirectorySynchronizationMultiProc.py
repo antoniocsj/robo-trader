@@ -667,14 +667,6 @@ def synchronize():
     if len(list_sync_files) == 0:
         print('iniciando a sincronização dos arquivos csv pela PRIMEIRA vez.')
 
-        if _len_symbols == 0:
-            print('Não há arquivos para sincronizar.')
-            return
-        elif _len_symbols == 1:
-            print('Apenas 1 arquivo, portanto não há necessidade de sincronização.')
-            return
-
-        # n_procs = DirectoryCorrection.n_procs_start
         n_procs = choose_n_procs_start(_len_symbols)
         pool = mp.Pool(n_procs)
 

@@ -1,5 +1,7 @@
 import math
 import multiprocessing as mp
+import shutil
+
 from utils_filesystem import get_list_sync_files, read_json
 from utils_symbols import search_symbols_in_directory
 from DirectorySynchronizationMultiProc import DirectorySynchronization, make_backup, choose_n_procs_start
@@ -16,7 +18,7 @@ def synchronize(symbols_to_sync: list[str] = None) -> bool:
     csv_s_dir = setup['csv_s_dir']
     timeframe = setup['timeframe']
 
-    # se o diretório csv não existe, então crie-o.
+    # se o diretório temp não existe, então crie-o.
     if not os.path.exists(temp_dir):
         print('o diretório temp não existe. criando-o.')
         os.mkdir(temp_dir)
@@ -40,13 +42,6 @@ def synchronize(symbols_to_sync: list[str] = None) -> bool:
 
     if len(list_sync_files) == 0:
         print('iniciando a sincronização dos arquivos csv pela PRIMEIRA vez.')
-
-        if _len_symbols == 0:
-            print('Não há arquivos para sincronizar.')
-            return True
-        elif _len_symbols == 1:
-            print('Apenas 1 arquivo, portanto não há necessidade de sincronização.')
-            return True
 
         n_procs = choose_n_procs_start(_len_symbols)
         pool = mp.Pool(n_procs)
@@ -86,8 +81,14 @@ def synchronize(symbols_to_sync: list[str] = None) -> bool:
 
             if n_procs == 1:
                 print('a sincronização total está finalizada. parabéns!')
+
+                # renomeie o arquivo final de checkpoint de sincronização para sync_cp.json
+                _sync_filename = list_sync_files[0]
+                shutil.move(_sync_filename, 'sync_cp.json')
+
                 make_backup(temp_dir, csv_s_dir)
                 return True
+
             else:
                 print(f'iniciando a fusão de conjuntos de símbolos')
                 list_sync_cp_dic = get_all_sync_cp_dic(list_sync_files)
@@ -145,7 +146,9 @@ def synchronize(symbols_to_sync: list[str] = None) -> bool:
 
 
 def main():
-    synchronize()
+    ret = False
+    while not ret:
+        ret = synchronize()
 
 
 if __name__ == '__main__':
