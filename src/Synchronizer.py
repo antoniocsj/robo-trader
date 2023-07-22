@@ -307,11 +307,10 @@ def test_03():
     currencies_majors_2 = currencies_majors_1[:]
 
     currencies_majors_1 = currencies_majors_1[0:-2]
-    currencies_majors_2 = currencies_majors_2[-2:]
 
     synchronize_with_cache_loop(currencies_majors_1)
     synchronize_with_cache_loop(currencies_majors_2)
 
 
 if __name__ == '__main__':
-    test_02()
+    test_03()
