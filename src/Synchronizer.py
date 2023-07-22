@@ -1,6 +1,142 @@
-from DirectorySynchronizationMultiProc import DirectorySynchronization
+import math
+import multiprocessing as mp
+from utils_filesystem import get_list_sync_files, read_json
+from utils_symbols import search_symbols_in_directory
+from DirectorySynchronizationMultiProc import DirectorySynchronization, make_backup, choose_n_procs_start
+from utils_sync import *
+
 
 # synchronizer
+
+
+def synchronize():
+    setup = read_json('settings.json')
+    csv_dir = setup['csv_dir']
+    csv_s_dir = setup['csv_s_dir']
+    timeframe = setup['timeframe']
+
+    # se o diretório csv não existe, então crie-o.
+    if not os.path.exists(csv_dir):
+        print('o diretório csv não existe. criando-o.')
+        os.mkdir(csv_dir)
+        _filename = f'{csv_dir}/.directory'
+        _f = open(_filename, 'x')  # para manter o diretório no git
+        _f.close()
+
+    symbols = search_symbols_in_directory(csv_dir, timeframe)
+    _len_symbols = len(symbols)
+    if _len_symbols == 0:
+        print('Não há arquivos CSVs para serem sincronizados.')
+        exit(-1)
+    elif _len_symbols == 1:
+        print('Há apenas 1 arquivo CSV. Portanto, o arquivo será considerado já sincronizado.')
+        make_backup(csv_dir, csv_s_dir)
+        exit(0)
+
+    symbols_to_sync_per_proc = []
+
+    list_sync_files = get_list_sync_files('.')
+    if len(list_sync_files) == 0:
+        print('iniciando a sincronização dos arquivos csv pela PRIMEIRA vez.')
+
+        if _len_symbols == 0:
+            print('Não há arquivos para sincronizar.')
+            return
+        elif _len_symbols == 1:
+            print('Apenas 1 arquivo, portanto não há necessidade de sincronização.')
+            return
+
+        # n_procs = DirectoryCorrection.n_procs_start
+        n_procs = choose_n_procs_start(_len_symbols)
+        pool = mp.Pool(n_procs)
+
+        for i in range(n_procs):
+            symbols_to_sync_per_proc.append([])
+
+        for i in range(len(symbols)):
+            i_proc = i % n_procs
+            symbols_to_sync_per_proc[i_proc].append(symbols[i])
+
+        dir_sync_l: list[DirectorySynchronization] = []
+        for i in range(n_procs):
+            dir_sync = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
+            dir_sync_l.append(dir_sync)
+
+        for i in range(n_procs):
+            pool.apply_async(dir_sync_l[i].synchronize_directory, args=(i,))
+        pool.close()
+        pool.join()
+    else:
+        print('pode haver sincronização em andamento.')
+        print(f'checkpoints: {list_sync_files}')
+        # verifique se todos os checkpoints indicam sincronização finalizada
+        _results_set = set()
+        for i in range(len(list_sync_files)):
+            _sync_status = get_sync_status(list_sync_files[i])
+            _results_set.add(_sync_status)
+
+        if len(_results_set) == 1 and list(_results_set)[0] is True:
+            print('TODOS os checkpoints indicam que suas sincronizações estão FINALIZADAS')
+            # assume-se que sempre há um número de processos/num_sync_cp_files que seja uma potência de 2
+            # pois será feita uma fusão de cada 2 conjuntos de símbolos de modo que na próxima sincronização
+            # haverá a metade do número de processos/num_sync_cp_files do que havia na sincronização precedente.
+            n_procs = len(list_sync_files)
+
+            if n_procs == 1:
+                print('a sincronização total está finalizada. parabéns!')
+                make_backup(csv_dir, csv_s_dir)
+            else:
+                print(f'iniciando a fusão de conjuntos de símbolos')
+                list_sync_cp_dic = get_all_sync_cp_dic(list_sync_files)
+                n_procs = n_procs // 2
+                pool = mp.Pool(n_procs)
+                symbols_to_sync_per_proc = []
+
+                for i in range(n_procs):
+                    symbols_to_sync_per_proc.append([])
+
+                for i in range(n_procs * 2):
+                    j = math.floor(i / 2)
+                    symbols_to_sync_per_proc[j] += list_sync_cp_dic[i]['symbols_to_sync']
+
+                print('removendo sync_cp_files')
+                remove_sync_cp_files(get_list_sync_files('.'))
+
+                print('criando novo(s) sync_cp_file(s)')
+                for i in range(n_procs):
+                    create_sync_cp_file(i, symbols_to_sync_per_proc[i], timeframe)
+
+                dir_sync_l: list[DirectorySynchronization] = []
+                for i in range(n_procs):
+                    dir_sync = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
+                    dir_sync_l.append(dir_sync)
+
+                for i in range(n_procs):
+                    pool.apply_async(dir_sync_l[i].synchronize_directory, args=(i,))
+                pool.close()
+                pool.join()
+
+        else:
+            print('NEM todos os checkpoints indicam que suas sincronização estão finalizadas')
+            print('continuando as sincronizações')
+            n_procs = len(list_sync_files)
+            pool = mp.Pool(n_procs)
+
+            for i in range(n_procs):
+                symbols_to_sync_per_proc.append([])
+
+            for i in range(n_procs):
+                symbols_to_sync_per_proc[i] = get_symbols_to_sync(list_sync_files[i])
+
+            dir_sync_l: list[DirectorySynchronization] = []
+            for i in range(n_procs):
+                dir_sync = DirectorySynchronization(csv_dir, timeframe, i, symbols_to_sync_per_proc[i])
+                dir_sync_l.append(dir_sync)
+
+            for i in range(n_procs):
+                pool.apply_async(dir_sync_l[i].synchronize_directory, args=(i,))
+            pool.close()
+            pool.join()
 
 
 def main():
