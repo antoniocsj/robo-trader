@@ -657,7 +657,7 @@ def synchronize():
         print('Não há arquivos CSVs para serem sincronizados.')
         exit(-1)
     elif _len_symbols == 1:
-        print('Há apenas 1 arquivo CSV. Portanto, o arquivo será considerado já sincronizado.')
+        print('Há apenas 1 arquivo CSV. Portanto, considera-se que o arquivo já está sincronizado.')
         make_backup(temp_dir, csv_s_dir)
         exit(0)
 

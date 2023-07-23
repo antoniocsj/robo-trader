@@ -2,7 +2,7 @@ import math
 import multiprocessing as mp
 import shutil
 
-from utils_filesystem import get_list_sync_files, read_json
+from utils_filesystem import get_list_sync_files, read_json, copy_files, reset_dir
 from utils_symbols import search_symbols_in_directory, get_symbols
 from DirectorySynchronizationMultiProc import DirectorySynchronization, make_backup, choose_n_procs_start
 from utils_sync import *
@@ -33,7 +33,7 @@ def synchronize() -> bool:
         print('Não há arquivos CSVs para serem sincronizados.')
         return True
     elif _len_symbols == 1:
-        print('Há apenas 1 arquivo CSV. Portanto, o arquivo será considerado já sincronizado.')
+        print('Há apenas 1 arquivo CSV. Portanto, considera-se que o arquivo já está sincronizado.')
         make_backup(temp_dir, csv_s_dir)
         return True
 
@@ -145,15 +145,35 @@ def synchronize() -> bool:
     return False
 
 
+def find_sync_cache(symbols_to_sync: list[str], sync_dir: str):
+    pass
+
+
 def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
     if not symbols_to_sync:
         return synchronize()
 
-    setup = read_json('settings.json')
-    temp_dir = setup['temp_dir']
-    csv_o_dir = setup['csv_o_dir']
-    csv_s_dir = setup['csv_s_dir']
-    timeframe = setup['timeframe']
+    settings = read_json('settings.json')
+    temp_dir = settings['temp_dir']
+    csv_o_dir = settings['csv_o_dir']
+    csv_s_dir = settings['csv_s_dir']
+    timeframe = settings['timeframe']
+
+    reset_dir(temp_dir)
+
+    if symbols_to_sync:
+        _len_symbols_to_sync = len(symbols_to_sync)
+        if _len_symbols_to_sync == 0:
+            print('Não há arquivos CSVs para serem sincronizados.')
+            return True
+        elif _len_symbols_to_sync == 1:
+            print('Há apenas 1 arquivo CSV. Portanto, considera-se que o arquivo já está sincronizado.')
+            # make_backup(temp_dir, csv_s_dir)
+            cache_dir = find_sync_cache(symbols_to_sync, csv_s_dir)
+            copy_files(symbols_to_sync, csv_o_dir, cache_dir)
+            copy_files(symbols_to_sync, csv_o_dir, temp_dir)
+
+            return True
 
     # se o diretório temp não existe, então crie-o.
     if not os.path.exists(temp_dir):
@@ -313,4 +333,4 @@ def test_03():
 
 
 if __name__ == '__main__':
-    test_03()
+    test_01()

@@ -67,6 +67,19 @@ def are_dir_trees_equal(dir1, dir2):
     return True
 
 
+def are_files_equal(filenames: list[str], src_dir: str, dst_dir: str):
+    for filename in filenames:
+        filepath_src = f'{src_dir}/{filename}'
+        filepath_dst = f'{dst_dir}/{filename}'
+
+        result = filecmp.cmp(filepath_src, filepath_dst, shallow=False)
+
+        if not result:
+            return False
+
+    return True
+
+
 def get_list_sync_files(directory: str):
     _list = []
     all_files = os.listdir(directory)
@@ -106,7 +119,7 @@ def read_train_config() -> dict:
 
 
 def make_backup(src_dir: str, dst_dir: str):
-    print(f'copiando os arquivos sincronizado para o diretório {dst_dir}')
+    print(f'copiando os arquivos sincronizados para o diretório {dst_dir}')
     if os.path.exists(dst_dir):
         print(f'o diretório {dst_dir} já existe. será substituído.')
         shutil.rmtree(dst_dir)
@@ -114,13 +127,48 @@ def make_backup(src_dir: str, dst_dir: str):
     shutil.copytree(src_dir, dst_dir)
     if are_dir_trees_equal(src_dir, dst_dir):
         print('Backup efetuado e verificado com SUCESSO!')
-        # aproveita e copia o arquivo final de checkpoint de sincronização 'sync_cp_0.json' para dst_dir também
+        # aproveita e copia o arquivo final de checkpoint de sincronização 'sync_cp.json' para dst_dir também
         _list = get_list_sync_files('.')
-        _sync_filename = _list[0]
-        _sync_filepath_copy = f'{dst_dir}/{_sync_filename}'
-        shutil.copy(_sync_filename, _sync_filepath_copy)
+
+        if len(_list) > 0:
+            _sync_filename = _list[0]
+            _sync_filepath_copy = f'{dst_dir}/{_sync_filename}'
+            shutil.copy(_sync_filename, _sync_filepath_copy)
     else:
         print('ERRO ao fazer o backup.')
+        exit(-1)
+
+
+def copy_files(filenames: list[str], src_dir: str, dst_dir: str):
+    print(f'copiando os arquivos {filenames} para o diretório {dst_dir}')
+    if os.path.exists(dst_dir):
+        print(f'o diretório {dst_dir} já existe. será substituído.')
+        shutil.rmtree(dst_dir)
+
+    shutil.copytree(src_dir, dst_dir)
+    if are_files_equal(filenames, src_dir, dst_dir):
+        print('Cópia de arquivos efetuada e verificada com SUCESSO!')
+        # aproveita e copia o arquivo final de checkpoint de sincronização 'sync_cp.json' para dst_dir também
+        _list = get_list_sync_files('.')
+
+        for filename in filenames:
+            filepath_src = f'{src_dir}/{filename}'
+            filepath_dst = f'{dst_dir}/{filename}'
+            shutil.copy(filepath_src, filepath_dst)
+    else:
+        print('ERRO ao fazer as cópias.')
+        exit(-1)
+
+
+def reset_dir(dirname: str):
+    if os.path.exists(dirname):
+        print(f'o diretório {dirname} já existe. será resetado.')
+        shutil.rmtree(dirname)
+
+    os.mkdir(dirname)
+    _filename = f'{dirname}/.directory'
+    _f = open(_filename, 'x')  # para manter o diretório no git
+    _f.close()
 
 
 if __name__ == '__main__':
