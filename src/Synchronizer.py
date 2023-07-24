@@ -143,6 +143,20 @@ def synchronize() -> bool:
     return False
 
 
+def get_symbols_from_bits_segment(segment: str) -> list[str]:
+    all_symbols = get_symbols()
+
+    if len(segment) != len(all_symbols):
+        print('ERRO. get_symbols_from_bits_segment(). len(segment) != len(all_symbols)')
+        exit(-1)
+
+    _list = []
+    for x, y in zip(segment, all_symbols):
+        if bool(int(x)):
+            _list.append(y)
+    return _list
+
+
 def get_bits_segment_from_symbols(symbols: list[str]) -> str:
     all_symbols = get_symbols()
     _list = []
@@ -163,7 +177,12 @@ def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str):
     if not os.path.exists(_filename):
         write_json(_filename, cache)
 
-    pass
+    cache = read_json(_filename)
+
+
+    key = get_bits_segment_from_symbols(symbols_to_sync)
+    cache[key] = symbols_to_sync
+
 
 
 def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
@@ -353,6 +372,14 @@ def test_04():
     all_symbs = get_symbols()
     s = get_bits_segment_from_symbols(all_symbs)
     print(s)
+
+    segment = '000100000000001000000010000000001110000000000'
+    symbs = get_symbols_from_bits_segment(segment)
+    print(symbs)
+
+    segment = '111111111111111111111111111111111111111111111'
+    symbs = get_symbols_from_bits_segment(segment)
+    print(symbs)
 
 
 if __name__ == '__main__':
