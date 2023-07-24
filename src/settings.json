@@ -3,6 +3,7 @@
     "timeframe": "M5",
     "temp_dir": "../temp",
     "csv_s_dir": "../csv_s",
+    "csv_s_cache_dir": "../csv_s_cache",
     "csv_o_dir": "../csv_o",
     "candle_input_type": "OHLCV",
     "candle_output_type": "OHLCV",

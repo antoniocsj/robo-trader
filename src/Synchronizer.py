@@ -145,7 +145,7 @@ def synchronize() -> bool:
     return False
 
 
-def find_sync_cache(symbols_to_sync: list[str], sync_dir: str):
+def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str):
     pass
 
 
@@ -157,6 +157,7 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
     temp_dir = settings['temp_dir']
     csv_o_dir = settings['csv_o_dir']
     csv_s_dir = settings['csv_s_dir']
+    root_cache_dir = settings['root_cache_dir']
     timeframe = settings['timeframe']
 
     reset_dir(temp_dir)
@@ -169,19 +170,14 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
         elif _len_symbols_to_sync == 1:
             print('Há apenas 1 arquivo CSV. Portanto, considera-se que o arquivo já está sincronizado.')
             # make_backup(temp_dir, csv_s_dir)
-            cache_dir = find_sync_cache(symbols_to_sync, csv_s_dir)
+            cache_dir = find_sync_cache_dir(symbols_to_sync, root_cache_dir)
             copy_files(symbols_to_sync, csv_o_dir, cache_dir)
             copy_files(symbols_to_sync, csv_o_dir, temp_dir)
-
             return True
-
-    # se o diretório temp não existe, então crie-o.
-    if not os.path.exists(temp_dir):
-        print('o diretório temp não existe. criando-o.')
-        os.mkdir(temp_dir)
-        _filename = f'{temp_dir}/.directory'
-        _f = open(_filename, 'x')  # para manter o diretório no git
-        _f.close()
+        else:
+            cache_dir = find_sync_cache_dir(symbols_to_sync, root_cache_dir)
+            copy_files(symbols_to_sync, csv_o_dir, cache_dir)
+            copy_files(symbols_to_sync, csv_o_dir, temp_dir)
 
     symbols = search_symbols_in_directory(temp_dir, timeframe)
     _len_symbols = len(symbols)
