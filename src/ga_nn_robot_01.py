@@ -72,7 +72,7 @@ def make_layers_config(max_n_layers: int,
     return _list
 
 
-def get_symbols_from_bits_segment(segment: ar.array, all_symbols: list[str]):
+def get_symbols_from_bits_segment(segment: ar.array, all_symbols: list[str]) -> list[str]:
     if len(segment) != len(all_symbols):
         print('ERRO. get_symbols_from_bits_segment(). len(segment) != len(all_symbols)')
         exit(-1)
@@ -130,6 +130,9 @@ def individual_to_hyperparameters(ind):
     symbols_bits_len = len(all_symbols)  # 45
     symbols_bits_end = symbols_bits_start + symbols_bits_len
     symbols = get_symbols_from_bits_segment(ind[symbols_bits_start:symbols_bits_end], all_symbols)
+
+    if len(symbols) == 0:
+        symbols = [symbol_out]
 
     params = {
         'n_steps': n_steps,
