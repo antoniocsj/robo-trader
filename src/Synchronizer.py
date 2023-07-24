@@ -170,7 +170,9 @@ def get_bits_segment_from_symbols(symbols: list[str]) -> str:
 
 
 def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str):
-    reset_dir(root_cache_dir)
+    if not os.path.exists(root_cache_dir):
+        print(f'o diretório {root_cache_dir} não existe. será criado.')
+        os.mkdir(root_cache_dir)
 
     dir_name = get_bits_segment_from_symbols(symbols_to_sync)
     dir_path = f'{root_cache_dir}/{dir_name}'
@@ -180,6 +182,13 @@ def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str):
     else:
         os.mkdir(dir_path)
         return dir_path
+
+
+def get_symbols_filenames(symbols: list[str], timeframe: str):
+    _list = []
+    for symbol in symbols:
+        _list.append(f'{symbol}_{timeframe}.csv')
+    return _list
 
 
 def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
@@ -194,6 +203,7 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
     timeframe = settings['timeframe']
 
     reset_dir(temp_dir)
+    cache_dir = ''
 
     if symbols_to_sync:
         _len_symbols_to_sync = len(symbols_to_sync)
@@ -209,8 +219,12 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
             return True
         else:
             cache_dir = find_sync_cache_dir(symbols_to_sync, root_cache_dir)
-            copy_files(symbols_to_sync, csv_o_dir, cache_dir)
-            copy_files(symbols_to_sync, csv_o_dir, temp_dir)
+            # symbols_filenames = get_symbols_filenames(symbols_to_sync, timeframe)
+            # copy_files(symbols_filenames, csv_o_dir, cache_dir)
+            # copy_files(symbols_filenames, csv_o_dir, temp_dir)
+    else:
+        print('Não há arquivos CSVs para serem sincronizados.')
+        return True
 
     symbols = search_symbols_in_directory(temp_dir, timeframe)
     _len_symbols = len(symbols)
@@ -380,4 +394,4 @@ def test_04():
 
 
 if __name__ == '__main__':
-    test_04()
+    test_03()

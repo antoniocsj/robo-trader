@@ -139,22 +139,19 @@ def make_backup(src_dir: str, dst_dir: str):
         exit(-1)
 
 
-def copy_files(filenames: list[str], src_dir: str, dst_dir: str):
+def copy_files(filenames: list[str], src_dir: str, dst_dir: str, clear_dst=False):
     print(f'copiando os arquivos {filenames} para o diretório {dst_dir}')
-    if os.path.exists(dst_dir):
+    if clear_dst and os.path.exists(dst_dir):
         print(f'o diretório {dst_dir} já existe. será substituído.')
         shutil.rmtree(dst_dir)
 
-    shutil.copytree(src_dir, dst_dir)
+    for filename in filenames:
+        filepath_src = f'{src_dir}/{filename}'
+        filepath_dst = f'{dst_dir}/{filename}'
+        shutil.copy(filepath_src, filepath_dst)
+
     if are_files_equal(filenames, src_dir, dst_dir):
         print('Cópia de arquivos efetuada e verificada com SUCESSO!')
-        # aproveita e copia o arquivo final de checkpoint de sincronização 'sync_cp.json' para dst_dir também
-        _list = get_list_sync_files('.')
-
-        for filename in filenames:
-            filepath_src = f'{src_dir}/{filename}'
-            filepath_dst = f'{dst_dir}/{filename}'
-            shutil.copy(filepath_src, filepath_dst)
     else:
         print('ERRO ao fazer as cópias.')
         exit(-1)
