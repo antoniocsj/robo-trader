@@ -143,6 +143,18 @@ def synchronize() -> bool:
     return False
 
 
+def get_bits_segment_from_symbols(symbols: list[str]) -> str:
+    all_symbols = get_symbols()
+    _list = []
+    for symbol in all_symbols:
+        if symbol in symbols:
+            _list.append('1')
+        else:
+            _list.append('0')
+
+    return ''.join(_list)
+
+
 def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str):
     reset_dir(root_cache_dir)
 
