@@ -563,9 +563,6 @@ def synchronize():
     if not os.path.exists(temp_dir):
         print('o diretório temp não existe. criando-o.')
         os.mkdir(temp_dir)
-        _filename = f'{temp_dir}/.directory'
-        _f = open(_filename, 'x')  # para manter o diretório no git
-        _f.close()
 
     symbols = search_symbols_in_directory(temp_dir, timeframe)
     _len_symbols = len(symbols)

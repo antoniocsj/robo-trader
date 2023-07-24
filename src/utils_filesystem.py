@@ -164,11 +164,7 @@ def reset_dir(dirname: str):
     if os.path.exists(dirname):
         print(f'o diretório {dirname} já existe. será resetado.')
         shutil.rmtree(dirname)
-
     os.mkdir(dirname)
-    _filename = f'{dirname}/.directory'
-    _f = open(_filename, 'x')  # para manter o diretório no git
-    _f.close()
 
 
 if __name__ == '__main__':

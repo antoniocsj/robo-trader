@@ -6,7 +6,7 @@ import copy
 
 import pandas as pd
 from HistMulti import HistMulti
-from utils_filesystem import read_json, get_list_sync_files, load_sync_cp_file, update_settings
+from utils_filesystem import read_json, get_list_sync_files, load_sync_cp_file, update_settings, reset_dir
 from utils_symbols import search_symbols
 from utils_ops import transform_directory, transform_files, transform_symbols, \
     normalize_directory, normalize_symbols, \
@@ -41,19 +41,7 @@ def check_base_ok():
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
 
-    if os.path.exists(temp_dir):
-        print(f'o diretório {temp_dir} já existe. deletando todo seu conteúdo.')
-        shutil.rmtree(temp_dir)
-        os.mkdir(temp_dir)
-        _filename = f'{temp_dir}/.directory'
-        _f = open(_filename, 'x')  # para manter o diretório no git
-        _f.close()
-    else:
-        print(f'o diretório {temp_dir} não existe. criando-o.')
-        os.mkdir(temp_dir)
-        _filename = f'{temp_dir}/.directory'
-        _f = open(_filename, 'x')  # para manter o diretório no git
-        _f.close()
+    reset_dir(temp_dir)
 
     if not os.path.exists(csv_s_dir):
         print(f'o diretório csv_s não foi encontrado.')
