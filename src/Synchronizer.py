@@ -345,5 +345,15 @@ def test_03():
     synchronize_with_cache_loop(currencies_majors_2)
 
 
+def test_04():
+    currencies_majors = get_symbols('currencies_majors')
+    s = get_bits_segment_from_symbols(currencies_majors)
+    print(s)
+
+    all_symbs = get_symbols()
+    s = get_bits_segment_from_symbols(all_symbs)
+    print(s)
+
+
 if __name__ == '__main__':
-    test_03()
+    test_04()
