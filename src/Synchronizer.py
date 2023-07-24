@@ -146,6 +146,7 @@ def synchronize() -> bool:
 
 
 def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str):
+    reset_dir(root_cache_dir)
     pass
 
 
@@ -329,4 +330,4 @@ def test_03():
 
 
 if __name__ == '__main__':
-    test_01()
+    test_03()
