@@ -172,17 +172,14 @@ def get_bits_segment_from_symbols(symbols: list[str]) -> str:
 def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str):
     reset_dir(root_cache_dir)
 
-    cache = {}
-    _filename = 'sync_cache_info.json'
-    if not os.path.exists(_filename):
-        write_json(_filename, cache)
+    dir_name = get_bits_segment_from_symbols(symbols_to_sync)
+    dir_path = f'{root_cache_dir}/{dir_name}'
 
-    cache = read_json(_filename)
-
-
-    key = get_bits_segment_from_symbols(symbols_to_sync)
-    cache[key] = symbols_to_sync
-
+    if os.path.exists(dir_path):
+        return dir_path
+    else:
+        os.mkdir(dir_path)
+        return dir_path
 
 
 def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
