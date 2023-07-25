@@ -169,7 +169,19 @@ def get_bits_segment_from_symbols(symbols: list[str]) -> str:
     return ''.join(_list)
 
 
-def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str):
+def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tuple[str, bool]:
+    """
+    Os diretório de símbolos sincronizados dentro do cache possuem nomes que indicam quais são os símbolos que estão
+    sincronizados. O nome é um padrão de bits.
+    Procura pelo diretório contendo os símbolos já sincronizados ou cria um novo diretório onde seráo armazenados os
+    símbolos a serem sincronizados. Quando um diretório de símbolos sincronizados não existe, tenta encontrar um
+    diretório de símbolos que seja o maior subconjunto de symbols_to_sync. Assim, a sincronização dos símbolos
+    especificados em symbols_to_sync será acelerada pela inclusão de símbolos já sincronizados entre si.
+    :param symbols_to_sync: símbolos a serem sincronizados.
+    :param root_cache_dir: pasta raíz onde ficam os diretórios de símbolos sincronizados.
+    :return: retorna uma tupla. o primeiro elemento é o diretório dos símbolos dentro do cache dir_path.
+    o segundo elemento é um bool, True, se o diretório sincronizado já existia, ou False, se acaba de ser criado.
+    """
     if not os.path.exists(root_cache_dir):
         print(f'o diretório {root_cache_dir} não existe. será criado.')
         os.mkdir(root_cache_dir)
@@ -177,11 +189,31 @@ def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str):
     dir_name = get_bits_segment_from_symbols(symbols_to_sync)
     dir_path = f'{root_cache_dir}/{dir_name}'
 
+    # se o diretório já existe, então ele já contém os símbolos sincronizados. basta retornar esse diretório.
     if os.path.exists(dir_path):
-        return dir_path
-    else:
-        os.mkdir(dir_path)
-        return dir_path
+        return dir_path, True
+
+    # se o diretório não existe, então terá que ser criado.
+    # aproveita para pesquisar se há algum diretório dentro do cache que possa acelerar a sincronização dos símbolos
+    # especificados em symbols_to_sync.
+    # procure pelo diretório que contém o maior subconjunto de symbols_to_sync.
+    _subsets = []
+    symbols_to_sync_set = set(symbols_to_sync)
+    _max_subset = set()
+
+    all_dirs = os.listdir(root_cache_dir)
+    for dirname in all_dirs:
+        symbols = get_symbols_from_bits_segment(dirname)
+        symbols_set = set(symbols)
+        if symbols_set.issubset(symbols_to_sync_set):
+            _subsets.append(symbols_set)
+
+    for _set in _subsets:
+        if len(_set) > len(_max_subset):
+            _max_subset = _set
+
+    os.mkdir(dir_path)
+    return dir_path, False
 
 
 def get_symbols_filenames(symbols: list[str], timeframe: str):
@@ -214,8 +246,9 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
             print('Há apenas 1 arquivo CSV. Portanto, considera-se que o arquivo já está sincronizado.')
             # make_backup(temp_dir, csv_s_dir)
             cache_dir = find_sync_cache_dir(symbols_to_sync, root_cache_dir)
-            copy_files(symbols_to_sync, csv_o_dir, cache_dir)
-            copy_files(symbols_to_sync, csv_o_dir, temp_dir)
+            symbols_filenames = get_symbols_filenames(symbols_to_sync, timeframe)
+            copy_files(symbols_filenames, csv_o_dir, cache_dir)
+            copy_files(symbols_filenames, csv_o_dir, temp_dir)
             return True
         else:
             cache_dir = find_sync_cache_dir(symbols_to_sync, root_cache_dir)
@@ -366,16 +399,6 @@ def test_02():
 
 
 def test_03():
-    currencies_majors_1 = get_symbols('currencies_majors')
-    currencies_majors_2 = currencies_majors_1[:]
-
-    currencies_majors_1 = currencies_majors_1[0:-2]
-
-    synchronize_with_cache_loop(currencies_majors_1)
-    synchronize_with_cache_loop(currencies_majors_2)
-
-
-def test_04():
     currencies_majors = get_symbols('currencies_majors')
     s = get_bits_segment_from_symbols(currencies_majors)
     print(s)
@@ -393,5 +416,16 @@ def test_04():
     print(symbs)
 
 
+def test_04():
+    currencies_majors_1 = get_symbols('currencies_majors')
+    currencies_majors_2 = currencies_majors_1[:]
+
+    currencies_majors_1 = currencies_majors_1[0:-2]
+    synchronize_with_cache_loop(['AUDUSD'])
+
+    synchronize_with_cache_loop(currencies_majors_1)
+    synchronize_with_cache_loop(currencies_majors_2)
+
+
 if __name__ == '__main__':
-    test_03()
+    test_04()
