@@ -2,6 +2,7 @@ import math
 import multiprocessing as mp
 import os.path
 import shutil
+from typing import Any
 
 from utils_filesystem import get_list_sync_files, read_json, write_json, copy_files, reset_dir
 from utils_symbols import search_symbols_in_directory, get_symbols
@@ -169,31 +170,36 @@ def get_bits_segment_from_symbols(symbols: list[str]) -> str:
     return ''.join(_list)
 
 
-def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tuple[str, bool, list]:
+def find_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tuple[str, Any, list, list]:
     """
     Os diretório de símbolos sincronizados dentro do cache possuem nomes que indicam quais são os símbolos que estão
     sincronizados. O nome é um padrão de bits.
     Procura pelo diretório contendo os símbolos já sincronizados ou cria um novo diretório onde seráo armazenados os
     símbolos a serem sincronizados. Quando um diretório de símbolos sincronizados não existe, tenta encontrar um
-    diretório de símbolos que seja o maior subconjunto de symbols_to_sync. Assim, a sincronização dos símbolos
-    especificados em symbols_to_sync será acelerada pela inclusão de símbolos já sincronizados entre si.
+    diretório de símbolos que seja o maior subconjunto de symbols_to_sync. Em seguida copia os arquivos(símbolos) desse
+    diretório para o novo diretório alvo.
+    Assim, a sincronização dos símbolos especificados em symbols_to_sync será acelerada pela inclusão de símbolos já
+    sincronizados entre si.
     :param symbols_to_sync: símbolos a serem sincronizados.
     :param root_cache_dir: pasta raíz onde ficam os diretórios de símbolos sincronizados.
-    :return: retorna uma tupla. o primeiro elemento é o diretório dos símbolos dentro do cache dir_path.
-    o segundo elemento é um bool, True, se o diretório sincronizado já existia, ou False, se acaba de ser criado.
-    o terceiro elemento é uma lista dos símbolos que foram copiados para o diretório recém-criado a fim de acelerar a
-    sincronização de symbols_to_sync.
+    :return: retorna uma tupla.
+    o primeiro elemento é o diretório dos símbolos (symbols_to_sync) dentro do cache dir_path_target.
+    o segundo elemento é uma lista dos símbolos que devem ser copiados e reutilizados a fim de acelerar a
+    sincronização. essa lista é de elementos presentes em outro diretório do cache e que já estão sincronizados
+    entre si.
+    o quarto elemento é uma lista dos símbolos que ainda precisam ser copiados para o diretório recém-criado a
+    fim de completar a lista de símbolos indicada em symbols_to_sync.
     """
     if not os.path.exists(root_cache_dir):
         print(f'o diretório {root_cache_dir} não existe. será criado.')
         os.mkdir(root_cache_dir)
 
     dir_name = get_bits_segment_from_symbols(symbols_to_sync)
-    dir_path = f'{root_cache_dir}/{dir_name}'
+    dir_path_target = f'{root_cache_dir}/{dir_name}'
 
     # se o diretório já existe, então ele já contém os símbolos sincronizados. basta retornar esse diretório.
-    if os.path.exists(dir_path):
-        return dir_path, True, []
+    if os.path.exists(dir_path_target):
+        return dir_path_target, dir_path_target, symbols_to_sync[:], []
 
     # se o diretório não existe, então terá que ser criado.
     # aproveita para pesquisar se há algum diretório dentro do cache que possa acelerar a sincronização dos símbolos
@@ -214,9 +220,18 @@ def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tupl
         if len(_set) > len(_max_subset):
             _max_subset = _set
 
-    os.mkdir(dir_path)
+    if len(_max_subset) == 0:
+        dir_path_max_subset = ''
+    else:
+        dir_name_max_subset = get_bits_segment_from_symbols(sorted(list(_max_subset)))
+        dir_path_max_subset = f'{root_cache_dir}_{dir_name_max_subset}'
 
-    return dir_path, False
+    _present_symbols = symbols_to_sync_set.intersection(_max_subset)
+    _missing_symbols = symbols_to_sync_set.difference(_max_subset)
+
+    os.mkdir(dir_path_target)
+
+    return dir_path_target, dir_path_max_subset, sorted(list(_present_symbols)), sorted(list(_missing_symbols))
 
 
 def get_symbols_filenames(symbols: list[str], timeframe: str):
@@ -248,13 +263,15 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
         elif _len_symbols_to_sync == 1:
             print('Há apenas 1 arquivo CSV. Portanto, considera-se que o arquivo já está sincronizado.')
             # make_backup(temp_dir, csv_s_dir)
-            cache_dir = find_sync_cache_dir(symbols_to_sync, root_cache_dir)
+            dir_cache_target, _r, dir_cache_subset, _present, _missing = find_cache_dir(symbols_to_sync, root_cache_dir)
+            if dir_cache_subset:
+                pass
             symbols_filenames = get_symbols_filenames(symbols_to_sync, timeframe)
-            copy_files(symbols_filenames, csv_o_dir, cache_dir)
+            copy_files(symbols_filenames, csv_o_dir, dir_cache_target)
             copy_files(symbols_filenames, csv_o_dir, temp_dir)
             return True
         else:
-            cache_dir = find_sync_cache_dir(symbols_to_sync, root_cache_dir)
+            dir_cache_target, _r, dir_cache_subset, _present, _missing = find_cache_dir(symbols_to_sync, root_cache_dir)
             # symbols_filenames = get_symbols_filenames(symbols_to_sync, timeframe)
             # copy_files(symbols_filenames, csv_o_dir, cache_dir)
             # copy_files(symbols_filenames, csv_o_dir, temp_dir)
