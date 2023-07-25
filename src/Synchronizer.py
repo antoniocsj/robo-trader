@@ -169,7 +169,7 @@ def get_bits_segment_from_symbols(symbols: list[str]) -> str:
     return ''.join(_list)
 
 
-def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tuple[str, bool]:
+def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tuple[str, bool, list]:
     """
     Os diretório de símbolos sincronizados dentro do cache possuem nomes que indicam quais são os símbolos que estão
     sincronizados. O nome é um padrão de bits.
@@ -181,6 +181,8 @@ def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tupl
     :param root_cache_dir: pasta raíz onde ficam os diretórios de símbolos sincronizados.
     :return: retorna uma tupla. o primeiro elemento é o diretório dos símbolos dentro do cache dir_path.
     o segundo elemento é um bool, True, se o diretório sincronizado já existia, ou False, se acaba de ser criado.
+    o terceiro elemento é uma lista dos símbolos que foram copiados para o diretório recém-criado a fim de acelerar a
+    sincronização de symbols_to_sync.
     """
     if not os.path.exists(root_cache_dir):
         print(f'o diretório {root_cache_dir} não existe. será criado.')
@@ -191,7 +193,7 @@ def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tupl
 
     # se o diretório já existe, então ele já contém os símbolos sincronizados. basta retornar esse diretório.
     if os.path.exists(dir_path):
-        return dir_path, True
+        return dir_path, True, []
 
     # se o diretório não existe, então terá que ser criado.
     # aproveita para pesquisar se há algum diretório dentro do cache que possa acelerar a sincronização dos símbolos
@@ -213,6 +215,7 @@ def find_sync_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tupl
             _max_subset = _set
 
     os.mkdir(dir_path)
+
     return dir_path, False
 
 
