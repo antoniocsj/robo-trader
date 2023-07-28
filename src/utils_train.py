@@ -24,8 +24,8 @@ from HistMulti import HistMulti
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Flatten
-from keras.layers.convolutional import Conv1D
-from keras.layers.convolutional import MaxPooling1D
+from keras.layers import Conv1D
+from keras.layers import MaxPooling1D
 from keras.callbacks import EarlyStopping
 
 tf.keras.utils.set_random_seed(1)

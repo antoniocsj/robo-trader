@@ -47,6 +47,10 @@ class HistMulti:
         Procurando pelos arquivos csv correspondentes ao 'simbolo' e ao 'timeframe'
         :return:
         """
+        if not os.path.exists(self.directory):
+            print(f'ERRO. o diretório {self.directory} não existe.')
+            exit(-1)
+        
         # passe por todos os arquivos csv e descubra o symbol e timeframe
         self.all_files = os.listdir(self.directory)
         for filename in self.all_files:
