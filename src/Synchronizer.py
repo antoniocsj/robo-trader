@@ -170,7 +170,7 @@ def get_bits_segment_from_symbols(symbols: list[str]) -> str:
     return ''.join(_list)
 
 
-def find_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tuple[str, Any, list, list]:
+def find_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tuple[str, str, list, list]:
     """
     Os diretório de símbolos sincronizados dentro do cache possuem nomes que indicam quais são os símbolos que estão
     sincronizados. O nome é um padrão de bits.
@@ -263,7 +263,7 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
         elif _len_symbols_to_sync == 1:
             print('Há apenas 1 arquivo CSV. Portanto, considera-se que o arquivo já está sincronizado.')
             # make_backup(temp_dir, csv_s_dir)
-            dir_cache_target, _r, dir_cache_subset, _present, _missing = find_cache_dir(symbols_to_sync, root_cache_dir)
+            dir_cache_target, dir_cache_subset, _present, _missing = find_cache_dir(symbols_to_sync, root_cache_dir)
             if dir_cache_subset:
                 pass
             symbols_filenames = get_symbols_filenames(symbols_to_sync, timeframe)
@@ -271,7 +271,7 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
             copy_files(symbols_filenames, csv_o_dir, temp_dir)
             return True
         else:
-            dir_cache_target, _r, dir_cache_subset, _present, _missing = find_cache_dir(symbols_to_sync, root_cache_dir)
+            dir_cache_target, dir_cache_subset, _present, _missing = find_cache_dir(symbols_to_sync, root_cache_dir)
             # symbols_filenames = get_symbols_filenames(symbols_to_sync, timeframe)
             # copy_files(symbols_filenames, csv_o_dir, cache_dir)
             # copy_files(symbols_filenames, csv_o_dir, temp_dir)
