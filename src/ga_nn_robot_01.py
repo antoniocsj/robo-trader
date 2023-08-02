@@ -21,6 +21,7 @@ from deap import base
 from deap import creator
 from deap import tools
 
+from utils_train import train_model_param
 from utils_filesystem import read_json
 from utils_symbols import get_symbols
 from HistMulti import HistMulti
