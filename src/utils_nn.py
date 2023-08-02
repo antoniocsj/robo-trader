@@ -151,6 +151,10 @@ def prepare_train_data2(hist: HistMulti, symbol_out: str, start_index: int, num_
     timeframe = hist.timeframe
     symbol_tf_out = f'{symbol_out}_{timeframe}'
 
+    if len(hist.symbols) == 0:
+        print('ERRO. o histórico está vazio.')
+        exit(-1)
+
     if candle_input_type == 'C':
         for symbol in hist.symbols:
             _symbol_timeframe = f'{symbol}_{timeframe}'

@@ -101,6 +101,10 @@ class HistMulti:
         del df
 
     def load_symbols(self):
+        if len(self.symbols) == 0:
+            print(f'ERRO. nenhum símbolo foi encontrado no diretório {self.directory}')
+            exit(-1)
+
         for s in self.symbols:
             self.add_hist_data(s, self.timeframe)
 
