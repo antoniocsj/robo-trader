@@ -477,13 +477,12 @@ def test_model_with_trader_interactive():
 
 def show_tf():
     print(os.environ["LD_LIBRARY_PATH"])
-    print(os.environ["PYTHONPATH"])
     print(tf.__version__)
     print(tf.config.list_physical_devices('GPU'))
 
 
 if __name__ == '__main__':
-    # show_tf()
+    show_tf()
     train_model()
     # calculate_model_bias()
     # evaluate_model()

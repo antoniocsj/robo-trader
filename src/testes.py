@@ -4,7 +4,6 @@ def test_01():
     import tensorflow as tf
 
     print(os.environ["LD_LIBRARY_PATH"])
-    print(os.environ["PYTHONPATH"])
     print(tf.__version__)
     print(tf.config.list_physical_devices('GPU'))
 
@@ -257,5 +256,4 @@ def test_11():
 
 
 if __name__ == '__main__':
-    # test_11()
-    pass
+    test_01()

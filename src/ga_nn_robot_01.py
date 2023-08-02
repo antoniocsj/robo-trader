@@ -9,6 +9,10 @@ np.random.seed(1)
 import random
 random.seed(1)
 
+import tensorflow as tf
+tf.random.set_seed(1)
+tf.keras.utils.set_random_seed(1)
+
 import array as ar
 import time
 
@@ -17,7 +21,6 @@ from deap import base
 from deap import creator
 from deap import tools
 
-from utils_train import train_model_param
 from utils_filesystem import read_json
 from utils_symbols import get_symbols
 from HistMulti import HistMulti
@@ -160,7 +163,15 @@ toolbox.register("mutate", tools.mutFlipBit, indpb=0.05)
 toolbox.register("select", tools.selTournament, tournsize=3)
 
 
+def show_tf():
+    print(os.environ["LD_LIBRARY_PATH"])
+    print(tf.__version__)
+    print(tf.config.list_physical_devices('GPU'))
+
+
 def main():
+    show_tf()
+
     random.seed(1)
     freq = 1
     mutpb = 0.2
