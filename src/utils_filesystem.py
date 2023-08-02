@@ -140,7 +140,7 @@ def make_backup(src_dir: str, dst_dir: str):
 
 
 def copy_files(filenames: list[str], src_dir: str, dst_dir: str, clear_dst=False):
-    print(f'copiando os arquivos {filenames} para o diretório {dst_dir}')
+    print(f'copiando os arquivos {filenames} de {src_dir} para {dst_dir}')
     if clear_dst and os.path.exists(dst_dir):
         print(f'o diretório {dst_dir} já existe. será substituído.')
         shutil.rmtree(dst_dir)
@@ -151,9 +151,9 @@ def copy_files(filenames: list[str], src_dir: str, dst_dir: str, clear_dst=False
         shutil.copy(filepath_src, filepath_dst)
 
     if are_files_equal(filenames, src_dir, dst_dir):
-        print('Cópia de arquivos efetuada e verificada com SUCESSO!')
+        print('A cópia dos arquivos foi efetuada e verificada com SUCESSO!')
     else:
-        print('ERRO ao fazer as cópias.')
+        print('ERRO ao fazer a cópia dos arquivos.')
         exit(-1)
 
 

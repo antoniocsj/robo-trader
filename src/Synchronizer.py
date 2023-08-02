@@ -224,7 +224,7 @@ def find_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tuple[str
         dir_path_max_subset = ''
     else:
         dir_name_max_subset = get_bits_segment_from_symbols(sorted(list(_max_subset)))
-        dir_path_max_subset = f'{root_cache_dir}_{dir_name_max_subset}'
+        dir_path_max_subset = f'{root_cache_dir}/{dir_name_max_subset}'
 
     _present_symbols = symbols_to_sync_set.intersection(_max_subset)
     _missing_symbols = symbols_to_sync_set.difference(_max_subset)
@@ -252,43 +252,48 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
     root_cache_dir = settings['root_cache_dir']
     timeframe = settings['timeframe']
 
-    reset_dir(temp_dir)
-    cache_dir = ''
+    list_sync_files = get_list_sync_files('.')
+    if len(list_sync_files) <= 1:
+        reset_dir(temp_dir)
 
     if symbols_to_sync:
+        print(f'sincronizando os símbolos: {symbols_to_sync}')
         _len_symbols_to_sync = len(symbols_to_sync)
         if _len_symbols_to_sync == 0:
-            print('Não há arquivos CSVs para serem sincronizados.')
+            print('Não há símbolos para serem sincronizados.')
             return True
         elif _len_symbols_to_sync == 1:
-            print('Há apenas 1 arquivo CSV. Portanto, considera-se que o arquivo já está sincronizado.')
-            # make_backup(temp_dir, csv_s_dir)
+            print('Há apenas 1 símbolo. Portanto, considera-se que o símbolo já está sincronizado.')
             dir_cache_target, dir_cache_subset, _present, _missing = find_cache_dir(symbols_to_sync, root_cache_dir)
-            if dir_cache_subset:
-                pass
-            symbols_filenames = get_symbols_filenames(symbols_to_sync, timeframe)
-            copy_files(symbols_filenames, csv_o_dir, dir_cache_target)
-            copy_files(symbols_filenames, csv_o_dir, temp_dir)
+            if len(_present) > 0:
+                print(f'o símbolo {_present} já está no cache e será aproveitado.')
+                symbols_filenames = get_symbols_filenames(_present, timeframe)
+                copy_files(symbols_filenames, dir_cache_subset, temp_dir)
+            if len(_missing) > 0:
+                print(f'o símbolo {_missing} não está no cache. copiando-o de {csv_o_dir}')
+                symbols_filenames = get_symbols_filenames(_missing, timeframe)
+                copy_files(symbols_filenames, csv_o_dir, dir_cache_target)
+                copy_files(symbols_filenames, dir_cache_target, temp_dir)
             return True
         else:
             dir_cache_target, dir_cache_subset, _present, _missing = find_cache_dir(symbols_to_sync, root_cache_dir)
-            # symbols_filenames = get_symbols_filenames(symbols_to_sync, timeframe)
-            # copy_files(symbols_filenames, csv_o_dir, cache_dir)
-            # copy_files(symbols_filenames, csv_o_dir, temp_dir)
+            if len(_present) > 0:
+                print(f'os símbolos {_present} já estão no cache e serão aproveitados.')
+                symbols_filenames = get_symbols_filenames(_present, timeframe)
+                copy_files(symbols_filenames, dir_cache_subset, temp_dir)
+            if len(_missing) > 0:
+                print(f'os símbolos {_missing} não estão no cache. copiando-os de {csv_o_dir}')
+                symbols_filenames = get_symbols_filenames(_missing, timeframe)
+                copy_files(symbols_filenames, csv_o_dir, temp_dir)
+            else:
+                # para evitar uma nova sincronização sobre símbolos já sincronizados.
+                return True
     else:
-        print('Não há arquivos CSVs para serem sincronizados.')
+        print('Não há símbolos para serem sincronizados.')
         return True
 
     symbols = search_symbols_in_directory(temp_dir, timeframe)
     _len_symbols = len(symbols)
-
-    if _len_symbols == 0:
-        print('Não há arquivos CSVs para serem sincronizados.')
-        return True
-    elif _len_symbols == 1:
-        print('Há apenas 1 arquivo CSV. Portanto, o arquivo será considerado já sincronizado.')
-        make_backup(temp_dir, csv_s_dir)
-        return True
 
     symbols_to_sync_per_proc = []
     list_sync_files = get_list_sync_files('.')
@@ -335,11 +340,10 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
             if n_procs == 1:
                 print('a sincronização total está finalizada. parabéns!')
 
-                # renomeie o arquivo final de checkpoint de sincronização para sync_cp.json
-                _sync_filename = list_sync_files[0]
-                shutil.move(_sync_filename, 'sync_cp.json')
+                # remova o arquivo final de checkpoint de sincronização
+                print(f'removendo o arquivo final de checkpoint de sincronização: {list_sync_files[0]}')
+                remove_sync_cp_files(list_sync_files)
 
-                make_backup(temp_dir, csv_s_dir)
                 return True
 
             else:
@@ -395,6 +399,9 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
             pool.close()
             pool.join()
 
+    symbols_filenames = get_symbols_filenames(symbols_to_sync, timeframe)
+    copy_files(symbols_filenames, temp_dir, dir_cache_target)
+
     return False
 
 
@@ -442,6 +449,8 @@ def test_04():
 
     currencies_majors_1 = currencies_majors_1[0:-2]
     synchronize_with_cache_loop(['AUDUSD'])
+    synchronize_with_cache_loop(['AUDUSD', 'EURUSD'])
+    synchronize_with_cache_loop(['AUDUSD', 'EURUSD', 'GBPUSD'])
 
     synchronize_with_cache_loop(currencies_majors_1)
     synchronize_with_cache_loop(currencies_majors_2)
