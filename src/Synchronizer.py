@@ -253,8 +253,15 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
     timeframe = settings['timeframe']
 
     list_sync_files = get_list_sync_files('.')
-    if len(list_sync_files) <= 1:
+    _len_list_sync_files = len(list_sync_files)
+    if _len_list_sync_files == 0:
         reset_dir(temp_dir)
+    elif _len_list_sync_files == 1:
+        reset_dir(temp_dir)
+        # se houver algum arquivo de checkpoint de um sincronização finalizada, pode deletar.
+        _sync_status = get_sync_status(list_sync_files[0])
+        if _sync_status:
+            remove_sync_cp_files(list_sync_files)
 
     if symbols_to_sync:
         print(f'sincronizando os símbolos: {symbols_to_sync}')
@@ -286,8 +293,9 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
                 symbols_filenames = get_symbols_filenames(_missing, timeframe)
                 copy_files(symbols_filenames, csv_o_dir, temp_dir)
             else:
-                # para evitar uma nova sincronização sobre símbolos já sincronizados.
-                return True
+                if _len_list_sync_files <= 1:
+                    # para evitar uma nova sincronização sobre símbolos já sincronizados.
+                    return True
     else:
         print('Não há símbolos para serem sincronizados.')
         return True
