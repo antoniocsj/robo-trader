@@ -2,9 +2,8 @@ import math
 import multiprocessing as mp
 import os.path
 import shutil
-from typing import Any
 
-from utils_filesystem import get_list_sync_files, read_json, write_json, copy_files, reset_dir
+from utils_filesystem import get_list_sync_files, read_json, copy_files, reset_dir
 from utils_symbols import search_symbols_in_directory, get_symbols
 from DirectorySynchronizationMultiProc import DirectorySynchronization, make_backup, choose_n_procs_start
 from utils_sync import *
@@ -16,7 +15,6 @@ from utils_sync import *
 def synchronize() -> bool:
     setup = read_json('settings.json')
     temp_dir = setup['temp_dir']
-    csv_o_dir = setup['csv_o_dir']
     csv_s_dir = setup['csv_s_dir']
     timeframe = setup['timeframe']
 
@@ -248,23 +246,23 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
     settings = read_json('settings.json')
     temp_dir = settings['temp_dir']
     csv_o_dir = settings['csv_o_dir']
-    csv_s_dir = settings['csv_s_dir']
     root_cache_dir = settings['root_cache_dir']
     timeframe = settings['timeframe']
 
     list_sync_files = get_list_sync_files('.')
     _len_list_sync_files = len(list_sync_files)
+
     if _len_list_sync_files == 0:
         reset_dir(temp_dir)
     elif _len_list_sync_files == 1:
-        reset_dir(temp_dir)
         # se houver algum arquivo de checkpoint de um sincronização finalizada, pode deletar.
         _sync_status = get_sync_status(list_sync_files[0])
         if _sync_status:
             remove_sync_cp_files(list_sync_files)
+            reset_dir(temp_dir)
 
     if symbols_to_sync:
-        print(f'sincronizando os símbolos: {symbols_to_sync}')
+        print(f'\nsincronizando os símbolos: {symbols_to_sync}')
         _len_symbols_to_sync = len(symbols_to_sync)
         if _len_symbols_to_sync == 0:
             print('Não há símbolos para serem sincronizados.')
@@ -287,10 +285,13 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
             if len(_present) > 0:
                 print(f'os símbolos {_present} já estão no cache e serão aproveitados.')
                 symbols_filenames = get_symbols_filenames(_present, timeframe)
+                if dir_cache_subset != dir_cache_target:
+                    copy_files(symbols_filenames, dir_cache_subset, dir_cache_target)
                 copy_files(symbols_filenames, dir_cache_subset, temp_dir)
             if len(_missing) > 0:
                 print(f'os símbolos {_missing} não estão no cache. copiando-os de {csv_o_dir}')
                 symbols_filenames = get_symbols_filenames(_missing, timeframe)
+                copy_files(symbols_filenames, csv_o_dir, dir_cache_target)
                 copy_files(symbols_filenames, csv_o_dir, temp_dir)
             else:
                 if _len_list_sync_files <= 1:
@@ -458,10 +459,11 @@ def test_04():
     currencies_majors_1 = currencies_majors_1[0:-2]
     synchronize_with_cache_loop(['AUDUSD'])
     synchronize_with_cache_loop(['AUDUSD', 'EURUSD'])
-    synchronize_with_cache_loop(['AUDUSD', 'EURUSD', 'GBPUSD'])
 
-    synchronize_with_cache_loop(currencies_majors_1)
-    synchronize_with_cache_loop(currencies_majors_2)
+    # synchronize_with_cache_loop(['AUDUSD', 'EURUSD', 'GBPUSD'])
+
+    # synchronize_with_cache_loop(currencies_majors_1)
+    # synchronize_with_cache_loop(currencies_majors_2)
 
 
 if __name__ == '__main__':
