@@ -195,7 +195,7 @@ def find_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tuple[str
     dir_name = get_bits_segment_from_symbols(symbols_to_sync)
     dir_path_target = f'{root_cache_dir}/{dir_name}'
 
-    # se o diretório já existe, então ele já contém os símbolos sincronizados. basta retornar esse diretório.
+    # se o diretório já existe. basta retornar esse diretório.
     if os.path.exists(dir_path_target):
         return dir_path_target, dir_path_target, symbols_to_sync[:], []
 
@@ -239,6 +239,23 @@ def get_symbols_filenames(symbols: list[str], timeframe: str):
     return _list
 
 
+def is_all_sync_cp_done(sync_files: list[str]) -> bool:
+    """
+    # verifique se todos os checkpoints indicam sincronização finalizada
+    :param sync_files:
+    :return:
+    """
+    _results_set = set()
+    for i in range(len(sync_files)):
+        _sync_status = get_sync_status(sync_files[i])
+        _results_set.add(_sync_status)
+
+    if len(_results_set) == 1 and list(_results_set)[0] is True:
+        return True
+    else:
+        return False
+
+
 def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
     if not symbols_to_sync:
         return synchronize()
@@ -252,14 +269,25 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
     list_sync_files = get_list_sync_files('.')
     _len_list_sync_files = len(list_sync_files)
 
+    sync_in_progress = False
+    dir_cache_target, dir_cache_subset, _present, _missing = find_cache_dir(symbols_to_sync, root_cache_dir)
+
     if _len_list_sync_files == 0:
         reset_dir(temp_dir)
     elif _len_list_sync_files == 1:
-        # se houver algum arquivo de checkpoint de um sincronização finalizada, pode deletar.
-        _sync_status = get_sync_status(list_sync_files[0])
-        if _sync_status:
+        symbols_filenames = get_symbols_filenames(symbols_to_sync, timeframe)
+        copy_files(symbols_filenames, temp_dir, dir_cache_target)
+        if is_all_sync_cp_done(list_sync_files):
             remove_sync_cp_files(list_sync_files)
             reset_dir(temp_dir)
+            return True
+        else:
+            sync_in_progress = True
+    else:
+        symbols_filenames = get_symbols_filenames(symbols_to_sync, timeframe)
+        copy_files(symbols_filenames, temp_dir, dir_cache_target)
+        if not is_all_sync_cp_done(list_sync_files):
+            sync_in_progress = True
 
     if symbols_to_sync:
         print(f'\nsincronizando os símbolos: {symbols_to_sync}')
@@ -294,7 +322,7 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
                 copy_files(symbols_filenames, csv_o_dir, dir_cache_target)
                 copy_files(symbols_filenames, csv_o_dir, temp_dir)
             else:
-                if _len_list_sync_files <= 1:
+                if _len_list_sync_files <= 1 and not sync_in_progress:
                     # para evitar uma nova sincronização sobre símbolos já sincronizados.
                     return True
     else:
@@ -333,13 +361,11 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
     else:
         print('pode haver sincronização em andamento.')
         print(f'checkpoints: {list_sync_files}')
-        # verifique se todos os checkpoints indicam sincronização finalizada
-        _results_set = set()
-        for i in range(len(list_sync_files)):
-            _sync_status = get_sync_status(list_sync_files[i])
-            _results_set.add(_sync_status)
 
-        if len(_results_set) == 1 and list(_results_set)[0] is True:
+        # verifique se todos os checkpoints indicam sincronização finalizada
+        all_sync_cp_done = is_all_sync_cp_done(list_sync_files)
+
+        if all_sync_cp_done:
             print('TODOS os checkpoints indicam que suas sincronizações estão FINALIZADAS')
             # assume-se que sempre há um número de processos/num_sync_cp_files que seja uma potência de 2
             # pois será feita uma fusão de cada 2 conjuntos de símbolos de modo que na próxima sincronização
@@ -457,10 +483,10 @@ def test_04():
     currencies_majors_2 = currencies_majors_1[:]
 
     currencies_majors_1 = currencies_majors_1[0:-2]
-    synchronize_with_cache_loop(['AUDUSD'])
-    synchronize_with_cache_loop(['AUDUSD', 'EURUSD'])
+    # synchronize_with_cache_loop(['AUDUSD'])
+    synchronize_with_cache_loop(['AUDUSD', 'XAUUSD'])
 
-    # synchronize_with_cache_loop(['AUDUSD', 'EURUSD', 'GBPUSD'])
+    # synchronize_with_cache_loop(['AUDUSD', 'XAUUSD', 'GBPUSD'])
 
     # synchronize_with_cache_loop(currencies_majors_1)
     # synchronize_with_cache_loop(currencies_majors_2)
