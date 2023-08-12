@@ -168,7 +168,22 @@ def get_bits_segment_from_symbols(symbols: list[str]) -> str:
     return ''.join(_list)
 
 
-def find_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tuple[str, str, list, list]:
+def find_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> str:
+    if not os.path.exists(root_cache_dir):
+        print(f'o diretório {root_cache_dir} não existe. será criado.')
+        os.mkdir(root_cache_dir)
+
+    dir_name = get_bits_segment_from_symbols(symbols_to_sync)
+    dir_path_target = f'{root_cache_dir}/{dir_name}'
+
+    # se o diretório já existe. basta retornar esse diretório.
+    if os.path.exists(dir_path_target):
+        return dir_path_target
+
+    return dir_path_target
+
+
+def reuse_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> tuple[str, str, list, list]:
     """
     Os diretório de símbolos sincronizados dentro do cache possuem nomes que indicam quais são os símbolos que estão
     sincronizados. O nome é um padrão de bits.
@@ -270,7 +285,7 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
     _len_list_sync_files = len(list_sync_files)
 
     sync_in_progress = False
-    dir_cache_target, dir_cache_subset, _present, _missing = find_cache_dir(symbols_to_sync, root_cache_dir)
+    dir_cache_target = find_cache_dir(symbols_to_sync, root_cache_dir)
 
     if _len_list_sync_files == 0:
         reset_dir(temp_dir)
@@ -297,7 +312,7 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
             return True
         elif _len_symbols_to_sync == 1:
             print('Há apenas 1 símbolo. Portanto, considera-se que o símbolo já está sincronizado.')
-            dir_cache_target, dir_cache_subset, _present, _missing = find_cache_dir(symbols_to_sync, root_cache_dir)
+            dir_cache_target, dir_cache_subset, _present, _missing = reuse_cache_dir(symbols_to_sync, root_cache_dir)
             if len(_present) > 0:
                 print(f'o símbolo {_present} já está no cache e será aproveitado.')
                 symbols_filenames = get_symbols_filenames(_present, timeframe)
@@ -309,7 +324,7 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
                 copy_files(symbols_filenames, dir_cache_target, temp_dir)
             return True
         else:
-            dir_cache_target, dir_cache_subset, _present, _missing = find_cache_dir(symbols_to_sync, root_cache_dir)
+            dir_cache_target, dir_cache_subset, _present, _missing = reuse_cache_dir(symbols_to_sync, root_cache_dir)
             if len(_present) > 0:
                 print(f'os símbolos {_present} já estão no cache e serão aproveitados.')
                 symbols_filenames = get_symbols_filenames(_present, timeframe)
@@ -484,9 +499,9 @@ def test_04():
 
     currencies_majors_1 = currencies_majors_1[0:-2]
     # synchronize_with_cache_loop(['AUDUSD'])
-    synchronize_with_cache_loop(['AUDUSD', 'XAUUSD'])
+    # synchronize_with_cache_loop(['AUDUSD', 'XAUUSD'])
 
-    # synchronize_with_cache_loop(['AUDUSD', 'XAUUSD', 'GBPUSD'])
+    synchronize_with_cache_loop(['AUDUSD', 'XAUUSD', 'GBPUSD'])
 
     # synchronize_with_cache_loop(currencies_majors_1)
     # synchronize_with_cache_loop(currencies_majors_2)
