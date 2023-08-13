@@ -294,7 +294,7 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
         copy_files(symbols_filenames, temp_dir, dir_cache_target)
         if is_all_sync_cp_done(list_sync_files):
             remove_sync_cp_files(list_sync_files)
-            reset_dir(temp_dir)
+            # reset_dir(temp_dir)
             return True
         else:
             sync_in_progress = True
@@ -494,9 +494,9 @@ def test_03():
 
 
 def test_04():
-    currencies_majors_1 = get_symbols('currencies_majors')
-    currencies_majors_2 = currencies_majors_1[:]
-    currencies_majors_1 = currencies_majors_1[0:-2]
+    # currencies_majors_1 = get_symbols('currencies_majors')
+    # currencies_majors_2 = currencies_majors_1[:]
+    # currencies_majors_1 = currencies_majors_1[0:-2]
 
     # synchronize_with_cache_loop(['AUDUSD'])
     # synchronize_with_cache_loop(['AUDUSD', 'XAUUSD'])
