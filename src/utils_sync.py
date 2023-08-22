@@ -2,9 +2,14 @@ import os
 import json
 
 
-def get_sync_status(_filename: str):
-    if os.path.exists(_filename):
-        with open(_filename, 'r') as file:
+def get_sync_status(filename: str, directory: str = None):
+    if directory:
+        filepath = f'{directory}/{filename}'
+    else:
+        filepath = filename
+
+    if os.path.exists(filepath):
+        with open(filepath, 'r') as file:
             cp = json.load(file)
         finished = cp['finished']
         return finished

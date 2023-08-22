@@ -168,17 +168,13 @@ def get_bits_segment_from_symbols(symbols: list[str]) -> str:
     return ''.join(_list)
 
 
-def find_cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> str:
+def cache_dir(symbols_to_sync: list[str], root_cache_dir: str) -> str:
     if not os.path.exists(root_cache_dir):
         print(f'o diretório {root_cache_dir} não existe. será criado.')
         os.mkdir(root_cache_dir)
 
     dir_name = get_bits_segment_from_symbols(symbols_to_sync)
     dir_path_target = f'{root_cache_dir}/{dir_name}'
-
-    # se o diretório já existe. basta retornar esse diretório.
-    if os.path.exists(dir_path_target):
-        return dir_path_target
 
     return dir_path_target
 
@@ -254,15 +250,16 @@ def get_symbols_filenames(symbols: list[str], timeframe: str):
     return _list
 
 
-def is_all_sync_cp_done(sync_files: list[str]) -> bool:
+def is_all_sync_cp_done(sync_files: list[str], directory: str = None) -> bool:
     """
     # verifique se todos os checkpoints indicam sincronização finalizada
+    :param directory:
     :param sync_files:
     :return:
     """
     _results_set = set()
     for i in range(len(sync_files)):
-        _sync_status = get_sync_status(sync_files[i])
+        _sync_status = get_sync_status(sync_files[i], directory)
         _results_set.add(_sync_status)
 
     if len(_results_set) == 1 and list(_results_set)[0] is True:
@@ -285,7 +282,7 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
     _len_list_sync_files = len(list_sync_files)
 
     sync_in_progress = False
-    dir_cache_target = find_cache_dir(symbols_to_sync, root_cache_dir)
+    dir_cache_target = cache_dir(symbols_to_sync, root_cache_dir)
 
     if _len_list_sync_files == 0:
         reset_dir(temp_dir)
@@ -293,8 +290,10 @@ def synchronize_with_cache(symbols_to_sync: list[str] = None) -> bool:
         symbols_filenames = get_symbols_filenames(symbols_to_sync, timeframe)
         copy_files(symbols_filenames, temp_dir, dir_cache_target)
         if is_all_sync_cp_done(list_sync_files):
-            remove_sync_cp_files(list_sync_files)
-            # reset_dir(temp_dir)
+            # remove_sync_cp_files(list_sync_files)
+            filename = list_sync_files[0]
+            dst = f'{dir_cache_target}/{filename}'
+            shutil.move(filename, dst)
             return True
         else:
             sync_in_progress = True
@@ -466,6 +465,34 @@ def test_01():
 
 
 def synchronize_with_cache_loop(symbols: list[str] = None):
+    settings = read_json('settings.json')
+    temp_dir = settings['temp_dir']
+    root_cache_dir = settings['root_cache_dir']
+    timeframe = settings['timeframe']
+
+    reset_dir(temp_dir)
+
+    # antes de sincronizar, delete todos os arquivos de sincronização.
+    list_sync_files = get_list_sync_files('.')
+    _len_list_sync_files = len(list_sync_files)
+    if _len_list_sync_files > 0:
+        remove_sync_cp_files(list_sync_files)
+
+    # caso o diretório alvo exista, mas não esteja completamente sincronizado, ele deve ser deletado,
+    # e a sincronização iniciará do zero.
+    # caso o diretório alvo exista e o arquivo de sincronização indique que está finalizado, então basta copiar
+    # os arquivos para temp e terminar.
+    dir_cache_target = cache_dir(symbols, root_cache_dir)
+    if os.path.exists(dir_cache_target):
+        list_sync_files = get_list_sync_files(dir_cache_target)
+        if is_all_sync_cp_done(list_sync_files, dir_cache_target):
+            print(f'os símbolos {symbols} já estão presentes no cache.')
+            symbols_filenames = get_symbols_filenames(symbols, timeframe)
+            copy_files(symbols_filenames, dir_cache_target, temp_dir)
+            return
+        else:
+            shutil.rmtree(dir_cache_target)
+
     ret = False
     while not ret:
         ret = synchronize_with_cache(symbols)
