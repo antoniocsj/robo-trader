@@ -142,7 +142,7 @@ def evaluate(ind):
     print(params)
 
     loss = train_model_param(settings, hist, params)
-    print(loss)
+    print(f'loss = {loss}')
 
     # time.sleep(30)
     # loss = sum(ind)
