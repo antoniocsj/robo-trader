@@ -73,7 +73,7 @@ def train_model_param(settings: dict, hist: HistMulti, params: dict) -> float:
 
     model.compile(optimizer='adam', loss='mse')
 
-    callbacks = [EarlyStopping(monitor='val_loss', patience=patience, verbose=0)]
+    callbacks = [EarlyStopping(monitor='val_loss', patience=patience, verbose=1)]
     model.fit(X_train, y_train, epochs=max_n_epochs, verbose=1, validation_split=validation_split,
               callbacks=callbacks)
 
