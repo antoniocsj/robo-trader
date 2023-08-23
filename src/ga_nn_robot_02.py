@@ -29,7 +29,7 @@ from Synchronizer import synchronize_with_cache_loop
 from setups import setup_directory_01
 
 
-individual_size = 81
+individual_size = 87
 
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -52,8 +52,7 @@ temp_dir = settings['temp_dir']
 timeframe = settings['timeframe']
 candle_input_type = settings['candle_input_type']
 candle_output_type = settings['candle_output_type']
-symbol_out = settings['symbol_out']
-all_symbols = get_symbols()
+# symbol_out = settings['symbol_out']
 
 
 def make_layers_config(max_n_layers: int,
@@ -124,11 +123,30 @@ def individual_to_hyperparameters(ind):
 
     layers_config = make_layers_config(max_n_layers, n_bits_per_layer, layers_bit_start, ind)
 
+    all_symbols = get_symbols()
+
+    symbol_out_bit_start = layers_bit_end
+    symbol_out_bits_len = 6
+    symbol_out_bit_end = symbol_out_bit_start + symbol_out_bits_len
+    symbol_out = get_symbolout_from_bits_segment(ind[symbol_out_bit_start:symbol_out_bit_end], all_symbols)
+
+    symbols_bits_start = symbol_out_bit_end
+    symbols_bits_len = len(all_symbols)  # 45
+    symbols_bits_end = symbols_bits_start + symbols_bits_len
+    symbols = get_symbols_from_bits_segment(ind[symbols_bits_start:symbols_bits_end], all_symbols)
+
+    if len(symbols) == 0:
+        symbols = [symbol_out]
+
+    if symbol_out not in symbols:
+        symbols.append(symbol_out)
+        symbols = sorted(symbols)
+
     params = {
         'n_steps': n_steps,
         'layers_config': layers_config,
         'symbol_out': symbol_out,
-        'symbols': all_symbols
+        'symbols': symbols
     }
 
     return params
@@ -138,7 +156,9 @@ def evaluate(ind):
     params = individual_to_hyperparameters(ind)
     print(params)
 
+    synchronize_with_cache_loop(params['symbols'])
     hist = HistMulti(temp_dir, timeframe)
+
     setup_directory_01()
 
     loss = train_model_param(settings, hist, params)
