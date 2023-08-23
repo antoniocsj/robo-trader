@@ -26,6 +26,7 @@ from utils_filesystem import read_json
 from utils_symbols import get_symbols
 from HistMulti import HistMulti
 from Synchronizer import synchronize_with_cache_loop
+from setups import setup_directory_01
 
 
 individual_size = 81
@@ -158,6 +159,8 @@ def evaluate(ind):
 
     synchronize_with_cache_loop(params['symbols'])
     hist = HistMulti(temp_dir, timeframe)
+
+    setup_directory_01()
 
     loss = train_model_param(settings, hist, params)
     print(loss)
