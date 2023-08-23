@@ -267,6 +267,10 @@ def predict_next_candle(data: dict):
     output_denorm = denorm_output(output_norm, bias, candle_output_type, scaler)
     print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
 
+    if candle_output_type == 'OHLC' or candle_output_type == 'OHLCV':
+        dCO = output_denorm[3] - output_denorm[0]
+        print(f'C - O = {dCO}')
+
 
 def test_01():
     data = read_json('request_1.json')
