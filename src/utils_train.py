@@ -35,12 +35,13 @@ from utils_filesystem import read_json
 
 
 def train_model_param(settings: dict, hist: HistMulti, params: dict) -> float:
-    symbol_out = settings['symbol_out']
     candle_input_type = settings['candle_input_type']
     candle_output_type = settings['candle_output_type']
 
+    symbol_out = params['symbol_out']
     n_steps = params['n_steps']
     layers_config = params['layers_config']
+
     n_features = hist.calc_n_features(candle_input_type)
     n_inputs = n_steps * n_features
     max_n_epochs = n_inputs

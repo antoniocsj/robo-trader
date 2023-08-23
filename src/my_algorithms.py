@@ -186,6 +186,13 @@ def read_checkpoint(checkpoint: str):
     return cp
 
 
+def ask_to_user():
+    x = input('continuar? sim(s) não(n) <-- ')
+    x = x.lower()
+    if x != 's':
+        exit(0)
+
+
 def eaSimple_WithCP2(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpoint=None, freq=5,
                      halloffame=None, verbose=__debug__):
     if checkpoint and os.path.exists(checkpoint):
@@ -214,6 +221,7 @@ def eaSimple_WithCP2(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpo
                 fit = toolbox.evaluate(ind)
                 ind.fitness.values = fit
                 write_checkpoint(population, start_gen, halloffame, logbook)
+                ask_to_user()
 
     if halloffame is not None:
         halloffame.update(population)
@@ -245,6 +253,7 @@ def eaSimple_WithCP2(population, toolbox, cxpb, mutpb, ngen, stats=None, checkpo
                     fit = toolbox.evaluate(ind)
                     ind.fitness.values = fit
                     write_checkpoint(offspring, gen, halloffame, logbook)
+                    ask_to_user()
 
         # Update the hall of fame with the generated individuals
         if halloffame is not None:

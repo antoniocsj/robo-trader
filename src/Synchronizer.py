@@ -521,17 +521,17 @@ def test_03():
 
 
 def test_04():
-    # currencies_majors_1 = get_symbols('currencies_majors')
-    # currencies_majors_2 = currencies_majors_1[:]
-    # currencies_majors_1 = currencies_majors_1[0:-2]
+    currencies_majors_1 = get_symbols('currencies_majors')
+    currencies_majors_2 = currencies_majors_1[:]
+    currencies_majors_1 = currencies_majors_1[0:-2]
 
-    # synchronize_with_cache_loop(['AUDUSD'])
-    # synchronize_with_cache_loop(['AUDUSD', 'XAUUSD'])
-    # synchronize_with_cache_loop(['AUDUSD', 'XAUUSD', 'GBPUSD'])
+    synchronize_with_cache_loop(['AUDUSD'])
+    synchronize_with_cache_loop(['AUDUSD', 'XAUUSD'])
+    synchronize_with_cache_loop(['AUDUSD', 'XAUUSD', 'GBPUSD'])
     synchronize_with_cache_loop(['AUDUSD', 'XAUUSD', 'GBPUSD', 'EURCHF'])
 
-    # synchronize_with_cache_loop(currencies_majors_1)
-    # synchronize_with_cache_loop(currencies_majors_2)
+    synchronize_with_cache_loop(currencies_majors_1)
+    synchronize_with_cache_loop(currencies_majors_2)
 
 
 if __name__ == '__main__':

@@ -25,9 +25,10 @@ from utils_train import train_model_param
 from utils_filesystem import read_json
 from utils_symbols import get_symbols
 from HistMulti import HistMulti
+from Synchronizer import synchronize_with_cache_loop
 
 
-individual_size = 87
+individual_size = 81
 
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -50,9 +51,7 @@ temp_dir = settings['temp_dir']
 timeframe = settings['timeframe']
 candle_input_type = settings['candle_input_type']
 candle_output_type = settings['candle_output_type']
-
-hist = HistMulti(temp_dir, timeframe)
-n_features = hist.calc_n_features(candle_input_type)
+symbol_out = settings['symbol_out']
 
 
 def make_layers_config(max_n_layers: int,
@@ -125,18 +124,23 @@ def individual_to_hyperparameters(ind):
 
     all_symbols = get_symbols()
 
-    symbol_out_bit_start = layers_bit_end
-    symbol_out_bits_len = 6
-    symbol_out_bit_end = symbol_out_bit_start + symbol_out_bits_len
-    symbol_out = get_symbolout_from_bits_segment(ind[symbol_out_bit_start:symbol_out_bit_end], all_symbols)
+    # symbol_out_bit_start = layers_bit_end
+    # symbol_out_bits_len = 6
+    # symbol_out_bit_end = symbol_out_bit_start + symbol_out_bits_len
+    # symbol_out = get_symbolout_from_bits_segment(ind[symbol_out_bit_start:symbol_out_bit_end], all_symbols)
 
-    symbols_bits_start = symbol_out_bit_end
+    # symbols_bits_start = symbol_out_bit_end
+    symbols_bits_start = layers_bit_end
     symbols_bits_len = len(all_symbols)  # 45
     symbols_bits_end = symbols_bits_start + symbols_bits_len
     symbols = get_symbols_from_bits_segment(ind[symbols_bits_start:symbols_bits_end], all_symbols)
 
     if len(symbols) == 0:
         symbols = [symbol_out]
+
+    if symbol_out not in symbols:
+        symbols.append(symbol_out)
+        symbols = sorted(symbols)
 
     params = {
         'n_steps': n_steps,
@@ -151,10 +155,15 @@ def individual_to_hyperparameters(ind):
 def evaluate(ind):
     params = individual_to_hyperparameters(ind)
     print(params)
-    # loss = train_model_param(settings, hist, params)
-    # print(loss)
+
+    synchronize_with_cache_loop(params['symbols'])
+    hist = HistMulti(temp_dir, timeframe)
+
+    loss = train_model_param(settings, hist, params)
+    print(loss)
+
     # time.sleep(30)
-    loss = sum(ind)
+    # loss = sum(ind)
     return loss,
 
 
@@ -204,4 +213,5 @@ def main():
 
 
 if __name__ == "__main__":
+    show_tf()
     main()
