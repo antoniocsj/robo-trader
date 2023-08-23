@@ -9,9 +9,6 @@ from DirectorySynchronizationMultiProc import DirectorySynchronization, make_bac
 from utils_sync import *
 
 
-# synchronizer
-
-
 def synchronize() -> bool:
     setup = read_json('settings.json')
     temp_dir = setup['temp_dir']
@@ -535,4 +532,4 @@ def test_04():
 
 
 if __name__ == '__main__':
-    test_04()
+    synchronize_loop()
