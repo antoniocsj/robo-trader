@@ -29,7 +29,7 @@ from Synchronizer import synchronize_with_cache_loop
 from setups import setup_directory_01
 
 
-individual_size = 81
+individual_size = 36
 
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -138,8 +138,8 @@ def evaluate(ind):
     params = individual_to_hyperparameters(ind)
     print(params)
 
-    hist = HistMulti(temp_dir, timeframe)
     setup_directory_01()
+    hist = HistMulti(temp_dir, timeframe)
 
     loss = train_model_param(settings, hist, params)
     print(loss)
@@ -162,8 +162,6 @@ def show_tf():
 
 
 def main():
-    show_tf()
-
     random.seed(1)
     freq = 1
     mutpb = 0.2
@@ -195,5 +193,5 @@ def main():
 
 
 if __name__ == "__main__":
-    show_tf()
+    # show_tf()
     main()
