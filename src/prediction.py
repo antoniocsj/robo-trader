@@ -156,7 +156,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
     setup_code = settings['setup_code']
     setup_uses_differentiation = settings['setup_uses_differentiation']
 
-    train_configs = read_json('train_configs.json')
+    train_configs = read_json('train_config.json')
     print('train_configs:')
     print(f'{train_configs}')
 
@@ -250,8 +250,7 @@ def predict_next_candle(data: dict):
     timeframe = settings['timeframe']
     _symbol_tf = f'{symbol_out}_{timeframe}'
 
-    with open("train_configs.json", "r") as file:
-        train_configs = json.load(file)
+    train_config = read_json('train_config.json')
 
     with open('scalers.pkl', 'rb') as file:
         scalers = pickle.load(file)
@@ -261,8 +260,8 @@ def predict_next_candle(data: dict):
     model = load_model('model.h5')
     output_norm = model.predict(x_input)
 
-    bias = train_configs['bias']
-    candle_output_type = train_configs['candle_output_type']
+    bias = train_config['bias']
+    candle_output_type = train_config['candle_output_type']
     scaler = scalers[_symbol_tf]
 
     output_denorm = denorm_output(output_norm, bias, candle_output_type, scaler)
@@ -270,7 +269,7 @@ def predict_next_candle(data: dict):
 
 
 def test_01():
-    data = read_json('request_3.json')
+    data = read_json('request_1.json')
     predict_next_candle(data)
 
 
