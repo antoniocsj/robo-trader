@@ -55,6 +55,9 @@ candle_output_type = settings['candle_output_type']
 symbol_out = settings['symbol_out']
 all_symbols = get_symbols()
 
+# setup_directory_01()
+hist = HistMulti(temp_dir, timeframe)
+
 
 def make_layers_config(max_n_layers: int,
                        n_bits_per_layer: int,
@@ -137,9 +140,6 @@ def individual_to_hyperparameters(ind):
 def evaluate(ind):
     params = individual_to_hyperparameters(ind)
     print(params)
-
-    setup_directory_01()
-    hist = HistMulti(temp_dir, timeframe)
 
     loss = train_model_param(settings, hist, params)
     print(loss)
