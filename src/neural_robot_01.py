@@ -97,6 +97,7 @@ def train_model():
     model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
     model.add(Flatten())
     model.add(Dense(n_inputs, activation='relu'))
+    model.add(Dense(n_inputs, activation='relu'))
     model.add(Dense(len(candle_output_type), activation='relu'))
     model.compile(optimizer='adam', loss='mse')
     model_config = model.get_config()
