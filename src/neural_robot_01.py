@@ -66,7 +66,7 @@ def train_model():
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 2
+    n_steps = 8
     n_samples_train = 72000  # 30000-M10, 60000-M5 Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
@@ -96,6 +96,8 @@ def train_model():
     model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
     model.add(Flatten())
+    model.add(Dense(n_inputs, activation='relu'))
+    model.add(Dense(n_inputs, activation='relu'))
     model.add(Dense(n_inputs, activation='relu'))
     model.add(Dense(n_inputs, activation='relu'))
     model.add(Dense(len(candle_output_type), activation='relu'))
