@@ -66,11 +66,10 @@ def train_model():
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 8
+    n_steps = 3
     n_samples_train = 72000  # 30000-M10, 60000-M5 Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
-
     # horizontally stack columns
     dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
 
