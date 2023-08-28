@@ -115,7 +115,7 @@ def normalize_directory(directory: str):
     scalers = {}
 
     for _symbol in hist.symbols:
-        print(_symbol)
+        # print(_symbol)
         _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
 
         arr: ndarray = hist.arr[_symbol_timeframe]
@@ -146,7 +146,7 @@ def normalize_symbols(hist: HistMulti, scalers: dict, symbols: list[str] = None)
         if symbols and symbol not in symbols:
             continue
 
-        print(symbol)
+        # print(symbol)
         _symbol_timeframe = f'{symbol}_{hist.timeframe}'
 
         arr: ndarray = hist.arr[_symbol_timeframe]
@@ -180,7 +180,7 @@ def differentiate_directory(directory: str):
     hist = HistMulti(directory, timeframe)
 
     for _symbol in hist.symbols:
-        print(_symbol)
+        # print(_symbol)
         _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
 
         arr = hist.arr[_symbol_timeframe]
@@ -203,7 +203,7 @@ def differentiate_files(filepath_list: list[str], directory: str):
     print(f'diferenciando alguns símbolos do diretório {directory}')
 
     for _filepath in filepath_list:
-        print(_filepath)
+        # print(_filepath)
         df: pd.DataFrame = pd.read_csv(_filepath, sep='\t')
         arr = df.to_numpy()
 
@@ -228,7 +228,7 @@ def differentiate_symbols(hist: HistMulti, symbols: list[str] = None):
         if symbols and symbol not in symbols:
             continue
 
-        print(symbol)
+        # print(symbol)
         _symbol_timeframe = f'{symbol}_{hist.timeframe}'
 
         arr = hist.arr[_symbol_timeframe]
@@ -277,7 +277,7 @@ def transform_directory(directory: str, transform_str: str):
     hist = HistMulti(directory, timeframe)
 
     for _symbol in hist.symbols:
-        print(_symbol)
+        # print(_symbol)
         _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
         arr = hist.arr[_symbol_timeframe]
         data = apply_transform_str(arr, transform_str)
@@ -300,7 +300,7 @@ def transform_directory_(directory: str, transform_str: str):
 
     if transform_str == '(C-O)*V':
         for _symbol in hist.symbols:
-            print(_symbol)
+            # print(_symbol)
             _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
             arr = hist.arr[_symbol_timeframe]
             data = (arr[:, 4] - arr[:, 1]) * arr[:, 5]
@@ -312,7 +312,7 @@ def transform_directory_(directory: str, transform_str: str):
             dataf.to_csv(_filepath, index=False, sep='\t')
     elif transform_str == 'C*V':
         for _symbol in hist.symbols:
-            print(_symbol)
+            # print(_symbol)
             _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
             arr = hist.arr[_symbol_timeframe]
             data = arr[:, 4] * arr[:, 5]
@@ -334,7 +334,7 @@ def transform_files(filepath_list: list[str], directory: str, transform_str: str
 
     if transform_str == '(C-O)*V':
         for _filepath in filepath_list:
-            print(_filepath)
+            # print(_filepath)
             df: pd.DataFrame = pd.read_csv(_filepath, sep='\t')
             arr = df.to_numpy()
             data = (arr[:, 4] - arr[:, 1]) * arr[:, 5]
@@ -357,7 +357,7 @@ def transform_symbols(hist: HistMulti, transform_str: str, symbols: list[str] = 
         if symbols and symbol not in symbols:
             continue
 
-        print(symbol)
+        # print(symbol)
         _symbol_timeframe = f'{symbol}_{hist.timeframe}'
 
         arr = hist.arr[_symbol_timeframe]

@@ -24,14 +24,14 @@ class Sheet:
 
         if isinstance(source, str):
             self.filepath = source
-            print(f'criando planilha para {symbol}_{timeframe} a partir do arquivo {self.filepath}')
+            # print(f'criando planilha para {symbol}_{timeframe} a partir do arquivo {self.filepath}')
             self.df: DataFrame = pd.read_csv(self.filepath, delimiter='\t')
         elif isinstance(source, list):
             self.rates: list[dict] = source
-            print(f'criando planilha para {symbol}_{timeframe} a partir de uma lista')
+            # print(f'criando planilha para {symbol}_{timeframe} a partir de uma lista')
             self.df: DataFrame = self.create_df_from_rates()
         elif isinstance(source, ndarray):
-            print(f'criando planilha para {symbol}_{timeframe} a partir de um ndarray')
+            # print(f'criando planilha para {symbol}_{timeframe} a partir de um ndarray')
             self.df: DataFrame = pd.DataFrame(source)
 
         if self.df.isnull().sum().values.sum() != 0:
