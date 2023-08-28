@@ -21,6 +21,7 @@ def make_prediction():
     n_symbols = data['n_symbols']
     rates_count = data['rates_count']
     start_pos = data['start_pos']
+
     print(f'timeframe = {timeframe}, n_symbols = {n_symbols}, '
           f'rates_count = {rates_count}, start_pos = {start_pos} ')
 
