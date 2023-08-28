@@ -9,9 +9,9 @@ app = Flask(__name__)
 
 @app.route('/', methods=['POST'])
 def make_prediction():
-    print('make_prediction()')
+    # print('make_prediction()')
     data = request.json
-    print(data)
+    # print(data)
 
     last_datetime = datetime.fromisoformat(data['last_datetime'])
     trade_server_datetime = datetime.fromisoformat(data['trade_server_datetime'])
