@@ -248,7 +248,13 @@ def calculate_model_bias():
     for i in range(len_X_):
         print(f'{100 * i / len_X_:.2f} %')
         x_input = X[i]
+
         x_input = x_input.reshape((1, n_steps, n_features))
+
+        # for MLP model only
+        n_input = x_input.shape[1] * x_input.shape[2]
+        x_input = x_input.reshape((x_input.shape[0], n_input))
+
         y_pred = model.predict(x_input)
         if len(y_pred[0]) == 1:
             diff = y[i] - y_pred[0][0]
@@ -502,8 +508,8 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    train_model()
-    # calculate_model_bias()
+    # train_model()
+    calculate_model_bias()
     # evaluate_model()
     # test_model_with_trader()
     # test_model_with_trader_interactive()
