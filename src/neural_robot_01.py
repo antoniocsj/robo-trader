@@ -66,9 +66,9 @@ def train_model():
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 1
-    n_samples_train = 72000  # 30000-M10, 60000-M5 Número de amostras usadas na fase de treinamento e validação
-    validation_split = 0.15
+    n_steps = 2
+    n_samples_train = 72000  # 30000-M10, 72000-M5 Número de amostras usadas na fase de treinamento e validação
+    validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
     # horizontally stack columns
     dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
@@ -80,8 +80,8 @@ def train_model():
     # features to expect for each input sample.
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
-    max_n_epochs = n_inputs
-    patience = int(max_n_epochs / 10)
+    max_n_epochs = n_inputs * 3 * 0 + 250
+    patience = int(max_n_epochs / 10) * 0 + 40
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')
@@ -92,15 +92,13 @@ def train_model():
 
     # define model
     model = Sequential()
-    model.add(Conv1D(filters=n_features, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(Conv1D(filters=1024, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
     model.add(Flatten())
-    model.add(Dense(n_inputs, activation='relu'))
-    model.add(Dense(n_inputs, activation='relu'))
-    model.add(Dense(n_inputs, activation='relu'))
-    model.add(Dense(n_inputs, activation='relu'))
-    model.add(Dense(n_inputs, activation='relu'))
-    model.add(Dense(len(candle_output_type), activation='relu'))
+    model.add(Dense(1024, activation='relu'))
+    model.add(Dense(1024, activation='relu'))
+    model.add(Dense(1024, activation='relu'))
+    model.add(Dense(len(candle_output_type)))
     model.compile(optimizer='adam', loss='mse')
     model_config = model.get_config()
 

@@ -848,4 +848,4 @@ def apply_setup_symbols(hist: HistMulti, code: int) -> HistMulti:
 
 
 if __name__ == '__main__':
-    setup_directory_09()
+    setup_directory_07()

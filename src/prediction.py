@@ -264,7 +264,25 @@ def predict_next_candle(data: dict):
     candle_output_type = train_config['candle_output_type']
     scaler = scalers[_symbol_tf]
 
+    print('considerando o bias(+):')
     output_denorm = denorm_output(output_norm, bias, candle_output_type, scaler)
+    print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
+
+    if candle_output_type == 'OHLC' or candle_output_type == 'OHLCV':
+        dCO = output_denorm[3] - output_denorm[0]
+        print(f'C - O = {dCO}')
+
+    print('considerando o bias(-):')
+    bias = (-np.array(bias)).tolist()
+    output_denorm = denorm_output(output_norm, bias, candle_output_type, scaler)
+    print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
+
+    if candle_output_type == 'OHLC' or candle_output_type == 'OHLCV':
+        dCO = output_denorm[3] - output_denorm[0]
+        print(f'C - O = {dCO}')
+
+    print('sem considerar o bias=0:')
+    output_denorm = denorm_output(output_norm, 0.0, candle_output_type, scaler)
     print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
 
     if candle_output_type == 'OHLC' or candle_output_type == 'OHLCV':
@@ -273,7 +291,7 @@ def predict_next_candle(data: dict):
 
 
 def test_01():
-    data = read_json('request_2.json')
+    data = read_json('request_6.json')
     predict_next_candle(data)
 
 
