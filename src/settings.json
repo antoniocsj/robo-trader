@@ -7,6 +7,6 @@
     "root_cache_dir": "../csv_s_cache",
     "candle_input_type": "OHLCV",
     "candle_output_type": "OHLCV",
-    "setup_code": 7,
+    "setup_code": 9,
     "setup_uses_differentiation": true
 }
