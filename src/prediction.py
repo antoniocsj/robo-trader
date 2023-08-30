@@ -239,6 +239,10 @@ def prepare_data_for_model(data: dict) -> ndarray:
     X = np.asarray(X).astype(np.float32)
     X = X.reshape((1, n_steps, n_features))
 
+    # for MLP model only
+    n_input = X.shape[1] * X.shape[2]
+    X = X.reshape((X.shape[0], n_input))
+
     return X
 
 

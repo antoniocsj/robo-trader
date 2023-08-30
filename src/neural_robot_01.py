@@ -5,12 +5,15 @@ os.environ['TF_CUDNN_DETERMINISM'] = str(1)
 os.environ['TF_DETERMINISTIC_OPS'] = str(1)
 
 import numpy as np
+
 np.random.seed(1)
 
 import random
+
 random.seed(1)
 
 import tensorflow as tf
+
 tf.random.set_seed(1)
 tf.keras.utils.set_random_seed(1)
 
@@ -80,8 +83,8 @@ def train_model():
     # features to expect for each input sample.
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
-    max_n_epochs = n_inputs * 3 * 0 + 250
-    patience = int(max_n_epochs / 10) * 0 + 40
+    max_n_epochs = n_inputs * 3 * 0 + 300
+    patience = int(max_n_epochs / 10) * 0 + 50
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')
@@ -90,14 +93,25 @@ def train_model():
           f'n_samples_train = {n_samples_train}, validation_split = {validation_split}, '
           f'max_n_epochs = {max_n_epochs}, patience = {patience}')
 
-    # define model
     model = Sequential()
-    model.add(Conv1D(filters=1024, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
-    model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
-    model.add(Flatten())
+
+    # define cnn model
+    # model.add(Conv1D(filters=1024, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
+    # model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
+    # model.add(Flatten())
+    # model.add(Dense(1024, activation='relu'))
+    # model.add(Dense(1024, activation='relu'))
+    # model.add(Dense(1024, activation='relu'))
+    # model.add(Dense(1024, activation='relu'))
+
+    # define MLP model
+    n_input = X_train.shape[1] * X_train.shape[2]
+    X_train = X_train.reshape((X_train.shape[0], n_input))
+    model.add(Dense(1024, activation='relu', input_dim=n_input))
     model.add(Dense(1024, activation='relu'))
     model.add(Dense(1024, activation='relu'))
     model.add(Dense(1024, activation='relu'))
+
     model.add(Dense(len(candle_output_type)))
     model.compile(optimizer='adam', loss='mse')
     model_config = model.get_config()
@@ -130,6 +144,10 @@ def train_model():
                                        candle_output_type)
 
     X_test, y_test = split_sequences2(dataset_test, n_steps, candle_output_type)
+
+    # for MLP model only
+    n_input = X_test.shape[1] * X_test.shape[2]
+    X_test = X_test.reshape((X_test.shape[0], n_input))
 
     saved_model = load_model('model.h5')
     test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)
