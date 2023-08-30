@@ -272,17 +272,17 @@ def predict_next_candle(data: dict):
         dCO = output_denorm[3] - output_denorm[0]
         print(f'C - O = {dCO}')
 
-    print('considerando o bias(-):')
-    bias = (-np.array(bias)).tolist()
-    output_denorm = denorm_output(output_norm, bias, candle_output_type, scaler)
+    print('considerando o bias=0:')
+    output_denorm = denorm_output(output_norm, 0.0, candle_output_type, scaler)
     print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
 
     if candle_output_type == 'OHLC' or candle_output_type == 'OHLCV':
         dCO = output_denorm[3] - output_denorm[0]
         print(f'C - O = {dCO}')
 
-    print('sem considerar o bias=0:')
-    output_denorm = denorm_output(output_norm, 0.0, candle_output_type, scaler)
+    print('considerando o bias(-):')
+    bias = (-np.array(bias)).tolist()
+    output_denorm = denorm_output(output_norm, bias, candle_output_type, scaler)
     print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
 
     if candle_output_type == 'OHLC' or candle_output_type == 'OHLCV':
