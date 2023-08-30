@@ -69,7 +69,7 @@ def train_model():
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 1
+    n_steps = 2
     n_samples_train = 72000  # 30000-M10, 72000-M5 Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
@@ -84,7 +84,7 @@ def train_model():
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
     max_n_epochs = n_inputs * 3 * 0 + 300
-    patience = int(max_n_epochs / 10) * 0 + 50
+    patience = int(max_n_epochs / 10) * 0 + 40
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')
@@ -107,10 +107,8 @@ def train_model():
     # define MLP model
     n_input = X_train.shape[1] * X_train.shape[2]
     X_train = X_train.reshape((X_train.shape[0], n_input))
-    model.add(Dense(1024, activation='relu', input_dim=n_input))
-    model.add(Dense(1024, activation='relu'))
-    model.add(Dense(1024, activation='relu'))
-    model.add(Dense(1024, activation='relu'))
+    model.add(Dense(50, activation='sigmoid', input_dim=n_input))
+    model.add(Dense(50, activation='sigmoid'))
 
     model.add(Dense(len(candle_output_type)))
     model.compile(optimizer='adam', loss='mse')
