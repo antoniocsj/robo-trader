@@ -270,28 +270,40 @@ def predict_next_candle(data: dict):
 
     print('considerando o bias(+):')
     output_denorm = denorm_output(output_norm, bias, candle_output_type, scaler)
-    print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
+    # print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
+    if len(candle_output_type) == 1:
+        print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm:.5f}')
+    else:
+        print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
 
     if candle_output_type == 'OHLC' or candle_output_type == 'OHLCV':
         dCO = output_denorm[3] - output_denorm[0]
-        print(f'C - O = {dCO}')
+        print(f'C - O = {dCO:.5f}')
 
     print('considerando o bias=0:')
     output_denorm = denorm_output(output_norm, 0.0, candle_output_type, scaler)
-    print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
+    # print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
+    if len(candle_output_type) == 1:
+        print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm:.5f}')
+    else:
+        print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
 
     if candle_output_type == 'OHLC' or candle_output_type == 'OHLCV':
         dCO = output_denorm[3] - output_denorm[0]
-        print(f'C - O = {dCO}')
+        print(f'C - O = {dCO:.5f}')
 
     print('considerando o bias(-):')
     bias = (-np.array(bias)).tolist()
     output_denorm = denorm_output(output_norm, bias, candle_output_type, scaler)
-    print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
+    # print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
+    if len(candle_output_type) == 1:
+        print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm:.5f}')
+    else:
+        print(f'previsão para a próxima vela: {candle_output_type} = {output_denorm}')
 
     if candle_output_type == 'OHLC' or candle_output_type == 'OHLCV':
         dCO = output_denorm[3] - output_denorm[0]
-        print(f'C - O = {dCO}')
+        print(f'C - O = {dCO:.5f}')
 
 
 def test_01():
