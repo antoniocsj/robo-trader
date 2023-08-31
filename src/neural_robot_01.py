@@ -69,7 +69,7 @@ def train_model():
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 4
+    n_steps = 8
     n_samples_train = 72000  # 30000-M10, 72000-M5 Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
@@ -506,8 +506,8 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    train_model()
-    # calculate_model_bias()
+    # train_model()
+    calculate_model_bias()
     # evaluate_model()
     # test_model_with_trader()
     # test_model_with_trader_interactive()
