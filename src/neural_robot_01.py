@@ -84,31 +84,31 @@ def train_model():
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
     max_n_epochs = n_inputs * 3 * 0 + 300
-    patience = int(max_n_epochs / 10) * 0 + 40
+    patience = int(max_n_epochs / 10) * 0 + 30
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')
-    print(f'n_symbols = {n_symbols}, n_features (n_cols) = {n_features}, n_steps = {n_steps}, '
-          f'tipo_vela_entrada = {candle_input_type}, tipo_vela_saída = {candle_output_type}, \n'
+    print(f'n_symbols = {n_symbols}, n_features (n_cols) = {n_features}, n_steps = {n_steps}, n_inputs = {n_inputs}, '
+          f'\ntipo_vela_entrada = {candle_input_type}, tipo_vela_saída = {candle_output_type}, \n'
           f'n_samples_train = {n_samples_train}, validation_split = {validation_split}, '
           f'max_n_epochs = {max_n_epochs}, patience = {patience}')
 
     model = Sequential()
 
     # define cnn model
-    # model.add(Conv1D(filters=1024, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
-    # model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
-    # model.add(Flatten())
-    # model.add(Dense(1024, activation='relu'))
-    # model.add(Dense(1024, activation='relu'))
-    # model.add(Dense(1024, activation='relu'))
-    # model.add(Dense(1024, activation='relu'))
+    model.add(Conv1D(filters=n_inputs, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
+    model.add(Flatten())
+    model.add(Dense(n_inputs, activation='relu'))
+    model.add(Dense(n_inputs, activation='relu'))
+    model.add(Dense(n_inputs, activation='relu'))
+    model.add(Dense(n_inputs, activation='relu'))
 
     # define MLP model
-    n_input = X_train.shape[1] * X_train.shape[2]
-    X_train = X_train.reshape((X_train.shape[0], n_input))
-    model.add(Dense(50, activation='sigmoid', input_dim=n_input))
-    model.add(Dense(50, activation='sigmoid'))
+    # n_input = X_train.shape[1] * X_train.shape[2]
+    # X_train = X_train.reshape((X_train.shape[0], n_input))
+    # model.add(Dense(n_inputs, activation='relu', input_dim=n_input))
+    # model.add(Dense(n_inputs, activation='relu'))
 
     model.add(Dense(len(candle_output_type)))
     model.compile(optimizer='adam', loss='mse')
@@ -144,8 +144,8 @@ def train_model():
     X_test, y_test = split_sequences2(dataset_test, n_steps, candle_output_type)
 
     # for MLP model only
-    n_input = X_test.shape[1] * X_test.shape[2]
-    X_test = X_test.reshape((X_test.shape[0], n_input))
+    # n_input = X_test.shape[1] * X_test.shape[2]
+    # X_test = X_test.reshape((X_test.shape[0], n_input))
 
     saved_model = load_model('model.h5')
     test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)
@@ -250,8 +250,8 @@ def calculate_model_bias():
         x_input = x_input.reshape((1, n_steps, n_features))
 
         # for MLP model only
-        n_input = x_input.shape[1] * x_input.shape[2]
-        x_input = x_input.reshape((x_input.shape[0], n_input))
+        # n_input = x_input.shape[1] * x_input.shape[2]
+        # x_input = x_input.reshape((x_input.shape[0], n_input))
 
         y_pred = model.predict(x_input)
         if len(y_pred[0]) == 1:
@@ -259,7 +259,7 @@ def calculate_model_bias():
         else:
             diff = y[i] - y_pred[0]
         diffs.append(diff)
-        if i % 3000 == 0 and i > 0:
+        if i % 4000 == 0 and i > 0:
             _t = 60
             print(f'esperando {_t} segundos para continuar')
             time.sleep(_t)
