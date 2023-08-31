@@ -295,7 +295,7 @@ def predict_next_candle(data: dict):
 
 
 def test_01():
-    data = read_json('request_6.json')
+    data = read_json('request_1.json')
     predict_next_candle(data)
 
 
