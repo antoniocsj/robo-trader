@@ -1,4 +1,5 @@
 import json
+import os.path
 import pickle
 import numpy as np
 from numpy import ndarray
@@ -10,6 +11,7 @@ from utils_symbols import search_symbols_in_dict
 from utils_nn import prepare_data_for_prediction
 from utils_ops import denorm_output
 from setups import apply_setup_symbols
+from keras.models import load_model
 
 
 class SymbolsPreparation:
@@ -247,8 +249,6 @@ def prepare_data_for_model(data: dict) -> ndarray:
 
 
 def predict_next_candle(data: dict):
-    from keras.models import load_model
-
     settings = read_json('settings.json')
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
