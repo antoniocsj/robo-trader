@@ -86,16 +86,21 @@ class SymbolsPreparation:
         print(f'server_datetime = {self.server_datetime}')
 
         # verificar quais símbolos estão (ou não) operando
-        _who_is_trading = []
+        who_is_trading = []
         for s in list(self.sheets.values()):
             self.check_is_trading(s)
-            print(f'{s.symbol} is trading: {s.is_trading}')
+            # print(f'{s.symbol} is trading: {s.is_trading}')
             if s.is_trading:
-                _who_is_trading.append(s.symbol)
+                who_is_trading.append(s.symbol)
 
-        if len(_who_is_trading) == 0:
+        if len(who_is_trading) == 0:
             print('nenhum símbolo está operando agora.')
             exit(-1)
+
+        if len(who_is_trading) == len(self.symbols):
+            print('TODOS os símbolos estão operando.')
+        else:
+            print('NEM Todos os símbolos estão operando.')
 
         for k in self.sheets:
             s = self.sheets[k]
@@ -161,6 +166,9 @@ def prepare_data_for_model(data: dict) -> ndarray:
     train_configs = read_json('train_config.json')
     print('train_configs:')
     print(f'{train_configs}')
+
+    with open('scalers.pkl', 'rb') as file:
+        scalers = pickle.load(file)
 
     n_steps = train_configs['n_steps']
     n_features = train_configs['n_features']
@@ -231,7 +239,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
     symb_sync = SymbolsPreparation(symbols_rates, timeframe, trade_server_datetime, num_candles)
     symb_sync.prepare_symbols()
     hist = HistMulti(symb_sync.sheets, timeframe)
-    hist2 = apply_setup_symbols(hist, setup_code)
+    hist2 = apply_setup_symbols(hist, setup_code, settings, scalers)
 
     if hist2.symbols != symbols_used_in_training:
         print(f'ERRO. hist2.symbols != symbols_used_in_training.')
@@ -307,7 +315,7 @@ def predict_next_candle(data: dict):
 
 
 def test_01():
-    data = read_json('request_1.json')
+    data = read_json('request_2.json')
     predict_next_candle(data)
 
 
