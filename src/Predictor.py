@@ -198,9 +198,14 @@ class Predictor:
 def teste_01():
     data = read_json('request_2.json')
 
-    predictor = Predictor(1)
-    predictor.calc_output(data)
-    predictor.show_output()
+    predictor1 = Predictor(1)
+    predictor2 = Predictor(2)
+
+    predictor1.calc_output(data)
+    predictor2.calc_output(data)
+
+    predictor1.show_output()
+    predictor2.show_output()
     pass
 
 
