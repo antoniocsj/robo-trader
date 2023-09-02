@@ -1,7 +1,7 @@
 from flask import Flask, request
 from datetime import datetime
 from utils_filesystem import write_json, read_json
-from Predictor import Predictor
+from Predictors import Predictors
 
 
 app = Flask(__name__)
@@ -30,14 +30,9 @@ def make_prediction():
 
     data = read_json('request_2.json')
 
-    predictor_1 = Predictor(1)
-    predictor_1.calc_output(data)
-
-    predictor_2 = Predictor(2)
-    predictor_2.calc_output(data)
-
-    predictor_1.show_output()
-    predictor_2.show_output()
+    p = Predictors('../predictors')
+    p.calculate_outputs(data)
+    p.show_outputs()
 
     return "OK"
 
