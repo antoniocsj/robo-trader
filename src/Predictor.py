@@ -14,18 +14,18 @@ from prediction import SymbolsPreparation
 
 
 class Predictor:
-    def __init__(self):
-        self.id = 0
+    def __init__(self, index: int):
+        self.id = index
         self.settings = None
         self.train_config = None
         self.scalers = None
         self.model = None
         self.output = None
 
-    def load(self, index: int):
-        self.id = index
+        self.load()
 
-        directory = f'../predictors/{index:02d}'
+    def load(self):
+        directory = f'../predictors/{self.id:02d}'
         if not os.path.exists(directory):
             print(f'ERRO. o diretório {directory} não existe.')
             exit(-1)
@@ -198,8 +198,7 @@ class Predictor:
 def teste_01():
     data = read_json('request_2.json')
 
-    predictor = Predictor()
-    predictor.load(1)
+    predictor = Predictor(1)
     predictor.calc_output(data)
     predictor.show_output()
     pass
