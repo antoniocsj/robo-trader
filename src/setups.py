@@ -47,6 +47,18 @@ def check_base_ok():
         print(f'o diretório csv_s não foi encontrado.')
         return False
 
+    symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
+    if len(symbols_names) == 0:
+        print(f'ERRO. nenhum símbolo foi encontrado no diretório {csv_s_dir}')
+        return False
+    elif len(symbols_names) == 1:
+        if symbols_names[0] == symbol_out:
+            print(f'apenas o símbolo {symbol_out} será usado.')
+            return True
+        else:
+            print(f'o símbolo {symbol_out} não foi encontrado no diretório {csv_s_dir}')
+            return False
+
     _sync_files = []
     _sync_files = get_list_sync_files(csv_s_dir)
     if len(_sync_files) == 0:
@@ -66,7 +78,7 @@ def check_base_ok():
     print(sync_cp)
     if sync_cp['finished']:
         symbols_to_sync = sync_cp['symbols_to_sync']
-        symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
+        # symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
         if not symbols_names == symbols_to_sync:
             print(f'ERRO. os símbolos encontrados em {csv_s_dir} não coincidem com a lista dos símbolos '
                   f'sincronizados presente no arquivo {_sync_files[0]}')
