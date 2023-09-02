@@ -18,17 +18,17 @@ class NpEncoder(json.JSONEncoder):
         return super(NpEncoder, self).default(obj)
 
 
-def write_json(_filename: str, _dict: dict):
-    with open(_filename, 'w') as file:
+def write_json(filename: str, _dict: dict):
+    with open(filename, 'w') as file:
         json.dump(_dict, file, indent=4)
 
 
-def read_json(_filename: str) -> dict:
-    if os.path.exists(_filename):
-        with open(_filename, 'r') as file:
+def read_json(filename: str) -> dict:
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
             _dict = json.load(file)
     else:
-        print(f'ERRO. O arquivo {_filename} não foi encontrado.')
+        print(f'ERRO. O arquivo {filename} não foi encontrado.')
         exit(-1)
     return _dict
 
