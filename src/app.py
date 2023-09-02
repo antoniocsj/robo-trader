@@ -29,10 +29,15 @@ def make_prediction():
     # predict_next_candle(data)
 
     data = read_json('request_2.json')
-    predictor = Predictor()
-    predictor.load(1)
-    predictor.calc_output(data)
-    predictor.show_output()
+
+    predictor_1 = Predictor(1)
+    predictor_1.calc_output(data)
+
+    predictor_2 = Predictor(2)
+    predictor_2.calc_output(data)
+
+    predictor_1.show_output()
+    predictor_2.show_output()
 
     return "OK"
 
