@@ -95,7 +95,7 @@ class SymbolsPreparation:
 
         if len(who_is_trading) == 0:
             print('nenhum símbolo está operando agora.')
-            exit(-1)
+            # exit(-1)
 
         if len(who_is_trading) == len(self.symbols):
             print('TODOS os símbolos estão operando.')

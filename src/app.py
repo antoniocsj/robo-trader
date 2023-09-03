@@ -28,7 +28,7 @@ def make_prediction():
     write_json('request.json', data)
     # predict_next_candle(data)
 
-    data = read_json('request_2.json')
+    # data = read_json('request_2.json')
 
     p = Predictors('../predictors')
     p.calculate_outputs(data)
