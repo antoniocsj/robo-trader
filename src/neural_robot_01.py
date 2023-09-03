@@ -101,6 +101,7 @@ def train_model():
     model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
     model.add(Flatten())
     model.add(Dense(n_neurons, activation='relu'))
+    model.add(Dense(n_neurons, activation='relu'))
 
     # define MLP model
     # n_input = X_train.shape[1] * X_train.shape[2]
