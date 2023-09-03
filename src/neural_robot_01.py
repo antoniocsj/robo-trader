@@ -97,7 +97,7 @@ def train_model():
     n_neurons = 10
 
     # define cnn model
-    model.add(Conv1D(filters=n_inputs, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(Conv1D(filters=n_neurons, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
     model.add(Flatten())
     model.add(Dense(n_neurons, activation='relu'))

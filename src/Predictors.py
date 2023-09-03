@@ -12,7 +12,7 @@ class Predictors:
     def search_predictors(self):
         all_subdirs = os.listdir(self.directory)
 
-        for subdir in all_subdirs:
+        for subdir in sorted(all_subdirs):
             index = int(subdir)
             pred = Predictor(index)
             self.predictors.append(pred)
