@@ -68,12 +68,13 @@ class Predictor:
         :param data: dados históricos provenientes de uma requisição feita pelo MT5.
         :return: array pronto para ser aplicado no modelo
         """
-        print('prepare_data_for_model()')
+        # print('prepare_data_for_model()')
 
         settings = self.settings
         scalers = self.scalers
-        print('settings:')
-        print(f'{settings}')
+
+        # print('settings:')
+        # print(f'{settings}')
 
         temp_dir = settings['temp_dir']
         symbol_out = settings['symbol_out']
@@ -82,8 +83,8 @@ class Predictor:
         setup_uses_differentiation = settings['setup_uses_differentiation']
 
         train_configs = self.train_config
-        print('train_configs:')
-        print(f'{train_configs}')
+        # print('train_configs:')
+        # print(f'{train_configs}')
 
         n_steps = train_configs['n_steps']
         n_features = train_configs['n_features']
