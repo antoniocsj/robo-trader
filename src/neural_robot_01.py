@@ -69,7 +69,7 @@ def train_model():
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 16
+    n_steps = 8
     n_samples_train = 72000  # 30000-M10, 72000-M5 Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
@@ -83,8 +83,8 @@ def train_model():
     # features to expect for each input sample.
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
-    max_n_epochs = n_inputs * 3 * 0 + 720
-    patience = int(max_n_epochs / 10) * 0 + 72
+    max_n_epochs = n_inputs * 3 * 0 + 360
+    patience = int(max_n_epochs / 10) * 0 + 36
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')
@@ -101,11 +101,6 @@ def train_model():
     model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
     model.add(Flatten())
     model.add(Dense(n_neurons, activation='relu'))
-    model.add(Dense(n_neurons, activation='relu'))
-    # model.add(Dense(n_neurons, activation='relu'))
-    # model.add(Dense(n_neurons, activation='relu'))
-    # model.add(Dense(n_neurons, activation='relu'))
-    # model.add(Dense(n_neurons, activation='relu'))
 
     # define MLP model
     # n_input = X_train.shape[1] * X_train.shape[2]
@@ -509,8 +504,8 @@ def show_tf():
 
 if __name__ == '__main__':
     show_tf()
-    train_model()
-    # calculate_model_bias()
+    # train_model()
+    calculate_model_bias()
     # evaluate_model()
     # test_model_with_trader()
     # test_model_with_trader_interactive()
