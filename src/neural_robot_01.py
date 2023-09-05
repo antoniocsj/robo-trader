@@ -94,7 +94,7 @@ def train_model():
           f'max_n_epochs = {max_n_epochs}, patience = {patience}')
 
     model = Sequential()
-    n_neurons = n_inputs
+    n_neurons = 360
 
     # define cnn model
     model.add(Conv1D(filters=n_inputs, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
