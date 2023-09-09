@@ -1,4 +1,4 @@
-DETERMINISTIC = True
+DETERMINISTIC = False
 
 import os
 
@@ -35,11 +35,14 @@ from keras.layers import MaxPooling1D
 from keras.models import load_model
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
-tf.keras.utils.set_random_seed(1)
+if DETERMINISTIC:
+    tf.keras.utils.set_random_seed(1)
 
 from utils_nn import prepare_train_data, split_sequences2, prepare_train_data2
 from utils_filesystem import read_json, write_train_config, read_train_config
 from utils_ops import denorm_close_price
+
+print(f'DETERMINISTIC = {DETERMINISTIC}')
 
 
 # Multivariate CNN Models
