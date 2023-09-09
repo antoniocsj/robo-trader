@@ -25,8 +25,8 @@ def evaluate_predictor(pred: Predictor):
     timeframe = train_config['timeframe']
     symbol_tf = f'{symbol_out}_{timeframe}'
     n_samples_train = train_config['n_samples_train']
-    # bias = train_config['bias']
-    bias = 0.0
+    bias = train_config['bias']
+    # bias = 0.0
     candle_input_type = train_config['candle_input_type']
     candle_output_type = train_config['candle_output_type']
     n_samples_test = 3000
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # _hit_rate = evaluate_predictor(predictor)
     # hit_rates.append(_hit_rate)
 
-    predictor = Predictor(2)
+    predictor = Predictor(3)
     _hit_rate = evaluate_predictor(predictor)
     hit_rates.append(_hit_rate)
 
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     # hit_rates.append(_hit_rate)
 
     for i in range(len(hit_rates)):
-        print(f'predictor {i+1}: {hit_rates[i]:.2f} %')
+        print(f'predictor {i}: {100 * hit_rates[i]:.2f} %')
 
     average = sum(hit_rates) / len(hit_rates)
-    print(f'average hit_rate = {average:.2f} %')
+    print(f'average hit_rate = {100 * average:.2f} %')

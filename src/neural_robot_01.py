@@ -94,17 +94,15 @@ def train_model():
           f'max_n_epochs = {max_n_epochs}, patience = {patience}')
 
     model = Sequential()
-    n_filters = n_inputs
-    kernel_size = n_inputs
-    pool_size = n_steps
+    n_filters = 1
+    kernel_size = 2
+    pool_size = 2
     n_neurons = n_inputs
 
     # define cnn model
     model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
     model.add(Flatten())
-    model.add(Dense(n_neurons, activation='relu'))
-    model.add(Dense(n_neurons, activation='relu'))
     model.add(Dense(n_neurons, activation='relu'))
 
     # define MLP model
