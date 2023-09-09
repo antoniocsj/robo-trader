@@ -12,7 +12,7 @@ from utils_symbols import search_symbols_in_dict
 
 
 class HistMulti:
-    def __init__(self, source: Any, timeframe: str):
+    def __init__(self, source: Any, timeframe: str, symbols_allowed=None):
         """
         Cria um objeto que armazena os dados históricos obtidos por:
          1) a partir de um diretório contendo arquivos CSVs ou ;
@@ -32,7 +32,7 @@ class HistMulti:
             self.all_files = []
             self.csv_files = {}  # guarda os nomes dos arquivos csv conforme seu 'simbolo' e 'timeframe'
             self.hist_csv = {}  # guarda os nomes dos arquivos csv conforme seu 'simbolo' e 'timeframe'
-            self.search_symbols()
+            self.search_symbols(symbols_allowed)
         elif isinstance(source, dict):
             self.source_is_dir = False
             print(f'obtendo dados históricos a partir de um dicionário de planilhas')
@@ -42,7 +42,7 @@ class HistMulti:
 
         self.load_symbols()
 
-    def search_symbols(self):
+    def search_symbols(self, symbols_allowed=None):
         """
         Procurando pelos arquivos csv correspondentes ao 'simbolo' e ao 'timeframe'
         :return:
@@ -59,6 +59,9 @@ class HistMulti:
                 _timeframe = filename.split('_')[1]
                 if _timeframe.endswith('.csv'):
                     _timeframe = _timeframe.replace('.csv', '')
+
+                if symbols_allowed and _symbol not in symbols_allowed:
+                    continue
 
                 if _symbol not in self.symbols:
                     self.symbols.append(_symbol)
