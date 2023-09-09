@@ -79,25 +79,25 @@ def evaluate_predictor(pred: Predictor):
 if __name__ == '__main__':
     hit_rates = []
 
-    predictor = Predictor(1)
-    _hit_rate = evaluate_predictor(predictor)
-    hit_rates.append(_hit_rate)
+    # predictor = Predictor(1)
+    # _hit_rate = evaluate_predictor(predictor)
+    # hit_rates.append(_hit_rate)
 
     predictor = Predictor(2)
     _hit_rate = evaluate_predictor(predictor)
     hit_rates.append(_hit_rate)
 
-    predictor = Predictor(3)
-    _hit_rate = evaluate_predictor(predictor)
-    hit_rates.append(_hit_rate)
-
-    predictor = Predictor(4)
-    _hit_rate = evaluate_predictor(predictor)
-    hit_rates.append(_hit_rate)
-
-    predictor = Predictor(5)
-    _hit_rate = evaluate_predictor(predictor)
-    hit_rates.append(_hit_rate)
+    # predictor = Predictor(3)
+    # _hit_rate = evaluate_predictor(predictor)
+    # hit_rates.append(_hit_rate)
+    #
+    # predictor = Predictor(4)
+    # _hit_rate = evaluate_predictor(predictor)
+    # hit_rates.append(_hit_rate)
+    #
+    # predictor = Predictor(5)
+    # _hit_rate = evaluate_predictor(predictor)
+    # hit_rates.append(_hit_rate)
 
     for i in range(len(hit_rates)):
         print(f'predictor {i+1}: {hit_rates[i]:.2f} %')

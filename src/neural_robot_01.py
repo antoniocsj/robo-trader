@@ -69,7 +69,7 @@ def train_model():
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 4
+    n_steps = 2
     n_samples_train = 72000  # 30000-M10, 72000-M5 Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
@@ -94,11 +94,14 @@ def train_model():
           f'max_n_epochs = {max_n_epochs}, patience = {patience}')
 
     model = Sequential()
-    n_neurons = 360
+    n_filters = n_inputs
+    kernel_size = n_inputs
+    pool_size = n_steps
+    n_neurons = n_inputs
 
     # define cnn model
-    model.add(Conv1D(filters=n_inputs, kernel_size=n_steps, activation='relu', input_shape=(n_steps, n_features)))
-    model.add(MaxPooling1D(pool_size=n_steps, padding='same'))
+    model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu', input_shape=(n_steps, n_features)))
+    model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
     model.add(Flatten())
     model.add(Dense(n_neurons, activation='relu'))
     model.add(Dense(n_neurons, activation='relu'))
