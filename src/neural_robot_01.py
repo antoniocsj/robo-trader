@@ -1,21 +1,27 @@
+DETERMINISTIC = True
+
 import os
 
-os.environ['PYTHONHASHSEED'] = str(1)
-os.environ['TF_CUDNN_DETERMINISM'] = str(1)
-os.environ['TF_DETERMINISTIC_OPS'] = str(1)
+if DETERMINISTIC:
+    os.environ['PYTHONHASHSEED'] = str(1)
+    os.environ['TF_CUDNN_DETERMINISM'] = str(1)
+    os.environ['TF_DETERMINISTIC_OPS'] = str(1)
 
 import numpy as np
 
-np.random.seed(1)
+if DETERMINISTIC:
+    np.random.seed(1)
 
 import random
 
-random.seed(1)
+if DETERMINISTIC:
+    random.seed(1)
 
 import tensorflow as tf
 
-tf.random.set_seed(1)
-tf.keras.utils.set_random_seed(1)
+if DETERMINISTIC:
+    tf.random.set_seed(1)
+    tf.keras.utils.set_random_seed(1)
 
 import time
 import pickle
@@ -94,9 +100,9 @@ def train_model():
           f'max_n_epochs = {max_n_epochs}, patience = {patience}')
 
     model = Sequential()
-    n_filters = 1
-    kernel_size = 2
-    pool_size = 2
+    n_filters = n_inputs
+    kernel_size = n_inputs
+    pool_size = n_inputs
     n_neurons = n_inputs
 
     # define cnn model
