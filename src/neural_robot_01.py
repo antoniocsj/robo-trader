@@ -7,9 +7,9 @@ random_seed = _settings['random_seed']
 import os
 
 if DETERMINISTIC:
-    os.environ['PYTHONHASHSEED'] = str(random_seed)
-    os.environ['TF_CUDNN_DETERMINISM'] = str(random_seed)
-    os.environ['TF_DETERMINISTIC_OPS'] = str(random_seed)
+    os.environ['PYTHONHASHSEED'] = str(1)
+    os.environ['TF_CUDNN_DETERMINISM'] = str(1)
+    os.environ['TF_DETERMINISTIC_OPS'] = str(1)
 
 import numpy as np
 
