@@ -46,10 +46,6 @@ from utils_nn import prepare_train_data, split_sequences2, prepare_train_data2
 from utils_filesystem import write_train_config, read_train_config
 from utils_ops import denorm_close_price
 
-print(f'DETERMINISTIC? = {DETERMINISTIC}')
-if DETERMINISTIC:
-    print(f'random_seed = {random_seed}')
-
 
 # Multivariate CNN Models
 # Multivariate time series data means data where there is more than one observation for each time step.
@@ -69,6 +65,10 @@ if DETERMINISTIC:
 # We can demonstrate this with a simple example of two parallel input time series where the output series
 # is the simple addition of the input series.
 def train_model():
+    print(f'DETERMINISTIC? = {DETERMINISTIC}')
+    if DETERMINISTIC:
+        print(f'random_seed = {random_seed}')
+
     settings = read_json('settings.json')
     print(f'settings.json: {settings}')
 
