@@ -1,27 +1,31 @@
-DETERMINISTIC = False
+from utils_filesystem import read_json
+
+_settings = read_json('settings.json')
+DETERMINISTIC = _settings['deterministic']
+random_seed = _settings['random_seed']
 
 import os
 
 if DETERMINISTIC:
-    os.environ['PYTHONHASHSEED'] = str(1)
-    os.environ['TF_CUDNN_DETERMINISM'] = str(1)
-    os.environ['TF_DETERMINISTIC_OPS'] = str(1)
+    os.environ['PYTHONHASHSEED'] = str(random_seed)
+    os.environ['TF_CUDNN_DETERMINISM'] = str(random_seed)
+    os.environ['TF_DETERMINISTIC_OPS'] = str(random_seed)
 
 import numpy as np
 
 if DETERMINISTIC:
-    np.random.seed(1)
+    np.random.seed(random_seed)
 
 import random
 
 if DETERMINISTIC:
-    random.seed(1)
+    random.seed(random_seed)
 
 import tensorflow as tf
 
 if DETERMINISTIC:
-    tf.random.set_seed(1)
-    tf.keras.utils.set_random_seed(1)
+    tf.random.set_seed(random_seed)
+    tf.keras.utils.set_random_seed(random_seed)
 
 import time
 import pickle
@@ -36,14 +40,15 @@ from keras.models import load_model
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 if DETERMINISTIC:
-    tf.keras.utils.set_random_seed(1)
+    tf.keras.utils.set_random_seed(random_seed)
 
 from utils_nn import prepare_train_data, split_sequences2, prepare_train_data2
-from utils_filesystem import read_json, write_train_config, read_train_config
+from utils_filesystem import write_train_config, read_train_config
 from utils_ops import denorm_close_price
 
-print(f'DETERMINISTIC = {DETERMINISTIC}')
-
+print(f'DETERMINISTIC? = {DETERMINISTIC}')
+if DETERMINISTIC:
+    print(f'random_seed = {random_seed}')
 
 # Multivariate CNN Models
 # Multivariate time series data means data where there is more than one observation for each time step.
@@ -78,7 +83,7 @@ def train_model():
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 3
+    n_steps = 4
     n_samples_train = 72000  # 30000-M10, 72000-M5 Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
@@ -201,7 +206,6 @@ def evaluate_model():
     print(f'{train_config}')
 
     n_steps = train_config['n_steps']
-    n_features = train_config['n_features']
     symbol_out = train_config['symbol_out']
     n_samples_train = train_config['n_samples_train']
     candle_input_type = train_config['candle_input_type']

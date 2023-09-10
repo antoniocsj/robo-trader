@@ -1,6 +1,8 @@
 {
     "symbol_out": "EURUSD",
     "timeframe": "M5",
+    "deterministic": true,
+    "random_seed": 1,
     "temp_dir": "../temp",
     "csv_s_dir": "../csv_s",
     "csv_o_dir": "../csv_o",
