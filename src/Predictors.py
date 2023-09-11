@@ -15,7 +15,7 @@ class Predictors:
 
         for subdir in sorted(all_subdirs):
             index = int(subdir)
-            pred = Predictor(index)
+            pred = Predictor(index, self.directory)
             self.predictors.append(pred)
 
     def calculate_outputs(self, input_data: dict):
@@ -32,15 +32,16 @@ class Predictors:
             pred.show_output()
 
     def show_average(self):
-        print(f'predictors average : {self.average:.5f}')
+        print(f'predictors ({self.directory}) average : {self.average:.5f}')
 
 
 def teste_01():
-    data = read_json('request_2.json')
+    data = read_json('request.json')
 
     p = Predictors('../predictors')
     p.calculate_outputs(data)
     p.show_outputs()
+    p.show_average()
     pass
 
 

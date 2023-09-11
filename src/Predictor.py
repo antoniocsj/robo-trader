@@ -14,8 +14,9 @@ from prediction import SymbolsPreparation
 
 
 class Predictor:
-    def __init__(self, index: int):
+    def __init__(self, index: int, directory: str):
         self.id = index
+        self.directory = directory
         self.settings = None
         self.train_config = None
         self.scalers = None
@@ -25,7 +26,8 @@ class Predictor:
         self.load()
 
     def load(self):
-        directory = f'../predictors/{self.id:02d}'
+        # directory = f'../predictors/{self.id:02d}'
+        directory = f'{self.directory}/{self.id:02d}'
         if not os.path.exists(directory):
             print(f'ERRO. o diretório {directory} não existe.')
             exit(-1)
@@ -189,7 +191,7 @@ class Predictor:
     def show_output(self):
         candle_output_type = self.train_config['candle_output_type']
 
-        print(f'predictor ({self.id}) : ', end='')
+        print(f'predictor ({self.id}) ({self.directory}) : ', end='')
         if len(candle_output_type) == 1:
             print(f'{candle_output_type} = {self.output:.5f}')
         else:
@@ -197,17 +199,12 @@ class Predictor:
 
 
 def teste_01():
-    data = read_json('request_2.json')
+    data = read_json('request.json')
 
-    predictor_1 = Predictor(1)
+    directory = '../predictors'
+    predictor_1 = Predictor(1, directory)
     predictor_1.calc_output(data)
-
-    predictor_2 = Predictor(2)
-    predictor_2.calc_output(data)
-
     predictor_1.show_output()
-    predictor_2.show_output()
-    pass
 
 
 if __name__ == '__main__':
