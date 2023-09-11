@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # _hit_rate = evaluate_predictor(predictor)
     # hit_rates.append(_hit_rate)
 
-    predictor = Predictor(5)
+    predictor = Predictor(1)
     _hit_rate = evaluate_predictor(predictor)
     hit_rates.append(_hit_rate)
 

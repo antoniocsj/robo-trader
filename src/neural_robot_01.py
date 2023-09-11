@@ -98,8 +98,8 @@ def train_model():
     # features to expect for each input sample.
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
-    max_n_epochs = n_inputs * 3 * 0 + 500
-    patience = int(max_n_epochs / 10) * 0 + 50
+    max_n_epochs = n_inputs * 3 * 0 + 100
+    patience = int(max_n_epochs / 10) * 0 + 10
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')
@@ -109,8 +109,8 @@ def train_model():
           f'max_n_epochs = {max_n_epochs}, patience = {patience}')
 
     model = Sequential()
-    n_filters = n_inputs
-    kernel_size = n_inputs
+    n_filters = n_features
+    kernel_size = n_steps
     pool_size = n_inputs
     n_neurons = n_inputs
 
@@ -118,6 +118,10 @@ def train_model():
     model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
     model.add(Flatten())
+    model.add(Dense(n_neurons, activation='relu'))
+    model.add(Dense(n_neurons, activation='relu'))
+    model.add(Dense(n_neurons, activation='relu'))
+    model.add(Dense(n_neurons, activation='relu'))
     model.add(Dense(n_neurons, activation='relu'))
 
     # define MLP model
