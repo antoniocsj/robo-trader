@@ -30,9 +30,10 @@ def make_prediction():
 
     # data = read_json('request_2.json')
 
-    p = Predictors('../predictors')
+    p = Predictors('../predictors_2022-08-16_2023-08-18')
     p.calculate_outputs(data)
     p.show_outputs()
+    p.show_average()
 
     return "OK"
 

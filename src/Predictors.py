@@ -7,6 +7,7 @@ class Predictors:
     def __init__(self, directory: str):
         self.directory = directory
         self.predictors: list[Predictor] = []
+        self.average = 0.0
         self.search_predictors()
 
     def search_predictors(self):
@@ -18,18 +19,20 @@ class Predictors:
             self.predictors.append(pred)
 
     def calculate_outputs(self, input_data: dict):
-        for pred in self.predictors:
-            pred.calc_output(input_data)
-
-    def show_outputs(self):
         _sum = 0.0
 
         for pred in self.predictors:
-            pred.show_output()
+            pred.calc_output(input_data)
             _sum += pred.output
 
-        average = _sum / len(self.predictors)
-        print(f'média : {average:.5f}')
+        self.average = _sum / len(self.predictors)
+
+    def show_outputs(self):
+        for pred in self.predictors:
+            pred.show_output()
+
+    def show_average(self):
+        print(f'predictors average : {self.average:.5f}')
 
 
 def teste_01():
