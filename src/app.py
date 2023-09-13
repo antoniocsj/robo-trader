@@ -36,7 +36,7 @@ def make_prediction():
     p_2 = Predictors('../predictors')
     p_2.calculate_outputs(data)
 
-    p_1.show_outputs()
+    # p_1.show_outputs()
     p_2.show_outputs()
 
     p_1.show_average()
