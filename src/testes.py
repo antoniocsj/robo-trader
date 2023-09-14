@@ -275,12 +275,15 @@ def test_12():
 
     min_test_loss_eval = math.inf
     min_whole_set_train_loss_eval = math.inf
+    min_product = math.inf
     random_seed_min_test_loss_eval = -1
     random_seed_min_whole_set_train_loss_eval = -1
+    random_seed_min_product = -1
 
     for e in experiments:
         test_loss_eval = e['test_loss_eval']
         whole_set_train_loss_eval = e['whole_set_train_loss_eval']
+        product = test_loss_eval * whole_set_train_loss_eval
 
         if whole_set_train_loss_eval < min_whole_set_train_loss_eval:
             min_whole_set_train_loss_eval = whole_set_train_loss_eval
@@ -290,11 +293,18 @@ def test_12():
             min_test_loss_eval = test_loss_eval
             random_seed_min_test_loss_eval = e['random_seed']
 
+        if product < min_product:
+            min_product = product
+            random_seed_min_product = e['random_seed']
+
     print(f'random_seed_min_test_loss_eval = {random_seed_min_test_loss_eval}')
     elem = experiments[random_seed_min_test_loss_eval-1]
     print(f'{elem}\n')
     print(f'random_seed_min_whole_set_train_loss_eval = {random_seed_min_whole_set_train_loss_eval}')
     elem = experiments[random_seed_min_whole_set_train_loss_eval-1]
+    print(f'{elem}\n')
+    print(f'random_seed_min_product = {random_seed_min_product}')
+    elem = experiments[random_seed_min_product - 1]
     print(f'{elem}\n')
 
 
