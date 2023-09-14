@@ -1,3 +1,5 @@
+import math
+
 
 def test_01():
     import os
@@ -255,5 +257,46 @@ def test_11():
     pass
 
 
+def load_train_log() -> dict:
+    import os
+    from utils_filesystem import read_json
+    _filename = 'train_log.json'
+    if os.path.exists(_filename):
+        _dict = read_json(_filename)
+        return _dict
+    else:
+        print(f'ERRO. o arquivo {_filename} não existe.')
+        exit(-1)
+
+
+def test_12():
+    train_log = load_train_log()
+    experiments = train_log['experiments']
+
+    min_test_loss_eval = math.inf
+    min_whole_set_train_loss_eval = math.inf
+    random_seed_min_test_loss_eval = -1
+    random_seed_min_whole_set_train_loss_eval = -1
+
+    for e in experiments:
+        test_loss_eval = e['test_loss_eval']
+        whole_set_train_loss_eval = e['whole_set_train_loss_eval']
+
+        if whole_set_train_loss_eval < min_whole_set_train_loss_eval:
+            min_whole_set_train_loss_eval = whole_set_train_loss_eval
+            random_seed_min_whole_set_train_loss_eval = e['random_seed']
+
+        if test_loss_eval < min_test_loss_eval:
+            min_test_loss_eval = test_loss_eval
+            random_seed_min_test_loss_eval = e['random_seed']
+
+    print(f'random_seed_min_test_loss_eval = {random_seed_min_test_loss_eval}')
+    elem = experiments[random_seed_min_test_loss_eval-1]
+    print(f'{elem}\n')
+    print(f'random_seed_min_whole_set_train_loss_eval = {random_seed_min_whole_set_train_loss_eval}')
+    elem = experiments[random_seed_min_whole_set_train_loss_eval-1]
+    print(f'{elem}\n')
+
+
 if __name__ == '__main__':
-    test_01()
+    test_12()
