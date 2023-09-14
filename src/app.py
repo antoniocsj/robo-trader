@@ -1,9 +1,18 @@
+import os
+import tensorflow as tf
 from flask import Flask, request
 from datetime import datetime
 from utils_filesystem import write_json, read_json
 from Predictors import Predictors
 
 
+def show_tf():
+    print(os.environ["LD_LIBRARY_PATH"])
+    print(tf.__version__)
+    print(tf.config.list_physical_devices('GPU'))
+
+
+show_tf()
 app = Flask(__name__)
 
 
@@ -37,8 +46,7 @@ def make_prediction():
     p_2.calculate_outputs(data)
 
     # p_1.show_outputs()
-    p_2.show_outputs()
-
+    # p_2.show_outputs()
     p_1.show_average()
     p_2.show_average()
 
