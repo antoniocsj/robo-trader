@@ -27,8 +27,8 @@ def test_02():
     losses = {'min_loss': {'value': min_loss, 'index': i_min_loss, 'epoch': i_min_loss + 1},
               'min_val_loss': {'value': min_val_loss, 'index': i_min_val_loss, 'epoch': i_min_val_loss + 1}}
 
-    print(f'min_loss: {loss[i_min_loss]}, epoch = {i_min_loss+1}, val_loss = {val_loss[i_min_loss]}')
-    print(f'min_val_loss: {val_loss[i_min_val_loss]}, epoch = {i_min_val_loss+1}, loss = {loss[i_min_val_loss]}')
+    print(f'min_loss: {loss[i_min_loss]}, epoch = {i_min_loss + 1}, val_loss = {val_loss[i_min_loss]}')
+    print(f'min_val_loss: {val_loss[i_min_val_loss]}, epoch = {i_min_val_loss + 1}, loss = {loss[i_min_val_loss]}')
     print(losses)
 
 
@@ -90,7 +90,6 @@ def test_04():
 
     for n_symbols in range(2, 33):
         for n_cpus in range(1, 33):
-
             max_n_procs = find_max_power2_less_half(n_cpus)
             n_procs = find_max_power2_less_half_with_restriction(n_symbols, max_n_procs)
             print(f'n_symbols = {n_symbols}, n_cpus = {n_cpus}, max_n_procs = {max_n_procs} '
@@ -144,7 +143,7 @@ def test_06_1():
     min_n_neurons = 0
     max_n_neurons = 270
     step = 30
-    _list_n_neurons = list(range(min_n_neurons, max_n_neurons+1, step))
+    _list_n_neurons = list(range(min_n_neurons, max_n_neurons + 1, step))
     n_layers = 3
     c = list(it.combinations_with_replacement(_list_n_neurons, n_layers))
     pass
@@ -298,15 +297,41 @@ def test_12():
             random_seed_min_product = e['random_seed']
 
     print(f'random_seed_min_test_loss_eval = {random_seed_min_test_loss_eval}')
-    elem = experiments[random_seed_min_test_loss_eval-1]
+    elem = experiments[random_seed_min_test_loss_eval - 1]
     print(f'{elem}\n')
     print(f'random_seed_min_whole_set_train_loss_eval = {random_seed_min_whole_set_train_loss_eval}')
-    elem = experiments[random_seed_min_whole_set_train_loss_eval-1]
+    elem = experiments[random_seed_min_whole_set_train_loss_eval - 1]
     print(f'{elem}\n')
     print(f'random_seed_min_product = {random_seed_min_product}')
     elem = experiments[random_seed_min_product - 1]
     print(f'{elem}\n')
 
 
+def print_list(_list: list):
+    for e in _list:
+        print(e)
+    print('')
+
+
+def test_13():
+    from operator import itemgetter, attrgetter
+
+    train_log = load_train_log()
+    experiments = train_log['experiments']
+    sorted_exps_by_test_loss_eval = sorted(experiments, key=lambda d: d['test_loss_eval'])
+    sorted_exps_by_whole_set_train_loss_eval = sorted(experiments, key=lambda d: d['whole_set_train_loss_eval'])
+    sorted_exps_by_product_losses = sorted(experiments,
+                                           key=lambda d: d['test_loss_eval'] * d['whole_set_train_loss_eval'])
+
+    print('sorted_exps_by_product_losses:')
+    print_list(sorted_exps_by_product_losses)
+
+    print('sorted_exps_by_test_loss_eval:')
+    print_list(sorted_exps_by_test_loss_eval)
+
+    print('sorted_exps_by_whole_set_train_loss_eval:')
+    print_list(sorted_exps_by_whole_set_train_loss_eval)
+
+
 if __name__ == '__main__':
-    test_12()
+    test_13()
