@@ -37,7 +37,7 @@ def make_prediction():
     write_json('request.json', data)
     # predict_next_candle(data)
 
-    # data = read_json('request_2.json')
+    # data = read_json('request.json')
 
     p_1 = Predictors('../predictors_2022-08-16_2023-08-18')
     p_1.calculate_outputs(data)
@@ -47,6 +47,7 @@ def make_prediction():
 
     # p_1.show_outputs()
     # p_2.show_outputs()
+
     p_1.show_average()
     p_2.show_average()
 

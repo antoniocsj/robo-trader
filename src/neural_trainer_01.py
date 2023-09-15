@@ -107,6 +107,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
     model.add(Dense(n_neurons, activation='relu'))
     model.add(Dense(n_neurons, activation='relu'))
     model.add(Dense(n_neurons, activation='relu'))
+    model.add(Dense(n_neurons, activation='relu'))
 
     # define MLP model
     # n_input = X_train.shape[1] * X_train.shape[2]
