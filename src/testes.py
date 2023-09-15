@@ -308,8 +308,8 @@ def test_12():
 
 
 def print_list(_list: list):
-    for e in _list:
-        print(e)
+    for i in range(len(_list)):
+        print(f'{i:03d} {_list[i]}')
     print('')
 
 
