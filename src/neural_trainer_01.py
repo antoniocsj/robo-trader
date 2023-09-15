@@ -44,7 +44,6 @@ def train_model(deterministic: bool = True, seed: int = 1):
         tf.keras.utils.set_random_seed(random_seed)
 
     from utils_nn import split_sequences2, prepare_train_data2
-    from utils_filesystem import write_train_config
 
     print(os.environ["LD_LIBRARY_PATH"])
     print(tf.__version__)
@@ -187,13 +186,14 @@ def create_train_log():
     import os
     _filename = 'train_log.json'
     if not os.path.exists(_filename):
+        print(f'o arquivo {_filename} não existe ainda. será criado agora.')
         _dict = {
             'n_experiments': 0,
             'experiments': []
         }
         write_json(_filename, _dict)
     else:
-        print(f'o arquivo {_filename} já existe.')
+        print(f'o arquivo {_filename} já existe. continuando os experimentos.')
 
 
 def load_train_log() -> dict:
