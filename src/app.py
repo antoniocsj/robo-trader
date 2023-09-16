@@ -7,9 +7,10 @@ from Predictors import Predictors
 
 
 def show_tf():
-    print(os.environ["LD_LIBRARY_PATH"])
+    # print(os.environ["LD_LIBRARY_PATH"])
     print(tf.__version__)
-    print(tf.config.list_physical_devices('GPU'))
+    # print(tf.config.list_physical_devices('GPU'))
+    print(tf.config.list_physical_devices())
 
 
 show_tf()
@@ -45,8 +46,8 @@ def make_prediction():
     p_2 = Predictors('../predictors')
     p_2.calculate_outputs(data)
 
-    # p_1.show_outputs()
-    # p_2.show_outputs()
+    p_1.show_outputs()
+    p_2.show_outputs()
 
     p_1.show_average()
     p_2.show_average()

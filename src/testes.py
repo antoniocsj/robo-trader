@@ -259,7 +259,7 @@ def test_11():
 def load_train_log() -> dict:
     import os
     from utils_filesystem import read_json
-    _filename = 'train_log.json'
+    _filename = '../train_logs/train_log.json'
     if os.path.exists(_filename):
         _dict = read_json(_filename)
         return _dict

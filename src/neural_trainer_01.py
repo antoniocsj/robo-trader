@@ -68,7 +68,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 2
+    n_steps = 4
     n_samples_train = 370000  # Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
@@ -102,9 +102,6 @@ def train_model(deterministic: bool = True, seed: int = 1):
     model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
     model.add(Flatten())
-    model.add(Dense(n_neurons, activation='relu'))
-    model.add(Dense(n_neurons, activation='relu'))
-    model.add(Dense(n_neurons, activation='relu'))
     model.add(Dense(n_neurons, activation='relu'))
     model.add(Dense(n_neurons, activation='relu'))
 
@@ -184,7 +181,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
 
 def create_train_log():
     import os
-    _filename = 'train_log.json'
+    _filename = '../train_logs/train_log.json'
     if not os.path.exists(_filename):
         print(f'o arquivo {_filename} não existe ainda. será criado agora.')
         _dict = {
@@ -197,7 +194,7 @@ def create_train_log():
 
 
 def load_train_log() -> dict:
-    _filename = 'train_log.json'
+    _filename = '../train_logs/train_log.json'
     if os.path.exists(_filename):
         _dict = read_json(_filename)
         return _dict
@@ -207,7 +204,7 @@ def load_train_log() -> dict:
 
 
 def update_train_log(train_log: dict):
-    _filename = 'train_log.json'
+    _filename = '../train_logs/train_log.json'
     if os.path.exists(_filename):
         write_json(_filename, train_log)
     else:
@@ -217,7 +214,7 @@ def update_train_log(train_log: dict):
 
 def trainer_01():
     create_train_log()
-    _secs = 30
+    _secs = 40
 
     while True:
         train_log = load_train_log()

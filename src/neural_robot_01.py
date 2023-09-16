@@ -84,7 +84,7 @@ def train_model():
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 2
+    n_steps = 4
     n_samples_train = 370000  # Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
@@ -99,7 +99,7 @@ def train_model():
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
     max_n_epochs = n_inputs * 3 * 0 + 100
-    patience = int(max_n_epochs / 10) * 0 + 3
+    patience = int(max_n_epochs / 10) * 0 + 9
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')
@@ -118,9 +118,6 @@ def train_model():
     model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
     model.add(Flatten())
-    model.add(Dense(n_neurons, activation='relu'))
-    model.add(Dense(n_neurons, activation='relu'))
-    model.add(Dense(n_neurons, activation='relu'))
     model.add(Dense(n_neurons, activation='relu'))
     model.add(Dense(n_neurons, activation='relu'))
 
