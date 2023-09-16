@@ -181,7 +181,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
 
 def create_train_log():
     import os
-    _filename = '../train_logs/train_log.json'
+    _filename = 'train_log.json'
     if not os.path.exists(_filename):
         print(f'o arquivo {_filename} não existe ainda. será criado agora.')
         _dict = {
@@ -194,7 +194,7 @@ def create_train_log():
 
 
 def load_train_log() -> dict:
-    _filename = '../train_logs/train_log.json'
+    _filename = 'train_log.json'
     if os.path.exists(_filename):
         _dict = read_json(_filename)
         return _dict
@@ -204,7 +204,7 @@ def load_train_log() -> dict:
 
 
 def update_train_log(train_log: dict):
-    _filename = '../train_logs/train_log.json'
+    _filename = 'train_log.json'
     if os.path.exists(_filename):
         write_json(_filename, train_log)
     else:
