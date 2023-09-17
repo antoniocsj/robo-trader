@@ -69,6 +69,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
         exit(-1)
 
     n_steps = 8
+    n_hidden_layers = 2
     n_samples_train = 370000  # Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
@@ -88,9 +89,9 @@ def train_model(deterministic: bool = True, seed: int = 1):
 
     print(f'symbols = {hist.symbols}')
     print(f'n_symbols = {n_symbols}, n_features (n_cols) = {n_features}, n_steps = {n_steps}, n_inputs = {n_inputs}, '
-          f'\ntipo_vela_entrada = {candle_input_type}, tipo_vela_saída = {candle_output_type}, \n'
-          f'n_samples_train = {n_samples_train}, validation_split = {validation_split}, '
-          f'max_n_epochs = {max_n_epochs}, patience = {patience}')
+          f'n_hidden_layers = {n_hidden_layers},\ntipo_vela_entrada = {candle_input_type}, '
+          f'tipo_vela_saída = {candle_output_type}, n_samples_train = {n_samples_train}, '
+          f'\nvalidation_split = {validation_split}, max_n_epochs = {max_n_epochs}, patience = {patience}')
 
     model = Sequential()
     n_filters = n_features
@@ -99,10 +100,14 @@ def train_model(deterministic: bool = True, seed: int = 1):
     n_neurons = n_inputs
 
     # define cnn model
+    # input layer
     model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu', input_shape=(n_steps, n_features)))
     model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
     model.add(Flatten())
-    model.add(Dense(n_neurons, activation='relu'))
+
+    # hidden layers
+    for i in range(n_hidden_layers):
+        model.add(Dense(n_neurons, activation='relu'))
 
     # define MLP model
     # n_input = X_train.shape[1] * X_train.shape[2]
@@ -110,6 +115,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
     # model.add(Dense(n_inputs, activation='relu', input_dim=n_input))
     # model.add(Dense(n_inputs, activation='relu'))
 
+    # output layer
     model.add(Dense(len(candle_output_type)))
     model.compile(optimizer='adam', loss='mse')
     model_config = model.get_config()
