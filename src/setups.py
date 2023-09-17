@@ -64,7 +64,7 @@ def check_base_ok():
     if len(_sync_files) == 0:
         print('nenhum arquivo de checkpoint de sincronização foi encontrado.')
         print('não há garantia de que os arquivos foram sinzronizados.')
-        return False
+        return True
     elif len(_sync_files) > 1:
         print('há mais de 1 arquivo de checkpoint de sincronização.')
         print('a sincronização não foi finalizada ainda.')

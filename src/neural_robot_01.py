@@ -77,7 +77,7 @@ def train_model():
     timeframe = settings['timeframe']
     candle_input_type = settings['candle_input_type']
     candle_output_type = settings['candle_output_type']
-    hist = HistMulti(temp_dir, timeframe)
+    hist = HistMulti(temp_dir, timeframe, symbols_allowed=[symbol_out])
 
     if hist.timeframe != timeframe:
         print(f'o timeframe do diretório {temp_dir} ({hist.timeframe}) é diferente do timeframe especificado '
