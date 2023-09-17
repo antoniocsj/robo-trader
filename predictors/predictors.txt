@@ -1,0 +1,36 @@
+predictors (5 anos de histórico)
+01 - OHLCV, n_steps = 2, n_hidden_layers = 1
+02 - OHLCV, n_steps = 2, n_hidden_layers = 2
+03 - OHLCV, n_steps = 2, n_hidden_layers = 3
+04 - OHLCV, n_steps = 2, n_hidden_layers = 4
+05 - OHLCV, n_steps = 2, n_hidden_layers = 5
+
+06 - OHLCV, n_steps = 4, n_hidden_layers = 1
+07 - OHLCV, n_steps = 4, n_hidden_layers = 2
+08 - OHLCV, n_steps = 4, n_hidden_layers = 3
+09 - OHLCV, n_steps = 4, n_hidden_layers = 4
+10 - OHLCV, n_steps = 4, n_hidden_layers = 5
+
+11 - OHLCV, n_steps = 8, n_hidden_layers = 1
+12 - OHLCV, n_steps = 8, n_hidden_layers = 2
+13 - OHLCV, n_steps = 8, n_hidden_layers = 3
+14 - OHLCV, n_steps = 8, n_hidden_layers = 4
+15 - OHLCV, n_steps = 8, n_hidden_layers = 5
+
+16 - OHLC, n_steps = 2, n_hidden_layers = 1
+17 - OHLC, n_steps = 2, n_hidden_layers = 2
+18 - OHLC, n_steps = 2, n_hidden_layers = 3
+19 - OHLC, n_steps = 2, n_hidden_layers = 4
+20 - OHLC, n_steps = 2, n_hidden_layers = 5
+
+21 - OHLC, n_steps = 4, n_hidden_layers = 1
+22 - OHLC, n_steps = 4, n_hidden_layers = 2
+23 - OHLC, n_steps = 4, n_hidden_layers = 3
+24 - OHLC, n_steps = 4, n_hidden_layers = 4
+25 - OHLC, n_steps = 4, n_hidden_layers = 5
+
+26 - OHLC, n_steps = 8, n_hidden_layers = 1
+27 - OHLC, n_steps = 8, n_hidden_layers = 2
+28 - OHLC, n_steps = 8, n_hidden_layers = 3
+29 - OHLC, n_steps = 8, n_hidden_layers = 4
+30 - OHLC, n_steps = 8, n_hidden_layers = 5
