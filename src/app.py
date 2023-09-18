@@ -40,22 +40,11 @@ def make_prediction():
 
     # data = read_json('request.json')
 
-    p_1 = Predictors('../predictors_2022-08-16_2023-08-18')
+    p_1 = Predictors('../predictors')
     p_1.calculate_outputs(data)
 
-    p_2 = Predictors('../predictors')
-    p_2.calculate_outputs(data)
-
-    # p_3 = Predictors('../predictors_teste')
-    # p_3.calculate_outputs(data)
-
     p_1.show_outputs()
-    p_2.show_outputs()
-    # p_3.show_outputs()
-
     p_1.show_average()
-    p_2.show_average()
-    # p_3.show_average()
 
     return "OK"
 
