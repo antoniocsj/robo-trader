@@ -272,35 +272,35 @@ def test_12():
     train_log = load_train_log()
     experiments = train_log['experiments']
 
-    min_test_loss_eval = math.inf
-    min_whole_set_train_loss_eval = math.inf
+    min_test_loss = math.inf
+    min_whole_set_train_loss = math.inf
     min_product = math.inf
-    random_seed_min_test_loss_eval = -1
-    random_seed_min_whole_set_train_loss_eval = -1
+    random_seed_min_test_loss = -1
+    random_seed_min_whole_set_train_loss = -1
     random_seed_min_product = -1
 
     for e in experiments:
         test_loss_eval = e['test_loss_eval']
         whole_set_train_loss_eval = e['whole_set_train_loss_eval']
-        product = test_loss_eval * whole_set_train_loss_eval
+        product = e['product']
 
-        if whole_set_train_loss_eval < min_whole_set_train_loss_eval:
-            min_whole_set_train_loss_eval = whole_set_train_loss_eval
-            random_seed_min_whole_set_train_loss_eval = e['random_seed']
+        if whole_set_train_loss_eval < min_whole_set_train_loss:
+            min_whole_set_train_loss = whole_set_train_loss_eval
+            random_seed_min_whole_set_train_loss = e['random_seed']
 
-        if test_loss_eval < min_test_loss_eval:
-            min_test_loss_eval = test_loss_eval
-            random_seed_min_test_loss_eval = e['random_seed']
+        if test_loss_eval < min_test_loss:
+            min_test_loss = test_loss_eval
+            random_seed_min_test_loss = e['random_seed']
 
         if product < min_product:
             min_product = product
             random_seed_min_product = e['random_seed']
 
-    print(f'random_seed_min_test_loss_eval = {random_seed_min_test_loss_eval}')
-    elem = experiments[random_seed_min_test_loss_eval - 1]
+    print(f'random_seed_min_test_loss = {random_seed_min_test_loss}')
+    elem = experiments[random_seed_min_test_loss - 1]
     print(f'{elem}\n')
-    print(f'random_seed_min_whole_set_train_loss_eval = {random_seed_min_whole_set_train_loss_eval}')
-    elem = experiments[random_seed_min_whole_set_train_loss_eval - 1]
+    print(f'random_seed_min_whole_set_train_loss = {random_seed_min_whole_set_train_loss}')
+    elem = experiments[random_seed_min_whole_set_train_loss - 1]
     print(f'{elem}\n')
     print(f'random_seed_min_product = {random_seed_min_product}')
     elem = experiments[random_seed_min_product - 1]
@@ -318,19 +318,18 @@ def test_13():
 
     train_log = load_train_log()
     experiments = train_log['experiments']
-    sorted_exps_by_test_loss_eval = sorted(experiments, key=lambda d: d['test_loss_eval'])
-    sorted_exps_by_whole_set_train_loss_eval = sorted(experiments, key=lambda d: d['whole_set_train_loss_eval'])
-    sorted_exps_by_product_losses = sorted(experiments,
-                                           key=lambda d: d['test_loss_eval'] * d['whole_set_train_loss_eval'])
+    sorted_exps_by_test_loss = sorted(experiments, key=lambda d: d['test_loss_eval'])
+    sorted_exps_by_whole_set_train_loss = sorted(experiments, key=lambda d: d['whole_set_train_loss_eval'])
+    sorted_exps_by_product_losses = sorted(experiments, key=lambda d: d['product'])
 
     print('sorted_exps_by_product_losses:')
     print_list(sorted_exps_by_product_losses)
 
-    print('sorted_exps_by_test_loss_eval:')
-    print_list(sorted_exps_by_test_loss_eval)
+    print('sorted_exps_by_test_loss:')
+    print_list(sorted_exps_by_test_loss)
 
-    print('sorted_exps_by_whole_set_train_loss_eval:')
-    print_list(sorted_exps_by_whole_set_train_loss_eval)
+    print('sorted_exps_by_whole_set_train_loss:')
+    print_list(sorted_exps_by_whole_set_train_loss)
 
 
 if __name__ == '__main__':

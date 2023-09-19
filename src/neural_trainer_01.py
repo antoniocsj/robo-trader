@@ -69,7 +69,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
         exit(-1)
 
     n_steps = 4
-    n_hidden_layers = 2
+    n_hidden_layers = 3
     n_samples_train = 199000  # Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
@@ -228,10 +228,15 @@ def trainer_01():
 
         train_config = train_model(seed=index)
 
+        whole_set_train_loss_eval = train_config['whole_set_train_loss_eval']
+        test_loss_eval = train_config['test_loss_eval']
+        product = whole_set_train_loss_eval * test_loss_eval
+
         log = {
             'random_seed': index,
-            'whole_set_train_loss_eval': train_config['whole_set_train_loss_eval'],
-            'test_loss_eval': train_config['test_loss_eval']
+            'whole_set_train_loss': whole_set_train_loss_eval,
+            'test_loss': test_loss_eval,
+            'product': product
         }
         train_log['n_experiments'] = index
         train_log['experiments'].append(log)

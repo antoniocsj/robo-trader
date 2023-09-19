@@ -6,8 +6,8 @@ predictors_01:
 03 - OHLC, n_steps = 02, n_hidden_layers = 3 ok
 
 04 - OHLC, n_steps = 04, n_hidden_layers = 1 ok
-05 - OHLC, n_steps = 04, n_hidden_layers = 2 -
-06 - OHLC, n_steps = 04, n_hidden_layers = 3
+05 - OHLC, n_steps = 04, n_hidden_layers = 2 ok
+06 - OHLC, n_steps = 04, n_hidden_layers = 3 -
 
 07 - OHLC, n_steps = 06, n_hidden_layers = 1
 08 - OHLC, n_steps = 06, n_hidden_layers = 2
