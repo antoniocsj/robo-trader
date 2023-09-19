@@ -85,7 +85,7 @@ def train_model():
         exit(-1)
 
     n_steps = 2
-    n_hidden_layers = 1
+    n_hidden_layers = 3
     n_samples_train = 199000  # Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
@@ -100,7 +100,7 @@ def train_model():
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
     max_n_epochs = n_inputs * 3 * 0 + 100
-    patience = int(max_n_epochs / 10) * 0 + 3
+    patience = int(max_n_epochs / 10) * 0 + 9
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')
@@ -181,6 +181,7 @@ def train_model():
                     'n_symbols': n_symbols,
                     'n_features': n_features,
                     'n_inputs': n_inputs,
+                    'n_hidden_layers': n_hidden_layers,
                     'n_samples_train': n_samples_train,
                     'validation_split': validation_split,
                     'effective_n_epochs': effective_n_epochs,
