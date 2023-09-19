@@ -318,8 +318,8 @@ def test_13():
 
     train_log = load_train_log()
     experiments = train_log['experiments']
-    sorted_exps_by_test_loss = sorted(experiments, key=lambda d: d['test_loss_eval'])
-    sorted_exps_by_whole_set_train_loss = sorted(experiments, key=lambda d: d['whole_set_train_loss_eval'])
+    sorted_exps_by_test_loss = sorted(experiments, key=lambda d: d['test_loss'])
+    sorted_exps_by_whole_set_train_loss = sorted(experiments, key=lambda d: d['whole_set_train_loss'])
     sorted_exps_by_product_losses = sorted(experiments, key=lambda d: d['product'])
 
     print('sorted_exps_by_product_losses:')
