@@ -40,7 +40,7 @@ def make_prediction():
 
     # data = read_json('request.json')
 
-    p_1 = Predictors('../predictors')
+    p_1 = Predictors('../predictors_1')
     p_1.calculate_outputs(data)
 
     p_1.show_outputs()
