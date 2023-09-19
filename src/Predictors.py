@@ -32,7 +32,14 @@ class Predictors:
             pred.show_output()
 
     def show_average(self):
-        print(f'predictors ({self.directory}) average : {self.average:.5f}')
+        if len(self.predictors) == 0:
+            print(f'predictors ({self.directory}) average : {self.average}')
+        else:
+            symbol_out = self.predictors[0].train_config['symbol_out']
+            if symbol_out == 'XAUUSD':
+                print(f'predictors ({self.directory}) average : {self.average:.2f}')
+            else:
+                print(f'predictors ({self.directory}) average : {self.average:.5f}')
 
 
 def teste_01():

@@ -22,6 +22,10 @@ class Predictor:
         self.scalers = None
         self.model = None
         self.output = None
+        self.n_steps = 0
+        self.candle_input_type = ''
+        self.n_hidden_layers = 0
+        self.test_loss_eval = 0.0
 
         self.load()
 
@@ -43,6 +47,10 @@ class Predictor:
             print(f'ERRO. o arquivo {train_config_filepath} não existe.')
             exit(-1)
         self.train_config = read_json(train_config_filepath)
+        self.n_steps = self.train_config['n_steps']
+        self.candle_input_type = self.train_config['candle_input_type']
+        self.n_hidden_layers = self.train_config['n_hidden_layers']
+        self.test_loss_eval = self.train_config['test_loss_eval']
 
         scalers_filepath = f'{directory}/scalers.pkl'
         if not os.path.exists(scalers_filepath):
@@ -191,9 +199,13 @@ class Predictor:
     def show_output(self):
         candle_output_type = self.train_config['candle_output_type']
 
-        print(f'predictor ({self.id}) ({self.directory}) : ', end='')
+        print(f'predictor ({self.id}) ({self.directory}) {self.candle_input_type} n_steps={self.n_steps} '
+              f'nhl={self.n_hidden_layers} test_loss={self.test_loss_eval}: ', end='')
         if len(candle_output_type) == 1:
-            print(f'{candle_output_type} = {self.output:.5f}')
+            if self.train_config['symbol_out'] == 'XAUUSD':
+                print(f'{candle_output_type} = {self.output:.2f}')
+            else:
+                print(f'{candle_output_type} = {self.output:.5f}')
         else:
             print(f'{candle_output_type} = {self.output}')
 
