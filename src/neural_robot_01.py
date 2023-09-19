@@ -84,8 +84,8 @@ def train_model():
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 2
-    n_hidden_layers = 3
+    n_steps = 4
+    n_hidden_layers = 2
     n_samples_train = 199000  # Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
@@ -100,7 +100,7 @@ def train_model():
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
     max_n_epochs = n_inputs * 3 * 0 + 100
-    patience = int(max_n_epochs / 10) * 0 + 9
+    patience = int(max_n_epochs / 10) * 0 + 3
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')
@@ -172,6 +172,8 @@ def train_model():
     saved_model = load_model('model.h5')
     test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)
     print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
+    product = whole_set_train_loss_eval * test_loss_eval
+    print(f'p_{random_seed} = {whole_set_train_loss_eval} * {test_loss_eval} = {product} patience={patience}')
 
     train_config = {'symbol_out': symbol_out,
                     'timeframe': hist.timeframe,
