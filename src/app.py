@@ -44,7 +44,7 @@ def make_prediction():
     p_1.calculate_outputs(data)
 
     p_1.show_outputs()
-    p_1.show_average()
+    p_1.show_stats()
 
     return "OK"
 

@@ -1,6 +1,7 @@
 import os
 from utils_filesystem import read_json
 from Predictor import Predictor
+import numpy as np
 
 
 class Predictors:
@@ -8,6 +9,7 @@ class Predictors:
         self.directory = directory
         self.predictors: list[Predictor] = []
         self.average = 0.0
+        self.std = 0.0  # standard deviation
         self.search_predictors()
 
     def search_predictors(self):
@@ -21,34 +23,37 @@ class Predictors:
     def calculate_outputs(self, input_data: dict):
         _sum = 0.0
 
+        outputs = []
         for pred in self.predictors:
             pred.calc_output(input_data)
-            _sum += pred.output
+            outputs.append(pred.output)
 
-        self.average = _sum / len(self.predictors)
+        self.average = np.average(outputs)
+        self.std = np.std(outputs)
+        pass
 
     def show_outputs(self):
         for pred in self.predictors:
             pred.show_output()
 
-    def show_average(self):
+    def show_stats(self):
         if len(self.predictors) == 0:
-            print(f'predictors ({self.directory}) average : {self.average}')
+            print(f'predictors ({self.directory}) average: {self.average} std: {self.std}')
         else:
             symbol_out = self.predictors[0].train_config['symbol_out']
             if symbol_out == 'XAUUSD':
-                print(f'predictors ({self.directory}) average : {self.average:.2f}')
+                print(f'predictors ({self.directory}) average: {self.average:.2f} std: {self.std:.2f}')
             else:
-                print(f'predictors ({self.directory}) average : {self.average:.5f}')
+                print(f'predictors ({self.directory}) average: {self.average:.5f} std: {self.std:.2f}')
 
 
 def teste_01():
     data = read_json('request.json')
 
-    p = Predictors('../predictors')
+    p = Predictors('../predictors_1')
     p.calculate_outputs(data)
     p.show_outputs()
-    p.show_average()
+    p.show_stats()
     pass
 
 
