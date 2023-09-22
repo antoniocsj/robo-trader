@@ -62,7 +62,10 @@ def teste_01():
 
     p_2.show_outputs()
     p_2.show_stats()
-    pass
+
+    averages = [p_1.average, p_2.average]
+    total_average = np.average(averages)
+    print(f'total_average = {total_average:.2f}')
 
 
 if __name__ == '__main__':

@@ -36,8 +36,8 @@ predictors_1:
 ------
 
 predictors_2:
-01 - OHLCV, n_steps = 2, n_hidden_layers = 1 -
-02 - OHLCV, n_steps = 2, n_hidden_layers = 2
+01 - OHLCV, n_steps = 2, n_hidden_layers = 1 ok
+02 - OHLCV, n_steps = 2, n_hidden_layers = 2 -
 03 - OHLCV, n_steps = 2, n_hidden_layers = 3
 
 04 - OHLCV, n_steps = 4, n_hidden_layers = 1

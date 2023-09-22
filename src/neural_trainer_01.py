@@ -220,7 +220,7 @@ def update_train_log(train_log: dict):
 
 def trainer_01():
     create_train_log()
-    _secs = 60
+    _secs = 30
 
     while True:
         train_log = load_train_log()

@@ -1,4 +1,4 @@
-import os
+import numpy as np
 import tensorflow as tf
 from flask import Flask, request
 from datetime import datetime
@@ -41,10 +41,20 @@ def make_prediction():
     # data = read_json('request.json')
 
     p_1 = Predictors('../predictors_1')
+    p_2 = Predictors('../predictors_2')
+
     p_1.calculate_outputs(data)
+    p_2.calculate_outputs(data)
 
     p_1.show_outputs()
     p_1.show_stats()
+
+    p_2.show_outputs()
+    p_2.show_stats()
+
+    averages = [p_1.average, p_2.average]
+    total_average = np.average(averages)
+    print(f'total_average = {total_average:.2f}')
 
     return "OK"
 
