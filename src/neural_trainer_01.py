@@ -84,7 +84,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
     max_n_epochs = n_inputs * 3 * 0 + 100
-    patience = int(max_n_epochs / 10) * 0 + 3
+    patience = int(max_n_epochs / 10) * 0 + 8
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')
@@ -220,7 +220,7 @@ def update_train_log(train_log: dict):
 
 def trainer_01():
     create_train_log()
-    _secs = 40
+    _secs = 60
 
     while True:
         train_log = load_train_log()

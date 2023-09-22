@@ -16,8 +16,7 @@ class Predictors:
         all_subdirs = os.listdir(self.directory)
 
         for subdir in sorted(all_subdirs):
-            index = int(subdir)
-            pred = Predictor(index, self.directory)
+            pred = Predictor(subdir, self.directory)
             self.predictors.append(pred)
 
     def calculate_outputs(self, input_data: dict):
@@ -37,14 +36,16 @@ class Predictors:
             pred.show_output()
 
     def show_stats(self):
+        directory = self.directory.split('/')[1]
+
         if len(self.predictors) == 0:
-            print(f'predictors ({self.directory}) average: {self.average} std: {self.std}')
+            print(f'predictors ({directory}) average: {self.average} std: {self.std}')
         else:
             symbol_out = self.predictors[0].train_config['symbol_out']
             if symbol_out == 'XAUUSD':
-                print(f'predictors ({self.directory}) average: {self.average:.2f} std: {self.std:.2f}')
+                print(f'predictors ({directory}) average: {self.average:.2f} std: {self.std:.2f}')
             else:
-                print(f'predictors ({self.directory}) average: {self.average:.5f} std: {self.std:.2f}')
+                print(f'predictors ({directory}) average: {self.average:.5f} std: {self.std:.2f}')
 
 
 def teste_01():

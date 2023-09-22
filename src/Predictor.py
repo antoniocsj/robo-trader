@@ -14,8 +14,8 @@ from prediction import SymbolsPreparation
 
 
 class Predictor:
-    def __init__(self, index: int, directory: str):
-        self.id = index
+    def __init__(self, _id: str, directory: str):
+        self.id = _id
         self.directory = directory
         self.settings = None
         self.train_config = None
@@ -31,7 +31,7 @@ class Predictor:
 
     def load(self):
         # directory = f'../predictors/{self.id:02d}'
-        directory = f'{self.directory}/{self.id:02d}'
+        directory = f'{self.directory}/{self.id}'
         if not os.path.exists(directory):
             print(f'ERRO. o diretório {directory} não existe.')
             exit(-1)
@@ -198,8 +198,9 @@ class Predictor:
 
     def show_output(self):
         candle_output_type = self.train_config['candle_output_type']
+        directory = self.directory.split('/')[1]
 
-        print(f'predictor ({self.id}) ({self.directory}) {self.candle_input_type} n_steps={self.n_steps} '
+        print(f'predictor ({self.id}) ({directory}) {self.candle_input_type} n_steps={self.n_steps} '
               f'nhl={self.n_hidden_layers} test_loss={self.test_loss_eval}: ', end='')
         if len(candle_output_type) == 1:
             if self.train_config['symbol_out'] == 'XAUUSD':
@@ -213,8 +214,8 @@ class Predictor:
 def teste_01():
     data = read_json('request.json')
 
-    directory = '../predictors'
-    predictor_1 = Predictor(1, directory)
+    directory = '../predictors_1'
+    predictor_1 = Predictor('01', directory)
     predictor_1.calc_output(data)
     predictor_1.show_output()
 
