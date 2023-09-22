@@ -84,7 +84,7 @@ def train_model():
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 8
+    n_steps = 2
     n_hidden_layers = 1
     n_samples_train = 199000  # Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
@@ -100,7 +100,7 @@ def train_model():
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
     max_n_epochs = n_inputs * 3 * 0 + 100
-    patience = int(max_n_epochs / 10) * 0 + 16
+    patience = int(max_n_epochs / 10) * 0 + 9
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')

@@ -51,10 +51,17 @@ class Predictors:
 def teste_01():
     data = read_json('request.json')
 
-    p = Predictors('../predictors_1')
-    p.calculate_outputs(data)
-    p.show_outputs()
-    p.show_stats()
+    p_1 = Predictors('../predictors_1')
+    p_2 = Predictors('../predictors_2')
+
+    p_1.calculate_outputs(data)
+    p_2.calculate_outputs(data)
+
+    p_1.show_outputs()
+    p_1.show_stats()
+
+    p_2.show_outputs()
+    p_2.show_stats()
     pass
 
 
