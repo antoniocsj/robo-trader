@@ -49,7 +49,7 @@ class Predictors:
 
 
 def teste_01():
-    data = read_json('request.json')
+    data = read_json('request2.json')
 
     p_1 = Predictors('../predictors_1')
     p_2 = Predictors('../predictors_2')

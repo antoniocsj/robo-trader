@@ -21,8 +21,11 @@ class HistMulti:
         """
         self.symbols = []
         self.timeframe = timeframe
-        self.arr: dict[str, ndarray] = {}  # guarda os arrays dos dados históricos conforme seu 'simbolo' e 'timeframe'
-        self.sheets: dict[str, Sheet] = {}
+
+        # guarda os arrays dos dados históricos conforme seu 'simbolo' e 'timeframe'
+        self.arr: dict[str, dict[str, ndarray]] = {}
+
+        self.sheets: dict[str, dict[str, Sheet]] = {}
         self.source_is_dir = False
 
         if isinstance(source, str):
@@ -31,14 +34,13 @@ class HistMulti:
             print(f'obtendo dados históricos a partir do diretório {self.directory}')
             self.all_files = []
             self.csv_files = {}  # guarda os nomes dos arquivos csv conforme seu 'simbolo' e 'timeframe'
-            self.hist_csv = {}  # guarda os nomes dos arquivos csv conforme seu 'simbolo' e 'timeframe'
             self.search_symbols(symbols_allowed)
         elif isinstance(source, dict):
             self.source_is_dir = False
             print(f'obtendo dados históricos a partir de um dicionário de planilhas')
             # self.sheets: dict[str, Sheet] = source
             self.sheets = source
-            self.symbols = search_symbols_in_dict(self.sheets, self.timeframe)
+            self.symbols = search_symbols_in_dict(self.sheets)
 
         self.load_symbols()
 
@@ -75,32 +77,37 @@ class HistMulti:
                     exit(-1)
 
                 if self.source_is_dir:
-                    self.csv_files[f'{_symbol}_{_timeframe}'] = filename
+                    # self.csv_files[f'{_symbol}_{_timeframe}'] = filename
+                    self.csv_files[_symbol] = {}
+                    self.csv_files[_symbol][_timeframe] = filename
 
         self.symbols = sorted(self.symbols)
 
-    def get_csv_filepath(self, _symbol_timeframe: str) -> str:
-        _filepath = self.directory + '/' + self.csv_files[_symbol_timeframe]
+    def get_csv_filepath(self, symbol: str, timeframe: str) -> str:
+        _filepath = self.directory + '/' + self.csv_files[symbol][timeframe]
         return _filepath
 
     def add_hist_data(self, symbol: str, timeframe: str):
-        key = f'{symbol}_{timeframe}'
         df: DataFrame
 
         if self.source_is_dir:
-            _filepath = self.get_csv_filepath(f'{symbol}_{timeframe}')
+            _filepath = self.get_csv_filepath(symbol, timeframe)
             df = pd.read_csv(_filepath, delimiter='\t')
             # df.drop(columns=['<VOL>', '<SPREAD>'], inplace=True)
-            self.sheets[key] = Sheet(_filepath, symbol, timeframe)
+            # self.sheets[key] = Sheet(_filepath, symbol, timeframe)
+            self.sheets[symbol] = {}
+            self.sheets[symbol][timeframe] = Sheet(_filepath, symbol, timeframe)
         else:
-            s: Sheet = self.sheets[key]
+            # s: Sheet = self.sheets[key]
+            s: Sheet = self.sheets[symbol][timeframe]
             df = s.df
 
         if df.isnull().sum().values.sum() != 0:
-            print(f'Há dados faltando no dataframe {key}')
+            print(f'Há dados faltando no dataframe {symbol}_{timeframe}')
             exit(-1)
 
-        self.arr[key] = df.to_numpy(copy=True)
+        self.arr[symbol] = {}
+        self.arr[symbol][timeframe] = df.to_numpy(copy=True)
         del df
 
     def load_symbols(self):
@@ -114,8 +121,9 @@ class HistMulti:
     def print_hist(self):
         print('primeiras linhas dos históricos:')
         if len(self.arr) > 0:
-            for k, v in enumerate(self.arr):
-                print(k, v, self.arr[v][0])
+            for k1, v1 in enumerate(self.arr):
+                for k2, v2 in enumerate(self.arr[v1]):
+                    print(v1, v2, self.arr[v1][v2][0])
         else:
             print('os dados históricos não foram carregados ainda.')
 
@@ -130,10 +138,10 @@ class HistMulti:
         for symbol in self.symbols:
             if symbols and symbol not in symbols:
                 continue
-            _symbol_tf = f'{symbol}_{self.timeframe}'
-            arr = self.arr[_symbol_tf]
+
+            arr = self.arr[symbol][self.timeframe]
             s: Sheet = Sheet(arr, symbol, self.timeframe)
-            self.sheets[_symbol_tf] = s
+            self.sheets[symbol][self.timeframe] = s
 
     def copy_symbol(self, symbol_name_src: str, other_hist: "HistMulti", symbol_name_dst: str = None):
         if self.source_is_dir:
@@ -198,19 +206,17 @@ class HistMulti:
         self.symbols = sorted(self.symbols)
 
     def delete_first_row_symbol(self, symbol_name: str):
-        symbol_tf = f'{symbol_name}_{self.timeframe}'
-
         if symbol_name not in self.symbols:
             print(f'ERRO. delete_first_row_symbol(). tentativa de remover primeira linha do símbolo {symbol_name} '
                   f'que não existe no hist.')
             exit(-1)
 
-        s: Sheet = self.sheets[symbol_tf]
+        s: Sheet = self.sheets[symbol_name][self.timeframe]
         df: DataFrame = s.df
         df.drop(df.index[0], inplace=True)
         df.sort_index(ignore_index=True, inplace=True)
         df.reset_index(drop=True)
-        self.arr[symbol_tf] = np.delete(self.arr[symbol_tf], 0, axis=0)
+        self.arr[symbol_name][self.timeframe] = np.delete(self.arr[symbol_name][self.timeframe], 0, axis=0)
 
     def delete_first_row_symbols(self, excepting_pattern=None):
         if excepting_pattern:

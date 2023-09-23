@@ -114,11 +114,10 @@ def normalize_directory(directory: str):
     hist = HistMulti(directory, timeframe)
     scalers = {}
 
-    for _symbol in hist.symbols:
-        # print(_symbol)
-        _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
+    for symbol in hist.symbols:
+        # print(symbol)
 
-        arr: ndarray = hist.arr[_symbol_timeframe]
+        arr: ndarray = hist.arr[symbol][timeframe]
         if arr.shape[1] == 2:
             data: ndarray = arr[:, 1]
             data = data.reshape(len(data), 1)
@@ -130,8 +129,9 @@ def normalize_directory(directory: str):
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[:, 0], True)
         dataf.columns = range(dataf.columns.size)
-        _filepath = hist.get_csv_filepath(_symbol_timeframe)
+        _filepath = hist.get_csv_filepath(symbol, timeframe)
         dataf.to_csv(_filepath, index=False, sep='\t')
+        _symbol_timeframe = f'{symbol}_{timeframe}'
         scalers[_symbol_timeframe] = scaler
 
     with open('scalers.pkl', 'wb') as file:
@@ -142,14 +142,16 @@ def normalize_directory(directory: str):
 
 
 def normalize_symbols(hist: HistMulti, scalers: dict, symbols: list[str] = None):
+    timeframe = hist.timeframe
+
     for symbol in hist.symbols:
         if symbols and symbol not in symbols:
             continue
 
         # print(symbol)
-        _symbol_timeframe = f'{symbol}_{hist.timeframe}'
+        _symbol_timeframe = f'{symbol}_{timeframe}'
 
-        arr: ndarray = hist.arr[_symbol_timeframe]
+        arr: ndarray = hist.arr[symbol][timeframe]
         if arr.shape[1] == 2:
             data: ndarray = arr[:, 1]
             data = data.reshape(len(data), 1)
@@ -161,7 +163,7 @@ def normalize_symbols(hist: HistMulti, scalers: dict, symbols: list[str] = None)
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[:, 0], True)
         dataf.columns = range(dataf.columns.size)
-        hist.arr[_symbol_timeframe] = dataf.to_numpy(copy=True)
+        hist.arr[symbol][timeframe] = dataf.to_numpy(copy=True)
 
     if symbols:
         print(f'os símbolos {symbols} de {type(hist)} foram normalizados.')
@@ -179,11 +181,10 @@ def differentiate_directory(directory: str):
 
     hist = HistMulti(directory, timeframe)
 
-    for _symbol in hist.symbols:
-        # print(_symbol)
-        _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
+    for symbol in hist.symbols:
+        # print(symbol)
 
-        arr = hist.arr[_symbol_timeframe]
+        arr = hist.arr[symbol][timeframe]
         if arr.shape[1] == 2:
             data = arr[:, 1]
         else:
@@ -193,7 +194,7 @@ def differentiate_directory(directory: str):
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[1:, 0], True)
         dataf.columns = range(dataf.columns.size)
-        _filepath = hist.get_csv_filepath(_symbol_timeframe)
+        _filepath = hist.get_csv_filepath(symbol, timeframe)
         dataf.to_csv(_filepath, index=False, sep='\t')
 
     print(f'todos os símbolos do diretório {directory} foram diferenciados.')
@@ -224,14 +225,14 @@ def differentiate_files(filepath_list: list[str], directory: str):
 def differentiate_symbols(hist: HistMulti, symbols: list[str] = None):
     print(f'diferenciando alguns símbolos do objeto hist {type(hist)}')
 
+    timeframe = hist.timeframe
+
     for symbol in hist.symbols:
         if symbols and symbol not in symbols:
             continue
 
         # print(symbol)
-        _symbol_timeframe = f'{symbol}_{hist.timeframe}'
-
-        arr = hist.arr[_symbol_timeframe]
+        arr = hist.arr[symbol][timeframe]
         if arr.shape[1] == 2:
             data: ndarray = arr[:, 1]
             data = data.reshape(len(data), 1)
@@ -242,7 +243,7 @@ def differentiate_symbols(hist: HistMulti, symbols: list[str] = None):
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[1:, 0], True)
         dataf.columns = range(dataf.columns.size)
-        hist.arr[_symbol_timeframe] = dataf.to_numpy(copy=True)
+        hist.arr[symbol][timeframe] = dataf.to_numpy(copy=True)
 
     if symbols:
         print(f'os símbolos {symbols} de {type(hist)} foram diferenciados.')
@@ -276,15 +277,14 @@ def transform_directory(directory: str, transform_str: str):
     timeframe = setup['timeframe']
     hist = HistMulti(directory, timeframe)
 
-    for _symbol in hist.symbols:
-        # print(_symbol)
-        _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
-        arr = hist.arr[_symbol_timeframe]
+    for symbol in hist.symbols:
+        # print(symbol)
+        arr = hist.arr[symbol][timeframe]
         data = apply_transform_str(arr, transform_str)
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[:, 0], True)
         dataf.columns = range(dataf.columns.size)
-        _filepath = hist.get_csv_filepath(_symbol_timeframe)
+        _filepath = hist.get_csv_filepath(symbol, timeframe)
         dataf.to_csv(_filepath, index=False, sep='\t')
 
     print(f'todos os símbolos do diretório {directory} foram transformados: {transform_str}.')
@@ -299,28 +299,26 @@ def transform_directory_(directory: str, transform_str: str):
     hist = HistMulti(directory, timeframe)
 
     if transform_str == '(C-O)*V':
-        for _symbol in hist.symbols:
-            # print(_symbol)
-            _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
-            arr = hist.arr[_symbol_timeframe]
+        for symbol in hist.symbols:
+            # print(symbol)
+            arr = hist.arr[symbol][timeframe]
             data = (arr[:, 4] - arr[:, 1]) * arr[:, 5]
             data = np.reshape(data, (len(data), 1))
             dataf = pd.DataFrame(data)
             dataf.insert(0, 0, arr[:, 0], True)
             dataf.columns = range(dataf.columns.size)
-            _filepath = hist.get_csv_filepath(_symbol_timeframe)
+            _filepath = hist.get_csv_filepath(symbol, timeframe)
             dataf.to_csv(_filepath, index=False, sep='\t')
     elif transform_str == 'C*V':
-        for _symbol in hist.symbols:
-            # print(_symbol)
-            _symbol_timeframe = f'{_symbol}_{hist.timeframe}'
-            arr = hist.arr[_symbol_timeframe]
+        for symbol in hist.symbols:
+            # print(symbol)
+            arr = hist.arr[symbol][timeframe]
             data = arr[:, 4] * arr[:, 5]
             data = np.reshape(data, (len(data), 1))
             dataf = pd.DataFrame(data)
             dataf.insert(0, 0, arr[:, 0], True)
             dataf.columns = range(dataf.columns.size)
-            _filepath = hist.get_csv_filepath(_symbol_timeframe)
+            _filepath = hist.get_csv_filepath(symbol, timeframe)
             dataf.to_csv(_filepath, index=False, sep='\t')
     else:
         print(f'ERRO. a tranformação {transform_str} não está implementada')
@@ -353,19 +351,21 @@ def transform_files(filepath_list: list[str], directory: str, transform_str: str
 def transform_symbols(hist: HistMulti, transform_str: str, symbols: list[str] = None):
     print(f'transformando símbolos do objeto hist {type(hist)}')
 
+    timeframe = hist.timeframe
+
     for symbol in hist.symbols:
         if symbols and symbol not in symbols:
             continue
 
         # print(symbol)
-        _symbol_timeframe = f'{symbol}_{hist.timeframe}'
+        _symbol_timeframe = f'{symbol}_{timeframe}'
 
-        arr = hist.arr[_symbol_timeframe]
+        arr = hist.arr[symbol][timeframe]
         data = apply_transform_str(arr, transform_str)
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[:, 0], True)
         dataf.columns = range(dataf.columns.size)
-        hist.arr[_symbol_timeframe] = dataf.to_numpy(copy=True)
+        hist.arr[symbol][timeframe] = dataf.to_numpy(copy=True)
 
     hist.update_sheets()
     print(f'todos os símbolos de {type(hist)} foram tranformados.')

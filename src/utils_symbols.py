@@ -33,7 +33,7 @@ def search_symbols_in_directory(directory: str, timeframe: str) -> list[str]:
     return symbols
 
 
-def search_symbols_in_dict(_dict: dict, timeframe: str) -> list[str]:
+def search_symbols_in_dict(_dict: dict) -> list[str]:
     """
     Procurando pelos símbolos presentes num dicionário contendo velas de vários ativos.
     Todos os arquivos devem ser do mesmo timeframe.
@@ -42,18 +42,11 @@ def search_symbols_in_dict(_dict: dict, timeframe: str) -> list[str]:
     # passe por todos as chaves do dicionário e descubra o symbol e timeframe
     symbols = []
 
-    for symbol_tf in _dict:
-        _symbol = symbol_tf.split('_')[0]
-        _timeframe = symbol_tf.split('_')[1]
-
-        if _symbol not in symbols:
-            symbols.append(_symbol)
+    for symbol in _dict:
+        if symbol not in symbols:
+            symbols.append(symbol)
         else:
-            print(f'erro. o símbolo {_symbol} aparece repetido.')
-            exit(-1)
-
-        if _timeframe != timeframe:
-            print(f'ERRO. o timeframe {_timeframe} é diferente do especificado {timeframe}.')
+            print(f'erro. o símbolo {symbol} aparece repetido.')
             exit(-1)
 
     symbols = sorted(symbols)
@@ -121,8 +114,8 @@ def calc_n_features(directory: str, candle_input_type: str, timeframe: str):
     """
     count = 0
     symbols_names, symbols_paths = search_symbols(directory, timeframe)
-    for s in symbols_names:
-        if s.endswith('@T') or s.endswith('@DT') or s.endswith('@TD'):
+    for symbol_name in symbols_names:
+        if symbol_name.endswith('@T') or symbol_name.endswith('@DT') or symbol_name.endswith('@TD'):
             count += 1
         else:
             count += len(candle_input_type)

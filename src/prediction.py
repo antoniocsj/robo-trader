@@ -1,5 +1,3 @@
-import json
-import os.path
 import pickle
 import numpy as np
 from numpy import ndarray
@@ -31,7 +29,6 @@ class SymbolsPreparation:
         self.sheets = {}
         self.num_insertions_done = 0
         self.exclude_first_rows = False
-        self.new_start_row_datetime: datetime = None
         self.n_steps = n_steps
 
         self.search_symbols()
@@ -45,19 +42,19 @@ class SymbolsPreparation:
         # passe por todos as chaves do dicionário e descubra o symbol e timeframe
         symbols = []
 
-        for symbol_tf in self.symbols_rates:
-            _symbol = symbol_tf.split('_')[0]
-            _timeframe = symbol_tf.split('_')[1]
+        for symbol in self.symbols_rates:
+            # _symbol = symbol_tf.split('_')[0]
+            # _timeframe = symbol_tf.split('_')[1]
 
-            if _symbol not in symbols:
-                symbols.append(_symbol)
+            if symbol not in symbols:
+                symbols.append(symbol)
             else:
-                print(f'erro. o símbolo {_symbol} aparece repetido.')
+                print(f'erro. o símbolo {symbol} aparece repetido.')
                 exit(-1)
 
-            if _timeframe != self.timeframe:
-                print(f'ERRO. o timeframe {_timeframe} é diferente do especificado {self.timeframe}.')
-                exit(-1)
+            # if _timeframe != self.timeframe:
+            #     print(f'ERRO. o timeframe {_timeframe} é diferente do especificado {self.timeframe}.')
+            #     exit(-1)
 
         self.symbols = sorted(symbols)
 
@@ -67,10 +64,10 @@ class SymbolsPreparation:
     #         self.sheets.append(Sheet(d, _symbol, self.timeframe))
 
     def load_sheets(self):
-        for _symbol in self.symbols:
-            key = f'{_symbol}_{self.timeframe}'
-            d = self.symbols_rates[key]
-            self.sheets[key] = Sheet(d, _symbol, self.timeframe)
+        for symbol in self.symbols:
+            d = self.symbols_rates[symbol][self.timeframe]
+            self.sheets[symbol] = {}
+            self.sheets[symbol][self.timeframe] = Sheet(d, symbol, self.timeframe)
 
     def check_is_trading(self, s: Sheet):
         row = s.df.iloc[-1]
@@ -82,16 +79,15 @@ class SymbolsPreparation:
             s.is_trading = False
 
     def prepare_symbols(self):
-        s: Sheet
         print(f'server_datetime = {self.server_datetime}')
 
         # verificar quais símbolos estão (ou não) operando
         who_is_trading = []
-        for s in list(self.sheets.values()):
-            self.check_is_trading(s)
-            # print(f'{s.symbol} is trading: {s.is_trading}')
-            if s.is_trading:
-                who_is_trading.append(s.symbol)
+        for symbol_name in self.sheets:
+            sheet: Sheet = self.sheets[symbol_name][self.timeframe]
+            self.check_is_trading(sheet)
+            if sheet.is_trading:
+                who_is_trading.append(sheet.symbol)
 
         if len(who_is_trading) == 0:
             print('nenhum símbolo está operando agora.')
@@ -102,40 +98,40 @@ class SymbolsPreparation:
         else:
             print('NEM Todos os símbolos estão operando.')
 
-        for k in self.sheets:
-            s = self.sheets[k]
-            if s.is_trading:
+        for symbol_name in self.sheets:
+            sheet: Sheet = self.sheets[symbol_name][self.timeframe]
+            if sheet.is_trading:
                 # se está operando, então descarte a vela em formação (última)
                 # e mantenha apenas as N (n_steps) últimas velas.
-                if len(s.df) < self.n_steps + 1:
-                    print(f'o tamanho da planilha {s.symbol} ({len(s.df)}) é menor do que n_steps + 1 '
+                if len(sheet.df) < self.n_steps + 1:
+                    print(f'o tamanho da planilha {sheet.symbol} ({len(sheet.df)}) é menor do que n_steps + 1 '
                           f'({self.n_steps + 1})')
                     exit(-1)
-                s.df.drop(s.df.index[-1], inplace=True)
-                s.df.sort_index(ignore_index=True, inplace=True)
-                s.df.reset_index(drop=True)
-                s.df.drop(s.df.index[:-self.n_steps], inplace=True)
-                s.df.sort_index(ignore_index=True, inplace=True)
-                s.df.reset_index(drop=True)
+                sheet.df.drop(sheet.df.index[-1], inplace=True)
+                sheet.df.sort_index(ignore_index=True, inplace=True)
+                sheet.df.reset_index(drop=True)
+                sheet.df.drop(sheet.df.index[:-self.n_steps], inplace=True)
+                sheet.df.sort_index(ignore_index=True, inplace=True)
+                sheet.df.reset_index(drop=True)
             else:
                 # se não está operando, então todas as vela são velas concluídas e antigas;
                 # mantenha apenas as (n_steps) últimas velas;
                 # obtenha o preço de fechamento da última vela (C') e aplique nos OHLCs da (n_steps) últimas velas;
-                if len(s.df) < self.n_steps:
-                    print(f'o tamanho da planilha {s.symbol} ({len(s.df)}) é menor do que n_steps '
+                if len(sheet.df) < self.n_steps:
+                    print(f'o tamanho da planilha {sheet.symbol} ({len(sheet.df)}) é menor do que n_steps '
                           f'({self.n_steps})')
                     exit(-1)
-                s.df.drop(s.df.index[:-self.n_steps], inplace=True)
-                s.df.sort_index(ignore_index=True, inplace=True)
-                s.df.reset_index(drop=True)
+                sheet.df.drop(sheet.df.index[:-self.n_steps], inplace=True)
+                sheet.df.sort_index(ignore_index=True, inplace=True)
+                sheet.df.reset_index(drop=True)
 
-                _close = s.df.iloc[-1]['CLOSE']
+                _close = sheet.df.iloc[-1]['CLOSE']
                 for i in range(self.n_steps - 1, -1, -1):
-                    s.df.loc[i, 'OPEN'] = _close
-                    s.df.loc[i, 'HIGH'] = _close
-                    s.df.loc[i, 'LOW'] = _close
-                    s.df.loc[i, 'CLOSE'] = _close
-                    s.df.loc[i, 'TICKVOL'] = 0
+                    sheet.df.loc[i, 'OPEN'] = _close
+                    sheet.df.loc[i, 'HIGH'] = _close
+                    sheet.df.loc[i, 'LOW'] = _close
+                    sheet.df.loc[i, 'CLOSE'] = _close
+                    sheet.df.loc[i, 'TICKVOL'] = 0
 
 
 def prepare_data_for_model(data: dict) -> ndarray:
@@ -157,8 +153,6 @@ def prepare_data_for_model(data: dict) -> ndarray:
     print('settings:')
     print(f'{settings}')
 
-    temp_dir = settings['temp_dir']
-    symbol_out = settings['symbol_out']
     settings_timeframe = settings['timeframe']
     setup_code = settings['setup_code']
     setup_uses_differentiation = settings['setup_uses_differentiation']
@@ -172,11 +166,8 @@ def prepare_data_for_model(data: dict) -> ndarray:
 
     n_steps = train_configs['n_steps']
     n_features = train_configs['n_features']
-    symbol_out = train_configs['symbol_out']
     symbols_used_in_training: list[str] = train_configs['symbols']
-    n_samples_train = train_configs['n_samples_train']
     candle_input_type = settings['candle_input_type']
-    candle_output_type = settings['candle_output_type']
 
     if setup_code < 1:
         print(f'ERRO. setup_code = {setup_code} indica que não foi feito nenhum setup.')
@@ -208,7 +199,7 @@ def prepare_data_for_model(data: dict) -> ndarray:
         exit(-1)
 
     symbols_rates = data['symbols_rates']
-    symbols = search_symbols_in_dict(symbols_rates, timeframe)
+    symbols = search_symbols_in_dict(symbols_rates)
     symbols_present_in_the_request_set = set(symbols)
 
     # deixe na lista pure_symbols_used_in_training_set apenas os símbolos puros, ou seja, não modificados

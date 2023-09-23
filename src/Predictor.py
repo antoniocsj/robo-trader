@@ -69,8 +69,8 @@ class Predictor:
         """
         Prepara os dados históricos para seu uso no modelo (rede neural). Faz todos os ajustes necessários para retornar
         um array pronto para ser apresentado ao modelo para obter uma previsão.
-        Entre os ajustes estão a remoção de todos os símbolos desnessários, pois a requisição pode possuir um conjunto de
-        símbolos maior do que aquele que foi usado no treinamento da rede neural.
+        Entre os ajustes estão a remoção de todos os símbolos desnessários, pois a requisição pode possuir um conjunto
+        de símbolos maior do que aquele que foi usado no treinamento da rede neural.
         Outro ajuste importante é a remoção da última vela que pode estar em formação, no caso dos símbolos que estão
         operando.
         Outro ajuste é feito nas velas dos símbolos que não estão operando. Nessas velas é feito O=H=L=C=C' e V=0.
@@ -86,9 +86,7 @@ class Predictor:
         # print('settings:')
         # print(f'{settings}')
 
-        temp_dir = settings['temp_dir']
-        symbol_out = settings['symbol_out']
-        settings_timeframe = settings['timeframe']
+        timeframe = settings['timeframe']
         setup_code = settings['setup_code']
         setup_uses_differentiation = settings['setup_uses_differentiation']
 
@@ -98,11 +96,8 @@ class Predictor:
 
         n_steps = train_configs['n_steps']
         n_features = train_configs['n_features']
-        symbol_out = train_configs['symbol_out']
         symbols_used_in_training: list[str] = train_configs['symbols']
-        n_samples_train = train_configs['n_samples_train']
         candle_input_type = settings['candle_input_type']
-        candle_output_type = settings['candle_output_type']
 
         if setup_code < 1:
             print(f'ERRO. setup_code = {setup_code} indica que não foi feito nenhum setup.')
@@ -117,24 +112,19 @@ class Predictor:
         trade_server_datetime = datetime.fromisoformat(data['trade_server_datetime'])
         print(f'last_datetime = {last_datetime}, trade_server_datetime = {trade_server_datetime}')
 
-        timeframe = data['timeframe']
-        if timeframe != settings_timeframe:
-            print(f'o timeframe da requisição ({timeframe}) é diferente do timeframe definido no arquivo '
-                  f'settings.json ({settings_timeframe})')
+        timeframes = data['timeframes']
+        if timeframe not in timeframes:
+            print(f'ERRO! O timeframe do predictor ({timeframe})  não está presente é na requisição.')
             exit(-1)
 
-        n_symbols = data['n_symbols']
         rates_count = data['rates_count']
-        start_pos = data['start_pos']
-        print(f'timeframe = {timeframe}, n_symbols = {n_symbols}, '
-              f'rates_count = {rates_count}, start_pos = {start_pos} ')
 
         if num_candles > rates_count - 1:
             print(f'ERRO. o número de velas presentes na requisição não é suficiente para o modelo.')
             exit(-1)
 
         symbols_rates = data['symbols_rates']
-        symbols = search_symbols_in_dict(symbols_rates, timeframe)
+        symbols = search_symbols_in_dict(symbols_rates)
         symbols_present_in_the_request_set = set(symbols)
 
         # deixe na lista pure_symbols_used_in_training_set apenas os símbolos puros, ou seja, não modificados
@@ -154,9 +144,11 @@ class Predictor:
             # faça um novo symbols_rates contendo apenas os símbolos presentes no treinamento
             _new_symbol_rates = {}
             pure_symbols_used_in_training = sorted(list(pure_symbols_used_in_training_set))
-            for _symbol in pure_symbols_used_in_training:
-                key = f'{_symbol}_{timeframe}'
-                _new_symbol_rates[key] = symbols_rates[key]
+            for symbol in pure_symbols_used_in_training:
+                # key = f'{symbol}_{timeframe}'
+                # _new_symbol_rates[key] = symbols_rates[key]
+                _new_symbol_rates[symbol] = {}
+                _new_symbol_rates[symbol][timeframe] = symbols_rates[symbol][timeframe]
             symbols_rates = _new_symbol_rates
         else:
             print(f'ERRO. Nem todos os símbolos usados no treinamento da rede neural estão presentes na requisição.')
@@ -212,7 +204,7 @@ class Predictor:
 
 
 def teste_01():
-    data = read_json('request.json')
+    data = read_json('request2.json')
 
     directory = '../predictors_1'
     predictor_1 = Predictor('01', directory)

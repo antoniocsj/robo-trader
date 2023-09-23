@@ -1,5 +1,4 @@
 import os
-import pickle
 import shutil
 import json
 import copy
@@ -121,7 +120,6 @@ def setup_directory_01():
 
     temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
-    symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
@@ -144,7 +142,6 @@ def setup_symbols_01(hist: HistMulti, settings, scalers) -> HistMulti:
     -> 2) demais símbolos normalizados.
     :return:
     """
-    symbol_out = settings['symbol_out']
     _hist = copy.deepcopy(hist)
     normalize_symbols(_hist, scalers)
 
@@ -314,7 +311,6 @@ def setup_directory_04():
 
     temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
-    symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
@@ -357,8 +353,6 @@ def setup_symbols_04(hist: HistMulti, settings, scalers) -> HistMulti:
     -> 4) demais símbolos diferenciados e normalizados;
     :return:
     """
-    symbol_out = settings['symbol_out']
-
     _hist = copy.deepcopy(hist)
     _hist.rename_symbols_adding_suffix('@D')
     differentiate_symbols(_hist)
@@ -456,7 +450,6 @@ def setup_directory_06():
 
     temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
-    symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
@@ -490,8 +483,6 @@ def setup_symbols_06(hist: HistMulti, settings, scalers) -> HistMulti:
     -> 4) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
-    symbol_out = settings['symbol_out']
-
     _hist = copy.deepcopy(hist)
     _hist.rename_symbols_adding_suffix('@T')
     transform_symbols(_hist, '(C-O)*V')
@@ -526,7 +517,6 @@ def setup_directory_07():
 
     temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
-    symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
@@ -586,8 +576,6 @@ def setup_symbols_07(hist: HistMulti, settings, scalers) -> HistMulti:
     -> 6) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
-    symbol_out = settings['symbol_out']
-
     _hist = copy.deepcopy(hist)
     _hist.rename_symbols_adding_suffix('@T')
     _transformed = _hist.symbols[:]
