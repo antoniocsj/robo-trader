@@ -65,7 +65,7 @@ class Predictor:
             exit(-1)
         self.model = load_model(model_filepath)
 
-    def prepare_data_for_model(self, data: dict) -> ndarray:
+    def prepare_data_for_model(self, data: dict, force_all_symbols_trading=False) -> ndarray:
         """
         Prepara os dados históricos para seu uso no modelo (rede neural). Faz todos os ajustes necessários para retornar
         um array pronto para ser apresentado ao modelo para obter uma previsão.
@@ -75,11 +75,10 @@ class Predictor:
         operando.
         Outro ajuste é feito nas velas dos símbolos que não estão operando. Nessas velas é feito O=H=L=C=C' e V=0.
         Também deverá ser implementada a sincronização de todos os símbolos.
+        :param force_all_symbols_trading: supõe que todos os símbolos estão operando no instante da previsão.
         :param data: dados históricos provenientes de uma requisição feita pelo MT5.
         :return: array pronto para ser aplicado no modelo
         """
-        # print('prepare_data_for_model()')
-
         settings = self.settings
         scalers = self.scalers
 
@@ -155,7 +154,12 @@ class Predictor:
             exit(-1)
 
         symb_sync = SymbolsPreparation(symbols_rates, timeframe, trade_server_datetime, num_candles)
-        symb_sync.prepare_symbols()
+
+        if force_all_symbols_trading:
+            symb_sync.prepare_symbols(all_symbols_trading=True)
+        else:
+            symb_sync.prepare_symbols()
+
         hist = HistMulti(symb_sync.sheets, timeframe)
         hist2 = apply_setup_symbols(hist, setup_code, settings, scalers)
 
@@ -173,12 +177,12 @@ class Predictor:
 
         return X
 
-    def calc_output(self, input_data: dict):
+    def calc_output(self, input_data: dict, force_all_symbols_trading=False):
         symbol_out = self.settings['symbol_out']
         timeframe = self.settings['timeframe']
         _symbol_tf = f'{symbol_out}_{timeframe}'
 
-        x_input = self.prepare_data_for_model(input_data)
+        x_input = self.prepare_data_for_model(input_data, force_all_symbols_trading)
         output_norm = self.model.predict(x_input)
 
         bias = self.train_config['bias']
@@ -205,10 +209,11 @@ class Predictor:
 
 def teste_01():
     data = read_json('request2.json')
+    suppose_all_symbols_trading = True
 
     directory = '../predictors_1'
     predictor_1 = Predictor('01', directory)
-    predictor_1.calc_output(data)
+    predictor_1.calc_output(data, suppose_all_symbols_trading)
     predictor_1.show_output()
 
 

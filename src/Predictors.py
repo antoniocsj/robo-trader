@@ -11,6 +11,7 @@ class Predictors:
         self.average = 0.0
         self.std = 0.0  # standard deviation
         self.search_predictors()
+        self.all_symbols_trading = False
 
     def search_predictors(self):
         all_subdirs = os.listdir(self.directory)
@@ -24,7 +25,7 @@ class Predictors:
 
         outputs = []
         for pred in self.predictors:
-            pred.calc_output(input_data)
+            pred.calc_output(input_data, self.all_symbols_trading)
             outputs.append(pred.output)
 
         self.average = np.average(outputs)
@@ -53,6 +54,9 @@ def teste_01():
 
     p_1 = Predictors('../predictors_1')
     p_2 = Predictors('../predictors_2')
+
+    p_1.all_symbols_trading = True
+    p_2.all_symbols_trading = True
 
     p_1.calculate_outputs(data)
     p_2.calculate_outputs(data)

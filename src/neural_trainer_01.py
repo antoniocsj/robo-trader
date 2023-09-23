@@ -68,7 +68,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 2
+    n_steps = 4
     n_hidden_layers = 3
     n_samples_train = 199000  # Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2

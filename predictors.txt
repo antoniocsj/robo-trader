@@ -38,13 +38,13 @@ predictors_1:
 predictors_2:
 01 - OHLCV, n_steps = 2, n_hidden_layers = 1 ok
 02 - OHLCV, n_steps = 2, n_hidden_layers = 2 ok
-03 - OHLCV, n_steps = 2, n_hidden_layers = 3 -
+03 - OHLCV, n_steps = 2, n_hidden_layers = 3 ok
 
-04 - OHLCV, n_steps = 4, n_hidden_layers = 1
-05 - OHLCV, n_steps = 4, n_hidden_layers = 2
-06 - OHLCV, n_steps = 4, n_hidden_layers = 3
+04 - OHLCV, n_steps = 4, n_hidden_layers = 1 ok
+05 - OHLCV, n_steps = 4, n_hidden_layers = 2 ok
+06 - OHLCV, n_steps = 4, n_hidden_layers = 3 ok
 
-07 - OHLCV, n_steps = 6, n_hidden_layers = 1
+07 - OHLCV, n_steps = 6, n_hidden_layers = 1 -
 08 - OHLCV, n_steps = 6, n_hidden_layers = 2
 09 - OHLCV, n_steps = 6, n_hidden_layers = 3
 
