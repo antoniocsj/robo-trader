@@ -79,8 +79,6 @@ class SymbolsPreparation:
             s.is_trading = False
 
     def prepare_symbols(self):
-        print(f'server_datetime = {self.server_datetime}')
-
         # verificar quais símbolos estão (ou não) operando
         who_is_trading = []
         for symbol_name in self.sheets:
@@ -96,7 +94,7 @@ class SymbolsPreparation:
         if len(who_is_trading) == len(self.symbols):
             print('TODOS os símbolos estão operando.')
         else:
-            print('NEM Todos os símbolos estão operando.')
+            print('NEM todos os símbolos estão operando.')
 
         for symbol_name in self.sheets:
             sheet: Sheet = self.sheets[symbol_name][self.timeframe]

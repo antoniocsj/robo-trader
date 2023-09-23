@@ -31,13 +31,13 @@ class HistMulti:
         if isinstance(source, str):
             self.source_is_dir = True
             self.directory = source  # diretório onde se encontra os arquivos csv
-            print(f'obtendo dados históricos a partir do diretório {self.directory}')
+            # print(f'obtendo dados históricos a partir do diretório {self.directory}')
             self.all_files = []
             self.csv_files = {}  # guarda os nomes dos arquivos csv conforme seu 'simbolo' e 'timeframe'
             self.search_symbols(symbols_allowed)
         elif isinstance(source, dict):
             self.source_is_dir = False
-            print(f'obtendo dados históricos a partir de um dicionário de planilhas')
+            # print(f'obtendo dados históricos a partir de um dicionário de planilhas')
             # self.sheets: dict[str, Sheet] = source
             self.sheets = source
             self.symbols = search_symbols_in_dict(self.sheets)

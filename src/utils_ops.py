@@ -166,11 +166,11 @@ def normalize_symbols(hist: HistMulti, scalers: dict, symbols: list[str] = None)
         hist.arr[symbol][timeframe] = dataf.to_numpy(copy=True)
 
     if symbols:
-        print(f'os símbolos {symbols} de {type(hist)} foram normalizados.')
+        # print(f'os símbolos {symbols} de {type(hist)} foram normalizados.')
         hist.update_sheets(symbols)
     else:
         hist.update_sheets()
-        print(f'todos os símbolos de {type(hist)} foram normalizados.')
+        # print(f'todos os símbolos de {type(hist)} foram normalizados.')
 
 
 def differentiate_directory(directory: str):
@@ -246,11 +246,11 @@ def differentiate_symbols(hist: HistMulti, symbols: list[str] = None):
         hist.arr[symbol][timeframe] = dataf.to_numpy(copy=True)
 
     if symbols:
-        print(f'os símbolos {symbols} de {type(hist)} foram diferenciados.')
+        # print(f'os símbolos {symbols} de {type(hist)} foram diferenciados.')
         hist.update_sheets(symbols)
     else:
         hist.update_sheets()
-        print(f'todos os símbolos de {type(hist)} foram diferenciados.')
+        # print(f'todos os símbolos de {type(hist)} foram diferenciados.')
 
 
 def apply_transform_str(arr: ndarray, transform_str: str) -> ndarray:
@@ -368,4 +368,4 @@ def transform_symbols(hist: HistMulti, transform_str: str, symbols: list[str] = 
         hist.arr[symbol][timeframe] = dataf.to_numpy(copy=True)
 
     hist.update_sheets()
-    print(f'todos os símbolos de {type(hist)} foram tranformados.')
+    # print(f'todos os símbolos de {type(hist)} foram tranformados.')
