@@ -1,6 +1,6 @@
 predictors (5 anos de histórico, XAUUSD)
 
-predictors_1 - M10:
+predictors_1 - M10, csv_o_M10_2018-01-02_2023-09-15:
 01 - OHLC, n_steps = 2, n_hidden_layers = 1 ok
 02 - OHLC, n_steps = 2, n_hidden_layers = 2 ok
 03 - OHLC, n_steps = 2, n_hidden_layers = 3 ok
