@@ -86,8 +86,13 @@ predictors_2 - M10:
     # features to expect for each input sample.
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
-    max_n_epochs = n_inputs * 3 * 0 + 100
-    patience = int(max_n_epochs / 10) * 0 + 3
+
+    até n_steps=8, nhl=1:
+    max_n_epochs = 100, patience = 3 e 9
+
+    a partir de n_steps=8, nhl=2:
+    max_n_epochs = 150, patience = 5 e 15
+
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')
