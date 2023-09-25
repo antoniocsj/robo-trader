@@ -1,6 +1,8 @@
 predictors (5 anos de histórico, XAUUSD)
+csv_o_M10_2018-01-02_2023-09-15
 
-predictors_1:
+
+predictors_1 - M10:
 01 - OHLC, n_steps = 2, n_hidden_layers = 1 ok
 02 - OHLC, n_steps = 2, n_hidden_layers = 2 ok
 03 - OHLC, n_steps = 2, n_hidden_layers = 3 ok
@@ -35,7 +37,7 @@ predictors_1:
 
 ------
 
-predictors_2:
+predictors_2 - M10:
 01 - OHLCV, n_steps = 2, n_hidden_layers = 1 ok
 02 - OHLCV, n_steps = 2, n_hidden_layers = 2 ok
 03 - OHLCV, n_steps = 2, n_hidden_layers = 3 ok
@@ -68,7 +70,8 @@ predictors_2:
 23 - OHLCV, n_steps = 16, n_hidden_layers = 2
 24 - OHLCV, n_steps = 16, n_hidden_layers = 3
 
-    n_steps = 2, 4, 6, 8, 10, 12
+
+    n_steps = 2, 4, 6, 8, 10, 12, 14, 16
     n_hidden_layers = 1, 2, 3
     n_samples_train = 199000  # Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
