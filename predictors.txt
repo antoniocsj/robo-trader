@@ -1,6 +1,4 @@
 predictors (5 anos de histórico, XAUUSD)
-csv_o_M10_2018-01-02_2023-09-15
-
 
 predictors_1 - M10:
 01 - OHLC, n_steps = 2, n_hidden_layers = 1 ok
@@ -73,9 +71,12 @@ predictors_2 - M10:
 
     n_steps = 2, 4, 6, 8, 10, 12, 14, 16
     n_hidden_layers = 1, 2, 3
-    n_samples_train = 199000  # Número de amostras usadas na fase de treinamento e validação
+
+    M10, csv_o_M10_2018-01-02_2023-09-15:
+    n_samples_train = 199000
+
     validation_split = 0.2
-    n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
+    n_samples_test = 3000
     # horizontally stack columns
     dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
 
