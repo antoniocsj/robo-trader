@@ -68,8 +68,8 @@ def train_model(deterministic: bool = True, seed: int = 1):
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 4
-    n_hidden_layers = 3
+    n_steps = 8
+    n_hidden_layers = 2
     n_samples_train = 199000  # Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
     n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
@@ -83,8 +83,8 @@ def train_model(deterministic: bool = True, seed: int = 1):
     # features to expect for each input sample.
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
-    max_n_epochs = n_inputs * 3 * 0 + 100
-    patience = int(max_n_epochs / 10) * 0 + 3
+    max_n_epochs = n_inputs * 3 * 0 + 150
+    patience = int(max_n_epochs / 10) * 0 + 5
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')

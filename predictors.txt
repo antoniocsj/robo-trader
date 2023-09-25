@@ -13,8 +13,8 @@ predictors_1:
 08 - OHLC, n_steps = 6, n_hidden_layers = 2 ok
 09 - OHLC, n_steps = 6, n_hidden_layers = 3 ok
 
-10 - OHLC, n_steps = 8, n_hidden_layers = 1 ok (predictors_1_)
-11 - OHLC, n_steps = 8, n_hidden_layers = 2
+10 - OHLC, n_steps = 8, n_hidden_layers = 1 ok
+11 - OHLC, n_steps = 8, n_hidden_layers = 2 -
 12 - OHLC, n_steps = 8, n_hidden_layers = 3
 
 13 - OHLC, n_steps = 10, n_hidden_layers = 1
@@ -44,11 +44,11 @@ predictors_2:
 05 - OHLCV, n_steps = 4, n_hidden_layers = 2 ok
 06 - OHLCV, n_steps = 4, n_hidden_layers = 3 ok
 
-07 - OHLCV, n_steps = 6, n_hidden_layers = 1 -
-08 - OHLCV, n_steps = 6, n_hidden_layers = 2
-09 - OHLCV, n_steps = 6, n_hidden_layers = 3
+07 - OHLCV, n_steps = 6, n_hidden_layers = 1 ok
+08 - OHLCV, n_steps = 6, n_hidden_layers = 2 ok
+09 - OHLCV, n_steps = 6, n_hidden_layers = 3 ok
 
-10 - OHLCV, n_steps = 8, n_hidden_layers = 1
+10 - OHLCV, n_steps = 8, n_hidden_layers = 1 ok
 11 - OHLCV, n_steps = 8, n_hidden_layers = 2
 12 - OHLCV, n_steps = 8, n_hidden_layers = 3
 
