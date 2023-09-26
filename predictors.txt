@@ -14,8 +14,8 @@ predictors_1 - M10, csv_o_M10_2018-01-02_2023-09-15:
 09 - OHLC, n_steps = 6, n_hidden_layers = 3 ok
 
 10 - OHLC, n_steps = 8, n_hidden_layers = 1 ok
-11 - OHLC, n_steps = 8, n_hidden_layers = 2 -
-12 - OHLC, n_steps = 8, n_hidden_layers = 3
+11 - OHLC, n_steps = 8, n_hidden_layers = 2 ok
+12 - OHLC, n_steps = 8, n_hidden_layers = 3 -
 
 13 - OHLC, n_steps = 10, n_hidden_layers = 1
 14 - OHLC, n_steps = 10, n_hidden_layers = 2
@@ -49,7 +49,7 @@ predictors_2 - M10, csv_o_M10_2018-01-02_2023-09-15:
 09 - OHLCV, n_steps = 6, n_hidden_layers = 3 ok
 
 10 - OHLCV, n_steps = 8, n_hidden_layers = 1 ok
-11 - OHLCV, n_steps = 8, n_hidden_layers = 2
+11 - OHLCV, n_steps = 8, n_hidden_layers = 2 ok
 12 - OHLCV, n_steps = 8, n_hidden_layers = 3
 
 13 - OHLCV, n_steps = 10, n_hidden_layers = 1
