@@ -108,7 +108,7 @@ def train_model():
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
     max_n_epochs = n_inputs * 3 * 0 + 150
-    patience = int(max_n_epochs / 10) * 0 + 5
+    patience = int(max_n_epochs / 10) * 0 + 15
     n_symbols = len(hist.symbols)
 
     print(f'n_symbols = {n_symbols}')
