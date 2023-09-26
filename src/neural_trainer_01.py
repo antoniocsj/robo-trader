@@ -95,11 +95,13 @@ def train_model(deterministic: bool = True, seed: int = 1):
     patience = int(max_n_epochs / 10) * 0 + 3
     n_symbols = len(hist.symbols)
 
+    print(f'n_symbols = {n_symbols}')
     print(f'symbols = {hist.symbols}')
-    print(f'n_symbols = {n_symbols}, n_features (n_cols) = {n_features}, n_steps = {n_steps}, n_inputs = {n_inputs}, '
-          f'n_hidden_layers = {n_hidden_layers},\ntipo_vela_entrada = {candle_input_type}, '
-          f'tipo_vela_saída = {candle_output_type}, n_samples_train = {n_samples_train}, '
-          f'\nvalidation_split = {validation_split}, max_n_epochs = {max_n_epochs}, patience = {patience}')
+    print(f'tipo_vela_entrada = {candle_input_type}, n_steps = {n_steps}, n_hidden_layers = {n_hidden_layers}\n'
+          f'tipo_vela_saída = {candle_output_type}, max_n_epochs = {max_n_epochs}, patience = {patience}\n'
+          f'n_features (n_cols) = {n_features}, n_inputs = {n_inputs}\n'
+          f'validation_split = {validation_split}, samples_test_ratio = {samples_test_ratio}\n'
+          f'n_samples_train = {n_samples_train}, n_samples_test = {n_samples_test}')
 
     model = Sequential()
     n_filters = n_features
