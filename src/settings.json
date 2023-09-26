@@ -1,6 +1,6 @@
 {
     "symbol_out": "XAUUSD",
-    "timeframe": "M10",
+    "timeframe": "H1",
     "deterministic": true,
     "random_seed": 1,
     "temp_dir": "../temp",

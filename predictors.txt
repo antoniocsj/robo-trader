@@ -1,78 +1,39 @@
 predictors (5 anos de histórico, XAUUSD)
 
-predictors_1 - M10, csv_o_M10_2018-01-02_2023-09-15:
-01 - OHLC, n_steps = 2, n_hidden_layers = 1 ok
-02 - OHLC, n_steps = 2, n_hidden_layers = 2 ok
-03 - OHLC, n_steps = 2, n_hidden_layers = 3 ok
+predictors_1 - M10, csv_o_XAUUSD_2018-01-02_2023-09-15:
+M10_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 ok
+M10_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2 ok
+M10_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3 ok
 
-04 - OHLC, n_steps = 4, n_hidden_layers = 1 ok
-05 - OHLC, n_steps = 4, n_hidden_layers = 2 ok
-06 - OHLC, n_steps = 4, n_hidden_layers = 3 ok
+M10_OHLC_S4_HL1 -> OHLC, n_steps = 4, n_hidden_layers = 1 ok
+M10_OHLC_S4_HL2 -> OHLC, n_steps = 4, n_hidden_layers = 2 ok
+M10_OHLC_S4_HL3 -> OHLC, n_steps = 4, n_hidden_layers = 3 ok
 
-07 - OHLC, n_steps = 6, n_hidden_layers = 1 ok
-08 - OHLC, n_steps = 6, n_hidden_layers = 2 ok
-09 - OHLC, n_steps = 6, n_hidden_layers = 3 ok
-
-10 - OHLC, n_steps = 8, n_hidden_layers = 1 ok
-11 - OHLC, n_steps = 8, n_hidden_layers = 2 ok
-12 - OHLC, n_steps = 8, n_hidden_layers = 3 -
-
-13 - OHLC, n_steps = 10, n_hidden_layers = 1
-14 - OHLC, n_steps = 10, n_hidden_layers = 2
-15 - OHLC, n_steps = 10, n_hidden_layers = 3
-
-16 - OHLC, n_steps = 12, n_hidden_layers = 1
-17 - OHLC, n_steps = 12, n_hidden_layers = 2
-18 - OHLC, n_steps = 12, n_hidden_layers = 3
-
-19 - OHLC, n_steps = 14, n_hidden_layers = 1
-20 - OHLC, n_steps = 14, n_hidden_layers = 2
-21 - OHLC, n_steps = 14, n_hidden_layers = 3
-
-22 - OHLC, n_steps = 16, n_hidden_layers = 1
-23 - OHLC, n_steps = 16, n_hidden_layers = 2
-24 - OHLC, n_steps = 16, n_hidden_layers = 3
+M10_OHLC_S6_HL1 -> OHLC, n_steps = 6, n_hidden_layers = 1 ok
+M10_OHLC_S6_HL2 -> OHLC, n_steps = 6, n_hidden_layers = 2 ok
+M10_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3 ok
 
 ------
 
-predictors_2 - M10, csv_o_M10_2018-01-02_2023-09-15:
-01 - OHLCV, n_steps = 2, n_hidden_layers = 1 ok
-02 - OHLCV, n_steps = 2, n_hidden_layers = 2 ok
-03 - OHLCV, n_steps = 2, n_hidden_layers = 3 ok
+predictors_2 - M10, csv_o_XAUUSD_2018-01-02_2023-09-15:
+M10_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1 ok
+M10_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2 ok
+M10_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3 ok
 
-04 - OHLCV, n_steps = 4, n_hidden_layers = 1 ok
-05 - OHLCV, n_steps = 4, n_hidden_layers = 2 ok
-06 - OHLCV, n_steps = 4, n_hidden_layers = 3 ok
+M10_OHLCV_S4_HL1 -> OHLCV, n_steps = 4, n_hidden_layers = 1 ok
+M10_OHLCV_S4_HL2 -> OHLCV, n_steps = 4, n_hidden_layers = 2 ok
+M10_OHLCV_S4_HL3 -> OHLCV, n_steps = 4, n_hidden_layers = 3 ok
 
-07 - OHLCV, n_steps = 6, n_hidden_layers = 1 ok
-08 - OHLCV, n_steps = 6, n_hidden_layers = 2 ok
-09 - OHLCV, n_steps = 6, n_hidden_layers = 3 ok
+07 - M10_OHLCV_S6_HL1 -> OHLCV, n_steps = 6, n_hidden_layers = 1 ok
+08 - M10_OHLCV_S6_HL2 -> OHLCV, n_steps = 6, n_hidden_layers = 2 ok
+09 - M10_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3 ok
 
-10 - OHLCV, n_steps = 8, n_hidden_layers = 1 ok
-11 - OHLCV, n_steps = 8, n_hidden_layers = 2 ok
-12 - OHLCV, n_steps = 8, n_hidden_layers = 3
+---
 
-13 - OHLCV, n_steps = 10, n_hidden_layers = 1
-14 - OHLCV, n_steps = 10, n_hidden_layers = 2
-15 - OHLCV, n_steps = 10, n_hidden_layers = 3
+predictors_1 e predictors_2: M10, csv_o_M10_2018-01-02_2023-09-15:
 
-16 - OHLCV, n_steps = 12, n_hidden_layers = 1
-17 - OHLCV, n_steps = 12, n_hidden_layers = 2
-18 - OHLCV, n_steps = 12, n_hidden_layers = 3
-
-19 - OHLCV, n_steps = 14, n_hidden_layers = 1
-20 - OHLCV, n_steps = 14, n_hidden_layers = 2
-21 - OHLCV, n_steps = 14, n_hidden_layers = 3
-
-22 - OHLCV, n_steps = 16, n_hidden_layers = 1
-23 - OHLCV, n_steps = 16, n_hidden_layers = 2
-24 - OHLCV, n_steps = 16, n_hidden_layers = 3
-
-
-    n_steps = 2, 4, 6, 8, 10, 12, 14, 16
+    n_steps = 2, 4, 6
     n_hidden_layers = 1, 2, 3
-
-    M10, csv_o_M10_2018-01-02_2023-09-15:
     n_samples_train = 199000
 
     validation_split = 0.2
@@ -88,11 +49,7 @@ predictors_2 - M10, csv_o_M10_2018-01-02_2023-09-15:
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
 
-    até n_steps=8, nhl=1:
     max_n_epochs = 100, patience = 3 e 9
-
-    a partir de n_steps=8, nhl=2:
-    max_n_epochs = 150, patience = 5 e 15
 
     n_symbols = len(hist.symbols)
 
@@ -128,3 +85,70 @@ predictors_2 - M10, csv_o_M10_2018-01-02_2023-09-15:
     model.add(Dense(len(candle_output_type)))
     model.compile(optimizer='adam', loss='mse')
     model_config = model.get_config()
+
+    # fit model
+    print(f'treinando o modelo em parte das amostras de treinamento.')
+    print(f'n_samples_train * validation_split = {n_samples_train} * {validation_split} = '
+          f'{int(n_samples_train * validation_split)}).')
+
+    callbacks = [EarlyStopping(monitor='val_loss', patience=patience, verbose=1),
+                 ModelCheckpoint(filepath='model.h5', monitor='val_loss', save_best_only=True, verbose=1)]
+    history = model.fit(X_train, y_train, epochs=max_n_epochs, verbose=1,
+                        validation_split=validation_split, callbacks=callbacks)
+
+    effective_n_epochs = len(history.history['loss'])
+    loss, val_loss = history.history['loss'], history.history['val_loss']
+    i_min_loss, i_min_val_loss = np.argmin(loss), np.argmin(val_loss)
+    min_loss, min_val_loss = loss[i_min_loss], val_loss[i_min_val_loss]
+    losses = {'min_loss': {'value': min_loss, 'index': i_min_loss, 'epoch': i_min_loss + 1},
+              'min_val_loss': {'value': min_val_loss, 'index': i_min_val_loss, 'epoch': i_min_val_loss + 1}}
+
+    print(f'avaliando o modelo no conjunto inteiro das amostras de treinamento.')
+    saved_model = load_model('model.h5')
+    whole_set_train_loss_eval = saved_model.evaluate(X_train, y_train, verbose=0)
+    print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
+
+    print(f'avaliando o modelo num novo conjunto de amostras de teste.')
+    samples_index_start = n_samples_train
+    dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
+                                       candle_output_type)
+
+    X_test, y_test = split_sequences2(dataset_test, n_steps, candle_output_type)
+
+    # for MLP model only
+    # n_input = X_test.shape[1] * X_test.shape[2]
+    # X_test = X_test.reshape((X_test.shape[0], n_input))
+
+    saved_model = load_model('model.h5')
+    test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)
+    print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
+
+    train_config = {'symbol_out': symbol_out,
+                    'timeframe': hist.timeframe,
+                    'n_steps': n_steps,
+                    'candle_input_type': candle_input_type,
+                    'candle_output_type': candle_output_type,
+                    'n_symbols': n_symbols,
+                    'n_features': n_features,
+                    'n_inputs': n_inputs,
+                    'n_hidden_layers': n_hidden_layers,
+                    'n_samples_train': n_samples_train,
+                    'validation_split': validation_split,
+                    'effective_n_epochs': effective_n_epochs,
+                    'max_n_epochs': max_n_epochs,
+                    'patience': patience,
+                    'whole_set_train_loss_eval': whole_set_train_loss_eval,
+                    'n_samples_test': n_samples_test,
+                    'test_loss_eval': test_loss_eval,
+                    'losses': losses,
+                    'symbols': hist.symbols,
+                    'bias': 0.0,
+                    'n_samples_test_for_calc_bias': 0,
+                    'model_config': model_config,
+                    'history': history.history}
+
+    return train_config
+
+---
+
+predictors_3 em diante:

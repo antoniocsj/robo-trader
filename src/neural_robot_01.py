@@ -84,11 +84,18 @@ def train_model():
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 8
-    n_hidden_layers = 3
-    n_samples_train = 199000  # Número de amostras usadas na fase de treinamento e validação
+    n_steps = 2
+    n_hidden_layers = 1
+    samples_test_ratio = 0.02
+
+    n_rows = hist.arr[symbol_out][timeframe].shape[0]
+
+    # Número de amostras inéditas usadas na fase de avaliação.
+    n_samples_test = int(n_rows * samples_test_ratio)
+
+    n_samples_train = n_rows - n_samples_test  # Número de amostras usadas na fase de treinamento e validação
     validation_split = 0.2
-    n_samples_test = 3000  # Número de amostras usadas na fase de avaliação. São amostras inéditas.
+
     # horizontally stack columns
     dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
 
@@ -99,8 +106,8 @@ def train_model():
     # features to expect for each input sample.
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
-    max_n_epochs = n_inputs * 3 * 0 + 150
-    patience = int(max_n_epochs / 10) * 0 + 15
+    max_n_epochs = n_inputs * 3 * 0 + 100
+    patience = int(max_n_epochs / 10) * 0 + 9
     n_symbols = len(hist.symbols)
 
     print(f'symbols = {hist.symbols}')
@@ -159,7 +166,7 @@ def train_model():
     print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
 
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
-    samples_index_start = n_samples_train
+    samples_index_start = n_samples_train - 1
     dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
                                        candle_output_type)
 
@@ -172,6 +179,7 @@ def train_model():
     saved_model = load_model('model.h5')
     test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)
     print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
+
     product = whole_set_train_loss_eval * test_loss_eval
     print(f'p_{random_seed} = {whole_set_train_loss_eval} * {test_loss_eval} = {product} patience={patience}')
 
