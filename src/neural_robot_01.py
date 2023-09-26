@@ -86,6 +86,7 @@ def train_model():
 
     n_steps = 2
     n_hidden_layers = 1
+
     samples_test_ratio = 0.02
 
     n_rows = hist.arr[symbol_out][timeframe].shape[0]

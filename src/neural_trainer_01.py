@@ -70,6 +70,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
 
     n_steps = 2
     n_hidden_layers = 1
+
     samples_test_ratio = 0.02
 
     n_rows = hist.arr[symbol_out][timeframe].shape[0]
@@ -190,7 +191,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
                     'n_samples_test_for_calc_bias': 0,
                     'model_config': model_config,
                     'history': history.history}
-    
+
     return train_config
 
 
