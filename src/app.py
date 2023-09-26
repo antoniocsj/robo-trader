@@ -37,13 +37,13 @@ def make_prediction():
           f'rates_count = {rates_count}, start_pos = {start_pos} ')
     print(f'symbols: {symbols}')
 
-    write_json('request2.json', data)
+    write_json('request.json', data)
     # predict_next_candle(data)
 
     # data = read_json('request.json')
 
-    p_1 = Predictors('../predictors_1')
-    p_2 = Predictors('../predictors_2')
+    p_1 = Predictors('../predictors_01')
+    p_2 = Predictors('../predictors_02')
 
     p_1.calculate_outputs(data)
     p_2.calculate_outputs(data)

@@ -208,11 +208,11 @@ class Predictor:
 
 
 def teste_01():
-    data = read_json('request2.json')
+    data = read_json('request.json')
     suppose_all_symbols_trading = True
 
-    directory = '../predictors_1'
-    predictor_1 = Predictor('01', directory)
+    directory = '../predictors_01'
+    predictor_1 = Predictor('M10_OHLC_S2_HL1', directory)
     predictor_1.calc_output(data, suppose_all_symbols_trading)
     predictor_1.show_output()
 

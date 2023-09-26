@@ -50,10 +50,10 @@ class Predictors:
 
 
 def teste_01():
-    data = read_json('request2.json')
+    data = read_json('request.json')
 
-    p_1 = Predictors('../predictors_1')
-    p_2 = Predictors('../predictors_2')
+    p_1 = Predictors('../predictors_01')
+    p_2 = Predictors('../predictors_02')
 
     p_1.all_symbols_trading = True
     p_2.all_symbols_trading = True
