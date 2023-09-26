@@ -196,8 +196,8 @@ class Predictor:
         candle_output_type = self.train_config['candle_output_type']
         directory = self.directory.split('/')[1]
 
-        print(f'predictor ({self.id}) ({directory}) {self.candle_input_type} n_steps={self.n_steps} '
-              f'nhl={self.n_hidden_layers} test_loss={self.test_loss_eval}: ', end='')
+        print(f'predictor ({self.id}) ({directory}) {self.candle_input_type} S={self.n_steps} '
+              f'HL={self.n_hidden_layers} TL={self.test_loss_eval:.3e}: ', end='')
         if len(candle_output_type) == 1:
             if self.train_config['symbol_out'] == 'XAUUSD':
                 print(f'{candle_output_type} = {self.output:.2f}')

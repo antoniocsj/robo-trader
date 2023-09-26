@@ -62,9 +62,9 @@ def teste_01():
     p_2.calculate_outputs(data)
 
     p_1.show_outputs()
-    p_1.show_stats()
-
     p_2.show_outputs()
+
+    p_1.show_stats()
     p_2.show_stats()
 
     averages = [p_1.average, p_2.average]
