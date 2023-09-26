@@ -91,8 +91,8 @@ def train_model(deterministic: bool = True, seed: int = 1):
     # features to expect for each input sample.
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
-    max_n_epochs = n_inputs * 3 * 0 + 100
-    patience = int(max_n_epochs / 10) * 0 + 3
+    max_n_epochs = n_inputs * 3 * 0 + 150
+    patience = int(max_n_epochs / 10) * 0 + 5
     n_symbols = len(hist.symbols)
 
     print(f'n_symbols = {n_symbols}')
@@ -232,7 +232,7 @@ def update_train_log(train_log: dict):
 
 def trainer_01():
     create_train_log()
-    _secs = 40
+    _secs = 30
 
     while True:
         train_log = load_train_log()

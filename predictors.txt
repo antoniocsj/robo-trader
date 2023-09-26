@@ -201,6 +201,7 @@ predictors_1 e predictors_2: M10, csv_o_M10_2018-01-02_2023-09-15:
 predictors_3 em diante:
     n_steps = 2, 4, 6
     n_hidden_layers = 1, 2, 3
+
     samples_test_ratio = 0.02
 
     n_rows = hist.arr[symbol_out][timeframe].shape[0]
@@ -221,15 +222,17 @@ predictors_3 em diante:
     # features to expect for each input sample.
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
-    max_n_epochs = n_inputs * 3 * 0 + 100
-    patience = int(max_n_epochs / 10) * 0 + 3
+    max_n_epochs = n_inputs * 3 * 0 + 150
+    patience = int(max_n_epochs / 10) * 0 + 5
     n_symbols = len(hist.symbols)
 
+    print(f'n_symbols = {n_symbols}')
     print(f'symbols = {hist.symbols}')
-    print(f'n_symbols = {n_symbols}, n_features (n_cols) = {n_features}, n_steps = {n_steps}, n_inputs = {n_inputs}, '
-          f'n_hidden_layers = {n_hidden_layers},\ntipo_vela_entrada = {candle_input_type}, '
-          f'tipo_vela_saída = {candle_output_type}, n_samples_train = {n_samples_train}, '
-          f'\nvalidation_split = {validation_split}, max_n_epochs = {max_n_epochs}, patience = {patience}')
+    print(f'tipo_vela_entrada = {candle_input_type}, n_steps = {n_steps}, n_hidden_layers = {n_hidden_layers}\n'
+          f'tipo_vela_saída = {candle_output_type}, max_n_epochs = {max_n_epochs}, patience = {patience}\n'
+          f'n_features (n_cols) = {n_features}, n_inputs = {n_inputs}\n'
+          f'validation_split = {validation_split}, samples_test_ratio = {samples_test_ratio}\n'
+          f'n_samples_train = {n_samples_train}, n_samples_test = {n_samples_test}')
 
     model = Sequential()
     n_filters = n_features
