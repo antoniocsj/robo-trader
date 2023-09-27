@@ -52,7 +52,7 @@ H1_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 ok
 H1_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2
 H1_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3
 
-H1_OHLC_S4_HL1 -> OHLC, n_steps = 4, n_hidden_layers = 1
+H1_OHLC_S4_HL1 -> OHLC, n_steps = 4, n_hidden_layers = 1 -
 H1_OHLC_S4_HL2 -> OHLC, n_steps = 4, n_hidden_layers = 2
 H1_OHLC_S4_HL3 -> OHLC, n_steps = 4, n_hidden_layers = 3
 
@@ -63,7 +63,7 @@ H1_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3
 ---
 
 predictors_10 - H1, csv_o_XAUUSD_2018-01-02_2023-09-15:
-H1_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1 -
+H1_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1 ok
 H1_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2
 H1_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3
 
