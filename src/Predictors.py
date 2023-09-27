@@ -52,22 +52,27 @@ class Predictors:
 def teste_01():
     data = read_json('request.json')
 
-    p_1 = Predictors('../predictors_01')
-    p_2 = Predictors('../predictors_02')
+    p_01 = Predictors('../predictors_01')
+    p_02 = Predictors('../predictors_02')
+    p_09 = Predictors('../predictors_09')
+    p_10 = Predictors('../predictors_10')
 
-    p_1.all_symbols_trading = True
-    p_2.all_symbols_trading = True
+    p_01.calculate_outputs(data)
+    p_02.calculate_outputs(data)
+    p_09.calculate_outputs(data)
+    p_10.calculate_outputs(data)
 
-    p_1.calculate_outputs(data)
-    p_2.calculate_outputs(data)
+    p_01.show_outputs()
+    p_02.show_outputs()
+    p_09.show_outputs()
+    p_10.show_outputs()
 
-    p_1.show_outputs()
-    p_2.show_outputs()
+    p_01.show_stats()
+    p_02.show_stats()
+    p_09.show_stats()
+    p_10.show_stats()
 
-    p_1.show_stats()
-    p_2.show_stats()
-
-    averages = [p_1.average, p_2.average]
+    averages = [p_01.average, p_02.average, p_09.average, p_10.average]
     total_average = np.average(averages)
     print(f'total_average = {total_average:.2f}')
 
