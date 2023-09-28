@@ -194,9 +194,9 @@ class Predictor:
 
     def show_output(self):
         candle_output_type = self.train_config['candle_output_type']
-        directory = self.directory.split('/')[1]
+        # directory = self.directory.split('/')[1]
 
-        print(f'predictor ({self.id}) ({directory}) {self.candle_input_type} S={self.n_steps} '
+        print(f'predictor ({self.id}) {self.candle_input_type} S={self.n_steps} '
               f'HL={self.n_hidden_layers} TL={self.test_loss_eval:.3e}: ', end='')
         if len(candle_output_type) == 1:
             if self.train_config['symbol_out'] == 'XAUUSD':
@@ -211,7 +211,7 @@ def teste_01():
     data = read_json('request.json')
     suppose_all_symbols_trading = True
 
-    directory = '../predictors_M10A'
+    directory = '../predictors/M10A'
     predictor_1 = Predictor('M10_OHLC_S2_HL1', directory)
     predictor_1.calc_output(data, suppose_all_symbols_trading)
     predictor_1.show_output()

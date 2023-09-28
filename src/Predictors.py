@@ -37,7 +37,7 @@ class Predictors:
             pred.show_output()
 
     def show_stats(self):
-        directory = self.directory.split('/')[1]
+        directory = self.directory.split('/')[2]
 
         if len(self.predictors) == 0:
             print(f'predictors ({directory}) average: {self.average} std: {self.std}')
@@ -52,10 +52,10 @@ class Predictors:
 def teste_01():
     data = read_json('request.json')
 
-    p_01 = Predictors('../predictors_M10A')
-    p_02 = Predictors('../predictors_M10B')
-    p_09 = Predictors('../predictors_H1A')
-    p_10 = Predictors('../predictors_H1B')
+    p_01 = Predictors('../predictors/M10A')
+    p_02 = Predictors('../predictors/M10B')
+    p_09 = Predictors('../predictors/H1A')
+    p_10 = Predictors('../predictors/H1B')
 
     p_01.calculate_outputs(data)
     p_02.calculate_outputs(data)

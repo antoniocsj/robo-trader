@@ -1,21 +1,21 @@
 predictors (5 anos de histórico, XAUUSD)
 
-predictors_M5A, csv_o_XAUUSD_2018-01-02_2023-09-15
-predictors_M5B, csv_o_XAUUSD_2018-01-02_2023-09-15
-predictors_M10A, csv_o_XAUUSD_2018-01-02_2023-09-15
-predictors_M10B, csv_o_XAUUSD_2018-01-02_2023-09-15
-predictors_M15A, csv_o_XAUUSD_2018-01-02_2023-09-15
-predictors_M15B, csv_o_XAUUSD_2018-01-02_2023-09-15
-predictors_M20A, csv_o_XAUUSD_2018-01-02_2023-09-15
-predictors_M20B, csv_o_XAUUSD_2018-01-02_2023-09-15
-predictors_M30A, csv_o_XAUUSD_2018-01-02_2023-09-15
-predictors_M30B, csv_o_XAUUSD_2018-01-02_2023-09-15
-predictors_H1A, csv_o_XAUUSD_2018-01-02_2023-09-15
-predictors_H1B, csv_o_XAUUSD_2018-01-02_2023-09-15
+M5A, csv_o_XAUUSD_2018-01-02_2023-09-15
+M5B, csv_o_XAUUSD_2018-01-02_2023-09-15
+M10A, csv_o_XAUUSD_2018-01-02_2023-09-15
+M10B, csv_o_XAUUSD_2018-01-02_2023-09-15
+M15A, csv_o_XAUUSD_2018-01-02_2023-09-15
+M15B, csv_o_XAUUSD_2018-01-02_2023-09-15
+M20A, csv_o_XAUUSD_2018-01-02_2023-09-15
+M20B, csv_o_XAUUSD_2018-01-02_2023-09-15
+M30A, csv_o_XAUUSD_2018-01-02_2023-09-15
+M30B, csv_o_XAUUSD_2018-01-02_2023-09-15
+H1A, csv_o_XAUUSD_2018-01-02_2023-09-15
+H1B, csv_o_XAUUSD_2018-01-02_2023-09-15
 
 ------
 
-predictors_M5A:
+M5A:
 M5_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 -
 M5_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2
 M5_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3
@@ -30,7 +30,7 @@ M5_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3
 
 ------
 
-predictors_M5B:
+M5B:
 M5_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1
 M5_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2
 M5_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3
@@ -45,7 +45,7 @@ M5_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3
 
 ------
 
-predictors_M10A:
+M10A:
 M10_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 ok
 M10_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2 ok
 M10_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3 ok
@@ -60,7 +60,7 @@ M10_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3 ok
 
 ---
 
-predictors_M10B:
+M10B:
 M10_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1 ok
 M10_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2 ok
 M10_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3 ok
@@ -80,7 +80,7 @@ M10_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3 ok
 
 ---
 
-predictors_H1A:
+H1A:
 H1_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 ok
 H1_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2
 H1_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3
@@ -95,7 +95,7 @@ H1_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3
 
 ---
 
-predictors_H1B:
+H1B:
 H1_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1 ok
 H1_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2
 H1_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3
@@ -110,7 +110,7 @@ H1_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3
 
 -------
 
-predictors_M10A e predictors_M10B:
+M10A e M10B:
     n_steps = 2, 4, 6
     n_hidden_layers = 1, 2, 3
     n_samples_train = 199000
