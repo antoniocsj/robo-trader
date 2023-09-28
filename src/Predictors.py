@@ -52,10 +52,10 @@ class Predictors:
 def teste_01():
     data = read_json('request.json')
 
-    p_01 = Predictors('../predictors_01')
-    p_02 = Predictors('../predictors_02')
-    p_09 = Predictors('../predictors_09')
-    p_10 = Predictors('../predictors_10')
+    p_01 = Predictors('../predictors_M10A')
+    p_02 = Predictors('../predictors_M10B')
+    p_09 = Predictors('../predictors_H1A')
+    p_10 = Predictors('../predictors_H1B')
 
     p_01.calculate_outputs(data)
     p_02.calculate_outputs(data)
