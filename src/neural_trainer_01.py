@@ -68,7 +68,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 4
+    n_steps = 6
     n_hidden_layers = 1
 
     samples_test_ratio = 0.02
@@ -232,7 +232,7 @@ def update_train_log(train_log: dict):
 
 def trainer_01():
     create_train_log()
-    _secs = 30
+    _secs = 40
 
     while True:
         train_log = load_train_log()
