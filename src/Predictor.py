@@ -113,7 +113,7 @@ class Predictor:
 
         timeframes = data['timeframes']
         if timeframe not in timeframes:
-            print(f'ERRO! O timeframe do predictor ({timeframe})  não está presente é na requisição.')
+            print(f'ERRO! O timeframe do predictor ({timeframe})  não está presente na requisição.')
             exit(-1)
 
         rates_count = data['rates_count']

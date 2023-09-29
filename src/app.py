@@ -42,27 +42,31 @@ def make_prediction():
 
     # data = read_json('request.json')
 
-    p_01 = Predictors('../predictors/M10A')
-    p_02 = Predictors('../predictors/M10B')
-    p_09 = Predictors('../predictors/H1A')
-    p_10 = Predictors('../predictors/H1B')
+    p_M5A = Predictors('../predictors/M5A')
+    p_M10A = Predictors('../predictors/M10A')
+    p_M10B = Predictors('../predictors/M10B')
+    p_H1A = Predictors('../predictors/H1A')
+    p_H1B = Predictors('../predictors/H1B')
 
-    p_01.calculate_outputs(data)
-    p_02.calculate_outputs(data)
-    p_09.calculate_outputs(data)
-    p_10.calculate_outputs(data)
+    p_M5A.calculate_outputs(data)
+    p_M10A.calculate_outputs(data)
+    p_M10B.calculate_outputs(data)
+    p_H1A.calculate_outputs(data)
+    p_H1B.calculate_outputs(data)
 
-    p_01.show_outputs()
-    p_02.show_outputs()
-    p_09.show_outputs()
-    p_10.show_outputs()
+    p_M5A.show_outputs()
+    p_M10A.show_outputs()
+    p_M10B.show_outputs()
+    p_H1A.show_outputs()
+    p_H1B.show_outputs()
 
-    p_01.show_stats()
-    p_02.show_stats()
-    p_09.show_stats()
-    p_10.show_stats()
+    p_M5A.show_stats()
+    p_M10A.show_stats()
+    p_M10B.show_stats()
+    p_H1A.show_stats()
+    p_H1B.show_stats()
 
-    averages = [p_01.average, p_02.average, p_09.average, p_10.average]
+    averages = [p_M5A.average, p_M10A.average, p_M10B.average, p_H1A.average, p_H1B.average]
     total_average = np.average(averages)
     print(f'total_average = {total_average:.2f}')
 
