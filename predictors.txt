@@ -20,7 +20,7 @@ M5_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 ok
 M5_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2
 M5_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3
 
-M5_OHLC_S4_HL1 -> OHLC, n_steps = 4, n_hidden_layers = 1
+M5_OHLC_S4_HL1 -> OHLC, n_steps = 4, n_hidden_layers = 1 -
 M5_OHLC_S4_HL2 -> OHLC, n_steps = 4, n_hidden_layers = 2
 M5_OHLC_S4_HL3 -> OHLC, n_steps = 4, n_hidden_layers = 3
 
@@ -31,7 +31,7 @@ M5_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3
 ------
 
 M5B:
-M5_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1 -
+M5_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1 ok
 M5_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2
 M5_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3
 
