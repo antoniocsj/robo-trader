@@ -202,6 +202,7 @@ def train_model():
                     'max_n_epochs': max_n_epochs,
                     'patience': patience,
                     'whole_set_train_loss_eval': whole_set_train_loss_eval,
+                    'samples_test_ratio': samples_test_ratio,
                     'n_samples_test': n_samples_test,
                     'test_loss_eval': test_loss_eval,
                     'losses': losses,
