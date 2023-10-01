@@ -43,30 +43,34 @@ def make_prediction():
     # data = read_json('request.json')
 
     p_M5A = Predictors('../predictors/M5A')
+    p_M5B = Predictors('../predictors/M5B')
     p_M10A = Predictors('../predictors/M10A')
     p_M10B = Predictors('../predictors/M10B')
     p_H1A = Predictors('../predictors/H1A')
     p_H1B = Predictors('../predictors/H1B')
 
     p_M5A.calculate_outputs(data)
+    p_M5B.calculate_outputs(data)
     p_M10A.calculate_outputs(data)
     p_M10B.calculate_outputs(data)
     p_H1A.calculate_outputs(data)
     p_H1B.calculate_outputs(data)
 
     p_M5A.show_outputs()
+    p_M5B.show_outputs()
     p_M10A.show_outputs()
     p_M10B.show_outputs()
     p_H1A.show_outputs()
     p_H1B.show_outputs()
 
     p_M5A.show_stats()
+    p_M5B.show_stats()
     p_M10A.show_stats()
     p_M10B.show_stats()
     p_H1A.show_stats()
     p_H1B.show_stats()
 
-    averages = [p_M5A.average, p_M10A.average, p_M10B.average, p_H1A.average, p_H1B.average]
+    averages = [p_M5A.average, p_M5B.average, p_M10A.average, p_M10B.average, p_H1A.average, p_H1B.average]
     total_average = np.average(averages)
     print(f'total_average = {total_average:.2f}')
 
