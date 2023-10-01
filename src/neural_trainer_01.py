@@ -168,7 +168,8 @@ def train_model(deterministic: bool = True, seed: int = 1):
     print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
 
     product = whole_set_train_loss_eval * test_loss_eval
-    print(f'p_{random_seed} = {whole_set_train_loss_eval} * {test_loss_eval} = {product} patience={patience}')
+    print(f'p_{random_seed} = {whole_set_train_loss_eval} * {test_loss_eval} = {product} patience={patience} '
+          f'eff_n_epochs={effective_n_epochs}')
 
     train_config = {'symbol_out': symbol_out,
                     'timeframe': hist.timeframe,
