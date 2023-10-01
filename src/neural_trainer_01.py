@@ -220,7 +220,6 @@ def create_train_log():
             'n_samples_test': 0,
             'max_n_epochs': 0,
             'patience': 0,
-            'effective_n_epochs': 0,
             'experiments': []
         }
         write_json(_filename, _dict)
@@ -277,14 +276,14 @@ def trainer_01():
             'samples_test_ratio': train_config['samples_test_ratio'],
             'n_samples_test': train_config['n_samples_test'],
             'max_n_epochs': train_config['max_n_epochs'],
-            'patience': train_config['patience'],
-            'effective_n_epochs': train_config['effective_n_epochs'],
+            'patience': train_config['patience']
         }
 
         train_log.update(_dict)
 
         log = {
             'random_seed': index,
+            'effective_n_epochs': train_config['effective_n_epochs'],
             'whole_set_train_loss': whole_set_train_loss_eval,
             'test_loss': test_loss_eval,
             'product': product
