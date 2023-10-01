@@ -68,7 +68,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 2
+    n_steps = 4
     n_hidden_layers = 1
 
     samples_test_ratio = 0.02
@@ -179,6 +179,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
                     'n_features': n_features,
                     'n_inputs': n_inputs,
                     'n_hidden_layers': n_hidden_layers,
+                    'random_seed': random_seed,
                     'n_samples_train': n_samples_train,
                     'validation_split': validation_split,
                     'effective_n_epochs': effective_n_epochs,
