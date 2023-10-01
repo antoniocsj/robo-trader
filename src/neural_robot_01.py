@@ -78,6 +78,8 @@ def train_model():
     candle_input_type = settings['candle_input_type']
     candle_output_type = settings['candle_output_type']
     hist = HistMulti(temp_dir, timeframe, symbols_allowed=[symbol_out])
+    datetime_start = hist.arr[symbol_out][timeframe][0][0]
+    datetime_end = hist.arr[symbol_out][timeframe][-1][0]
 
     if hist.timeframe != timeframe:
         print(f'o timeframe do diretório {temp_dir} ({hist.timeframe}) é diferente do timeframe especificado '
@@ -187,31 +189,35 @@ def train_model():
     print(f'p_{random_seed} = {whole_set_train_loss_eval} * {test_loss_eval} = {product} patience={patience} '
           f'eff_n_epochs={effective_n_epochs}')
 
-    train_config = {'symbol_out': symbol_out,
-                    'timeframe': hist.timeframe,
-                    'n_steps': n_steps,
-                    'candle_input_type': candle_input_type,
-                    'candle_output_type': candle_output_type,
-                    'n_symbols': n_symbols,
-                    'n_features': n_features,
-                    'n_inputs': n_inputs,
-                    'n_hidden_layers': n_hidden_layers,
-                    'random_seed': random_seed,
-                    'n_samples_train': n_samples_train,
-                    'validation_split': validation_split,
-                    'effective_n_epochs': effective_n_epochs,
-                    'max_n_epochs': max_n_epochs,
-                    'patience': patience,
-                    'whole_set_train_loss_eval': whole_set_train_loss_eval,
-                    'samples_test_ratio': samples_test_ratio,
-                    'n_samples_test': n_samples_test,
-                    'test_loss_eval': test_loss_eval,
-                    'losses': losses,
-                    'symbols': hist.symbols,
-                    'bias': 0.0,
-                    'n_samples_test_for_calc_bias': 0,
-                    'model_config': model_config,
-                    'history': history.history}
+    train_config = {
+        'symbol_out': symbol_out,
+        'timeframe': hist.timeframe,
+        'n_steps': n_steps,
+        'candle_input_type': candle_input_type,
+        'candle_output_type': candle_output_type,
+        'n_symbols': n_symbols,
+        'n_features': n_features,
+        'n_inputs': n_inputs,
+        'n_hidden_layers': n_hidden_layers,
+        'random_seed': random_seed,
+        'n_samples_train': n_samples_train,
+        'validation_split': validation_split,
+        'effective_n_epochs': effective_n_epochs,
+        'max_n_epochs': max_n_epochs,
+        'patience': patience,
+        'datetime_start': datetime_start,
+        'datetime_end': datetime_end,
+        'whole_set_train_loss_eval': whole_set_train_loss_eval,
+        'samples_test_ratio': samples_test_ratio,
+        'n_samples_test': n_samples_test,
+        'test_loss_eval': test_loss_eval,
+        'losses': losses,
+        'symbols': hist.symbols,
+        'bias': 0.0,
+        'n_samples_test_for_calc_bias': 0,
+        'model_config': model_config,
+        'history': history.history
+    }
 
     write_train_config(train_config)
 
