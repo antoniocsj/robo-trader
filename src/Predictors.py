@@ -17,6 +17,9 @@ class Predictors:
         all_subdirs = os.listdir(self.directory)
 
         for subdir in sorted(all_subdirs):
+            if subdir.startswith('_'):
+                continue
+
             pred = Predictor(subdir, self.directory)
             self.predictors.append(pred)
 
