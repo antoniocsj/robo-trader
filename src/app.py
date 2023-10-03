@@ -74,6 +74,8 @@ def make_prediction():
     total_average = np.average(averages)
     print(f'total_average = {total_average:.2f}')
 
+    print(f'last_datetime = {last_datetime}, trade_server_datetime = {trade_server_datetime}')
+
     return "OK"
 
 
