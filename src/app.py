@@ -70,9 +70,35 @@ def make_prediction():
     p_H1A.show_stats()
     p_H1B.show_stats()
 
-    averages = [p_M5A.average, p_M5B.average, p_M10A.average, p_M10B.average, p_H1A.average, p_H1B.average]
-    total_average = np.average(averages)
-    print(f'total_average = {total_average:.2f}')
+    avg_M5 = np.average([p_M5A.average, p_M5B.average])
+    avg_M10 = np.average([p_M10A.average, p_M10B.average])
+    avg_H1 = np.average([p_H1A.average, p_H1B.average])
+
+    averages = [avg_M5, avg_M10, avg_H1]
+    time_weights = np.array([5, 10, 60])
+    inv_time_weights = 1 / time_weights
+
+    std_M5 = np.average([p_M5A.std, p_M5B.std])
+    std_M10 = np.average([p_M10A.std, p_M10B.std])
+    std_H1 = np.average([p_H1A.std, p_H1B.std])
+    inv_exp_std_weights = 1 / np.exp([std_M5, std_M10, std_H1])
+
+    inv_time_prod_inv_exp_std_weights = inv_time_weights * inv_exp_std_weights
+
+    total_avg_1 = np.average(averages)
+    print(f'total_average_1 (simple) = {total_avg_1:.2f}')
+
+    total_avg_2 = np.average(averages, weights=time_weights)
+    print(f'total_average_2 (time_weights) = {total_avg_2:.2f}')
+
+    total_avg_3 = np.average(averages, weights=inv_time_weights)
+    print(f'total_average_3 (inv_time_weights) = {total_avg_3:.2f}')
+
+    total_avg_4 = np.average(averages, weights=inv_exp_std_weights)
+    print(f'total_average_4 (inv_exp_std_weights) = {total_avg_4:.2f}')
+
+    total_avg_5 = np.average(averages, weights=inv_time_prod_inv_exp_std_weights)
+    print(f'total_average_5 (inv_time_prod_inv_exp_std_weights) = {total_avg_5:.2f}')
 
     print(f'last_datetime = {last_datetime}, trade_server_datetime = {trade_server_datetime}')
 
