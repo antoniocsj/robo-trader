@@ -13,6 +13,54 @@ from keras.models import load_model
 from prediction import SymbolsPreparation
 
 
+def get_timeframe_in_minutes(tf: str) -> int:
+    if tf == 'M1':
+        ret = 1
+    elif tf == 'M2':
+        ret = 2
+    elif tf == 'M3':
+        ret = 3
+    elif tf == 'M4':
+        ret = 4
+    elif tf == 'M5':
+        ret = 5
+    elif tf == 'M6':
+        ret = 6
+    elif tf == 'M10':
+        ret = 10
+    elif tf == 'M12':
+        ret = 12
+    elif tf == 'M15':
+        ret = 15
+    elif tf == 'M20':
+        ret = 20
+    elif tf == 'M30':
+        ret = 30
+    elif tf == 'H1':
+        ret = 1 * 60
+    elif tf == 'H2':
+        ret = 2 * 60
+    elif tf == 'H3':
+        ret = 3 * 60
+    elif tf == 'H4':
+        ret = 4 * 60
+    elif tf == 'H6':
+        ret = 6 * 60
+    elif tf == 'H8':
+        ret = 8 * 60
+    elif tf == 'H12':
+        ret = 12 * 60
+    elif tf == 'D1':
+        ret = 24 * 60
+    elif tf == 'W1':
+        ret = 7 * 24 * 60
+    else:
+        print(f'ERRO. timeframe inválido. ({tf})')
+        exit(-1)
+
+    return ret
+
+
 class Predictor:
     def __init__(self, _id: str, directory: str):
         self.id = _id
@@ -22,10 +70,18 @@ class Predictor:
         self.scalers = None
         self.model = None
         self.output = None
+        self.symbol_out = ''
+        self.timeframe = ''
+        self.timeframe_in_minutes = 0
         self.n_steps = 0
         self.candle_input_type = ''
+        self.candle_output_type = ''
         self.n_hidden_layers = 0
+        self.n_samples_train = 0
+        self.whole_set_train_loss_eval = 0.0
+        self.n_samples_test = 0
         self.test_loss_eval = 0.0
+        self.product_losses = 0.0
 
         self.load()
 
@@ -47,10 +103,6 @@ class Predictor:
             print(f'ERRO. o arquivo {train_config_filepath} não existe.')
             exit(-1)
         self.train_config = read_json(train_config_filepath)
-        self.n_steps = self.train_config['n_steps']
-        self.candle_input_type = self.train_config['candle_input_type']
-        self.n_hidden_layers = self.train_config['n_hidden_layers']
-        self.test_loss_eval = self.train_config['test_loss_eval']
 
         scalers_filepath = f'{directory}/scalers.pkl'
         if not os.path.exists(scalers_filepath):
@@ -64,6 +116,19 @@ class Predictor:
             print(f'ERRO. o arquivo {model_filepath} não existe.')
             exit(-1)
         self.model = load_model(model_filepath)
+
+        self.symbol_out: str = self.train_config['symbol_out']
+        self.timeframe: str = self.train_config['timeframe']
+        self.timeframe_in_minutes: int = get_timeframe_in_minutes(self.timeframe)
+        self.n_steps: int = self.train_config['n_steps']
+        self.candle_input_type: str = self.train_config['candle_input_type']
+        self.candle_output_type: str = self.train_config['candle_output_type']
+        self.n_hidden_layers: int = self.train_config['n_hidden_layers']
+        self.n_samples_train: int = self.train_config['n_samples_train']
+        self.n_samples_test: int = self.train_config['n_samples_test']
+        self.whole_set_train_loss_eval = self.train_config['whole_set_train_loss_eval']
+        self.test_loss_eval: float = self.train_config['test_loss_eval']
+        self.product_losses: float = self.whole_set_train_loss_eval * self.test_loss_eval
 
     def prepare_data_for_model(self, data: dict, force_all_symbols_trading=False) -> ndarray:
         """

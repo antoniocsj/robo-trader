@@ -17,7 +17,7 @@ class Predictors:
         all_subdirs = os.listdir(self.directory)
 
         for subdir in sorted(all_subdirs):
-            if subdir.startswith('_'):
+            if subdir.startswith('_') or subdir.endswith('_'):
                 continue
 
             pred = Predictor(subdir, self.directory)
