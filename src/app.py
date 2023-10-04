@@ -70,17 +70,20 @@ def make_prediction():
     p_H1A.show_stats()
     p_H1B.show_stats()
 
-    avg_M5 = np.average([p_M5A.average, p_M5B.average])
-    avg_M10 = np.average([p_M10A.average, p_M10B.average])
-    avg_H1 = np.average([p_H1A.average, p_H1B.average])
+    avg_M5 = np.average([p_M5A.output_average, p_M5B.output_average])
+    avg_M10 = np.average([p_M10A.output_average, p_M10B.output_average])
+    avg_H1 = np.average([p_H1A.output_average, p_H1B.output_average])
 
     averages = [avg_M5, avg_M10, avg_H1]
     time_weights = np.array([5, 10, 60])
+    # _time_weights = np.array([p_M5A.timeframe_in_minutes, p_M5B.timeframe_in_minutes,
+    #                           p_M10A.timeframe_in_minutes, p_M10B.timeframe_in_minutes,
+    #                           p_H1A.timeframe_in_minutes, p_H1B.timeframe_in_minutes])
     inv_time_weights = 1 / time_weights
 
-    std_M5 = np.average([p_M5A.std, p_M5B.std])
-    std_M10 = np.average([p_M10A.std, p_M10B.std])
-    std_H1 = np.average([p_H1A.std, p_H1B.std])
+    std_M5 = np.average([p_M5A.output_std, p_M5B.output_std])
+    std_M10 = np.average([p_M10A.output_std, p_M10B.output_std])
+    std_H1 = np.average([p_H1A.output_std, p_H1B.output_std])
     inv_exp_std_weights = 1 / np.exp([std_M5, std_M10, std_H1])
 
     inv_time_prod_inv_exp_std_weights = inv_time_weights * inv_exp_std_weights

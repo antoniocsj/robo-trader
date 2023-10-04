@@ -8,8 +8,11 @@ class Predictors:
     def __init__(self, directory: str):
         self.directory = directory
         self.predictors: list[Predictor] = []
-        self.average = 0.0
-        self.std = 0.0  # standard deviation
+        self.timeframe = ''
+        self.timeframe_in_minutes = 0
+        self.output_average = 0.0
+        self.output_std = 0.0  # standard deviation
+        self.losses_average = 0.0
         self.search_predictors()
         self.all_symbols_trading = False
 
@@ -21,18 +24,29 @@ class Predictors:
                 continue
 
             pred = Predictor(subdir, self.directory)
+
+            if self.timeframe and self.timeframe != pred.timeframe:
+                print(f'ERRO. timeframes diferentes no mesmo grupo de predictors')
+                exit(-1)
+            else:
+                self.timeframe = pred.timeframe
+                self.timeframe_in_minutes = pred.timeframe_in_minutes
+
             self.predictors.append(pred)
 
     def calculate_outputs(self, input_data: dict):
         _sum = 0.0
 
         outputs = []
+        losses = []
         for pred in self.predictors:
             pred.calc_output(input_data, self.all_symbols_trading)
             outputs.append(pred.output)
+            losses.append(pred.product_losses)
 
-        self.average = np.average(outputs)
-        self.std = np.std(outputs)
+        self.output_average = np.average(outputs)
+        self.output_std = np.std(outputs)
+        self.losses_average = np.average(losses)
         pass
 
     def show_outputs(self):
@@ -43,13 +57,13 @@ class Predictors:
         directory = self.directory.split('/')[2]
 
         if len(self.predictors) == 0:
-            print(f'predictors ({directory}) average: {self.average} std: {self.std}')
+            print(f'predictors ({directory}) average: {self.output_average} std: {self.output_std}')
         else:
             symbol_out = self.predictors[0].train_config['symbol_out']
             if symbol_out == 'XAUUSD':
-                print(f'predictors ({directory}) average: {self.average:.2f} std: {self.std:.2f}')
+                print(f'predictors ({directory}) average: {self.output_average:.2f} std: {self.output_std:.2f}')
             else:
-                print(f'predictors ({directory}) average: {self.average:.5f} std: {self.std:.2f}')
+                print(f'predictors ({directory}) average: {self.output_average:.5f} std: {self.output_std:.2f}')
 
 
 def teste_01():
@@ -75,7 +89,7 @@ def teste_01():
     p_09.show_stats()
     p_10.show_stats()
 
-    averages = [p_01.average, p_02.average, p_09.average, p_10.average]
+    averages = [p_01.output_average, p_02.output_average, p_09.output_average, p_10.output_average]
     total_average = np.average(averages)
     print(f'total_average = {total_average:.2f}')
 
