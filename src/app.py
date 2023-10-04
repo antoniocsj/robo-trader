@@ -100,6 +100,9 @@ def make_prediction():
     total_avg_5 = np.average(averages, weights=inv_time_prod_inv_exp_std_weights)
     print(f'total_average_5 (inv_time_prod_inv_exp_std_weights) = {total_avg_5:.2f}')
 
+    total_avg = np.average([total_avg_1, total_avg_2, total_avg_3, total_avg_4, total_avg_5])
+    print(f'total_average = {total_avg:.2f}')
+
     print(f'last_datetime = {last_datetime}, trade_server_datetime = {trade_server_datetime}')
 
     return "OK"
