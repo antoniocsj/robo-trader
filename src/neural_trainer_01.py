@@ -257,7 +257,7 @@ def update_train_log(train_log: dict):
 
 def trainer_01():
     create_train_log()
-    _secs = 80
+    _secs = 50
 
     while True:
         train_log = load_train_log()
@@ -309,3 +309,12 @@ def trainer_01():
 
 if __name__ == '__main__':
     trainer_01()
+
+# 5 anos de histórico
+# TF(MIN)    PAUSA(S)
+#  5        80
+# 10        60
+# 15        50
+# 20        40
+# 30        30
+# 60        20
