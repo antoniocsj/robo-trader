@@ -23,7 +23,8 @@ class PredictorsGroup:
             if subdir.startswith('_') or subdir.endswith('_'):
                 continue
 
-            self.predictors.append(Predictors(subdir))
+            sub_pred_dir = f'{self.directory}/{subdir}'
+            self.predictors.append(Predictors(sub_pred_dir))
 
     def calculate_outputs(self, input_data: dict):
         for p in self.predictors:
@@ -45,12 +46,12 @@ class PredictorsGroup:
     def show_averages(self):
         inv_timeframes = 1 / self.timeframes
         inv_exp_stds = 1 / np.exp(self.stds)
-        inv_exp_losses = 1 / np.exp(self.losses)
+        inv_losses = 1 / self.losses
 
         product_1 = inv_timeframes * inv_exp_stds
-        product_2 = inv_timeframes * inv_exp_losses
-        product_3 = inv_exp_stds * inv_exp_losses
-        product_4 = inv_timeframes * inv_exp_stds * inv_exp_losses
+        product_2 = inv_timeframes * inv_losses
+        product_3 = inv_exp_stds * inv_losses
+        product_4 = inv_timeframes * inv_exp_stds * inv_losses
 
         total_avg_1 = np.average(self.averages)
         print(f'total_average_1 (simple) = {total_avg_1:.2f}')
@@ -64,20 +65,24 @@ class PredictorsGroup:
         total_avg_4 = np.average(self.averages, weights=inv_exp_stds)
         print(f'total_average_4 (weights : inv_exp_stds) = {total_avg_4:.2f}')
 
-        total_avg_5 = np.average(self.averages, weights=inv_exp_losses)
-        print(f'total_average_5 (weights : inv_exp_losses) = {total_avg_5:.2f}')
+        total_avg_5 = np.average(self.averages, weights=inv_losses)
+        print(f'total_average_5 (weights : inv_losses) = {total_avg_5:.2f}')
 
         total_avg_6 = np.average(self.averages, weights=product_1)
-        print(f'total_average_6 (weights : product_1) = {total_avg_6:.2f}')
+        print(f'total_average_6 (weights : inv_timeframes * inv_exp_stds) = {total_avg_6:.2f}')
 
         total_avg_7 = np.average(self.averages, weights=product_2)
-        print(f'total_average_7 (weights : product_2) = {total_avg_7:.2f}')
+        print(f'total_average_7 (weights : inv_timeframes * inv_losses) = {total_avg_7:.2f}')
 
         total_avg_8 = np.average(self.averages, weights=product_3)
-        print(f'total_average_8 (weights : product_3) = {total_avg_8:.2f}')
+        print(f'total_average_8 (weights : inv_exp_stds * inv_losses) = {total_avg_8:.2f}')
 
         total_avg_9 = np.average(self.averages, weights=product_4)
-        print(f'total_average_9 (weights : product_4) = {total_avg_9:.2f}')
+        print(f'total_average_9 (weights : inv_timeframes * inv_exp_stds * inv_losses) = {total_avg_9:.2f}')
+
+        total_avg = np.average([total_avg_1, total_avg_2, total_avg_3, total_avg_4, total_avg_5,
+                                total_avg_6, total_avg_7, total_avg_8, total_avg_9])
+        print(f'total_average = {total_avg:.2f}')
 
 
 if __name__ == '__main__':
@@ -85,3 +90,7 @@ if __name__ == '__main__':
 
     pred_group = PredictorsGroup('../predictors')
     pred_group.calculate_outputs(data)
+    pred_group.show_outputs()
+    pred_group.show_stats()
+    pred_group.show_averages()
+    pass

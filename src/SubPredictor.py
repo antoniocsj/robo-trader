@@ -262,7 +262,7 @@ class SubPredictor:
         # directory = self.directory.split('/')[1]
 
         print(f'sub_predictor ({self.id}) {self.candle_input_type} S={self.n_steps} '
-              f'HL={self.n_hidden_layers} TL={self.test_loss_eval:.3e}: ', end='')
+              f'HL={self.n_hidden_layers} L={self.loss:.3e}: ', end='')
         if len(candle_output_type) == 1:
             if self.train_config['symbol_out'] == 'XAUUSD':
                 print(f'{candle_output_type} = {self.output:.2f}')
