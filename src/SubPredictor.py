@@ -61,7 +61,7 @@ def get_timeframe_in_minutes(tf: str) -> int:
     return ret
 
 
-class Predictor:
+class SubPredictor:
     def __init__(self, _id: str, directory: str):
         self.id = _id
         self.directory = directory
@@ -81,7 +81,7 @@ class Predictor:
         self.whole_set_train_loss_eval = 0.0
         self.n_samples_test = 0
         self.test_loss_eval = 0.0
-        self.product_losses = 0.0
+        self.loss = 0.0
 
         self.load()
 
@@ -128,7 +128,7 @@ class Predictor:
         self.n_samples_test: int = self.train_config['n_samples_test']
         self.whole_set_train_loss_eval = self.train_config['whole_set_train_loss_eval']
         self.test_loss_eval: float = self.train_config['test_loss_eval']
-        self.product_losses: float = self.whole_set_train_loss_eval * self.test_loss_eval
+        self.loss: float = self.whole_set_train_loss_eval * self.test_loss_eval
 
     def prepare_data_for_model(self, data: dict, force_all_symbols_trading=False) -> ndarray:
         """
@@ -261,7 +261,7 @@ class Predictor:
         candle_output_type = self.train_config['candle_output_type']
         # directory = self.directory.split('/')[1]
 
-        print(f'predictor ({self.id}) {self.candle_input_type} S={self.n_steps} '
+        print(f'sub_predictor ({self.id}) {self.candle_input_type} S={self.n_steps} '
               f'HL={self.n_hidden_layers} TL={self.test_loss_eval:.3e}: ', end='')
         if len(candle_output_type) == 1:
             if self.train_config['symbol_out'] == 'XAUUSD':
@@ -277,7 +277,7 @@ def teste_01():
     suppose_all_symbols_trading = True
 
     directory = '../predictors/M10A'
-    predictor_1 = Predictor('M10_OHLC_S2_HL1', directory)
+    predictor_1 = SubPredictor('M10_OHLC_S2_HL1', directory)
     predictor_1.calc_output(data, suppose_all_symbols_trading)
     predictor_1.show_output()
 

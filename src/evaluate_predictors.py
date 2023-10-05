@@ -1,12 +1,12 @@
 import numpy as np
 
 from HistMulti import HistMulti
-from Predictor import Predictor
+from SubPredictor import SubPredictor
 from utils_ops import denorm_output
 from utils_nn import split_sequences2, prepare_train_data3
 
 
-def evaluate_predictor(pred: Predictor):
+def evaluate_predictor(pred: SubPredictor):
     settings = pred.settings
     print(f'settings.json: {settings}')
 
@@ -79,23 +79,23 @@ def evaluate_predictor(pred: Predictor):
 if __name__ == '__main__':
     hit_rates = []
 
-    # predictor = Predictor(1)
+    # predictor = SubPredictor(1)
     # _hit_rate = evaluate_predictor(predictor)
     # hit_rates.append(_hit_rate)
 
-    predictor = Predictor(1)
+    predictor = SubPredictor(1)
     _hit_rate = evaluate_predictor(predictor)
     hit_rates.append(_hit_rate)
 
-    # predictor = Predictor(3)
+    # predictor = SubPredictor(3)
     # _hit_rate = evaluate_predictor(predictor)
     # hit_rates.append(_hit_rate)
     #
-    # predictor = Predictor(4)
+    # predictor = SubPredictor(4)
     # _hit_rate = evaluate_predictor(predictor)
     # hit_rates.append(_hit_rate)
     #
-    # predictor = Predictor(5)
+    # predictor = SubPredictor(5)
     # _hit_rate = evaluate_predictor(predictor)
     # hit_rates.append(_hit_rate)
 

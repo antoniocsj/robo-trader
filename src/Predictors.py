@@ -1,13 +1,13 @@
 import os
 from utils_filesystem import read_json
-from Predictor import Predictor
+from SubPredictor import SubPredictor
 import numpy as np
 
 
 class Predictors:
     def __init__(self, directory: str):
         self.directory = directory
-        self.predictors: list[Predictor] = []
+        self.sub_predictors: list[SubPredictor] = []
         self.timeframe = ''
         self.timeframe_in_minutes = 0
         self.output_average = 0.0
@@ -23,26 +23,26 @@ class Predictors:
             if subdir.startswith('_') or subdir.endswith('_'):
                 continue
 
-            pred = Predictor(subdir, self.directory)
+            pred = SubPredictor(subdir, self.directory)
 
             if self.timeframe and self.timeframe != pred.timeframe:
-                print(f'ERRO. timeframes diferentes no mesmo grupo de predictors')
+                print(f'ERRO. timeframes diferentes no mesmo grupo de sub_predictors')
                 exit(-1)
             else:
                 self.timeframe = pred.timeframe
                 self.timeframe_in_minutes = pred.timeframe_in_minutes
 
-            self.predictors.append(pred)
+            self.sub_predictors.append(pred)
 
     def calculate_outputs(self, input_data: dict):
         _sum = 0.0
 
         outputs = []
         losses = []
-        for pred in self.predictors:
+        for pred in self.sub_predictors:
             pred.calc_output(input_data, self.all_symbols_trading)
             outputs.append(pred.output)
-            losses.append(pred.product_losses)
+            losses.append(pred.loss)
 
         self.output_average = np.average(outputs)
         self.output_std = np.std(outputs)
@@ -50,16 +50,16 @@ class Predictors:
         pass
 
     def show_outputs(self):
-        for pred in self.predictors:
+        for pred in self.sub_predictors:
             pred.show_output()
 
     def show_stats(self):
         directory = self.directory.split('/')[2]
 
-        if len(self.predictors) == 0:
+        if len(self.sub_predictors) == 0:
             print(f'predictors ({directory}) average: {self.output_average} std: {self.output_std}')
         else:
-            symbol_out = self.predictors[0].train_config['symbol_out']
+            symbol_out = self.sub_predictors[0].train_config['symbol_out']
             if symbol_out == 'XAUUSD':
                 print(f'predictors ({directory}) average: {self.output_average:.2f} std: {self.output_std:.2f}')
             else:
@@ -69,23 +69,31 @@ class Predictors:
 def teste_01():
     data = read_json('request.json')
 
-    p_01 = Predictors('../predictors/M10A')
-    p_02 = Predictors('../predictors/M10B')
+    p_01 = Predictors('../predictors/M5A')
+    p_02 = Predictors('../predictors/M5B')
+    p_03 = Predictors('../predictors/M10A')
+    p_04 = Predictors('../predictors/M10B')
     p_09 = Predictors('../predictors/H1A')
     p_10 = Predictors('../predictors/H1B')
 
     p_01.calculate_outputs(data)
     p_02.calculate_outputs(data)
+    p_03.calculate_outputs(data)
+    p_04.calculate_outputs(data)
     p_09.calculate_outputs(data)
     p_10.calculate_outputs(data)
 
     p_01.show_outputs()
     p_02.show_outputs()
+    p_03.show_outputs()
+    p_04.show_outputs()
     p_09.show_outputs()
     p_10.show_outputs()
 
     p_01.show_stats()
     p_02.show_stats()
+    p_03.show_stats()
+    p_04.show_stats()
     p_09.show_stats()
     p_10.show_stats()
 
