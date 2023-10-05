@@ -39,7 +39,7 @@ M5_OHLCV_S4_HL1 -> OHLCV, n_steps = 4, n_hidden_layers = 1 ok
 M5_OHLCV_S4_HL2 -> OHLCV, n_steps = 4, n_hidden_layers = 2
 M5_OHLCV_S4_HL3 -> OHLCV, n_steps = 4, n_hidden_layers = 3
 
-M5_OHLCV_S6_HL1 -> OHLCV, n_steps = 6, n_hidden_layers = 1 -
+M5_OHLCV_S6_HL1 -> OHLCV, n_steps = 6, n_hidden_layers = 1 ok
 M5_OHLCV_S6_HL2 -> OHLCV, n_steps = 6, n_hidden_layers = 2
 M5_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3
 
@@ -75,8 +75,93 @@ M10_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3 ok
 
 ---
 
+M15A:
+M15_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 -
+M15_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2
+M15_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3
 
+M15_OHLC_S4_HL1 -> OHLC, n_steps = 4, n_hidden_layers = 1
+M15_OHLC_S4_HL2 -> OHLC, n_steps = 4, n_hidden_layers = 2
+M15_OHLC_S4_HL3 -> OHLC, n_steps = 4, n_hidden_layers = 3
 
+M15_OHLC_S6_HL1 -> OHLC, n_steps = 6, n_hidden_layers = 1
+M15_OHLC_S6_HL2 -> OHLC, n_steps = 6, n_hidden_layers = 2
+M15_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3
+
+---
+
+M15B:
+M15_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1
+M15_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2
+M15_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3
+
+M15_OHLCV_S4_HL1 -> OHLCV, n_steps = 4, n_hidden_layers = 1
+M15_OHLCV_S4_HL2 -> OHLCV, n_steps = 4, n_hidden_layers = 2
+M15_OHLCV_S4_HL3 -> OHLCV, n_steps = 4, n_hidden_layers = 3
+
+M15_OHLCV_S6_HL1 -> OHLCV, n_steps = 6, n_hidden_layers = 1
+M15_OHLCV_S6_HL2 -> OHLCV, n_steps = 6, n_hidden_layers = 2
+M15_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3
+
+---
+
+M20A:
+M20_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1
+M20_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2
+M20_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3
+
+M20_OHLC_S4_HL1 -> OHLC, n_steps = 4, n_hidden_layers = 1
+M20_OHLC_S4_HL2 -> OHLC, n_steps = 4, n_hidden_layers = 2
+M20_OHLC_S4_HL3 -> OHLC, n_steps = 4, n_hidden_layers = 3
+
+M20_OHLC_S6_HL1 -> OHLC, n_steps = 6, n_hidden_layers = 1
+M20_OHLC_S6_HL2 -> OHLC, n_steps = 6, n_hidden_layers = 2
+M20_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3
+
+---
+
+M15B:
+M20_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1
+M20_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2
+M20_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3
+
+M20_OHLCV_S4_HL1 -> OHLCV, n_steps = 4, n_hidden_layers = 1
+M20_OHLCV_S4_HL2 -> OHLCV, n_steps = 4, n_hidden_layers = 2
+M20_OHLCV_S4_HL3 -> OHLCV, n_steps = 4, n_hidden_layers = 3
+
+M20_OHLCV_S6_HL1 -> OHLCV, n_steps = 6, n_hidden_layers = 1
+M20_OHLCV_S6_HL2 -> OHLCV, n_steps = 6, n_hidden_layers = 2
+M20_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3
+
+---
+
+M30A:
+M30_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1
+M30_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2
+M30_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3
+
+M30_OHLC_S4_HL1 -> OHLC, n_steps = 4, n_hidden_layers = 1
+M30_OHLC_S4_HL2 -> OHLC, n_steps = 4, n_hidden_layers = 2
+M30_OHLC_S4_HL3 -> OHLC, n_steps = 4, n_hidden_layers = 3
+
+M30_OHLC_S6_HL1 -> OHLC, n_steps = 6, n_hidden_layers = 1
+M30_OHLC_S6_HL2 -> OHLC, n_steps = 6, n_hidden_layers = 2
+M30_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3
+
+---
+
+M30B:
+M30_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1
+M30_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2
+M30_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3
+
+M30_OHLCV_S4_HL1 -> OHLCV, n_steps = 4, n_hidden_layers = 1
+M30_OHLCV_S4_HL2 -> OHLCV, n_steps = 4, n_hidden_layers = 2
+M30_OHLCV_S4_HL3 -> OHLCV, n_steps = 4, n_hidden_layers = 3
+
+M30_OHLCV_S6_HL1 -> OHLCV, n_steps = 6, n_hidden_layers = 1
+M30_OHLCV_S6_HL2 -> OHLCV, n_steps = 6, n_hidden_layers = 2
+M30_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3
 
 ---
 
