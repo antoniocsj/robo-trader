@@ -24,6 +24,7 @@ class Predictors:
                 continue
 
             pred = SubPredictor(subdir, self.directory)
+            print(f'sub_predictor loaded ({pred.id})')
 
             if self.timeframe and self.timeframe != pred.timeframe:
                 print(f'ERRO. timeframes diferentes no mesmo grupo de sub_predictors')

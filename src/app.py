@@ -14,6 +14,8 @@ def show_tf():
 
 
 show_tf()
+pred_group = PredictorsGroup('../predictors')
+
 app = Flask(__name__)
 
 
@@ -42,7 +44,7 @@ def make_prediction():
 
     # data = read_json('request.json')
 
-    pred_group = PredictorsGroup('../predictors')
+    # pred_group = PredictorsGroup('../predictors')
     pred_group.calculate_outputs(data)
     pred_group.show_outputs()
     pred_group.show_stats()
