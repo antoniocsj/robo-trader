@@ -1,21 +1,21 @@
 predictors (5 anos de histórico, XAUUSD)
 
-M5A, csv_o_XAUUSD_2018-01-02_2023-09-15
-M5B, csv_o_XAUUSD_2018-01-02_2023-09-15
-M10A, csv_o_XAUUSD_2018-01-02_2023-09-15
-M10B, csv_o_XAUUSD_2018-01-02_2023-09-15
-M15A, csv_o_XAUUSD_2018-01-02_2023-09-15
-M15B, csv_o_XAUUSD_2018-01-02_2023-09-15
-M20A, csv_o_XAUUSD_2018-01-02_2023-09-15
-M20B, csv_o_XAUUSD_2018-01-02_2023-09-15
-M30A, csv_o_XAUUSD_2018-01-02_2023-09-15
-M30B, csv_o_XAUUSD_2018-01-02_2023-09-15
-H1A, csv_o_XAUUSD_2018-01-02_2023-09-15
-H1B, csv_o_XAUUSD_2018-01-02_2023-09-15
+M5_OHLC, csv_o_XAUUSD_2018-01-02_2023-09-15
+M5_OHLCV, csv_o_XAUUSD_2018-01-02_2023-09-15
+M10_OHLC, csv_o_XAUUSD_2018-01-02_2023-09-15
+M10_OHLCV, csv_o_XAUUSD_2018-01-02_2023-09-15
+M15_OHLC, csv_o_XAUUSD_2018-01-02_2023-09-15
+M15_OHLCV, csv_o_XAUUSD_2018-01-02_2023-09-15
+M20_OHLC, csv_o_XAUUSD_2018-01-02_2023-09-15
+M20_OHLCV, csv_o_XAUUSD_2018-01-02_2023-09-15
+M30_OHLC, csv_o_XAUUSD_2018-01-02_2023-09-15
+M30_OHLCV, csv_o_XAUUSD_2018-01-02_2023-09-15
+H1_OHLC, csv_o_XAUUSD_2018-01-02_2023-09-15
+H1_OHLCV, csv_o_XAUUSD_2018-01-02_2023-09-15
 
 ------
 
-M5A:
+M5_OHLC:
 M5_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 ok
 M5_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2
 M5_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3
@@ -30,7 +30,7 @@ M5_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3
 
 ------
 
-M5B:
+M5_OHLCV:
 M5_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1 ok
 M5_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2
 M5_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3
@@ -45,7 +45,7 @@ M5_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3
 
 ------
 
-M10A:
+M10_OHLC:
 M10_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 ok
 M10_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2 ok
 M10_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3 ok
@@ -58,9 +58,9 @@ M10_OHLC_S6_HL1 -> OHLC, n_steps = 6, n_hidden_layers = 1 ok
 M10_OHLC_S6_HL2 -> OHLC, n_steps = 6, n_hidden_layers = 2 ok
 M10_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3 ok
 
----
+------
 
-M10B:
+M10_OHLCV:
 M10_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1 ok
 M10_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2 ok
 M10_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3 ok
@@ -73,14 +73,14 @@ M10_OHLCV_S6_HL1 -> OHLCV, n_steps = 6, n_hidden_layers = 1 ok
 M10_OHLCV_S6_HL2 -> OHLCV, n_steps = 6, n_hidden_layers = 2 ok
 M10_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3 ok
 
----
+------
 
-M15A:
-M15_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 -
+M15_OHLC:
+M15_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 ok
 M15_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2
 M15_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3
 
-M15_OHLC_S4_HL1 -> OHLC, n_steps = 4, n_hidden_layers = 1
+M15_OHLC_S4_HL1 -> OHLC, n_steps = 4, n_hidden_layers = 1 ---
 M15_OHLC_S4_HL2 -> OHLC, n_steps = 4, n_hidden_layers = 2
 M15_OHLC_S4_HL3 -> OHLC, n_steps = 4, n_hidden_layers = 3
 
@@ -88,10 +88,10 @@ M15_OHLC_S6_HL1 -> OHLC, n_steps = 6, n_hidden_layers = 1
 M15_OHLC_S6_HL2 -> OHLC, n_steps = 6, n_hidden_layers = 2
 M15_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3
 
----
+------
 
-M15B:
-M15_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1
+M15_OHLCV:
+M15_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1 ok
 M15_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2
 M15_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3
 
@@ -103,9 +103,9 @@ M15_OHLCV_S6_HL1 -> OHLCV, n_steps = 6, n_hidden_layers = 1
 M15_OHLCV_S6_HL2 -> OHLCV, n_steps = 6, n_hidden_layers = 2
 M15_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3
 
----
+------
 
-M20A:
+M20_OHLC:
 M20_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1
 M20_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2
 M20_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3
@@ -118,9 +118,9 @@ M20_OHLC_S6_HL1 -> OHLC, n_steps = 6, n_hidden_layers = 1
 M20_OHLC_S6_HL2 -> OHLC, n_steps = 6, n_hidden_layers = 2
 M20_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3
 
----
+------
 
-M15B:
+M15_OHLCV:
 M20_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1
 M20_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2
 M20_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3
@@ -133,9 +133,9 @@ M20_OHLCV_S6_HL1 -> OHLCV, n_steps = 6, n_hidden_layers = 1
 M20_OHLCV_S6_HL2 -> OHLCV, n_steps = 6, n_hidden_layers = 2
 M20_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3
 
----
+------
 
-M30A:
+M30_OHLC:
 M30_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1
 M30_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2
 M30_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3
@@ -148,9 +148,9 @@ M30_OHLC_S6_HL1 -> OHLC, n_steps = 6, n_hidden_layers = 1
 M30_OHLC_S6_HL2 -> OHLC, n_steps = 6, n_hidden_layers = 2
 M30_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3
 
----
+------
 
-M30B:
+M30_OHLCV:
 M30_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1
 M30_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2
 M30_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3
@@ -163,9 +163,9 @@ M30_OHLCV_S6_HL1 -> OHLCV, n_steps = 6, n_hidden_layers = 1
 M30_OHLCV_S6_HL2 -> OHLCV, n_steps = 6, n_hidden_layers = 2
 M30_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3
 
----
+------
 
-H1A:
+H1_OHLC:
 H1_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 ok
 H1_OHLC_S2_HL2 -> OHLC, n_steps = 2, n_hidden_layers = 2
 H1_OHLC_S2_HL3 -> OHLC, n_steps = 2, n_hidden_layers = 3
@@ -178,9 +178,9 @@ H1_OHLC_S6_HL1 -> OHLC, n_steps = 6, n_hidden_layers = 1 ok
 H1_OHLC_S6_HL2 -> OHLC, n_steps = 6, n_hidden_layers = 2
 H1_OHLC_S6_HL3 -> OHLC, n_steps = 6, n_hidden_layers = 3
 
----
+------
 
-H1B:
+H1_OHLCV:
 H1_OHLCV_S2_HL1 -> OHLCV, n_steps = 2, n_hidden_layers = 1 ok
 H1_OHLCV_S2_HL2 -> OHLCV, n_steps = 2, n_hidden_layers = 2
 H1_OHLCV_S2_HL3 -> OHLCV, n_steps = 2, n_hidden_layers = 3
@@ -193,9 +193,10 @@ H1_OHLCV_S6_HL1 -> OHLCV, n_steps = 6, n_hidden_layers = 1 ok
 H1_OHLCV_S6_HL2 -> OHLCV, n_steps = 6, n_hidden_layers = 2
 H1_OHLCV_S6_HL3 -> OHLCV, n_steps = 6, n_hidden_layers = 3
 
--------
+------
 
-M10A e M10B:
+M10_OHLC e M10_OHLCV:
+    candle_input_type: OHLC, OHLCV
     n_steps = 2, 4, 6
     n_hidden_layers = 1, 2, 3
     n_samples_train = 199000
@@ -313,9 +314,10 @@ M10A e M10B:
 
     return train_config
 
----
+------
 
-outros predictors em diante:
+demais predictors:
+    candle_input_type: OHLC, OHLCV
     n_steps = 2, 4, 6
     n_hidden_layers = 1, 2, 3
 
