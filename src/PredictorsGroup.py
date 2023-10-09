@@ -115,9 +115,11 @@ class PredictorsGroup:
         total_avg_7 = np.average(self.averages, weights=product_4)
         print(f'total_average_7 (weights : inv_timeframes * inv_exp_stds * inv_losses) = {total_avg_7:.2f}')
 
-        total_avg = np.average([total_avg_1, total_avg_2, total_avg_3, total_avg_4,
-                                total_avg_5, total_avg_6, total_avg_7])
-        print(f'total_average = {total_avg:.2f}')
+        averages = [total_avg_1, total_avg_2, total_avg_3, total_avg_4, total_avg_5, total_avg_6, total_avg_7]
+
+        total_avg = np.average(averages)
+        total_avg_std = np.std(averages)
+        print(f'total_average = {total_avg:.2f} std = {total_avg_std:.2f}')
 
 
 if __name__ == '__main__':
