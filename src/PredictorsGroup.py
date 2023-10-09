@@ -43,7 +43,7 @@ class PredictorsGroup:
         for p in self.predictors:
             p.show_stats()
 
-    def show_averages(self):
+    def show_averages_0(self):
         inv_timeframes = 1 / self.timeframes
         inv_exp_stds = 1 / np.exp(self.stds)
         inv_losses = 1 / self.losses
@@ -82,6 +82,41 @@ class PredictorsGroup:
 
         total_avg = np.average([total_avg_1, total_avg_2, total_avg_3, total_avg_4, total_avg_5,
                                 total_avg_6, total_avg_7, total_avg_8, total_avg_9])
+        print(f'total_average = {total_avg:.2f}')
+
+    def show_averages(self):
+        inv_timeframes = 1 / self.timeframes
+        inv_exp_stds = 1 / np.exp(self.stds)
+        inv_losses = 1 / self.losses
+
+        product_1 = inv_timeframes * inv_exp_stds
+        product_2 = inv_timeframes * inv_losses
+        product_3 = inv_exp_stds * inv_losses
+        product_4 = inv_timeframes * inv_exp_stds * inv_losses
+
+        total_avg_1 = np.average(self.averages, weights=inv_timeframes)
+        print(f'total_average_1 (weights : inv_timeframes) = {total_avg_1:.2f}')
+
+        total_avg_2 = np.average(self.averages, weights=inv_exp_stds)
+        print(f'total_average_2 (weights : inv_exp_stds) = {total_avg_2:.2f}')
+
+        total_avg_3 = np.average(self.averages, weights=inv_losses)
+        print(f'total_average_3 (weights : inv_losses) = {total_avg_3:.2f}')
+
+        total_avg_4 = np.average(self.averages, weights=product_1)
+        print(f'total_average_4 (weights : inv_timeframes * inv_exp_stds) = {total_avg_4:.2f}')
+
+        total_avg_5 = np.average(self.averages, weights=product_2)
+        print(f'total_average_5 (weights : inv_timeframes * inv_losses) = {total_avg_5:.2f}')
+
+        total_avg_6 = np.average(self.averages, weights=product_3)
+        print(f'total_average_6 (weights : inv_exp_stds * inv_losses) = {total_avg_6:.2f}')
+
+        total_avg_7 = np.average(self.averages, weights=product_4)
+        print(f'total_average_7 (weights : inv_timeframes * inv_exp_stds * inv_losses) = {total_avg_7:.2f}')
+
+        total_avg = np.average([total_avg_1, total_avg_2, total_avg_3, total_avg_4,
+                                total_avg_5, total_avg_6, total_avg_7])
         print(f'total_average = {total_avg:.2f}')
 
 
