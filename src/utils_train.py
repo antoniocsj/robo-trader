@@ -1,6 +1,5 @@
 import json
 import os
-import math
 
 os.environ['PYTHONHASHSEED'] = str(1)
 os.environ['TF_CUDNN_DETERMINISM'] = str(1)
