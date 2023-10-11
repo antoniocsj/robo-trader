@@ -1,0 +1,11 @@
+{
+    "timeframe": "M20",
+    "candle_input_type": "OHLC",
+    "n_steps": 4,
+    "n_hidden_layers": 1,
+    "max_n_epochs": 150,
+    "patience_1": 5,
+    "patience_2": 15,
+    "random_seed_start": 1,
+    "random_seed_end": 100
+}
