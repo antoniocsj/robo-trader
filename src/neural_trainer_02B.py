@@ -1,3 +1,7 @@
+# faz um pesquisa mais profunda para encontrar o melhor random_seed.
+# usa o arquivo train_log.json
+# faz treinamentos com patience=15
+
 import os
 import time
 

@@ -1,3 +1,6 @@
+# executa vários treinamentos com random_seeds diferentes
+# com patience=5 e guarda os resultados em train_log.json
+
 import os
 import time
 
