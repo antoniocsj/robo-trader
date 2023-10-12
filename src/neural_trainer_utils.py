@@ -1,7 +1,15 @@
 import os
 
 
-def train_model(settings: dict, params_nn: dict, seed: int = 1):
+def train_model(settings: dict, params_nn: dict, seed: int, patience_style: str):
+    """
+
+    :param settings:
+    :param params_nn:
+    :param seed:
+    :param patience_style: short or long
+    :return:
+    """
     random_seed = seed
 
     os.environ['PYTHONHASHSEED'] = str(1)
@@ -82,7 +90,15 @@ def train_model(settings: dict, params_nn: dict, seed: int = 1):
     # max_n_epochs = n_inputs * 3 * 0 + 150
     max_n_epochs = params_nn['max_n_epochs']
     # patience = int(max_n_epochs / 10) * 0 + 5
-    patience = params_nn['patience']
+
+    if patience_style.lower() == 'short':
+        patience = params_nn['patience_short']
+    elif patience_style.lower() == 'long':
+        patience = params_nn['patience_long']
+    else:
+        print(f'ERRO. patience_style ({patience_style}) inválido')
+        exit(-1)
+
     n_symbols = len(hist.symbols)
 
     print(f'n_symbols = {n_symbols}')
@@ -192,3 +208,36 @@ def train_model(settings: dict, params_nn: dict, seed: int = 1):
     }
 
     return train_config
+
+
+def get_time_break_from_timeframe(tf: str):
+    """
+    Define uma tabela que relaciona o tempo de intervalo entre os treinos das redes neurais em função do timeframe
+    dos dados históricos. O objetivo dessa pausa entre os treinos serve para não superaquecer a placa de vídeo.
+    # supondo 5 anos de histórico
+    # TF(MIN)    PAUSA(S)
+    #  5        80
+    # 10        60
+    # 15        50
+    # 20        40
+    # 30        30
+    # 60        20
+    :return:
+    """
+    if tf == 'M5':
+        ret = 80
+    elif tf == 'M10':
+        ret = 60
+    elif tf == 'M15':
+        ret = 50
+    elif tf == 'M20':
+        ret = 40
+    elif tf == 'M30':
+        ret = 30
+    elif tf == 'H1':
+        ret = 20
+    else:
+        print('ERRO. get_time_break_from_timeframe. timeframe inválido.')
+        exit(-1)
+
+    return ret

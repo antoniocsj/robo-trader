@@ -5,7 +5,7 @@ import os
 import time
 
 from utils_filesystem import read_json, write_json
-from neural_trainer_utils import train_model
+from neural_trainer_utils import train_model, get_time_break_from_timeframe
 
 
 params_nn = read_json('params_nn.json')
@@ -60,16 +60,16 @@ def update_train_log(train_log: dict):
         exit(-1)
 
 
-def trainer_01():
+def nn_train_scan_random_seeds():
     settings = read_json('settings.json')
     create_train_log()
-    _secs = 40
+    time_break_secs = get_time_break_from_timeframe(settings['timeframe'])
 
     while True:
         train_log = load_train_log()
         index = train_log['n_experiments'] + 1
 
-        train_config = train_model(settings, params_nn=params_nn, seed=index)
+        train_config = train_model(settings=settings, params_nn=params_nn, seed=index, patience_style='short')
 
         whole_set_train_loss_eval = train_config['whole_set_train_loss_eval']
         test_loss_eval = train_config['test_loss_eval']
@@ -109,8 +109,8 @@ def trainer_01():
 
         update_train_log(train_log=train_log)
 
-        print(f'esperando por {_secs} segundos')
-        time.sleep(_secs)
+        print(f'esperando por {time_break_secs} segundos')
+        time.sleep(time_break_secs)
 
 
 if __name__ == '__main__':
@@ -119,14 +119,4 @@ if __name__ == '__main__':
     _settings['candle_input_type'] = params_nn['candle_input_type']
     write_json('settings.json', _settings)
 
-    trainer_01()
-
-
-# 5 anos de histórico
-# TF(MIN)    PAUSA(S)
-#  5        80
-# 10        60
-# 15        50
-# 20        40
-# 30        30
-# 60        20
+    nn_train_scan_random_seeds()
