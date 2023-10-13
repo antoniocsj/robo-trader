@@ -70,9 +70,9 @@ def create_rs_deeper_search_json():
 
             # se houver um arquivo rs_deeper_search.json, delete-o, pois ele não está valido, um vez que
             # rs_basic_search.json indica que a busca básica ainda está incompleta.
-            if os.path.exists(filename_deeper):
-                print(f'removendo arquivo inválido: {filename_deeper}')
-                os.remove(filename_deeper)
+            # if os.path.exists(filename_deeper):
+            #     print(f'removendo arquivo inválido: {filename_deeper}')
+            #     os.remove(filename_deeper)
 
             exit(-1)
 
