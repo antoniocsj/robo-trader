@@ -63,11 +63,16 @@ def update_train_log(train_log: dict):
 def nn_train_scan_random_seeds():
     settings = read_json('settings.json')
     create_train_log()
-    time_break_secs = get_time_break_from_timeframe(settings['timeframe'])
+    time_break_secs: int = get_time_break_from_timeframe(settings['timeframe'])
+    random_seed_max: int = params_nn['random_seed_max']
 
     while True:
         train_log = load_train_log()
-        index = train_log['n_experiments'] + 1
+        n_experiments: int = train_log['n_experiments']
+        index = n_experiments + 1
+        if index > random_seed_max:
+            print(f'nn_train_scan_random_seeds: CONCLUÍDO. n_experiments = {n_experiments}')
+            break
 
         train_config = train_model(settings=settings, params_nn=params_nn, seed=index, patience_style='short')
 
