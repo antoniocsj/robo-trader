@@ -217,25 +217,25 @@ def get_time_break_from_timeframe(tf: str):
     # supondo 5 anos de histórico
     # TF(MIN)    PAUSA(S)
     #  5        80
-    # 10        60
-    # 15        50
-    # 20        40
-    # 30        30
-    # 60        20
+    # 10        70
+    # 15        60
+    # 20        50
+    # 30        40
+    # 60        30
     :return:
     """
     if tf == 'M5':
         ret = 80
     elif tf == 'M10':
-        ret = 60
+        ret = 70
     elif tf == 'M15':
-        ret = 50
+        ret = 60
     elif tf == 'M20':
-        ret = 40
+        ret = 50
     elif tf == 'M30':
-        ret = 30
+        ret = 40
     elif tf == 'H1':
-        ret = 20
+        ret = 30
     else:
         print('ERRO. get_time_break_from_timeframe. timeframe inválido.')
         exit(-1)
