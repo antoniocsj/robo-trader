@@ -17,7 +17,7 @@ filename_deeper = 'rs_deeper_search.json'
 # indica o número de experimentos que serão selecionados do início da lista ordenada dos experimentos
 # básicos (patience_short) para uma busca mais profunda (patience_long) do random_seed que gera o menor
 # 'product_loss' no treinamento e teste da rede neural.
-deeper_search_range = 2
+deeper_search_range = params_nn['deeper_search_range']
 
 
 def load_rs_basic_search_json() -> dict:

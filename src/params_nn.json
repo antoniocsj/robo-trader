@@ -6,5 +6,6 @@
     "max_n_epochs": 5,
     "patience_short": 1,
     "patience_long": 2,
-    "random_seed_max": 4
+    "random_seed_max": 4,
+    "deeper_search_range": 2
 }

@@ -113,8 +113,13 @@ def nn_train_scan_random_seeds():
 
         update_rs_basic_search_json(rs_basic_search)
 
-        print(f'esperando por {time_break_secs} segundos')
-        time.sleep(time_break_secs)
+        # sempre espera alguns segundos para não superaquecer a placa de vídeo
+        # o 'if' é para não precisar esperar após o último experimento
+        if index < random_seed_max:
+            print(f'esperando por {time_break_secs} segundos')
+            time.sleep(time_break_secs)
+        else:
+            break
 
 
 if __name__ == '__main__':
