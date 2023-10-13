@@ -86,7 +86,7 @@ def train_model():
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 2
+    n_steps = 6
     n_hidden_layers = 1
 
     samples_test_ratio = 0.02
