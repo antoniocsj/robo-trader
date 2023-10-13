@@ -139,6 +139,8 @@ def normalize_directory(directory: str):
 
     print(f'todos os símbolos do diretório {directory} foram normalizados.')
     print('o arquivo scalers.pkl, que guarda as informações da normalização, foi salvo.')
+    print(f'conteúdo de scalers.pkl:')
+    print(f'{scalers}')
 
 
 def normalize_symbols(hist: HistMulti, scalers: dict, symbols: list[str] = None):
