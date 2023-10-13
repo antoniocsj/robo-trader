@@ -70,7 +70,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps = 2
+    n_steps = 6
     n_hidden_layers = 1
 
     samples_test_ratio = 0.02
@@ -313,8 +313,8 @@ if __name__ == '__main__':
 # 5 anos de histórico
 # TF(MIN)    PAUSA(S)
 #  5        80
-# 10        60
-# 15        50
-# 20        40
-# 30        30
-# 60        20
+# 10        70
+# 15        60
+# 20        50
+# 30        40
+# 60        30
