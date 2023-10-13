@@ -61,12 +61,12 @@ def create_rs_deeper_search_json():
             print('ERRO. os parametros de rs_basic_search.json NÃO são idênticos aos definidos em params_nn.json')
             exit(-1)
 
-        n_experiments: int = rs_basic_search['n_experiments']
+        n_basic_experiments: int = rs_basic_search['n_basic_experiments']
         random_seed_max = params_nn['random_seed_max']
 
-        if n_experiments < random_seed_max:
+        if n_basic_experiments < random_seed_max:
             print(f'ERRO! o arquivo {filename_basic} indica que o scan dos random seeds não foi completado ainda.')
-            print(f'n_experiments ({n_experiments}) < random_seed_max ({random_seed_max})')
+            print(f'n_basic_experiments ({n_basic_experiments}) < random_seed_max ({random_seed_max})')
 
             # se houver um arquivo rs_deeper_search.json, delete-o, pois ele não está valido, um vez que
             # rs_basic_search.json indica que a busca básica ainda está incompleta.
@@ -90,13 +90,12 @@ def create_rs_deeper_search_json():
         # novo campo 'deeper_search_range', que indica tamanho máximo da lista 'sorted_deeper_experiments';
         # novo campo n_deeper_experiments, que indica o tamanho atual da lista 'sorted_deeper_experiments';
         _dict = copy.deepcopy(rs_basic_search)
-        experiments = _dict['experiments']
-        sorted_experiments = sorted(experiments, key=lambda d: d['product'])
-        del _dict['experiments']
+        basic_experiments = _dict['basic_experiments']
+        sorted_basic_experiments = sorted(basic_experiments, key=lambda d: d['losses_product'])
         _dict['patience'] = params_nn['patience_long']
+        _dict['sorted_basic_experiments'] = sorted_basic_experiments
         _dict['deeper_search_range'] = deeper_search_range
         _dict['n_deeper_experiments'] = 0
-        _dict['sorted_basic_experiments'] = sorted_experiments
         _dict['sorted_deeper_experiments'] = []
         write_json(filename_deeper, _dict)
     else:
@@ -122,6 +121,9 @@ def update_rs_deeper_search_json(_dict: dict):
 
 def nn_train_search_best_random_seed():
     create_rs_deeper_search_json()
+
+    rs_deeper_search = load_rs_deeper_search_json()
+    pass
 
 
 if __name__ == '__main__':

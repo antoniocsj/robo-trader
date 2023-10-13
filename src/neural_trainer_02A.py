@@ -69,7 +69,8 @@ def nn_train_scan_random_seeds():
         index = n_basic_experiments + 1
 
         if index > random_seed_max:
-            print(f'nn_train_scan_random_seeds: CONCLUÍDO. n_basic_experiments = {n_basic_experiments}')
+            print(f'nn_train_scan_random_seeds: CONCLUÍDO. n_basic_experiments = {n_basic_experiments} == '
+                  f'params_nn["random_seed_max"] ({random_seed_max})')
             break
 
         train_config = train_model(settings=settings, params_nn=params_nn, seed=index, patience_style='short')
