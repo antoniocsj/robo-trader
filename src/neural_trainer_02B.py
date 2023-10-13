@@ -14,6 +14,11 @@ params_nn = read_json('params_nn.json')
 filename_basic = 'rs_basic_search.json'
 filename_deeper = 'rs_deeper_search.json'
 
+# indica o número de experimentos que serão selecionados do início da lista ordenada dos experimentos
+# básicos (patience_short) para uma busca mais profunda (patience_long) do random_seed que gera o menor
+# 'product_loss' no treinamento e teste da rede neural.
+deeper_search_range = 2
+
 
 def load_rs_basic_search_json() -> dict:
     if os.path.exists(filename_basic):
@@ -82,14 +87,25 @@ def create_rs_deeper_search_json():
     if not os.path.exists(filename_deeper):
         print(f'o arquivo {filename_deeper} não existe ainda. será criado agora.')
 
-        # o arquivo rs_deeper_search.json será inicialmente quase idêntico ao arquivo rs_basic_search.json, a
-        # diferença está no campo 'experiments' que será renomeado para 'sorted_experiments' e conterá a lista dos
-        # experimentos ordenada pelo 'campo product'.
+        # o arquivo rs_deeper_search.json será inicialmente quase idêntico ao arquivo rs_basic_search.json, as
+        # diferenças serão as seguintes
+        # - o campo 'experiments' será renomeado para 'sorted_basic_experiments', e conterá a mesma lista de
+        # experimentos, porém estará ordenada pelo campo 'product' (product losses);
+        # o campo 'patience' terá seu valor ajustado para o valor de params_nn['patience_long'];
+        # novo campo 'sorted_experiments_deeper', que guardará a lista ordenada dos experimentos mais profundos
+        # (patience_long). essa lista começa vazia inicialmente, e crescerá até atingir o número de elementos
+        # definido por 'deeper_search_range';
+        # novo campo 'deeper_search_range', que indica tamanho máximo da lista 'sorted_deeper_experiments';
+        # novo campo n_deeper_experiments, que indica o tamanho atual da lista 'sorted_deeper_experiments';
         _dict = copy.deepcopy(rs_basic_search)
         experiments = _dict['experiments']
         sorted_experiments = sorted(experiments, key=lambda d: d['product'])
         del _dict['experiments']
-        _dict['sorted_experiments'] = sorted_experiments
+        _dict['patience'] = params_nn['patience_long']
+        _dict['deeper_search_range'] = deeper_search_range
+        _dict['n_deeper_experiments'] = 0
+        _dict['sorted_basic_experiments'] = sorted_experiments
+        _dict['sorted_deeper_experiments'] = []
         write_json(filename_deeper, _dict)
     else:
         print(f'o arquivo {filename_deeper} já existe. continuando a pesquisa do melhor random seed.')
