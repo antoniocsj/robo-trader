@@ -68,11 +68,17 @@ def create_rs_deeper_search_json():
             print(f'ERRO! o arquivo {filename_basic} indica que o scan dos random seeds não foi completado ainda.')
             print(f'n_basic_experiments ({n_basic_experiments}) < random_seed_max ({random_seed_max})')
 
+            # é possível que já exista um arquivo rs_deeper_search.json remanescente de uma busca anterior, contendo
+            # dados que você não gostaria de perder, já que foram obtidos com treinamentos longos (patience_long).
+            # isso pode acontecer, por exemplo, se você alterar algumas informações em params_nn.json, como
+            # 'random_seed_max' ou 'deeper_search_range'.
+            # ainda deve ser implementada a lógica relacionada ao aproveitamento das informações contida no arquivo
+            # rs_deeper_search.json remanescente antes de continuar a busca aprofundada, para evitar treinar a rede
+            # de novo com os mesmos random seeds.
             # se houver um arquivo rs_deeper_search.json, delete-o, pois ele não está valido, um vez que
             # rs_basic_search.json indica que a busca básica ainda está incompleta.
-            # if os.path.exists(filename_deeper):
-            #     print(f'removendo arquivo inválido: {filename_deeper}')
-            #     os.remove(filename_deeper)
+            if os.path.exists(filename_deeper):
+                print(f'há um arquivo remanescente de busca aprofundada: {filename_deeper}')
 
             exit(-1)
 
