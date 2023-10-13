@@ -35,14 +35,6 @@ def print_list(_list: list):
     print('')
 
 
-# def get_sorted_experiments():
-#     train_log = load_train_log()
-#     experiments = train_log['experiments']
-#     sorted_exps_by_product_losses = sorted(experiments, key=lambda d: d['product'])
-#
-#     return sorted_exps_by_product_losses
-
-
 def create_rs_deeper_search_json():
     """
     Cria o arquivo que guarda o status da pesquisa mais profunda do melhor random seed (rs_deeper_search.json).
@@ -120,9 +112,9 @@ def load_rs_deeper_search_json() -> dict:
         exit(-1)
 
 
-def update_rs_deeper_search_json(rs_deeper_search: dict):
+def update_rs_deeper_search_json(_dict: dict):
     if os.path.exists(filename_deeper):
-        write_json(filename_deeper, rs_deeper_search)
+        write_json(filename_deeper, _dict)
     else:
         print(f'ERRO. o arquivo {filename_deeper} não existe.')
         exit(-1)

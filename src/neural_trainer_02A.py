@@ -1,5 +1,5 @@
-# executa vários treinamentos com random_seeds diferentes
-# com patience=5 e guarda os resultados em train_log.json
+# executa vários treinamentos com random_seeds diferentes e com patience=params_nn['patience_short'];
+# guarda os resultados em rs_basic_search.json;
 
 import os
 import time
@@ -9,15 +9,14 @@ from neural_trainer_utils import train_model, get_time_break_from_timeframe
 
 
 params_nn = read_json('params_nn.json')
+filename_basic = 'rs_basic_search.json'
 
 
-def create_train_log():
-    import os
-    _filename = 'train_log.json'
-    if not os.path.exists(_filename):
-        print(f'o arquivo {_filename} não existe ainda. será criado agora.')
+def create_rs_basic_search_json():
+    if not os.path.exists(filename_basic):
+        print(f'o arquivo {filename_basic} não existe ainda. será criado agora.')
         _dict = {
-            'n_experiments': 0,
+            'n_basic_experiments': 0,
             'symbol_out': '',
             'timeframe': '',
             'candle_input_type': '',
@@ -34,53 +33,52 @@ def create_train_log():
             'patience': 0,
             'datetime_start': '',
             'datetime_end': '',
-            'experiments': []
+            'basic_experiments': []
         }
-        write_json(_filename, _dict)
+        write_json(filename_basic, _dict)
     else:
-        print(f'o arquivo {_filename} já existe. continuando os experimentos.')
+        print(f'o arquivo {filename_basic} já existe. continuando os experimentos.')
 
 
-def load_train_log() -> dict:
-    _filename = 'train_log.json'
-    if os.path.exists(_filename):
-        _dict = read_json(_filename)
+def load_rs_basic_search_json() -> dict:
+    if os.path.exists(filename_basic):
+        _dict = read_json(filename_basic)
         return _dict
     else:
-        print(f'ERRO. o arquivo {_filename} não existe.')
+        print(f'ERRO. o arquivo {filename_basic} não existe.')
         exit(-1)
 
 
-def update_train_log(train_log: dict):
-    _filename = 'train_log.json'
-    if os.path.exists(_filename):
-        write_json(_filename, train_log)
+def update_rs_basic_search_json(_dict: dict):
+    if os.path.exists(filename_basic):
+        write_json(filename_basic, _dict)
     else:
-        print(f'ERRO. o arquivo {_filename} não existe.')
+        print(f'ERRO. o arquivo {filename_basic} não existe.')
         exit(-1)
 
 
 def nn_train_scan_random_seeds():
     settings = read_json('settings.json')
-    create_train_log()
+    create_rs_basic_search_json()
     time_break_secs: int = get_time_break_from_timeframe(settings['timeframe'])
     random_seed_max: int = params_nn['random_seed_max']
 
     while True:
-        train_log = load_train_log()
-        n_experiments: int = train_log['n_experiments']
-        index = n_experiments + 1
+        rs_basic_search = load_rs_basic_search_json()
+        n_basic_experiments: int = rs_basic_search['n_basic_experiments']
+        index = n_basic_experiments + 1
+
         if index > random_seed_max:
-            print(f'nn_train_scan_random_seeds: CONCLUÍDO. n_experiments = {n_experiments}')
+            print(f'nn_train_scan_random_seeds: CONCLUÍDO. n_basic_experiments = {n_basic_experiments}')
             break
 
         train_config = train_model(settings=settings, params_nn=params_nn, seed=index, patience_style='short')
 
         whole_set_train_loss_eval = train_config['whole_set_train_loss_eval']
         test_loss_eval = train_config['test_loss_eval']
-        product = whole_set_train_loss_eval * test_loss_eval
+        losses_product = whole_set_train_loss_eval * test_loss_eval
 
-        train_log['n_experiments'] = index
+        rs_basic_search['n_basic_experiments'] = index
 
         _dict = {
             'symbol_out': train_config['symbol_out'],
@@ -101,18 +99,18 @@ def nn_train_scan_random_seeds():
             'datetime_end': train_config['datetime_end']
         }
 
-        train_log.update(_dict)
+        rs_basic_search.update(_dict)
 
         log = {
             'random_seed': index,
             'effective_n_epochs': train_config['effective_n_epochs'],
             'whole_set_train_loss': whole_set_train_loss_eval,
             'test_loss': test_loss_eval,
-            'product': product
+            'losses_product': losses_product
         }
-        train_log['experiments'].append(log)
+        rs_basic_search['basic_experiments'].append(log)
 
-        update_train_log(train_log=train_log)
+        update_rs_basic_search_json(rs_basic_search)
 
         print(f'esperando por {time_break_secs} segundos')
         time.sleep(time_break_secs)
