@@ -7,6 +7,5 @@
     "patience_short": 1,
     "patience_long": 2,
     "random_seed_max": 4,
-    "deep_search_range": 2,
-    "best_random_seed": -1
+    "deep_search_range": 2
 }

@@ -102,6 +102,7 @@ def create_rs_deep_search_json():
         _dict['sorted_basic_experiments'] = sorted_basic_experiments
         _dict['deep_search_range'] = deep_search_range
         _dict['n_deep_experiments'] = 0
+        _dict['deep_experiments'] = []
         _dict['sorted_deep_experiments'] = []
         write_json(filename_deep, _dict)
     else:
@@ -127,6 +128,7 @@ def update_rs_deep_search_json(_dict: dict):
 
 def nn_train_search_best_random_seed():
     settings = read_json('settings.json')
+    time_break_secs = 5
 
     create_rs_deep_search_json()
 
@@ -142,8 +144,15 @@ def nn_train_search_best_random_seed():
         exit(-1)
 
     first_basic_experiments = sorted_basic_experiments[0:deep_search_range]
+    deep_experiments = rs_deep_search['deep_experiments']
+    len_deep_experiments = len(deep_experiments)
 
-    for e in first_basic_experiments:
+    if len_deep_experiments >= N:
+        print(f'a busca profunda já terminou. deep_search_range = {N}')
+        exit(0)
+
+    for i in range(len_deep_experiments, N):
+        e = first_basic_experiments[i]
         print(e)
         seed: int = e['random_seed']
 
@@ -152,6 +161,49 @@ def nn_train_search_best_random_seed():
         whole_set_train_loss_eval = train_config['whole_set_train_loss_eval']
         test_loss_eval = train_config['test_loss_eval']
         losses_product = whole_set_train_loss_eval * test_loss_eval
+
+        _dict = {
+            'symbol_out': train_config['symbol_out'],
+            'timeframe': train_config['timeframe'],
+            'candle_input_type': train_config['candle_input_type'],
+            'n_steps': train_config['n_steps'],
+            'n_hidden_layers': train_config['n_hidden_layers'],
+            'candle_output_type': train_config['candle_output_type'],
+            'n_symbols': train_config['n_symbols'],
+            'symbols': train_config['symbols'],
+            'n_samples_train': train_config['n_samples_train'],
+            'validation_split': train_config['validation_split'],
+            'samples_test_ratio': train_config['samples_test_ratio'],
+            'n_samples_test': train_config['n_samples_test'],
+            'max_n_epochs': train_config['max_n_epochs'],
+            'patience': train_config['patience'],
+            'datetime_start': train_config['datetime_start'],
+            'datetime_end': train_config['datetime_end']
+        }
+
+        rs_deep_search.update(_dict)
+
+        log = {
+            'random_seed': seed,
+            'effective_n_epochs': train_config['effective_n_epochs'],
+            'whole_set_train_loss': whole_set_train_loss_eval,
+            'test_loss': test_loss_eval,
+            'losses_product': losses_product
+        }
+        rs_deep_search['deep_experiments'].append(log)
+
+        rs_deep_search['n_deep_experiments'] = len(rs_deep_search['deep_experiments'])
+        rs_deep_search['sorted_deep_experiments'] = sorted(rs_deep_search['deep_experiments'],
+                                                           key=lambda d: d['losses_product'])
+        update_rs_deep_search_json(rs_deep_search)
+
+        # sempre espera alguns segundos para não superaquecer a placa de vídeo
+        # o 'if' é para não precisar esperar após o último experimento
+        if i < N - 1:
+            print(f'esperando por {time_break_secs} segundos')
+            time.sleep(time_break_secs)
+        else:
+            break
 
     pass
 
