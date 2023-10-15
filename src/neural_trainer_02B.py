@@ -101,8 +101,8 @@ def create_rs_deep_search_json():
         _dict['patience'] = params_nn['patience_long']
         _dict['sorted_basic_experiments'] = sorted_basic_experiments
         _dict['deep_search_range'] = deep_search_range
-        _dict['n_deeper_experiments'] = 0
-        _dict['sorted_deeper_experiments'] = []
+        _dict['n_deep_experiments'] = 0
+        _dict['sorted_deep_experiments'] = []
         write_json(filename_deep, _dict)
     else:
         print(f'o arquivo {filename_deep} já existe. continuando a pesquisa do melhor random seed.')
@@ -129,6 +129,20 @@ def nn_train_search_best_random_seed():
     create_rs_deep_search_json()
 
     rs_deep_search = load_rs_deep_search_json()
+
+    # refaz o treinamento dos N primeiros experimentos de 'sorted_basic_experiments', onde N = deep_search_range,
+    # porém, desta vez, o treinamento das redes neurais será com 'patience' = patience_long
+    N = rs_deep_search['deep_search_range']
+    sorted_basic_experiments = rs_deep_search['sorted_basic_experiments']
+
+    if N > len(sorted_basic_experiments):
+        print(f'ERRO. deep_search_range ({N}) > len(sorted_basic_experiments) ({len(sorted_basic_experiments)})')
+        exit(-1)
+
+    first_basic_experiments = sorted_basic_experiments[0:deep_search_range]
+
+    for e in first_basic_experiments:
+        print(e)
     pass
 
 
