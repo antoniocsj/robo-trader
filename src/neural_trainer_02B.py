@@ -12,12 +12,12 @@ from neural_trainer_utils import train_model
 
 params_nn = read_json('params_nn.json')
 filename_basic = 'rs_basic_search.json'
-filename_deeper = 'rs_deeper_search.json'
+filename_deep = 'rs_deep_search.json'
 
 # indica o número de experimentos que serão selecionados do início da lista ordenada dos experimentos
 # básicos (patience_short) para uma busca mais profunda (patience_long) do random_seed que gera o menor
 # 'product_loss' no treinamento e teste da rede neural.
-deeper_search_range = params_nn['deeper_search_range']
+deep_search_range = params_nn['deep_search_range']
 
 
 def load_rs_basic_search_json() -> dict:
@@ -35,7 +35,7 @@ def print_list(_list: list):
     print('')
 
 
-def create_rs_deeper_search_json():
+def create_rs_deep_search_json():
     """
     Cria o arquivo que guarda o status da pesquisa mais profunda do melhor random seed (rs_deeper_search.json).
     Antes de criar esse arquivo é necessário já existir um arquivo rs_basic_search.json válido contendo
@@ -71,19 +71,19 @@ def create_rs_deeper_search_json():
             # é possível que já exista um arquivo rs_deeper_search.json remanescente de uma busca anterior, contendo
             # dados que você não gostaria de perder, já que foram obtidos com treinamentos longos (patience_long).
             # isso pode acontecer, por exemplo, se você alterar algumas informações em params_nn.json, como
-            # 'random_seed_max' ou 'deeper_search_range'.
+            # 'random_seed_max' ou 'deep_search_range'.
             # ainda deve ser implementada a lógica relacionada ao aproveitamento das informações contida no arquivo
             # rs_deeper_search.json remanescente antes de continuar a busca aprofundada, para evitar treinar a rede
             # de novo com os mesmos random seeds.
             # se houver um arquivo rs_deeper_search.json, delete-o, pois ele não está valido, um vez que
             # rs_basic_search.json indica que a busca básica ainda está incompleta.
-            if os.path.exists(filename_deeper):
-                print(f'há um arquivo remanescente de busca aprofundada: {filename_deeper}')
+            if os.path.exists(filename_deep):
+                print(f'há um arquivo remanescente de busca aprofundada: {filename_deep}')
 
             exit(-1)
 
-    if not os.path.exists(filename_deeper):
-        print(f'o arquivo {filename_deeper} não existe ainda. será criado agora.')
+    if not os.path.exists(filename_deep):
+        print(f'o arquivo {filename_deep} não existe ainda. será criado agora.')
 
         # o arquivo rs_deeper_search.json será inicialmente quase idêntico ao arquivo rs_basic_search.json, as
         # diferenças serão as seguintes
@@ -92,43 +92,43 @@ def create_rs_deeper_search_json():
         # o campo 'patience' terá seu valor ajustado para o valor de params_nn['patience_long'];
         # novo campo 'sorted_experiments_deeper', que guardará a lista ordenada dos experimentos mais profundos
         # (patience_long). essa lista começa vazia inicialmente, e crescerá até atingir o número de elementos
-        # definido por 'deeper_search_range';
-        # novo campo 'deeper_search_range', que indica tamanho máximo da lista 'sorted_deeper_experiments';
+        # definido por 'deep_search_range';
+        # novo campo 'deep_search_range', que indica tamanho máximo da lista 'sorted_deeper_experiments';
         # novo campo n_deeper_experiments, que indica o tamanho atual da lista 'sorted_deeper_experiments';
         _dict = copy.deepcopy(rs_basic_search)
         basic_experiments = _dict['basic_experiments']
         sorted_basic_experiments = sorted(basic_experiments, key=lambda d: d['losses_product'])
         _dict['patience'] = params_nn['patience_long']
         _dict['sorted_basic_experiments'] = sorted_basic_experiments
-        _dict['deeper_search_range'] = deeper_search_range
+        _dict['deep_search_range'] = deep_search_range
         _dict['n_deeper_experiments'] = 0
         _dict['sorted_deeper_experiments'] = []
-        write_json(filename_deeper, _dict)
+        write_json(filename_deep, _dict)
     else:
-        print(f'o arquivo {filename_deeper} já existe. continuando a pesquisa do melhor random seed.')
+        print(f'o arquivo {filename_deep} já existe. continuando a pesquisa do melhor random seed.')
 
 
-def load_rs_deeper_search_json() -> dict:
-    if os.path.exists(filename_deeper):
-        _dict = read_json(filename_deeper)
+def load_rs_deep_search_json() -> dict:
+    if os.path.exists(filename_deep):
+        _dict = read_json(filename_deep)
         return _dict
     else:
-        print(f'ERRO. o arquivo {filename_deeper} não existe.')
+        print(f'ERRO. o arquivo {filename_deep} não existe.')
         exit(-1)
 
 
-def update_rs_deeper_search_json(_dict: dict):
-    if os.path.exists(filename_deeper):
-        write_json(filename_deeper, _dict)
+def update_rs_deep_search_json(_dict: dict):
+    if os.path.exists(filename_deep):
+        write_json(filename_deep, _dict)
     else:
-        print(f'ERRO. o arquivo {filename_deeper} não existe.')
+        print(f'ERRO. o arquivo {filename_deep} não existe.')
         exit(-1)
 
 
 def nn_train_search_best_random_seed():
-    create_rs_deeper_search_json()
+    create_rs_deep_search_json()
 
-    rs_deeper_search = load_rs_deeper_search_json()
+    rs_deep_search = load_rs_deep_search_json()
     pass
 
 
