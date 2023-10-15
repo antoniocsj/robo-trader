@@ -7,7 +7,7 @@ import copy
 import time
 
 from utils_filesystem import read_json, write_json
-from neural_trainer_utils import train_model
+from neural_trainer_utils import train_model, get_time_break_from_timeframe
 
 
 params_nn = read_json('params_nn.json')
@@ -128,7 +128,7 @@ def update_rs_deep_search_json(_dict: dict):
 
 def nn_train_search_best_random_seed():
     settings = read_json('settings.json')
-    time_break_secs = 5
+    time_break_secs: int = get_time_break_from_timeframe(settings['timeframe']) * 3
 
     create_rs_deep_search_json()
 
