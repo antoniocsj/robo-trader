@@ -111,6 +111,7 @@ def nn_train_scan_random_seeds():
         }
         rs_basic_search['basic_experiments'].append(log)
 
+        rs_basic_search['n_basic_experiments'] = len(rs_basic_search['basic_experiments'])
         update_rs_basic_search_json(rs_basic_search)
 
         # sempre espera alguns segundos para não superaquecer a placa de vídeo
