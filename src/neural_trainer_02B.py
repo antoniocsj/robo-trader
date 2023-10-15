@@ -126,6 +126,8 @@ def update_rs_deep_search_json(_dict: dict):
 
 
 def nn_train_search_best_random_seed():
+    settings = read_json('settings.json')
+
     create_rs_deep_search_json()
 
     rs_deep_search = load_rs_deep_search_json()
@@ -143,6 +145,14 @@ def nn_train_search_best_random_seed():
 
     for e in first_basic_experiments:
         print(e)
+        seed: int = e['random_seed']
+
+        train_config = train_model(settings, params_nn, seed, patience_style='long')
+
+        whole_set_train_loss_eval = train_config['whole_set_train_loss_eval']
+        test_loss_eval = train_config['test_loss_eval']
+        losses_product = whole_set_train_loss_eval * test_loss_eval
+
     pass
 
 
