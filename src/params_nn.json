@@ -1,11 +1,11 @@
 {
-    "timeframe": "M30",
-    "candle_input_type": "OHLCV",
+    "timeframe": "H1",
+    "candle_input_type": "OHLC",
     "n_steps": 2,
     "n_hidden_layers": 1,
-    "max_n_epochs": 5,
-    "patience_short": 1,
-    "patience_long": 2,
-    "random_seed_max": 4,
-    "deep_search_range": 2
+    "max_n_epochs": 150,
+    "patience_short": 5,
+    "patience_long": 15,
+    "random_seed_max": 120,
+    "deep_search_range": 20
 }
