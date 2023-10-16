@@ -1,17 +1,13 @@
-predictors (5 anos de histórico, XAUUSD)
+predictors
+dados históricos
+XAUUSD: 2018-01-02T02:00 -> 2023-09-15T23:00 (aproximadamente 5 anos e meio)
 
-M5_OHLC, csv_o_XAUUSD_2018-01-02_2023-09-15
-M5_OHLCV, csv_o_XAUUSD_2018-01-02_2023-09-15
-M10_OHLC, csv_o_XAUUSD_2018-01-02_2023-09-15
-M10_OHLCV, csv_o_XAUUSD_2018-01-02_2023-09-15
-M15_OHLC, csv_o_XAUUSD_2018-01-02_2023-09-15
-M15_OHLCV, csv_o_XAUUSD_2018-01-02_2023-09-15
-M20_OHLC, csv_o_XAUUSD_2018-01-02_2023-09-15
-M20_OHLCV, csv_o_XAUUSD_2018-01-02_2023-09-15
-M30_OHLC, csv_o_XAUUSD_2018-01-02_2023-09-15
-M30_OHLCV, csv_o_XAUUSD_2018-01-02_2023-09-15
-H1_OHLC, csv_o_XAUUSD_2018-01-02_2023-09-15
-H1_OHLCV, csv_o_XAUUSD_2018-01-02_2023-09-15
+M5_OHLC, M5_OHLCV
+M10_OHLC, M10_OHLCV
+M15_OHLC, M15_OHLCV
+M20_OHLC, M20_OHLCV
+M30_OHLC, M30_OHLCV
+H1_OHLC, H1_OHLCV
 
 ------
 
@@ -34,7 +30,7 @@ M5_OHLCV_S6_HL1 -> OHLCV, n_steps = 6, n_hidden_layers = 1 ok
 ------
 
 M10_OHLC:
-M10_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1
+M10_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 ---
 M10_OHLC_S3_HL1 -> OHLC, n_steps = 3, n_hidden_layers = 1
 M10_OHLC_S4_HL1 -> OHLC, n_steps = 4, n_hidden_layers = 1
 M10_OHLC_S5_HL1 -> OHLC, n_steps = 5, n_hidden_layers = 1
