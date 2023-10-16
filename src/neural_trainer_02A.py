@@ -127,6 +127,7 @@ if __name__ == '__main__':
     _settings = read_json('settings.json')
     _settings['timeframe'] = params_nn['timeframe']
     _settings['candle_input_type'] = params_nn['candle_input_type']
+    _settings['random_seed'] = 1
     write_json('settings.json', _settings)
 
     nn_train_scan_random_seeds()
