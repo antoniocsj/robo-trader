@@ -6,12 +6,11 @@ import os
 import copy
 import time
 
-from utils_filesystem import read_json, write_json
-from neural_trainer_utils import train_model, get_time_break_from_timeframe
+from utils_filesystem import read_json, write_json, write_train_config
+from neural_trainer_utils import train_model
 
 
 params_nn = read_json('params_nn.json')
-filename_basic = 'rs_basic_search.json'
 filename_deep = 'rs_deep_search.json'
 
 
@@ -33,6 +32,7 @@ def nn_train_with_best_deep_random_seed():
     write_json('settings.json', settings)
 
     train_config = train_model(settings, params_nn, seed, patience_style='long')
+    write_train_config(train_config)
 
     whole_set_train_loss_eval = train_config['whole_set_train_loss_eval']
     test_loss_eval = train_config['test_loss_eval']

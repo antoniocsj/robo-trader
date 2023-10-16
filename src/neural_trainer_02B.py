@@ -99,12 +99,12 @@ def create_rs_deep_search_json():
         basic_experiments = _dict['basic_experiments']
         sorted_basic_experiments = sorted(basic_experiments, key=lambda d: d['losses_product'])
         _dict['patience'] = params_nn['patience_long']
-        _dict['best_deep_random_seed'] = -1
         _dict['sorted_basic_experiments'] = sorted_basic_experiments
         _dict['deep_search_range'] = deep_search_range
         _dict['n_deep_experiments'] = 0
         _dict['deep_experiments'] = []
         _dict['sorted_deep_experiments'] = []
+        _dict['best_deep_random_seed'] = -1
         write_json(filename_deep, _dict)
     else:
         print(f'o arquivo {filename_deep} já existe. continuando a pesquisa do melhor random seed.')
