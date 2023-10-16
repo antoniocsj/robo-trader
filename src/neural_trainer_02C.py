@@ -38,7 +38,7 @@ def nn_train_with_best_deep_random_seed():
     test_loss_eval = train_config['test_loss_eval']
     losses_product = whole_set_train_loss_eval * test_loss_eval
 
-    _dict = {
+    d = {
         'symbol_out': train_config['symbol_out'],
         'timeframe': train_config['timeframe'],
         'candle_input_type': train_config['candle_input_type'],
@@ -57,7 +57,7 @@ def nn_train_with_best_deep_random_seed():
         'datetime_end': train_config['datetime_end']
     }
 
-    print(_dict)
+    print(d)
 
     log = {
         'random_seed': seed,
@@ -67,6 +67,9 @@ def nn_train_with_best_deep_random_seed():
         'losses_product': losses_product
     }
     print(log)
+    print(f'diretório destino:')
+    print(f"{d['timeframe']}_{d['candle_input_type']}/"
+          f"{d['timeframe']}_{d['candle_input_type']}_S{d['n_steps']}_HL{d['n_hidden_layers']}")
 
     pass
 
