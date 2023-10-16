@@ -99,6 +99,7 @@ def create_rs_deep_search_json():
         basic_experiments = _dict['basic_experiments']
         sorted_basic_experiments = sorted(basic_experiments, key=lambda d: d['losses_product'])
         _dict['patience'] = params_nn['patience_long']
+        _dict['best_deep_random_seed'] = -1
         _dict['sorted_basic_experiments'] = sorted_basic_experiments
         _dict['deep_search_range'] = deep_search_range
         _dict['n_deep_experiments'] = 0
@@ -149,6 +150,12 @@ def nn_train_search_best_random_seed():
 
     if len_deep_experiments >= N:
         print(f'a busca profunda já terminou. deep_search_range = {N}')
+        sorted_deep_experiments = rs_deep_search['sorted_deep_experiments']
+        best_deep_random_seed = sorted_deep_experiments[0]['random_seed']
+        rs_deep_search['best_deep_random_seed'] = best_deep_random_seed
+        update_rs_deep_search_json(rs_deep_search)
+        print(f'best_deep_random_seed = {best_deep_random_seed}')
+        print(f'{sorted_deep_experiments[0]}')
         exit(0)
 
     for i in range(len_deep_experiments, N):
@@ -205,6 +212,12 @@ def nn_train_search_best_random_seed():
         else:
             break
 
+    rs_deep_search = load_rs_deep_search_json()
+    sorted_deep_experiments = rs_deep_search['sorted_deep_experiments']
+    best_deep_random_seed = sorted_deep_experiments[0]['random_seed']
+    rs_deep_search['best_deep_random_seed'] = best_deep_random_seed
+    print(f'best_deep_random_seed = {best_deep_random_seed}')
+    print(f'{sorted_deep_experiments[0]}')
     pass
 
 
