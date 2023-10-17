@@ -27,6 +27,10 @@ def nn_train_with_best_deep_random_seed():
     rs_deep_search = load_rs_deep_search_json()
     seed: int = rs_deep_search['best_deep_random_seed']
 
+    if seed <= 0:
+        print(f'ERRO. {filename_deep} indica que a busca pelo melhor random seed está incompleta.')
+        exit(-1)
+
     settings = read_json('settings.json')
     settings['random_seed'] = seed
     write_json('settings.json', settings)
