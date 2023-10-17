@@ -216,6 +216,7 @@ def nn_train_search_best_random_seed():
     sorted_deep_experiments = rs_deep_search['sorted_deep_experiments']
     best_deep_random_seed = sorted_deep_experiments[0]['random_seed']
     rs_deep_search['best_deep_random_seed'] = best_deep_random_seed
+    update_rs_deep_search_json(rs_deep_search)
     print(f'best_deep_random_seed = {best_deep_random_seed}')
     print(f'{sorted_deep_experiments[0]}')
     pass
