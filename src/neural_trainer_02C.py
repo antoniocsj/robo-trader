@@ -41,26 +41,10 @@ def nn_train_with_best_deep_random_seed():
     test_loss_eval = train_config['test_loss_eval']
     losses_product = whole_set_train_loss_eval * test_loss_eval
 
-    d = {
-        'symbol_out': train_config['symbol_out'],
-        'timeframe': train_config['timeframe'],
-        'candle_input_type': train_config['candle_input_type'],
-        'n_steps': train_config['n_steps'],
-        'n_hidden_layers': train_config['n_hidden_layers'],
-        'candle_output_type': train_config['candle_output_type'],
-        'n_symbols': train_config['n_symbols'],
-        'symbols': train_config['symbols'],
-        'n_samples_train': train_config['n_samples_train'],
-        'validation_split': train_config['validation_split'],
-        'samples_test_ratio': train_config['samples_test_ratio'],
-        'n_samples_test': train_config['n_samples_test'],
-        'max_n_epochs': train_config['max_n_epochs'],
-        'patience': train_config['patience'],
-        'datetime_start': train_config['datetime_start'],
-        'datetime_end': train_config['datetime_end']
-    }
-
-    print(d)
+    timeframe: str = train_config['timeframe']
+    candle_input_type: str = train_config['candle_input_type']
+    n_steps: int = train_config['n_steps']
+    n_hidden_layers: int = train_config['n_hidden_layers']
 
     log = {
         'random_seed': seed,
@@ -70,10 +54,9 @@ def nn_train_with_best_deep_random_seed():
         'losses_product': losses_product
     }
     print(log)
-    print(f'diretório destino:')
 
-    predictors_family_name = f"{d['timeframe']}_{d['candle_input_type']}"
-    subpredictor_name = f"{d['candle_input_type']}_S{d['n_steps']}_HL{d['n_hidden_layers']}"
+    predictors_family_name = f'{timeframe}_{candle_input_type}'
+    subpredictor_name = f'{timeframe}_{candle_input_type}_S{n_steps}_HL{n_hidden_layers}'
 
     train_config['predictors_family_name'] = predictors_family_name
     train_config['subpredictor_name'] = subpredictor_name
@@ -81,6 +64,7 @@ def nn_train_with_best_deep_random_seed():
     write_train_config(train_config)
 
     dir_dest = f"{predictors_root_dir}/{predictors_family_name}/{subpredictor_name}"
+    print(f'diretório destino:')
     print(dir_dest)
 
     pass
