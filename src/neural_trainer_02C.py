@@ -35,7 +35,6 @@ def nn_train_with_best_deep_random_seed():
     write_json('settings.json', settings)
 
     train_config = train_model(settings, params_nn, seed, patience_style='long')
-    # write_train_config(train_config)
 
     whole_set_train_loss_eval = train_config['whole_set_train_loss_eval']
     test_loss_eval = train_config['test_loss_eval']
@@ -113,6 +112,8 @@ def backup_subpredictor_files():
         print(f'o diretório {subpredictor_path} não existe. será criado.')
         os.mkdir(subpredictor_path)
 
+    # copie para o diretório ../predictors/family_name/subpredictor_name todos os arquivos relacionados
+    # ao subpredictor atual
     file_names = ['model.h5', 'params_nn.json', 'rs_basic_search.json', 'rs_deep_search.json',
                   'scalers.pkl', 'settings.json', 'train_config.json']
 
