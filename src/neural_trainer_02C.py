@@ -89,6 +89,13 @@ def nn_train_with_best_deep_random_seed():
 def backup_subpredictor_files():
     train_config = read_train_config()
 
+    rs_deep_search = load_rs_deep_search_json()
+    seed: int = rs_deep_search['best_deep_random_seed']
+
+    if seed <= 0:
+        print(f'ERRO. {filename_deep} indica que a busca pelo melhor random seed está incompleta.')
+        exit(-1)
+
     predictors_family_name = train_config['predictors_family_name']
     subpredictor_name = train_config['subpredictor_name']
 
