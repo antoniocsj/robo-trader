@@ -3,15 +3,14 @@
 # faz treinamentos com patience=15
 
 import os
-import copy
-import time
-
-from utils_filesystem import read_json, write_json, write_train_config
+import shutil
+from utils_filesystem import read_json, write_json, read_train_config, write_train_config, copy_files
 from neural_trainer_utils import train_model
 
 
 params_nn = read_json('params_nn.json')
 filename_deep = 'rs_deep_search.json'
+predictors_root_dir = '../predictors'
 
 
 def load_rs_deep_search_json() -> dict:
@@ -36,7 +35,7 @@ def nn_train_with_best_deep_random_seed():
     write_json('settings.json', settings)
 
     train_config = train_model(settings, params_nn, seed, patience_style='long')
-    write_train_config(train_config)
+    # write_train_config(train_config)
 
     whole_set_train_loss_eval = train_config['whole_set_train_loss_eval']
     test_loss_eval = train_config['test_loss_eval']
@@ -72,11 +71,64 @@ def nn_train_with_best_deep_random_seed():
     }
     print(log)
     print(f'diretório destino:')
-    print(f"{d['timeframe']}_{d['candle_input_type']}/"
-          f"{d['timeframe']}_{d['candle_input_type']}_S{d['n_steps']}_HL{d['n_hidden_layers']}")
+
+    predictors_family_name = f"{d['timeframe']}_{d['candle_input_type']}"
+    subpredictor_name = f"{d['candle_input_type']}_S{d['n_steps']}_HL{d['n_hidden_layers']}"
+
+    train_config['predictors_family_name'] = predictors_family_name
+    train_config['subpredictor_name'] = subpredictor_name
+    train_config['losses_product'] = losses_product
+    write_train_config(train_config)
+
+    dir_dest = f"{predictors_root_dir}/{predictors_family_name}/{subpredictor_name}"
+    print(dir_dest)
 
     pass
 
 
+def backup_subpredictor_files():
+    train_config = read_train_config()
+
+    predictors_family_name = train_config['predictors_family_name']
+    subpredictor_name = train_config['subpredictor_name']
+
+    if not predictors_family_name or not subpredictor_name:
+        print(f'ERRO. predictors_family_name e/ou subpredictor_name não estão definidos.')
+        exit(-1)
+
+    print(f'fazendo o backup dos arquivos do subpredictor {predictors_family_name}/{subpredictor_name}')
+
+    # verifique se o diretório raíz dos predictors existe
+    if not os.path.exists(predictors_root_dir):
+        print(f'ERRO. o diretório {predictors_root_dir} não foi encontrado.')
+        exit(-1)
+
+    # verifique se o diretório da família dos predictors existe.
+    # se não existir, crie o diretório.
+    family_path = f'{predictors_root_dir}/{predictors_family_name}'
+    if not os.path.exists(family_path):
+        print(f'o diretório {family_path} não existe. será criado.')
+        os.mkdir(family_path)
+
+    # verifique se o diretório do subpredictor existe.
+    # se existir, o diretório deve ser resetado.
+    # se não existir, crie-o.
+    subpredictor_path = f'{family_path}/{subpredictor_name}'
+    if os.path.exists(subpredictor_path):
+        print(f'o diretório {subpredictor_path} já existe. será resetado.')
+        shutil.rmtree(subpredictor_path)
+        os.mkdir(subpredictor_path)
+    else:
+        print(f'o diretório {subpredictor_path} não existe. será criado.')
+        os.mkdir(subpredictor_path)
+
+    file_names = ['model.h5', 'params_nn.json', 'rs_basic_search.json', 'rs_deep_search.json',
+                  'scalers.pkl', 'settings.json', 'train_config.json']
+
+    copy_files(filenames=file_names, src_dir='.', dst_dir=subpredictor_path)
+    print(f'Backup de {subpredictor_name} efetuado com sucesso.')
+
+
 if __name__ == '__main__':
     nn_train_with_best_deep_random_seed()
+    # backup_subpredictor_files()

@@ -2,7 +2,7 @@ import os
 import json
 from datetime import datetime
 from utils_symbols import search_symbols_in_directory
-from utils_filesystem import read_json, make_backup
+from utils_filesystem import read_json, make_synch_backup
 from Sheet import Sheet
 
 
@@ -181,7 +181,7 @@ class DirectorySynchronization:
 
             if finished:
                 print(f'o checkpoint indica que os símbolos já estão sincronizados.')
-                make_backup(temp_dir, csv_s_dir)
+                make_synch_backup(temp_dir, csv_s_dir)
                 return
             else:
                 self.sheets_set_current_row(_current_row)
@@ -571,7 +571,7 @@ def synchronize():
         exit(-1)
     elif _len_symbols == 1:
         print('Há apenas 1 arquivo CSV. Portanto, o arquivo será considerado já sincronizado.')
-        make_backup(temp_dir, csv_s_dir)
+        make_synch_backup(temp_dir, csv_s_dir)
         exit(0)
 
     dir_sync = DirectorySynchronization(temp_dir)

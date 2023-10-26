@@ -2,7 +2,7 @@ import shutil
 import math
 from datetime import datetime
 import multiprocessing as mp
-from utils_filesystem import get_list_sync_files, read_json, make_backup
+from utils_filesystem import get_list_sync_files, read_json, make_synch_backup
 from utils_symbols import search_symbols_in_directory
 from utils_sync import *
 from Sheet import Sheet
@@ -655,7 +655,7 @@ def synchronize():
         exit(-1)
     elif _len_symbols == 1:
         print('Há apenas 1 arquivo CSV. Portanto, considera-se que o arquivo já está sincronizado.')
-        make_backup(temp_dir, csv_s_dir)
+        make_synch_backup(temp_dir, csv_s_dir)
         exit(0)
 
     symbols_to_sync_per_proc = []
@@ -706,7 +706,7 @@ def synchronize():
                 _sync_filename = list_sync_files[0]
                 shutil.move(_sync_filename, 'sync_cp.json')
 
-                make_backup(temp_dir, csv_s_dir)
+                make_synch_backup(temp_dir, csv_s_dir)
 
             else:
                 print(f'iniciando a fusão de conjuntos de símbolos')

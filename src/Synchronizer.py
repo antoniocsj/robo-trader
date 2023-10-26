@@ -5,7 +5,7 @@ import shutil
 
 from utils_filesystem import get_list_sync_files, read_json, copy_files, reset_dir
 from utils_symbols import search_symbols_in_directory, get_symbols
-from DirectorySynchronizationMultiProc import DirectorySynchronization, make_backup, choose_n_procs_start
+from DirectorySynchronizationMultiProc import DirectorySynchronization, make_synch_backup, choose_n_procs_start
 from utils_sync import *
 
 
@@ -28,7 +28,7 @@ def synchronize() -> bool:
         return True
     elif _len_symbols == 1:
         print('Há apenas 1 arquivo CSV. Portanto, considera-se que o arquivo já está sincronizado.')
-        make_backup(temp_dir, csv_s_dir)
+        make_synch_backup(temp_dir, csv_s_dir)
         return True
 
     symbols_to_sync_per_proc = []
@@ -80,7 +80,7 @@ def synchronize() -> bool:
                 _sync_filename = list_sync_files[0]
                 shutil.move(_sync_filename, 'sync_cp.json')
 
-                make_backup(temp_dir, csv_s_dir)
+                make_synch_backup(temp_dir, csv_s_dir)
                 return True
 
             else:

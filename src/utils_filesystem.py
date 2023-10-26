@@ -103,22 +103,28 @@ def load_sync_cp_file(_dirname: str, _filename: str) -> dict:
 
 
 def write_train_config(train_config: dict):
-    with open('train_config.json', 'w') as file:
+    train_config_filename = 'train_config.json'
+
+    with open(train_config_filename, 'w') as file:
         json.dump(train_config, file, indent=4, sort_keys=False, cls=NpEncoder)
+
+    print(f'O arquivo {train_config_filename} foi gravado com SUCESSO.')
 
 
 def read_train_config() -> dict:
-    _filename = 'train_config.json'
-    if os.path.exists(_filename):
-        with open(_filename, 'r') as file:
+    train_config_filename = 'train_config.json'
+
+    if os.path.exists(train_config_filename):
+        with open(train_config_filename, 'r') as file:
             _dict = json.load(file)
     else:
-        print(f'ERRO. O arquivo {_filename} não foi encontrado.')
+        print(f'ERRO. O arquivo {train_config_filename} não foi encontrado.')
         exit(-1)
+
     return _dict
 
 
-def make_backup(src_dir: str, dst_dir: str):
+def make_synch_backup(src_dir: str, dst_dir: str):
     print(f'copiando os arquivos sincronizados para o diretório {dst_dir}')
     if os.path.exists(dst_dir):
         print(f'o diretório {dst_dir} já existe. será substituído.')
