@@ -165,6 +165,21 @@ def copy_files(filenames: list[str], src_dir: str, dst_dir: str, clear_dst=False
         exit(-1)
 
 
+def remove_files(filenames: list[str], directory: str):
+    print(f'removendo de {directory} os seguintes arquivos:')
+    print(f'{filenames}')
+
+    if not os.path.exists(directory):
+        print(f'ERRO. O diretório {directory} não existe. abortando.')
+        exit(-1)
+
+    for filename in filenames:
+        filepath = f'{directory}/{filename}'
+        os.remove(filepath)
+
+    print(f'arquivos removidos com sucesso.')
+
+
 def reset_dir(dirname: str):
     if os.path.exists(dirname):
         print(f'o diretório {dirname} já existe. será resetado.')
