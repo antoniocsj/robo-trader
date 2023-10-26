@@ -124,5 +124,5 @@ def backup_subpredictor_files():
 
 
 if __name__ == '__main__':
-    # nn_train_with_best_deep_random_seed()
+    nn_train_with_best_deep_random_seed()
     backup_subpredictor_files()
