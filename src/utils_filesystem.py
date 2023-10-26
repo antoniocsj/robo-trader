@@ -146,7 +146,9 @@ def make_synch_backup(src_dir: str, dst_dir: str):
 
 
 def copy_files(filenames: list[str], src_dir: str, dst_dir: str, clear_dst=False):
-    print(f'copiando os arquivos {filenames} de {src_dir} para {dst_dir}')
+    print(f'copiando de {src_dir} para {dst_dir} os seguintes arquivos:')
+    print(f'{filenames}')
+
     if clear_dst and os.path.exists(dst_dir):
         print(f'o diretório {dst_dir} já existe. será substituído.')
         shutil.rmtree(dst_dir)
