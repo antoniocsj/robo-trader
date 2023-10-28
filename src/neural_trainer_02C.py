@@ -4,9 +4,11 @@
 
 import os
 import shutil
+from utils_checks import initial_compliance_checks
 from utils_filesystem import (read_json, write_json, read_train_config, write_train_config,
                               copy_files, remove_files)
 from neural_trainer_utils import train_model
+
 
 params_nn = read_json('params_nn.json')
 filename_deep = 'rs_deep_search.json'
@@ -23,6 +25,10 @@ def load_rs_deep_search_json() -> dict:
 
 
 def nn_train_with_best_deep_random_seed():
+    print('nn_train_with_best_deep_random_seed')
+
+    initial_compliance_checks()
+
     rs_deep_search = load_rs_deep_search_json()
     seed: int = rs_deep_search['best_deep_random_seed']
 
@@ -70,6 +76,10 @@ def nn_train_with_best_deep_random_seed():
 
 
 def backup_subpredictor_files():
+    print('backup_subpredictor_files')
+
+    initial_compliance_checks()
+
     train_config = read_train_config()
 
     rs_deep_search = load_rs_deep_search_json()

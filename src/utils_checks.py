@@ -9,6 +9,8 @@ def initial_compliance_checks():
     -> o conteúdo de temp, scalers.pkl deve estar em conformidade com params_nn.json e settings.json
     :return:
     """
+    print('Realizando as verificações iniciais de conformidade.')
+
     params_nn = read_json('params_nn.json')
     settings = read_json('settings.json')
 
@@ -42,15 +44,15 @@ def initial_compliance_checks():
               f'em settings.json ({settings_timeframe})')
         exit(-1)
 
+    del hist
+
     # verifica se o conteúdo de scalers está correto.
-    scalers = {}
-    with open('scalers.pkl', 'wb') as file:
-        pickle.dump(scalers, file)
+    with open('scalers.pkl', 'rb') as file:
+        scalers: dict = pickle.load(file)
 
     symbol_timeframe = f'{symbol_out}_{settings_timeframe}'
     if symbol_timeframe not in scalers:
         print(f'ERRO. symbol_timeframe ({symbol_timeframe}) not in scalers.pkl ({scalers.keys()}).')
         exit(-1)
 
-    n_steps: int = params_nn['n_steps']
-    n_hidden_layers: int = params_nn['n_hidden_layers']
+    print('Verificações Iniciais de Conformidade: OK.')

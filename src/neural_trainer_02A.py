@@ -4,6 +4,7 @@
 import os
 import time
 
+from utils_checks import initial_compliance_checks
 from utils_filesystem import read_json, write_json
 from neural_trainer_utils import train_model, get_time_break_from_timeframe
 
@@ -58,6 +59,10 @@ def update_rs_basic_search_json(_dict: dict):
 
 
 def nn_train_scan_random_seeds():
+    print('nn_train_scan_random_seeds')
+
+    initial_compliance_checks()
+
     settings = read_json('settings.json')
     create_rs_basic_search_json()
     time_break_secs: int = get_time_break_from_timeframe(settings['timeframe'])
