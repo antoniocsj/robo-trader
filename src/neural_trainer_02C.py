@@ -10,7 +10,7 @@ from utils_filesystem import (read_json, write_json, read_train_config, write_tr
 from neural_trainer_utils import train_model
 
 
-params_nn = read_json('params_nn.json')
+params_rs_search = read_json('params_rs_search.json')
 filename_deep = 'rs_deep_search.json'
 predictors_root_dir = '../predictors'
 
@@ -40,7 +40,7 @@ def nn_train_with_best_deep_random_seed():
     settings['random_seed'] = seed
     write_json('settings.json', settings)
 
-    train_config = train_model(settings, params_nn, seed, patience_style='long')
+    train_config = train_model(settings, params_rs_search, seed, patience_style='long')
 
     whole_set_train_loss_eval = train_config['whole_set_train_loss_eval']
     test_loss_eval = train_config['test_loss_eval']
@@ -124,7 +124,7 @@ def backup_subpredictor_files():
 
     # copie para o diretório ../predictors/family_name/subpredictor_name todos os arquivos relacionados
     # ao subpredictor atual
-    filenames_to_copy = ['model.h5', 'params_nn.json', 'rs_basic_search.json', 'rs_deep_search.json',
+    filenames_to_copy = ['model.h5', 'params_rs_search.json', 'rs_basic_search.json', 'rs_deep_search.json',
                          'scalers.pkl', 'settings.json', 'train_config.json']
     filenames_to_remove = ['model.h5', 'rs_basic_search.json', 'rs_deep_search.json', 'train_config.json']
 

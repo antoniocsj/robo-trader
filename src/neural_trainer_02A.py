@@ -1,5 +1,6 @@
-# executa vários treinamentos com random_seeds diferentes e com patience=params_nn['patience_short'];
-# guarda os resultados em rs_basic_search.json;
+# faz uma pesquisa básica por random seeds, isto é, executa vários treinamentos com random_seeds diferentes e com
+# patience=params_rs_search['patience_short'];
+# guarda os principais resultados de cada pesquisa em rs_basic_search.json;
 
 import os
 import time
@@ -9,7 +10,8 @@ from utils_filesystem import read_json, write_json
 from neural_trainer_utils import train_model, get_time_break_from_timeframe
 
 
-params_nn = read_json('params_nn.json')
+# tanto a pesquisa básica quanto a pesquisa profunda, usam os parâmetros definidos em params_rs_search.json
+params_rs_search = read_json('params_rs_search.json')
 filename_basic = 'rs_basic_search.json'
 
 
@@ -58,15 +60,15 @@ def update_rs_basic_search_json(_dict: dict):
         exit(-1)
 
 
-def nn_train_scan_random_seeds():
-    print('nn_train_scan_random_seeds')
+def nn_train_rs_basic_search():
+    print('nn_train_rs_basic_search')
 
     initial_compliance_checks()
 
     settings = read_json('settings.json')
     create_rs_basic_search_json()
     time_break_secs: int = get_time_break_from_timeframe(settings['timeframe'])
-    random_seed_max: int = params_nn['random_seed_max']
+    random_seed_max: int = params_rs_search['random_seed_max']
 
     while True:
         rs_basic_search = load_rs_basic_search_json()
@@ -74,11 +76,11 @@ def nn_train_scan_random_seeds():
         index = n_basic_experiments + 1
 
         if index > random_seed_max:
-            print(f'nn_train_scan_random_seeds: CONCLUÍDO. n_basic_experiments = {n_basic_experiments} == '
-                  f'params_nn["random_seed_max"] ({random_seed_max})')
+            print(f'nn_train_rs_basic_search: CONCLUÍDO. n_basic_experiments = {n_basic_experiments} == '
+                  f'params_rs_search["random_seed_max"] ({random_seed_max})')
             break
 
-        train_config = train_model(settings=settings, params_nn=params_nn, seed=index, patience_style='short')
+        train_config = train_model(settings, params_rs_search=params_rs_search, seed=index, patience_style='short')
 
         whole_set_train_loss_eval = train_config['whole_set_train_loss_eval']
         test_loss_eval = train_config['test_loss_eval']
@@ -130,9 +132,9 @@ def nn_train_scan_random_seeds():
 
 if __name__ == '__main__':
     _settings = read_json('settings.json')
-    _settings['timeframe'] = params_nn['timeframe']
-    _settings['candle_input_type'] = params_nn['candle_input_type']
+    _settings['timeframe'] = params_rs_search['timeframe']
+    _settings['candle_input_type'] = params_rs_search['candle_input_type']
     _settings['random_seed'] = 1
     write_json('settings.json', _settings)
 
-    nn_train_scan_random_seeds()
+    nn_train_rs_basic_search()

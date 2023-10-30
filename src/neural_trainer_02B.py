@@ -11,14 +11,14 @@ from utils_filesystem import read_json, write_json
 from neural_trainer_utils import train_model, get_time_break_from_timeframe
 
 
-params_nn = read_json('params_nn.json')
+params_rs_search = read_json('params_rs_search.json')
 filename_basic = 'rs_basic_search.json'
 filename_deep = 'rs_deep_search.json'
 
 # indica o número de experimentos que serão selecionados do início da lista ordenada dos experimentos
 # básicos (patience_short) para uma busca mais profunda (patience_long) do random_seed que gera o menor
 # 'product_loss' no treinamento e teste da rede neural.
-deep_search_range = params_nn['deep_search_range']
+deep_search_range = params_rs_search['deep_search_range']
 
 
 def load_rs_basic_search_json() -> dict:
@@ -51,19 +51,19 @@ def create_rs_deep_search_json():
     else:
         rs_basic_search = load_rs_basic_search_json()
 
-        timeframe_1, timeframe_2 = params_nn['timeframe'], rs_basic_search['timeframe']
-        candle_input_type_1, candle_input_type_2 = params_nn['candle_input_type'], rs_basic_search['candle_input_type']
-        n_steps_1, n_steps_2 = params_nn['n_steps'], rs_basic_search['n_steps']
-        n_hidden_layers_1, n_hidden_layers_2 = params_nn['n_hidden_layers'], rs_basic_search['n_hidden_layers']
+        timeframe_1, timeframe_2 = params_rs_search['timeframe'], rs_basic_search['timeframe']
+        candle_input_type_1, candle_input_type_2 = params_rs_search['candle_input_type'], rs_basic_search['candle_input_type']
+        n_steps_1, n_steps_2 = params_rs_search['n_steps'], rs_basic_search['n_steps']
+        n_hidden_layers_1, n_hidden_layers_2 = params_rs_search['n_hidden_layers'], rs_basic_search['n_hidden_layers']
 
-        # verificar se os parametros de rs_basic_search.json são idênticos aos definidos em params_nn.json
+        # verificar se os parametros de rs_basic_search.json são idênticos aos definidos em params_rs_search.json
         if not (timeframe_1 == timeframe_2 and candle_input_type_1 == candle_input_type_2 and
                 n_steps_1 == n_steps_2 and n_hidden_layers_1 == n_hidden_layers_2):
-            print('ERRO. os parametros de rs_basic_search.json NÃO são idênticos aos definidos em params_nn.json')
+            print('ERRO. os parametros de rs_basic_search.json NÃO são idênticos aos definidos em params_rs_search.json')
             exit(-1)
 
         n_basic_experiments: int = rs_basic_search['n_basic_experiments']
-        random_seed_max = params_nn['random_seed_max']
+        random_seed_max = params_rs_search['random_seed_max']
 
         if n_basic_experiments < random_seed_max:
             print(f'ERRO! o arquivo {filename_basic} indica que o scan dos random seeds não foi completado ainda.')
@@ -71,7 +71,7 @@ def create_rs_deep_search_json():
 
             # é possível que já exista um arquivo rs_deeper_search.json remanescente de uma busca anterior, contendo
             # dados que você não gostaria de perder, já que foram obtidos com treinamentos longos (patience_long).
-            # isso pode acontecer, por exemplo, se você alterar algumas informações em params_nn.json, como
+            # isso pode acontecer, por exemplo, se você alterar algumas informações em params_rs_search.json, como
             # 'random_seed_max' ou 'deep_search_range'.
             # ainda deve ser implementada a lógica relacionada ao aproveitamento das informações contida no arquivo
             # rs_deeper_search.json remanescente antes de continuar a busca aprofundada, para evitar treinar a rede
@@ -90,7 +90,7 @@ def create_rs_deep_search_json():
         # diferenças serão as seguintes
         # - o campo 'experiments' será renomeado para 'sorted_basic_experiments', e conterá a mesma lista de
         # experimentos, porém estará ordenada pelo campo 'product' (product losses);
-        # o campo 'patience' terá seu valor ajustado para o valor de params_nn['patience_long'];
+        # o campo 'patience' terá seu valor ajustado para o valor de params_rs_search['patience_long'];
         # novo campo 'sorted_experiments_deeper', que guardará a lista ordenada dos experimentos mais profundos
         # (patience_long). essa lista começa vazia inicialmente, e crescerá até atingir o número de elementos
         # definido por 'deep_search_range';
@@ -99,7 +99,7 @@ def create_rs_deep_search_json():
         _dict = copy.deepcopy(rs_basic_search)
         basic_experiments = _dict['basic_experiments']
         sorted_basic_experiments = sorted(basic_experiments, key=lambda d: d['losses_product'])
-        _dict['patience'] = params_nn['patience_long']
+        _dict['patience'] = params_rs_search['patience_long']
         _dict['sorted_basic_experiments'] = sorted_basic_experiments
         _dict['deep_search_range'] = deep_search_range
         _dict['n_deep_experiments'] = 0
@@ -128,8 +128,8 @@ def update_rs_deep_search_json(_dict: dict):
         exit(-1)
 
 
-def nn_train_search_best_random_seed():
-    print('nn_train_search_best_random_seed')
+def nn_train_rs_deep_search():
+    print('nn_train_rs_deep_search')
 
     initial_compliance_checks()
 
@@ -168,7 +168,7 @@ def nn_train_search_best_random_seed():
         print(e)
         seed: int = e['random_seed']
 
-        train_config = train_model(settings, params_nn, seed, patience_style='long')
+        train_config = train_model(settings, params_rs_search, seed, patience_style='long')
 
         whole_set_train_loss_eval = train_config['whole_set_train_loss_eval']
         test_loss_eval = train_config['test_loss_eval']
@@ -228,4 +228,4 @@ def nn_train_search_best_random_seed():
 
 
 if __name__ == '__main__':
-    nn_train_search_best_random_seed()
+    nn_train_rs_deep_search()

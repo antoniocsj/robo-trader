@@ -6,29 +6,29 @@ from HistMulti import HistMulti
 def initial_compliance_checks():
     """
     Realiza as verificações iniciais de conformidade:
-    -> o conteúdo de temp, scalers.pkl deve estar em conformidade com params_nn.json e settings.json
+    -> o conteúdo de temp, scalers.pkl deve estar em conformidade com params_rs_search.json e settings.json
     :return:
     """
     print('Realizando as verificações iniciais de conformidade.')
 
-    params_nn = read_json('params_nn.json')
+    params_rs_search = read_json('params_rs_search.json')
     settings = read_json('settings.json')
 
     temp_dir = settings['temp_dir']
     symbol_out = settings['symbol_out']
 
-    params_tf = params_nn['timeframe']
-    params_cit = params_nn['candle_input_type']
+    params_tf = params_rs_search['timeframe']
+    params_cit = params_rs_search['candle_input_type']
 
     settings_tf = settings['timeframe']
     settings_cit = settings['candle_input_type']
 
     if params_tf != settings_tf:
-        print(f'ERRO. params_nn_timeframe ({params_tf}) != settings_timeframe ({settings_tf})')
+        print(f'ERRO. params_rs_search["timeframe"] ({params_tf}) != settings["timeframe"] ({settings_tf})')
         exit(-1)
 
     if params_cit != settings_cit:
-        print(f'ERRO. params_nn_candle_input_type ({params_cit}) != settings_candle_input_type ({settings_cit})')
+        print(f'ERRO. params_rs_search["candle_input_type"] ({params_cit}) != settings["candle_input_type"] ({settings_cit})')
         exit(-1)
 
     hist = HistMulti(temp_dir, settings_tf, symbols_allowed=[symbol_out])

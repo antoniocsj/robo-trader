@@ -1,11 +1,11 @@
 import os
 
 
-def train_model(settings: dict, params_nn: dict, seed: int, patience_style: str):
+def train_model(settings: dict, params_rs_search: dict, seed: int, patience_style: str):
     """
 
     :param settings:
-    :param params_nn:
+    :param params_rs_search:
     :param seed:
     :param patience_style: short or long
     :return:
@@ -65,8 +65,8 @@ def train_model(settings: dict, params_nn: dict, seed: int, patience_style: str)
               f'em settings.json ({timeframe})')
         exit(-1)
 
-    n_steps: int = params_nn['n_steps']
-    n_hidden_layers: int = params_nn['n_hidden_layers']
+    n_steps: int = params_rs_search['n_steps']
+    n_hidden_layers: int = params_rs_search['n_hidden_layers']
     validation_split = 0.2
     samples_test_ratio = 0.02
 
@@ -88,13 +88,13 @@ def train_model(settings: dict, params_nn: dict, seed: int, patience_style: str)
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
     # max_n_epochs = n_inputs * 3 * 0 + 150
-    max_n_epochs = params_nn['max_n_epochs']
+    max_n_epochs = params_rs_search['max_n_epochs']
     # patience = int(max_n_epochs / 10) * 0 + 5
 
     if patience_style.lower() == 'short':
-        patience = params_nn['patience_short']
+        patience = params_rs_search['patience_short']
     elif patience_style.lower() == 'long':
-        patience = params_nn['patience_long']
+        patience = params_rs_search['patience_long']
     else:
         print(f'ERRO. patience_style ({patience_style}) inválido')
         exit(-1)
