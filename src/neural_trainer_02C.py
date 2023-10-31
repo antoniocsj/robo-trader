@@ -1,6 +1,6 @@
-# faz um pesquisa mais profunda para encontrar o melhor random_seed.
-# usa o arquivo train_log.json
-# faz treinamentos com patience=15
+# realiza o treinamento da rede neural com o melhor random_seed encontrado.
+# o melhor seed está indicado em rs_deep_search.json.
+# o treinamento usará a patiência longa (patience_long).
 
 import os
 import shutil
@@ -76,6 +76,12 @@ def nn_train_with_best_deep_random_seed():
 
 
 def backup_subpredictor_files():
+    """
+    - Realiza o backup, isto é, copia os arquivos relacionados ao subpredictor que acaba de ser treinado para o
+    diretório predictors, num subdiretório destino adequado.
+    - Remove alguns arquivos do diretório de trabalho (src) que são desnecessários.
+    :return:
+    """
     print('backup_subpredictor_files')
 
     initial_compliance_checks()
@@ -130,6 +136,8 @@ def backup_subpredictor_files():
 
     copy_files(filenames=filenames_to_copy, src_dir='.', dst_dir=subpredictor_path)
     print(f'Backup de {subpredictor_name} efetuado com sucesso.')
+
+    # remove arquivos desnecessários
     remove_files(filenames=filenames_to_remove, directory='.')
 
 
