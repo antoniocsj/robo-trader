@@ -43,7 +43,7 @@ class Predictors:
         for pred in self.sub_predictors:
             pred.calc_output(input_data, self.all_symbols_trading)
             outputs.append(pred.output)
-            losses.append(pred.loss)
+            losses.append(pred.losses_product)
 
         self.output_average = np.average(outputs)
         self.output_std = np.std(outputs)

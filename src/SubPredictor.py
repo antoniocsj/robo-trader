@@ -81,7 +81,7 @@ class SubPredictor:
         self.whole_set_train_loss_eval = 0.0
         self.n_samples_test = 0
         self.test_loss_eval = 0.0
-        self.loss = 0.0
+        self.losses_product = 0.0
 
         self.load()
 
@@ -128,7 +128,7 @@ class SubPredictor:
         self.n_samples_test: int = self.train_config['n_samples_test']
         self.whole_set_train_loss_eval = self.train_config['whole_set_train_loss_eval']
         self.test_loss_eval: float = self.train_config['test_loss_eval']
-        self.loss: float = self.whole_set_train_loss_eval * self.test_loss_eval
+        self.losses_product: float = self.whole_set_train_loss_eval * self.test_loss_eval
 
     def prepare_data_for_model(self, data: dict, force_all_symbols_trading=False) -> ndarray:
         """
@@ -262,7 +262,7 @@ class SubPredictor:
         # directory = self.directory.split('/')[1]
 
         print(f'sub_predictor ({self.id}) {self.candle_input_type} S={self.n_steps} '
-              f'HL={self.n_hidden_layers} L={self.loss:.3e}: ', end='')
+              f'HL={self.n_hidden_layers} LP={self.losses_product:.3e}: ', end='')
         if len(candle_output_type) == 1:
             if self.train_config['symbol_out'] == 'XAUUSD':
                 print(f'{candle_output_type} = {self.output:.2f}')
