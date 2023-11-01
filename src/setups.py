@@ -5,7 +5,7 @@ import copy
 
 import pandas as pd
 from HistMulti import HistMulti
-from utils_filesystem import read_json, get_list_sync_files, load_sync_cp_file, update_settings, reset_dir
+from utils_filesystem import read_json, write_json, get_list_sync_files, load_sync_cp_file, update_settings, reset_dir
 from utils_symbols import search_symbols
 from utils_ops import transform_directory, transform_files, transform_symbols, \
     normalize_directory, normalize_symbols, \
@@ -776,4 +776,13 @@ def apply_setup_symbols(hist: HistMulti, code: int, settings, scalers) -> HistMu
 
 
 if __name__ == '__main__':
+    params_rs_search = read_json('params_rs_search.json')
+    filename_basic = 'rs_basic_search.json'
+
+    _settings = read_json('settings.json')
+    _settings['timeframe'] = params_rs_search['timeframe']
+    _settings['candle_input_type'] = params_rs_search['candle_input_type']
+    _settings['random_seed'] = 1
+    write_json('settings.json', _settings)
+
     setup_directory_01()
