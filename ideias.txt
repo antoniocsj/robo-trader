@@ -1,0 +1,4 @@
+- Incluir em todos os projetos anteriores a possibilidade de busca básica e profunda de random seeds.
+  - redes neurais com um ou multiplos ativos de entrada
+  - algoritmos genéticos com um ou multiplos ativos de entrada
+  - programação genética com um ou multiplos ativos de entrada
