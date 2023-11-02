@@ -54,6 +54,9 @@ class PredictorsGroup:
         product_4 = inv_timeframes * inv_exp_stds * inv_losses
         product_5 = self.timeframes * inv_losses
 
+        total_avg_0 = np.average(self.outputs)
+        print(f'total_average_0 = {total_avg_0:.2f}')
+
         total_avg_1 = np.average(self.outputs, weights=inv_timeframes)
         print(f'total_average_1 (weights : inv_timeframes) = {total_avg_1:.2f}')
 
@@ -78,8 +81,8 @@ class PredictorsGroup:
         total_avg_8 = np.average(self.outputs, weights=product_5)
         print(f'total_average_8 (weights : timeframes * inv_losses) = {total_avg_8:.2f}')
 
-        averages = [total_avg_1, total_avg_2, total_avg_3, total_avg_4, total_avg_5, total_avg_6, total_avg_7,
-                    total_avg_8]
+        averages = [total_avg_0, total_avg_1, total_avg_2, total_avg_3, total_avg_4, total_avg_5,
+                    total_avg_6, total_avg_7, total_avg_8]
 
         total_avg = np.average(averages)
         total_avg_std = np.std(averages)
