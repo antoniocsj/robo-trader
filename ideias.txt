@@ -1,4 +1,6 @@
-- Incluir em todos os projetos anteriores a possibilidade de busca básica e profunda de random seeds.
+- Incluir em todos os projetos a possibilidade de busca básica e profunda de random seeds de modo que o modelo
+  fique o mais otimizado possível.
   - redes neurais com um ou multiplos ativos de entrada
   - algoritmos genéticos com um ou multiplos ativos de entrada
   - programação genética com um ou multiplos ativos de entrada
+  - mapas auto-organizáveis (redes de kohonen) com um ou multiplos ativos de entrada
