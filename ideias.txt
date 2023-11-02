@@ -1,3 +1,4 @@
+qui 02 nov 2023
 - Incluir em todos os projetos a possibilidade de busca básica e profunda de random seeds de modo que o modelo
   fique o mais otimizado possível.
   - redes neurais com um ou multiplos ativos de entrada
