@@ -40,11 +40,7 @@ def make_prediction():
     print(f'symbols: {symbols}')
 
     write_json('request.json', data)
-    # predict_next_candle(data)
 
-    # data = read_json('request.json')
-
-    # pred_group = PredictorsGroup('../predictors')
     pred_group.calculate_outputs(data)
     pred_group.show_outputs()
     pred_group.show_stats()
