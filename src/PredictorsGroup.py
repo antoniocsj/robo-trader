@@ -43,7 +43,7 @@ class PredictorsGroup:
         for p in self.predictors:
             p.show_stats()
 
-    def show_averages(self):
+    def show_averages_0(self):
         inv_timeframes = 1 / self.timeframes
         inv_exp_stds = 1 / np.exp(self.stds)
         inv_losses = 1 / self.losses
@@ -87,6 +87,10 @@ class PredictorsGroup:
         total_avg = np.average(averages)
         total_avg_std = np.std(averages)
         print(f'total_average = {total_avg:.2f} std = {total_avg_std:.2f}')
+
+    def show_averages(self):
+        total_avg = np.average(self.outputs)
+        print(f'média total = {total_avg:.2f}')
 
 
 if __name__ == '__main__':
