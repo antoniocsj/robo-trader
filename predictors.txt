@@ -102,7 +102,7 @@ M30_OHLCV_S6_HL1 -> OHLCV, n_steps = 6, n_hidden_layers = 1 ok *
 ------
 
 H1_OHLC:
-H1_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 ok * ---
+H1_OHLC_S2_HL1 -> OHLC, n_steps = 2, n_hidden_layers = 1 ok
 H1_OHLC_S3_HL1 -> OHLC, n_steps = 3, n_hidden_layers = 1 ok
 H1_OHLC_S4_HL1 -> OHLC, n_steps = 4, n_hidden_layers = 1 ok *
 H1_OHLC_S5_HL1 -> OHLC, n_steps = 5, n_hidden_layers = 1 ok
