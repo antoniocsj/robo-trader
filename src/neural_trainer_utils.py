@@ -227,15 +227,15 @@ def get_time_break_from_timeframe(tf: str):
     if tf == 'M5':
         ret = 80
     elif tf == 'M10':
-        ret = 40
+        ret = 90
     elif tf == 'M15':
-        ret = 35
+        ret = 45
     elif tf == 'M20':
-        ret = 30
+        ret = 40
     elif tf == 'M30':
-        ret = 25
+        ret = 35
     elif tf == 'H1':
-        ret = 20
+        ret = 30
     else:
         print('ERRO. get_time_break_from_timeframe. timeframe inválido.')
         exit(-1)
