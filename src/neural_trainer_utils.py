@@ -225,9 +225,9 @@ def get_time_break_from_timeframe(tf: str):
     :return:
     """
     if tf == 'M5':
-        ret = 80
+        ret = 100
     elif tf == 'M10':
-        ret = 90
+        ret = 50
     elif tf == 'M15':
         ret = 45
     elif tf == 'M20':
