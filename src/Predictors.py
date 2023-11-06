@@ -70,27 +70,19 @@ class Predictors:
 def teste_01():
     data = read_json('request.json')
 
-    p_01 = Predictors('../predictors/M5_OHLC')
-    p_02 = Predictors('../predictors/M5_OHLCV')
-    p_03 = Predictors('../predictors/M10_OHLC')
-    p_04 = Predictors('../predictors/M10_OHLCV')
+    p_01 = Predictors('../predictors/M10_OHLC')
+    p_02 = Predictors('../predictors/M10_OHLCV')
 
     p_01.calculate_outputs(data)
     p_02.calculate_outputs(data)
-    p_03.calculate_outputs(data)
-    p_04.calculate_outputs(data)
 
     p_01.show_outputs()
     p_02.show_outputs()
-    p_03.show_outputs()
-    p_04.show_outputs()
 
     p_01.show_stats()
     p_02.show_stats()
-    p_03.show_stats()
-    p_04.show_stats()
 
-    averages = [p_01.output_average, p_02.output_average, p_03.output_average, p_04.output_average]
+    averages = [p_01.output_average, p_02.output_average]
     total_average = np.average(averages)
     print(f'total_average = {total_average:.2f}')
 
