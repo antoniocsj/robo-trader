@@ -36,7 +36,8 @@ def create_rs_basic_search_json():
             'patience': 0,
             'datetime_start': '',
             'datetime_end': '',
-            'basic_experiments': []
+            'basic_experiments': [],
+            'sorted_basic_experiments': []
         }
         write_json(filename_basic, _dict)
     else:
@@ -118,7 +119,11 @@ def nn_train_rs_basic_search():
         }
         rs_basic_search['basic_experiments'].append(log)
 
-        rs_basic_search['n_basic_experiments'] = len(rs_basic_search['basic_experiments'])
+        basic_experiments = rs_basic_search['basic_experiments']
+        rs_basic_search['n_basic_experiments'] = len(basic_experiments)
+        sorted_basic_experiments = sorted(basic_experiments, key=lambda d: d['losses_product'])
+        rs_basic_search['sorted_basic_experiments'] = sorted_basic_experiments
+
         update_rs_basic_search_json(rs_basic_search)
 
         # sempre espera alguns segundos para não superaquecer a placa de vídeo
