@@ -35,6 +35,7 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
     from keras.layers import Flatten
     from keras.layers import Conv1D
     from keras.layers import MaxPooling1D
+    from keras.layers import LSTM
     from keras.models import load_model
     from keras.callbacks import EarlyStopping, ModelCheckpoint
 
@@ -110,16 +111,23 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
           f'n_samples_train = {n_samples_train}, n_samples_test = {n_samples_test}')
 
     model = Sequential()
-    n_filters = n_features
-    kernel_size = n_steps
-    pool_size = n_inputs
+
+    model_type = 'LSTM'
     n_neurons = n_inputs
 
-    # define cnn model
     # input layer
-    model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu', input_shape=(n_steps, n_features)))
-    model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
-    model.add(Flatten())
+    if model_type == 'CNN':
+        n_filters = n_features
+        kernel_size = n_steps
+        pool_size = n_inputs
+        model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu', input_shape=(n_steps, n_features)))
+        model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
+        model.add(Flatten())
+    elif model_type == 'LSTM':
+        model.add(LSTM(n_inputs, activation='relu', input_shape=(n_steps, n_features)))
+    else:
+        print(f'ERRO. model_type ({model_type}) inválido.')
+        exit(-1)
 
     # hidden layers
     for i in range(n_hidden_layers):
@@ -135,6 +143,8 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
     model.add(Dense(len(candle_output_type)))
     model.compile(optimizer='adam', loss='mse')
     model_config = model.get_config()
+
+    print(f'model_type = {model_type}.')
 
     # fit model
     print(f'treinando o modelo em parte das amostras de treinamento.')
@@ -224,6 +234,8 @@ def get_time_break_from_timeframe(tf: str):
     # 60        30
     :return:
     """
+    factor = 2
+
     if tf == 'M5':
         ret = 100
     elif tf == 'M10':
@@ -240,4 +252,4 @@ def get_time_break_from_timeframe(tf: str):
         print('ERRO. get_time_break_from_timeframe. timeframe inválido.')
         exit(-1)
 
-    return ret
+    return ret * factor
