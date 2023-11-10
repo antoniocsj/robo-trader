@@ -237,15 +237,15 @@ def get_time_break_from_timeframe(tf: str):
     factor = 2
 
     if tf == 'M5':
-        ret = 100
+        ret = 360
     elif tf == 'M10':
-        ret = 50
+        ret = 180
     elif tf == 'M15':
-        ret = 45
+        ret = 120
     elif tf == 'M20':
-        ret = 40
+        ret = 90
     elif tf == 'M30':
-        ret = 35
+        ret = 60
     elif tf == 'H1':
         ret = 30
     else:
