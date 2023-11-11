@@ -163,5 +163,9 @@ cython_debug/
 *.csv
 *.pdf
 *.pkl
-/src/logs.txt
+*.h5
+/notes_&_logs/*.*
 /src/halloffame.pkl
+/src/request.json
+/src/rs_basic_search.json
+/src/rs_deep_search.json
