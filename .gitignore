@@ -169,3 +169,6 @@ cython_debug/
 /src/request.json
 /src/rs_basic_search.json
 /src/rs_deep_search.json
+/predictors/
+/predictors_CNN/
+/predictors_LSTM/
