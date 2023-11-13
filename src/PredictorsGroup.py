@@ -13,6 +13,7 @@ class PredictorsGroup:
         self.timeframes: ndarray = np.array([])
         self.stds: ndarray = np.array([])
         self.losses: ndarray = np.array([])
+        self.total_average = 0.0
 
         self.load()
 
@@ -26,6 +27,9 @@ class PredictorsGroup:
             sub_pred_dir = f'{self.directory}/{subdir}'
             self.predictors.append(Predictors(sub_pred_dir))
 
+    def calc_total_average(self):
+        self.total_average = np.average(self.outputs)
+
     def calculate_outputs(self, input_data: dict):
         for p in self.predictors:
             p.calculate_outputs(input_data)
@@ -34,6 +38,8 @@ class PredictorsGroup:
         self.timeframes = np.array([p.timeframe_in_minutes for p in self.predictors])
         self.stds = np.array([p.output_std for p in self.predictors])
         self.losses = np.array([p.losses_average for p in self.predictors])
+
+        self.calc_total_average()
 
     def show_outputs(self):
         for p in self.predictors:
@@ -88,9 +94,8 @@ class PredictorsGroup:
         total_avg_std = np.std(averages)
         print(f'total_average = {total_avg:.2f} std = {total_avg_std:.2f}')
 
-    def show_averages(self):
-        total_avg = np.average(self.outputs)
-        print(f'média total = {total_avg:.2f}')
+    def show_average(self):
+        print(f'({self.directory}) média total = {self.total_average:.2f}')
 
 
 if __name__ == '__main__':
@@ -100,5 +105,5 @@ if __name__ == '__main__':
     pred_group.calculate_outputs(data)
     pred_group.show_outputs()
     pred_group.show_stats()
-    pred_group.show_averages()
+    pred_group.show_average()
     pass

@@ -14,7 +14,9 @@ def show_tf():
 
 
 show_tf()
-pred_group = PredictorsGroup('../predictors')
+pred_group_1 = PredictorsGroup('../predictors_CNN_1')
+pred_group_2 = PredictorsGroup('../predictors_CNN_2')
+pred_group_3 = PredictorsGroup('../predictors')
 
 app = Flask(__name__)
 
@@ -41,10 +43,21 @@ def make_prediction():
 
     write_json('request.json', data)
 
-    pred_group.calculate_outputs(data)
-    pred_group.show_outputs()
-    pred_group.show_stats()
-    pred_group.show_averages()
+    pred_group_1.calculate_outputs(data)
+    pred_group_2.calculate_outputs(data)
+    pred_group_3.calculate_outputs(data)
+
+    pred_group_1.show_outputs()
+    pred_group_2.show_outputs()
+    pred_group_3.show_outputs()
+
+    pred_group_1.show_stats()
+    pred_group_2.show_stats()
+    pred_group_3.show_stats()
+
+    pred_group_1.show_average()
+    pred_group_2.show_average()
+    pred_group_3.show_average()
 
     print(f'last_datetime = {last_datetime}, trade_server_datetime = {trade_server_datetime}')
 
