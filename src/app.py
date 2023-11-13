@@ -14,8 +14,8 @@ def show_tf():
 
 
 show_tf()
-pred_group_1 = PredictorsGroup('../predictors_CNN_1')
-pred_group_2 = PredictorsGroup('../predictors_CNN_2')
+pred_group_1 = PredictorsGroup('../predictors_CNN_OHLC')
+pred_group_2 = PredictorsGroup('../predictors_CNN_OHLCV')
 pred_group_3 = PredictorsGroup('../predictors')
 
 app = Flask(__name__)
