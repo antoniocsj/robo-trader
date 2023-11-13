@@ -70,8 +70,8 @@ class Predictors:
 def teste_01():
     data = read_json('request.json')
 
-    p_01 = Predictors('../predictors/M10_OHLC')
-    p_02 = Predictors('../predictors/M10_OHLCV')
+    p_01 = Predictors('../predictors/H1_OHLC')
+    p_02 = Predictors('../predictors/H1_OHLCV')
 
     p_01.calculate_outputs(data)
     p_02.calculate_outputs(data)
