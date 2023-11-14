@@ -13,10 +13,36 @@ def show_tf():
     print(tf.config.list_physical_devices())
 
 
+def load_predictors_groups(paths: list[str]):
+    _predictors_groups: list[PredictorsGroup] = []
+    for path in paths:
+        _predictors_groups.append(PredictorsGroup(path))
+
+    return _predictors_groups
+
+
+def execute_predictors_groups(_predictors_groups: list[PredictorsGroup], _data: dict):
+    outputs = []
+    for pred_group in _predictors_groups:
+        pred_group.calculate_outputs(_data)
+
+    for pred_group in _predictors_groups:
+        pred_group.show_outputs()
+
+    for pred_group in _predictors_groups:
+        pred_group.show_stats()
+
+    for pred_group in _predictors_groups:
+        pred_group.show_average()
+        outputs.append(pred_group.total_average)
+
+    total_average = np.average(outputs)
+    print(f'predictors groups total average = {total_average:.2f}')
+
+
 show_tf()
-pred_group_1 = PredictorsGroup('../predictors_CNN_OHLC')
-pred_group_2 = PredictorsGroup('../predictors_CNN_OHLCV')
-pred_group_3 = PredictorsGroup('../predictors')
+predictors_groups_paths = ['../predictors_CNN_OHLC', '../predictors']
+predictors_groups = load_predictors_groups(predictors_groups_paths)
 
 app = Flask(__name__)
 
@@ -43,21 +69,7 @@ def make_prediction():
 
     write_json('request.json', data)
 
-    pred_group_1.calculate_outputs(data)
-    pred_group_2.calculate_outputs(data)
-    pred_group_3.calculate_outputs(data)
-
-    pred_group_1.show_outputs()
-    pred_group_2.show_outputs()
-    pred_group_3.show_outputs()
-
-    pred_group_1.show_stats()
-    pred_group_2.show_stats()
-    pred_group_3.show_stats()
-
-    pred_group_1.show_average()
-    pred_group_2.show_average()
-    pred_group_3.show_average()
+    execute_predictors_groups(predictors_groups, data)
 
     print(f'last_datetime = {last_datetime}, trade_server_datetime = {trade_server_datetime}')
 
