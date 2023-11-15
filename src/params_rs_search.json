@@ -1,8 +1,8 @@
 {
     "timeframe": "H1",
     "candle_input_type": "OHLC",
-    "n_steps": 2,
-    "n_hidden_layers": 1,
+    "n_steps": 4,
+    "n_hidden_layers": 0,
     "max_n_epochs": 150,
     "patience_short": 5,
     "patience_long": 15,

@@ -2,7 +2,7 @@
     "symbol_out": "XAUUSD",
     "timeframe": "H1",
     "deterministic": true,
-    "random_seed": 1,
+    "random_seed": 85,
     "temp_dir": "../temp",
     "csv_s_dir": "../csv_s",
     "csv_o_dir": "../csv_o",
