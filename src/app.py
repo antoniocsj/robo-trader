@@ -41,7 +41,8 @@ def execute_predictors_groups(_predictors_groups: list[PredictorsGroup], _data: 
 
 
 show_tf()
-predictors_groups_paths = ['../predictors_CNN_OHLC', '../predictors']
+# predictors_groups_paths = ['../predictors_CNN_OHLC', '../predictors']
+predictors_groups_paths = ['../predictors']
 predictors_groups = load_predictors_groups(predictors_groups_paths)
 
 app = Flask(__name__)
