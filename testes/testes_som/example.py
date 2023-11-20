@@ -53,10 +53,10 @@ def get_umatrix(input_vects, weights, m, n):
     bmu_indices = []
     for vect in input_vects:
         min_index = min([i for i in range(len(list(weights)))],
-                        key=lambda x: np.linalg.norm(vect-
+                        key=lambda x: np.linalg.norm(vect -
                                                      list(weights)[x]))
         bmu_indices.append(neuron_locs[min_index])
-        
+
     return umatrix, bmu_indices
 
 
@@ -84,15 +84,15 @@ def get_umatrix_optimized(input_vects, weights, m, n):
     for j in range(m):
         for i in range(n):
             cneighbor_idxs = list()
-            
+
             # Save the neighbours for a unit with location i, j
-            if (i > 0):         
+            if i > 0:
                 cneighbor_idxs.append(j * n + i - 1)
-            if (i < n - 1):
+            if i < n - 1:
                 cneighbor_idxs.append(j * n + i + 1)
-            if (j > 0):
+            if j > 0:
                 cneighbor_idxs.append(j * n + i - n)
-            if (j < m - 1):
+            if j < m - 1:
                 cneighbor_idxs.append(j * n + i + n)
 
             # Get the weights of the neighbouring units
@@ -142,7 +142,8 @@ if __name__ == "__main__":
 
         # Build the SOM object and place all of its ops on the graph
         som = SelfOrganizingMap(m=m, n=n, dim=dims, max_epochs=2, gpus=1, session=session, graph=graph,
-                                input_tensor=next_element, batch_size=batch_size, initial_learning_rate=0.1, weights_init=None)
+                                input_tensor=next_element, batch_size=batch_size, initial_learning_rate=0.1,
+                                weights_init=None)
 
         init_op = tf.compat.v1.global_variables_initializer()
         session.run([init_op])
@@ -151,12 +152,12 @@ if __name__ == "__main__":
         # If you want Tensorboard support just make a new SummaryWriter and pass it to this method
         som.train(num_inputs=num_inputs)
 
-        print("Final QE={}",som.quantization_error(tf.constant(input_data, dtype=tf.float32)))
-        print("Final TE={}",som.topographic_error(tf.constant(input_data, dtype=tf.float32)))
-        
+        print("Final QE={}", som.quantization_error(tf.constant(input_data, dtype=tf.float32)))
+        print("Final TE={}", som.topographic_error(tf.constant(input_data, dtype=tf.float32)))
+
         weights = som.output_weights
-        
-        umatrix, bmu_loc = get_umatrix_optimized(input_data,weights, m, n)
+
+        umatrix, bmu_loc = get_umatrix_optimized(input_data, weights, m, n)
         fig = plt.figure()
         plt.imshow(umatrix.reshape((m, n)), origin='lower')
         plt.show(block=True)
