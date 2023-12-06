@@ -101,7 +101,7 @@ class PredictorsGroups:
 if __name__ == '__main__':
     data = read_json('request.json')
 
-    pred_group = PredictorsGroup('../predictors')
+    pred_group = PredictorsGroups('../predictors')
     pred_group.calculate_outputs(data)
     pred_group.show_outputs()
     pred_group.show_stats()
