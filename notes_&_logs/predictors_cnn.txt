@@ -1,6 +1,6 @@
 predictors_cnn
 dados históricos
-XAUUSD: 2018-01-02T02:00 -> 2023-09-15T23:00 (aproximadamente 5 anos e meio)
+XAUUSD: 2018.01.02-02:00 -> 2023.09.16-00:00 (aproximadamente 5 anos e meio)
 
 M5_OHLC, M5_OHLCV
 M10_OHLC, M10_OHLCV

@@ -1,3 +1,7 @@
+predictors_lstm
+dados históricos
+XAUUSD: 2018.01.02-02:00 -> 2023.09.16-00:00 (aproximadamente 5 anos e meio)
+
 losses_product:  best_basic              best_deep
 H1_OHLC_S3_HL0 -  7.39201122421942e-11   6.954390228448772e-11
 H1_OHLC_S3_HL1 -  7.354783689116938e-11  6.984871344846052e-11
