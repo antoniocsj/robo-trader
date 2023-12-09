@@ -33,7 +33,7 @@ def get_umatrix(input_vects, weights, m, n):
     """
     umatrix = np.zeros((m * n, 1))
     # Get the location of the neurons on the map to figure out their neighbors. I know I already have this in the
-    # SOM code but I put it here too to make it easier to follow.
+    # SOM code, but I put it here too to make it easier to follow.
     neuron_locs = list()
     for i in range(m):
         for j in range(n):
@@ -66,6 +66,7 @@ def get_umatrix_optimized(input_vects, weights, m, n):
     Used to visualize higher-dimensional data. Shows the average distance between a SOM unit and its neighbors.
     When displayed, areas of a darker color separated by lighter colors correspond to clusters of units which
     encode similar information.
+    :param input_vects:
     :param weights: SOM weight matrix, `ndarray`
     :param m: Rows of neurons
     :param n: Columns of neurons
@@ -119,11 +120,12 @@ if __name__ == "__main__":
             allow_soft_placement=True,
             log_device_placement=False))
 
-        num_inputs = 1024
-        dims = 10
-        clusters = 3
+        n_samples = 33058
+        n_features = 60
+        n_clusters = 3
         # Makes toy clusters with pretty clear separation, see the sklearn site for more info
-        blob_data = make_blobs(num_inputs, dims, cluster_std=clusters)
+        blob_data = make_blobs(n_samples, n_features, centers=n_clusters, random_state=1)
+
         # Scale the blob data for easier training. Also index 0 because the output is a (data, label) tuple.
         scaler = StandardScaler()
         input_data = scaler.fit_transform(blob_data[0])
@@ -136,12 +138,11 @@ if __name__ == "__main__":
         iterator = tf.compat.v1.data.make_one_shot_iterator(dataset)
         next_element = iterator.get_next()
 
-        # This is more neurons than you need but it makes the visualization look nicer
-        m = 20
-        n = 20
+        m = 8
+        n = 8
 
         # Build the SOM object and place all of its ops on the graph
-        som = SelfOrganizingMap(m=m, n=n, dim=dims, max_epochs=2, gpus=1, session=session, graph=graph,
+        som = SelfOrganizingMap(m=m, n=n, dim=n_features, max_epochs=10, gpus=1, session=session, graph=graph,
                                 input_tensor=next_element, batch_size=batch_size, initial_learning_rate=0.1,
                                 weights_init=None)
 
@@ -150,7 +151,7 @@ if __name__ == "__main__":
 
         # Note that I don't pass a SummaryWriter because I don't really want to record summaries in this script
         # If you want Tensorboard support just make a new SummaryWriter and pass it to this method
-        som.train(num_inputs=num_inputs)
+        som.train(num_inputs=n_samples)
 
         print("Final QE={}", som.quantization_error(tf.constant(input_data, dtype=tf.float32)))
         print("Final TE={}", som.topographic_error(tf.constant(input_data, dtype=tf.float32)))
