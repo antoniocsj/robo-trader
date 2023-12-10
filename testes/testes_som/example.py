@@ -156,8 +156,8 @@ if __name__ == "__main__":
         # If you want Tensorboard support just make a new SummaryWriter and pass it to this method
         som.train(num_inputs=n_samples)
 
-        # print("Final QE={}", som.quantization_error(tf.constant(input_data, dtype=tf.float32)))
-        # print("Final TE={}", som.topographic_error(tf.constant(input_data, dtype=tf.float32)))
+        print("Final QE={}", som.quantization_error(tf.constant(input_data, dtype=tf.float32)))
+        print("Final TE={}", som.topographic_error(tf.constant(input_data, dtype=tf.float32)))
 
         weights = som.output_weights
 
