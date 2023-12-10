@@ -123,8 +123,10 @@ if __name__ == "__main__":
             allow_soft_placement=True,
             log_device_placement=False))
 
-        n_samples = 1024
-        n_features = 2
+        # n_samples = 6 * 260 * 23 * 12  # n_years * work_days_per_year * trade_hours_per_days * timeframe
+        # n_features = 4 * 16  # len(candle_input_type) * n_steps
+        n_samples = 6 * 260 * 23 * 1  # n_years * work_days_per_year * trade_hours_per_days * timeframe
+        n_features = 4 * 16  # len(candle_input_type) * n_steps
         n_clusters = 3
         # Makes toy clusters with pretty clear separation, see the sklearn site for more info
         blob_data = make_blobs(n_samples, n_features, centers=n_clusters, random_state=1)
@@ -132,7 +134,7 @@ if __name__ == "__main__":
         # Scale the blob data for easier training. Also index 0 because the output is a (data, label) tuple.
         scaler = StandardScaler()
         input_data = scaler.fit_transform(blob_data[0])
-        batch_size = 128
+        batch_size = 1024
 
         # Build the TensorFlow dataset pipeline per the standard tutorial.
         dataset = tf.data.Dataset.from_tensor_slices(input_data.astype(np.float32))
@@ -145,7 +147,7 @@ if __name__ == "__main__":
         n = 8
 
         # Build the SOM object and place all of its ops on the graph
-        som = SelfOrganizingMap(m=m, n=n, dim=n_features, max_epochs=10, gpus=1, session=session, graph=graph,
+        som = SelfOrganizingMap(m=m, n=n, dim=n_features, max_epochs=4, gpus=1, session=session, graph=graph,
                                 input_tensor=next_element, batch_size=batch_size, initial_learning_rate=0.1,
                                 weights_init=None)
 
