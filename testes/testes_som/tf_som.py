@@ -434,13 +434,47 @@ class SelfOrganizingMap:
 
     def bmu_indices(self, dataset):
         with tf.compat.v1.name_scope('BMU_Indices_Dataset'):
-            # This is the same code from _tower_som adapted to calculate all Best Matching Units for each item in the dataset
+            # This is the same code from _tower_som adapted to calculate all Best Matching Units
+            # for each item in the dataset
             squared_distance = tf.reduce_sum(
                 input_tensor=tf.pow(tf.subtract(tf.expand_dims(self._weights, axis=0),
                                                 tf.expand_dims(dataset, axis=1)), 2), axis=2)
 
             bmu_indices = tf.argmin(input=squared_distance, axis=1)
             bmu_locs = tf.reshape(tf.gather(self._location_vects, bmu_indices), [-1, 2])
+
+            # The number of BMUs is the same as the number of items in the dataset
+            return np.array(self._sess.run(bmu_locs))
+
+    def bmu_indices2(self, dataset):
+        with tf.compat.v1.name_scope('Input_Dataset'):
+            _input = tf.identity(dataset)
+
+        # Start by computing the best matching units / winning units for each input vector in the batch.
+        # Basically calculates the Euclidean distance between every
+        # neuron's weight vector and the inputs, and returns the index of the neurons which give the least value
+        # Since we are doing batch processing of the input, we need to calculate a BMU for each of the individual
+        # inputs in the batch. Will have the shape [batch_size]
+
+        # Oh, also any time we call expand_dims. it's almost always, so we can make TF broadcast stuff properly
+        with tf.compat.v1.name_scope('BMU_Indices_Dataset'):
+            # Distance between weights and the input vector
+            # Note we are reducing along 2nd axis, so we end up with a tensor of [batch_size, num_neurons]
+            # corresponding to the distance between a particular input and each neuron in the map
+            # Also note we are getting the squared distance because there's no point calling sqrt or tf.norm
+            # if we're just doing a strict comparison
+            squared_distance = tf.reduce_sum(
+                input_tensor=tf.pow(tf.subtract(tf.expand_dims(self._weights, axis=0),
+                                                tf.expand_dims(_input, axis=1)), 2), axis=2)
+
+            # Get the index of the minimum distance for each input item, shape will be [batch_size]
+            bmu_indices = tf.argmin(input=squared_distance, axis=1)
+
+            # This will extract the location of the BMU in the map for each input based on the BMU's indices
+            with tf.compat.v1.name_scope('BMU_Locations_Dataset'):
+                # Using tf.gather we can use `bmu_indices` to index the location vectors directly
+                bmu_locs = tf.reshape(tf.gather(self._location_vects, bmu_indices), [-1, 2])
+
             # The number of BMUs is the same as the number of items in the dataset
             return np.array(self._sess.run(bmu_locs))
 

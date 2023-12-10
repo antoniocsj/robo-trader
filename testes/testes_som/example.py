@@ -154,7 +154,9 @@ def get_umatrix_optimized2(input_vects, _weights, _m, _n):
             # Expand dims to broadcast to each of the neighbors
             _umatrix[j * _n + i] = distance_matrix(np.expand_dims(_weights[j * _n + i], 0), cneighbor_weights).mean()
 
-    bmu_indices = som.bmu_indices(input_vects)
+    # bmu_indices = som.bmu_indices(input_vects)
+    bmu_indices = som.bmu_indices2(input_vects)
+    # bmu_indices = som.bmu_indices(tf.constant(input_vects, dtype=tf.float32))
 
     return _umatrix, bmu_indices
 
@@ -173,8 +175,8 @@ if __name__ == "__main__":
 
         # n_samples = 6 * 260 * 23 * 12  # n_years * work_days_per_year * trade_hours_per_days * timeframe
         # n_features = 4 * 16  # len(candle_input_type) * n_steps
-        n_samples = 6 * 260 * 23 * 12  # n_years * work_days_per_year * trade_hours_per_days * timeframe
-        n_features = 4 * 8  # len(candle_input_type) * n_steps
+        n_samples = 1 * 260 * 23 * 1  # n_years * work_days_per_year * trade_hours_per_days * timeframe
+        n_features = 4 * 0 + 2  # len(candle_input_type) * n_steps
         n_clusters = 3
         # Makes toy clusters with pretty clear separation, see the sklearn site for more info
         blob_data = make_blobs(n_samples, n_features, centers=n_clusters, random_state=1)
@@ -182,7 +184,7 @@ if __name__ == "__main__":
         # Scale the blob data for easier training. Also index 0 because the output is a (data, label) tuple.
         scaler = StandardScaler()
         input_data = scaler.fit_transform(blob_data[0])
-        batch_size = 128
+        batch_size = 64
 
         # Build the TensorFlow dataset pipeline per the standard tutorial.
         dataset = tf.data.Dataset.from_tensor_slices(input_data.astype(np.float32))
@@ -191,8 +193,8 @@ if __name__ == "__main__":
         iterator = tf.compat.v1.data.make_one_shot_iterator(dataset)
         next_element = iterator.get_next()
 
-        m = 16
-        n = 16
+        m = 32
+        n = 32
 
         # Build the SOM object and place all of its ops on the graph
         # max_epochs >= 2
