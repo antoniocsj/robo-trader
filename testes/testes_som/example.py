@@ -13,10 +13,13 @@ An example usage of the TensorFlow SOM. Loads a data set, trains a SOM, and disp
 
 
 def show_tf():
-    # print(os.environ["LD_LIBRARY_PATH"])
+    import os
+    # print(f"LD_LIBRARY_PATH={os.environ['LD_LIBRARY_PATH']}")
     print(tf.__version__)
-    # print(tf.config.list_physical_devices('GPU'))
     print(tf.config.list_physical_devices())
+
+    # os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
+    # print(f"TF_GPU_ALLOCATOR = {os.getenv('TF_GPU_ALLOCATOR')}")
 
 
 def get_umatrix(input_vects, weights, m, n):
@@ -120,7 +123,7 @@ if __name__ == "__main__":
             allow_soft_placement=True,
             log_device_placement=False))
 
-        n_samples = 33058
+        n_samples = 33058 * 4
         n_features = 60
         n_clusters = 3
         # Makes toy clusters with pretty clear separation, see the sklearn site for more info
@@ -153,8 +156,8 @@ if __name__ == "__main__":
         # If you want Tensorboard support just make a new SummaryWriter and pass it to this method
         som.train(num_inputs=n_samples)
 
-        print("Final QE={}", som.quantization_error(tf.constant(input_data, dtype=tf.float32)))
-        print("Final TE={}", som.topographic_error(tf.constant(input_data, dtype=tf.float32)))
+        # print("Final QE={}", som.quantization_error(tf.constant(input_data, dtype=tf.float32)))
+        # print("Final TE={}", som.topographic_error(tf.constant(input_data, dtype=tf.float32)))
 
         weights = som.output_weights
 
