@@ -165,6 +165,9 @@ if __name__ == "__main__":
 
         bmu_indice = som.bmu_indice(tf.constant(input_data[0], dtype=tf.float32))
 
+        # entrada de uma entrada nova
+        # bmu_indice = som.bmu_indice(tf.constant(np.array([0, 0]), dtype=tf.float32))
+
         fig = plt.figure()
         plt.imshow(umatrix.reshape((m, n)), origin='lower')
         plt.show(block=True)
