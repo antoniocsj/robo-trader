@@ -446,6 +446,7 @@ class SelfOrganizingMap:
 
     def bmu_indice(self, input_data):
         """
+        Retorna o índice ou posição (linha, coluna) na grade do SOM do BMU para uma data entrada.
         ACSJ
         :param input_data:
         :return:
