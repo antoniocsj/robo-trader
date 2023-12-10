@@ -31,7 +31,7 @@ def get_umatrix(input_vects, weights, m, n):
     :param weights: SOM weight matrix, `ndarray`
     :param m: Rows of neurons
     :param n: Columns of neurons
-    :return: m x n u-matrix `ndarray` 
+    :return: m x n u-matrix `ndarray`
     :return: input_size x 1 bmu indices 'ndarray'
     """
     umatrix = np.zeros((m * n, 1))
@@ -63,52 +63,52 @@ def get_umatrix(input_vects, weights, m, n):
     return umatrix, bmu_indices
 
 
-def get_umatrix_optimized(input_vects, weights, m, n):
+def get_umatrix_optimized(input_vects, _weights, _m, _n):
     """ Generates an n x m u-matrix of the SOM's weights and bmu indices of all the input data points
 
     Used to visualize higher-dimensional data. Shows the average distance between a SOM unit and its neighbors.
     When displayed, areas of a darker color separated by lighter colors correspond to clusters of units which
     encode similar information.
     :param input_vects:
-    :param weights: SOM weight matrix, `ndarray`
-    :param m: Rows of neurons
-    :param n: Columns of neurons
+    :param _weights: SOM weight matrix, `ndarray`
+    :param _m: Rows of neurons
+    :param _n: Columns of neurons
     :return: m x n u-matrix `ndarray` 
     :return: input_size x 1 bmu indices 'ndarray'
     """
-    umatrix = np.zeros((m * n, 1))
+    _umatrix = np.zeros((_m * _n, 1))
     # Get the location of the neurons on the map to figure out their neighbors. I know I already have this in the
     # SOM code but I put it here too to make it easier to follow.
     neuron_locs = list()
-    for i in range(m):
-        for j in range(n):
+    for i in range(_m):
+        for j in range(_n):
             neuron_locs.append(np.array([i, j]))
 
     # iterate through each unit and find its neighbours on the map
-    for j in range(m):
-        for i in range(n):
+    for j in range(_m):
+        for i in range(_n):
             cneighbor_idxs = list()
 
             # Save the neighbours for a unit with location i, j
             if i > 0:
-                cneighbor_idxs.append(j * n + i - 1)
-            if i < n - 1:
-                cneighbor_idxs.append(j * n + i + 1)
+                cneighbor_idxs.append(j * _n + i - 1)
+            if i < _n - 1:
+                cneighbor_idxs.append(j * _n + i + 1)
             if j > 0:
-                cneighbor_idxs.append(j * n + i - n)
-            if j < m - 1:
-                cneighbor_idxs.append(j * n + i + n)
+                cneighbor_idxs.append(j * _n + i - _n)
+            if j < _m - 1:
+                cneighbor_idxs.append(j * _n + i + _n)
 
             # Get the weights of the neighbouring units
-            cneighbor_weights = weights[cneighbor_idxs]
+            cneighbor_weights = _weights[cneighbor_idxs]
 
             # Get the average distance between unit i, j and all of its neighbors
             # Expand dims to broadcast to each of the neighbors
-            umatrix[j * n + i] = distance_matrix(np.expand_dims(weights[j * n + i], 0), cneighbor_weights).mean()
+            _umatrix[j * _n + i] = distance_matrix(np.expand_dims(_weights[j * _n + i], 0), cneighbor_weights).mean()
 
-    bmu_indices = som.bmu_indices(tf.constant(input_data, dtype=tf.float32))
+    bmu_indices = som.bmu_indices(tf.constant(input_vects, dtype=tf.float32))
 
-    return umatrix, bmu_indices
+    return _umatrix, bmu_indices
 
 
 if __name__ == "__main__":
@@ -123,8 +123,8 @@ if __name__ == "__main__":
             allow_soft_placement=True,
             log_device_placement=False))
 
-        n_samples = 33058 * 4
-        n_features = 60
+        n_samples = 1024
+        n_features = 2
         n_clusters = 3
         # Makes toy clusters with pretty clear separation, see the sklearn site for more info
         blob_data = make_blobs(n_samples, n_features, centers=n_clusters, random_state=1)
@@ -162,6 +162,9 @@ if __name__ == "__main__":
         weights = som.output_weights
 
         umatrix, bmu_loc = get_umatrix_optimized(input_data, weights, m, n)
+
+        bmu_indice = som.bmu_indice(tf.constant(input_data[0], dtype=tf.float32))
+
         fig = plt.figure()
         plt.imshow(umatrix.reshape((m, n)), origin='lower')
         plt.show(block=True)

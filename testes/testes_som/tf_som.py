@@ -444,6 +444,22 @@ class SelfOrganizingMap:
             # The number of BMUs is the same as the number of items in the dataset
             return np.array(self._sess.run(bmu_locs))
 
+    def bmu_indice(self, input_data):
+        """
+        ACSJ
+        :param input_data:
+        :return:
+        """
+        with tf.compat.v1.name_scope('BMU_Indice_Input'):
+            squared_distance = tf.reduce_sum(
+                input_tensor=tf.pow(tf.subtract(tf.expand_dims(self._weights, axis=0),
+                                                tf.expand_dims(input_data, axis=0)), 2), axis=2)
+
+            bmu_indices = tf.argmin(input=squared_distance, axis=1)
+            bmu_locs = tf.reshape(tf.gather(self._location_vects, bmu_indices), [-1, 2])
+            # The number of BMUs is the same as the number of items in the dataset
+            return np.array(self._sess.run(bmu_locs))
+
     def _pca_weights_init(self, dataset):
         """ Initializes the weights of the map to span to the first two principal components.
         Training a SOM with initial weights values based on their Principal Components makes the training process converge faster.

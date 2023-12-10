@@ -338,8 +338,8 @@ def test_14():
     from pandas import DataFrame
 
     # generate 2d classification dataset
-    n_samples = 33058
-    n_features = 60
+    n_samples = 1024
+    n_features = 2
     n_clusters = 3
     X, y = make_blobs(n_samples, n_features, centers=n_clusters, random_state=1)
 
