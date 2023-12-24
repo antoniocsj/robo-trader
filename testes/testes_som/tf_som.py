@@ -45,8 +45,7 @@ class SelfOrganizingMap:
 
     def __init__(self, m, n, dim, max_epochs=100, initial_radius=None, batch_size=128, initial_learning_rate=0.1,
                  graph=None, std_coeff=0.5, model_name='Self-Organizing-Map', softmax_activity=False, gpus=0,
-                 output_sensitivity=-1.0, input_tensor=None, input_dataset=None, session=None, checkpoint_dir=None,
-                 restore_path=None, weights_init=None):
+                 output_sensitivity=-1.0, input_tensor=None, input_dataset=None, session=None, checkpoint_dir=None, restore_path=None, weights_init=None):
         """
         Initialize a self-organizing map on the tensorflow graph
         :param m: Number of rows of neurons
@@ -161,8 +160,7 @@ class SelfOrganizingMap:
         In multi-gpu mode it will duplicate the model across the GPUs and use the CPU to calculate the final
         weight updates.
         """
-        with self._graph.as_default(), tf.compat.v1.variable_scope(tf.compat.v1.get_variable_scope()), tf.device(
-                '/cpu:0'):
+        with self._graph.as_default(), tf.compat.v1.variable_scope(tf.compat.v1.get_variable_scope()), tf.device('/cpu:0'):
             # This list will contain the handles to the numerator and denominator tensors for each of the towers
             tower_updates = list()
             # This is used by all of the towers and needs to be fed to the graph, so let's put it here
@@ -208,20 +206,19 @@ class SelfOrganizingMap:
         with tf.compat.v1.name_scope('Weights'):
             # Each tower will get its own copy of the weights variable. Since the towers are constructed sequentially,
             # the handle to the Tensors will be different for each tower even if we reference "self"
-
-            # PCA INIT
+            
+            #PCA INIT
             if self._weights_init == "PCA":
-                self._weights = self._pca_weights_init()
-            # HILBERT INIT
+              self._weights = self._pca_weights_init()
+            #HILBERT INIT
             elif self._weights_init == "HCV":
-                self._weights = self._hcv_weight_init(2)
-            # RANDOM INIT
+              self._weights = self._hcv_weight_init(2)
+            #RANDOM INIT
             else:
-                self._weights = tf.compat.v1.get_variable(name='weights',
+              self._weights = tf.compat.v1.get_variable(name='weights',
                                                           shape=[
                                                               self._m * self._n, self._dim],
-                                                          initializer=tf.compat.v1.random_uniform_initializer(minval=0,
-                                                                                                              maxval=1))
+                                                          initializer=tf.compat.v1.random_uniform_initializer(minval=0, maxval=1))
 
             with tf.compat.v1.name_scope('summaries'):
                 # All summary ops are added to a list and then the merge() function is called at the end of
@@ -262,7 +259,7 @@ class SelfOrganizingMap:
             # if we're just doing a strict comparison
             squared_distance = tf.reduce_sum(
                 input_tensor=tf.pow(tf.subtract(tf.expand_dims(self._weights, axis=0),
-                                                tf.expand_dims(self._input, axis=1)), 2), axis=2)
+                                   tf.expand_dims(self._input, axis=1)), 2), axis=2)
 
             # Get the index of the minimum distance for each input item, shape will be [batch_size],
             bmu_indices = tf.argmin(input=squared_distance, axis=1)
@@ -285,7 +282,7 @@ class SelfOrganizingMap:
             alpha = tf.multiply(self._initial_learning_rate,
                                 tf.subtract(1.0, tf.divide(tf.cast(self._epoch, tf.float32),
                                                            tf.cast(self._max_epochs, tf.float32))))
-
+            
             # Construct the op that will generate a matrix with learning rates for all neurons and all inputs,
             # based on iteration number and location to BMU
 
@@ -321,7 +318,7 @@ class SelfOrganizingMap:
             # The end result is that, for each neuron in the network, we use the learning
             # rate between it and each of the input vectors, to calculate a new set of weights.
             numerator = tf.reduce_sum(input_tensor=tf.multiply(tf.expand_dims(learning_rate_op, axis=-1),
-                                                               tf.expand_dims(self._input, axis=1)), axis=0)
+                                                  tf.expand_dims(self._input, axis=1)), axis=0)
 
             # The denominator is just the sum of the neighborhood functions for each neuron, so we get the sum
             # along axis 1 giving us an output shape of [num_neurons]. We then expand the dims so we can
@@ -419,7 +416,7 @@ class SelfOrganizingMap:
                         writer.add_summary(summary, global_step)
                 else:
                     self._sess.run(self._training_op, feed_dict={
-                        self._epoch: epoch})
+                                   self._epoch: epoch})
 
         self._trained = True
         return global_step
@@ -434,61 +431,10 @@ class SelfOrganizingMap:
 
     def bmu_indices(self, dataset):
         with tf.compat.v1.name_scope('BMU_Indices_Dataset'):
-            # This is the same code from _tower_som adapted to calculate all Best Matching Units
-            # for each item in the dataset
+            # This is the same code from _tower_som adapted to calculate all Best Matching Units for each item in the dataset
             squared_distance = tf.reduce_sum(
                 input_tensor=tf.pow(tf.subtract(tf.expand_dims(self._weights, axis=0),
-                                                tf.expand_dims(dataset, axis=1)), 2), axis=2)
-
-            bmu_indices = tf.argmin(input=squared_distance, axis=1)
-            bmu_locs = tf.reshape(tf.gather(self._location_vects, bmu_indices), [-1, 2])
-
-            # The number of BMUs is the same as the number of items in the dataset
-            return np.array(self._sess.run(bmu_locs))
-
-    def bmu_indices2(self, dataset):
-        with tf.compat.v1.name_scope('Input_Dataset'):
-            _input = tf.identity(dataset)
-
-        # Start by computing the best matching units / winning units for each input vector in the batch.
-        # Basically calculates the Euclidean distance between every
-        # neuron's weight vector and the inputs, and returns the index of the neurons which give the least value
-        # Since we are doing batch processing of the input, we need to calculate a BMU for each of the individual
-        # inputs in the batch. Will have the shape [batch_size]
-
-        # Oh, also any time we call expand_dims. it's almost always, so we can make TF broadcast stuff properly
-        with tf.compat.v1.name_scope('BMU_Indices_Dataset'):
-            # Distance between weights and the input vector
-            # Note we are reducing along 2nd axis, so we end up with a tensor of [batch_size, num_neurons]
-            # corresponding to the distance between a particular input and each neuron in the map
-            # Also note we are getting the squared distance because there's no point calling sqrt or tf.norm
-            # if we're just doing a strict comparison
-            squared_distance = tf.reduce_sum(
-                input_tensor=tf.pow(tf.subtract(tf.expand_dims(self._weights, axis=0),
-                                                tf.expand_dims(_input, axis=1)), 2), axis=2)
-
-            # Get the index of the minimum distance for each input item, shape will be [batch_size]
-            bmu_indices = tf.argmin(input=squared_distance, axis=1)
-
-            # This will extract the location of the BMU in the map for each input based on the BMU's indices
-            with tf.compat.v1.name_scope('BMU_Locations_Dataset'):
-                # Using tf.gather we can use `bmu_indices` to index the location vectors directly
-                bmu_locs = tf.reshape(tf.gather(self._location_vects, bmu_indices), [-1, 2])
-
-            # The number of BMUs is the same as the number of items in the dataset
-            return np.array(self._sess.run(bmu_locs))
-
-    def bmu_indice(self, input_data):
-        """
-        Retorna o índice ou posição (linha, coluna) na grade do SOM do BMU para uma data entrada.
-        ACSJ
-        :param input_data:
-        :return:
-        """
-        with tf.compat.v1.name_scope('BMU_Indice_Input'):
-            squared_distance = tf.reduce_sum(
-                input_tensor=tf.pow(tf.subtract(tf.expand_dims(self._weights, axis=0),
-                                                tf.expand_dims(input_data, axis=0)), 2), axis=2)
+                                   tf.expand_dims(dataset, axis=1)), 2), axis=2)
 
             bmu_indices = tf.argmin(input=squared_distance, axis=1)
             bmu_locs = tf.reshape(tf.gather(self._location_vects, bmu_indices), [-1, 2])
@@ -523,15 +469,14 @@ class SelfOrganizingMap:
         # Calculate the principal components by using the first two eigen vectors
         for i in range(self._m):
             for j in range(self._n):
-                weights.append(tf.add(tf.multiply(mspace[i], eigen_vectors[ev_order[0]]),
-                                      tf.multiply(nspace[j], eigen_vectors[ev_order[1]])))
-
+                weights.append(tf.add(tf.multiply(mspace[i], eigen_vectors[ev_order[0]]), tf.multiply(nspace[j], eigen_vectors[ev_order[1]])))
+       
         weights_tensor = tf.convert_to_tensor(weights)
-
+        
         weights_tensor = tf.cast(weights_tensor, tf.float32)
         # Finally, assign the new weights
         tf.compat.v1.assign(self._weights, weights_tensor)
-
+     
     def _hcv_weight_init(self, num_dims):
         max_hilberts = np.arange(self._m * self._n)
         hilbert_vectors = decode(max_hilberts, self._dim, num_dims)
@@ -545,7 +490,7 @@ class SelfOrganizingMap:
         with tf.compat.v1.name_scope('QUAN'):
             squared_distance = tf.reduce_sum(
                 input_tensor=tf.pow(tf.subtract(tf.expand_dims(self._weights, axis=0),
-                                                tf.expand_dims(dataset, axis=1)), 2), axis=2)
+                                   tf.expand_dims(dataset, axis=1)), 2), axis=2)
 
             # Get the index of the minimum distance for each input item, shape will be [batch_size],
             bmu_indices = tf.argmin(input=squared_distance, axis=1)
@@ -559,18 +504,19 @@ class SelfOrganizingMap:
         q_error = tf.reduce_mean(input_tensor=norm_values)
         return self._sess.run(q_error)
 
+
     def topographic_error(self, dataset):
-        with tf.compat.v1.name_scope('TE'):
+         with tf.compat.v1.name_scope('TE'):
             t = tf.constant(1.42, dtype=tf.float32)
             squared_distance = tf.reduce_sum(
                 input_tensor=tf.pow(tf.subtract(tf.expand_dims(self._weights, axis=0),
-                                                tf.expand_dims(dataset, axis=1)), 2), axis=2)
-
-            b2mu_inds = tf.argsort(squared_distance, axis=1)[:, :2]
+                                   tf.expand_dims(dataset, axis=1)), 2), axis=2)
+            
+            b2mu_inds = tf.argsort(squared_distance, axis=1)[:, :2]         
 
             bmu_locs = tf.gather(self._location_vects, b2mu_inds)
-            diff = tf.cast(bmu_locs[:, 1:] - bmu_locs[:, :-1], dtype=tf.float32)
-            distance = tf.norm(diff, axis=1)
+            diff = tf.cast(bmu_locs[:,1:]-bmu_locs[:,:-1], dtype=tf.float32)           
+            distance = tf.norm(diff, axis=1)            
             distance = distance[distance > t]
             te = tf.math.reduce_mean(distance)
             return self._sess.run(te)
