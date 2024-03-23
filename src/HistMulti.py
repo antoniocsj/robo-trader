@@ -6,7 +6,7 @@ import numpy as np
 from numpy import ndarray
 import pandas as pd
 from pandas import DataFrame
-from Sheet import Sheet
+from src.Sheet import Sheet
 from src.utils.utils_filesystem import read_json
 from src.utils.utils_symbols import search_symbols_in_dict
 
