@@ -1,6 +1,6 @@
 import os
-from utils_filesystem import read_json
-from SubPredictor import SubPredictor
+from src.utils_filesystem import read_json
+from src.prediction.SubPredictor import SubPredictor
 import numpy as np
 
 

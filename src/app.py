@@ -2,8 +2,8 @@ import numpy as np
 import tensorflow as tf
 from flask import Flask, request
 from datetime import datetime
-from utils_filesystem import write_json, read_json
-from PredictorsGroup import PredictorsGroup
+from utils_filesystem import write_json
+from src.prediction.PredictorsGroup import PredictorsGroup
 
 
 def show_tf():

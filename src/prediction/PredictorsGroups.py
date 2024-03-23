@@ -1,11 +1,11 @@
 import os
-from utils_filesystem import read_json
+from src.utils_filesystem import read_json
 from Predictors import Predictors
 import numpy as np
 from numpy import ndarray
 
 
-class PredictorsGroup:
+class PredictorsGroups:
     def __init__(self, directory: str):
         self.directory: str = directory
         self.predictors: list[Predictors] = []
@@ -101,7 +101,7 @@ class PredictorsGroup:
 if __name__ == '__main__':
     data = read_json('request.json')
 
-    pred_group = PredictorsGroup('../predictors')
+    pred_group = PredictorsGroups('../predictors')
     pred_group.calculate_outputs(data)
     pred_group.show_outputs()
     pred_group.show_stats()

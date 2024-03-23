@@ -1,5 +1,5 @@
 from datetime import datetime
-from Sheet import Sheet
+from src.Sheet import Sheet
 
 
 class SymbolsPreparation:

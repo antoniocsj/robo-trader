@@ -3,14 +3,14 @@ import pickle
 import numpy as np
 from numpy import ndarray
 from datetime import datetime
-from HistMulti import HistMulti
-from utils_filesystem import read_json
-from utils_symbols import search_symbols_in_dict
-from utils_nn import prepare_data_for_prediction
-from utils_ops import denorm_output
-from setups import apply_setup_symbols
+from src.HistMulti import HistMulti
+from src.utils_filesystem import read_json
+from src.utils_symbols import search_symbols_in_dict
+from src.utils_nn import prepare_data_for_prediction
+from src.utils_ops import denorm_output
+from src.setups import apply_setup_symbols
 from keras.models import load_model
-from SymbolsPreparation import SymbolsPreparation
+from src.prediction.SymbolsPreparation import SymbolsPreparation
 
 
 def get_timeframe_in_minutes(tf: str) -> int:
