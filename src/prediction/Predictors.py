@@ -13,27 +13,27 @@ class Predictors:
         self.output_average = 0.0
         self.output_std = 0.0  # standard deviation
         self.losses_average = 0.0
-        self.search_predictors()
+        self.search_subpredictors()
         self.all_symbols_trading = False
 
-    def search_predictors(self):
+    def search_subpredictors(self):
         all_subdirs = os.listdir(self.directory)
 
         for subdir in sorted(all_subdirs):
             if subdir.startswith('_') or subdir.endswith('_'):
                 continue
 
-            pred = SubPredictor(subdir, self.directory)
-            print(f'sub_predictor loaded ({pred.id})')
+            subpred = SubPredictor(subdir, self.directory)
+            print(f'sub_predictor loaded ({subpred.id})')
 
-            if self.timeframe and self.timeframe != pred.timeframe:
+            if self.timeframe and self.timeframe != subpred.timeframe:
                 print(f'ERRO. timeframes diferentes no mesmo grupo de sub_predictors')
                 exit(-1)
             else:
-                self.timeframe = pred.timeframe
-                self.timeframe_in_minutes = pred.timeframe_in_minutes
+                self.timeframe = subpred.timeframe
+                self.timeframe_in_minutes = subpred.timeframe_in_minutes
 
-            self.sub_predictors.append(pred)
+            self.sub_predictors.append(subpred)
 
     def calculate_outputs(self, input_data: dict):
         _sum = 0.0
