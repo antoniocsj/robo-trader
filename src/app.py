@@ -1,43 +1,18 @@
-import numpy as np
 import tensorflow as tf
 from flask import Flask, request
 from datetime import datetime
 from src.utils.utils_filesystem import write_json
-from src.prediction.PredictorsGroup import PredictorsGroup
+from src.prediction.predictor_utils import load_predictors_groups, execute_predictors_groups
 
 
 def show_tf():
-    # print(os.environ["LD_LIBRARY_PATH"])
     print(tf.__version__)
-    # print(tf.config.list_physical_devices('GPU'))
-    print(tf.config.list_physical_devices())
-
-
-def load_predictors_groups(paths: list[str]):
-    _predictors_groups: list[PredictorsGroup] = []
-    for path in paths:
-        _predictors_groups.append(PredictorsGroup(path))
-
-    return _predictors_groups
-
-
-def execute_predictors_groups(_predictors_groups: list[PredictorsGroup], _data: dict):
-    outputs = []
-    for pred_group in _predictors_groups:
-        pred_group.calculate_outputs(_data)
-
-    for pred_group in _predictors_groups:
-        pred_group.show_outputs()
-
-    for pred_group in _predictors_groups:
-        pred_group.show_stats()
-
-    for pred_group in _predictors_groups:
-        pred_group.show_average()
-        outputs.append(pred_group.total_average)
-
-    total_average = np.average(outputs)
-    print(f'predictors groups total average = {total_average:.2f}')
+    gpu_list = tf.config.list_physical_devices('GPU')
+    if len(gpu_list) == 0:
+        print('Não há GPUs instaladas. Abortando.')
+        exit(-1)
+    else:
+        print(gpu_list)
 
 
 show_tf()
