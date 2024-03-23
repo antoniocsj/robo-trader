@@ -14,16 +14,15 @@ tf.random.set_seed(1)
 tf.keras.utils.set_random_seed(1)
 
 import array as ar
-import time
 
 from my_algorithms import eaSimple_WithCP2
 from deap import base
 from deap import creator
 from deap import tools
 
-from utils_train import train_model_param
-from utils_filesystem import read_json
-from utils_symbols import get_symbols
+from src.utils.utils_train import train_model_param
+from src.utils.utils_filesystem import read_json
+from src.utils.utils_symbols import get_symbols
 from HistMulti import HistMulti
 from Synchronizer import synchronize_with_cache_loop
 from setups import setup_directory_01

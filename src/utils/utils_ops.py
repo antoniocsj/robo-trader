@@ -4,9 +4,9 @@ from numpy import ndarray
 import numpy as np
 import pandas as pd
 import pickle
-from HistMulti import HistMulti
+from src.HistMulti import HistMulti
 from sklearn.preprocessing import MinMaxScaler
-from utils_filesystem import read_json
+from src.utils.utils_filesystem import read_json
 
 
 def denorm_close_price(_c, scaler: MinMaxScaler):
@@ -108,7 +108,7 @@ def denorm_output(arr: ndarray, bias: Any, candle_type: str, scaler: MinMaxScale
 
 
 def normalize_directory(directory: str):
-    setup = read_json('settings.json')
+    setup = read_json('../settings.json')
     timeframe = setup['timeframe']
 
     hist = HistMulti(directory, timeframe)
@@ -134,7 +134,7 @@ def normalize_directory(directory: str):
         _symbol_timeframe = f'{symbol}_{timeframe}'
         scalers[_symbol_timeframe] = scaler
 
-    with open('scalers.pkl', 'wb') as file:
+    with open('../scalers.pkl', 'wb') as file:
         pickle.dump(scalers, file)
 
     print(f'todos os símbolos do diretório {directory} foram normalizados.')
@@ -178,7 +178,7 @@ def normalize_symbols(hist: HistMulti, scalers: dict, symbols: list[str] = None)
 def differentiate_directory(directory: str):
     print(f'diferenciando diretório {directory}')
 
-    setup = read_json('settings.json')
+    setup = read_json('../settings.json')
     timeframe = setup['timeframe']
 
     hist = HistMulti(directory, timeframe)
@@ -275,7 +275,7 @@ def apply_transform_str(arr: ndarray, transform_str: str) -> ndarray:
 def transform_directory(directory: str, transform_str: str):
     print(f'transformando diretório {directory}')
 
-    setup = read_json('settings.json')
+    setup = read_json('../settings.json')
     timeframe = setup['timeframe']
     hist = HistMulti(directory, timeframe)
 
@@ -295,7 +295,7 @@ def transform_directory(directory: str, transform_str: str):
 def transform_directory_(directory: str, transform_str: str):
     print(f'transformando diretório {directory}')
 
-    setup = read_json('settings.json')
+    setup = read_json('../settings.json')
     timeframe = setup['timeframe']
 
     hist = HistMulti(directory, timeframe)

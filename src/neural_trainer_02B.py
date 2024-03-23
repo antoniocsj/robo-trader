@@ -6,8 +6,8 @@ import os
 import copy
 import time
 
-from utils_checks import initial_compliance_checks
-from utils_filesystem import read_json, write_json
+from src.utils.utils_checks import initial_compliance_checks
+from src.utils.utils_filesystem import read_json, write_json
 from neural_trainer_utils import train_model, get_time_break_from_timeframe
 
 

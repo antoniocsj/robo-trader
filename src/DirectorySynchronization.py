@@ -1,8 +1,8 @@
 import os
 import json
 from datetime import datetime
-from utils_symbols import search_symbols_in_directory
-from utils_filesystem import read_json, make_synch_backup
+from src.utils.utils_symbols import search_symbols_in_directory
+from src.utils.utils_filesystem import read_json, make_synch_backup
 from Sheet import Sheet
 
 

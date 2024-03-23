@@ -1,6 +1,6 @@
 import numpy as np
-from Hist import Hist
-from HistMulti import HistMulti
+from src.Hist import Hist
+from src.HistMulti import HistMulti
 
 
 # usada na GP

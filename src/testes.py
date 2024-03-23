@@ -120,7 +120,7 @@ def test_05():
 def test_06():
     import itertools as it
     import json
-    from utils_symbols import search_symbols
+    from src.utils.utils_symbols import search_symbols
 
     with open('settings.json', 'r') as file:
         setup = json.load(file)
@@ -180,13 +180,11 @@ def test_07():
 
 
 def test_08():
-    import numpy as np
     from numpy import ndarray
     import json
     from HistMulti import HistMulti
     import itertools as it
     from scipy.stats import pearsonr, spearmanr
-    from sklearn.preprocessing import MinMaxScaler
 
     with open('settings.json', 'r') as file:
         setup = json.load(file)
@@ -247,7 +245,7 @@ def test_10():
 
 def test_11():
     import itertools as it
-    from utils_symbols import get_symbols
+    from src.utils.utils_symbols import get_symbols
     symbols = get_symbols('currencies_majors')
     combs = []
     for i in range(1, len(symbols) + 1):
@@ -258,7 +256,7 @@ def test_11():
 
 def load_train_log() -> dict:
     import os
-    from utils_filesystem import read_json
+    from src.utils.utils_filesystem import read_json
     _filename = 'train_log.json'
     if os.path.exists(_filename):
         _dict = read_json(_filename)
@@ -314,8 +312,6 @@ def print_list(_list: list):
 
 
 def test_13():
-    from operator import itemgetter, attrgetter
-
     train_log = load_train_log()
     experiments = train_log['experiments']
     sorted_exps_by_test_loss = sorted(experiments, key=lambda d: d['test_loss'])

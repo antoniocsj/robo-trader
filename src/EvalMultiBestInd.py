@@ -1,21 +1,11 @@
-import operator
 import math
-import random
 import numpy as np
-import itertools
 import pickle
-
-from deap import base
-from deap import creator
-from deap import tools
-from deap import gp
-
-from scoop import futures
 
 # -------------------------------------------------------------------
 # from TraderSim import TraderSim
 from TraderSimMultiNoPrints import TraderSimMulti
-from utils_gp import formar_entradas_multi
+from src.utils.utils_gp import formar_entradas_multi
 from GPMultiTradeExp import candlesticks_quantity as candlesticks_quantity_train
 from GPMultiTradeExp import num_velas_anteriores as num_velas_anteriores_train
 from GPMultiTradeExp import tipo_vela as tipo_vela_train

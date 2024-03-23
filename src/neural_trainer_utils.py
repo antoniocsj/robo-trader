@@ -41,7 +41,7 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
 
     tf.keras.utils.set_random_seed(random_seed)
 
-    from utils_nn import split_sequences2, prepare_train_data2
+    from src.utils.utils_nn import split_sequences2, prepare_train_data2
 
     print(os.environ["LD_LIBRARY_PATH"])
     print(tf.__version__)

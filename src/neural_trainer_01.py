@@ -1,7 +1,7 @@
 import os
 import time
 
-from utils_filesystem import read_json, write_json
+from src.utils.utils_filesystem import read_json, write_json
 
 
 def train_model(deterministic: bool = True, seed: int = 1):
@@ -43,7 +43,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
     if deterministic:
         tf.keras.utils.set_random_seed(random_seed)
 
-    from utils_nn import split_sequences2, prepare_train_data2
+    from src.utils.utils_nn import split_sequences2, prepare_train_data2
 
     print(os.environ["LD_LIBRARY_PATH"])
     print(tf.__version__)

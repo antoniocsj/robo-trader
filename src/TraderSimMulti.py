@@ -2,8 +2,8 @@ import os
 import pickle
 from HistMulti import HistMulti
 from sklearn.preprocessing import MinMaxScaler
-from utils_filesystem import read_json
-from utils_ops import denorm_close_price
+from src.utils.utils_filesystem import read_json
+from src.utils.utils_ops import denorm_close_price
 
 
 class TraderSimMulti:

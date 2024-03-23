@@ -19,7 +19,7 @@ tf.random.set_seed(1)
 tf.keras.utils.set_random_seed(1)
 
 import time
-from HistMulti import HistMulti
+from src.HistMulti import HistMulti
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Flatten
@@ -29,8 +29,8 @@ from keras.callbacks import EarlyStopping
 
 tf.keras.utils.set_random_seed(1)
 
-from utils_nn import split_sequences2, prepare_train_data2
-from utils_filesystem import read_json
+from src.utils.utils_nn import split_sequences2, prepare_train_data2
+from src.utils.utils_filesystem import read_json
 
 
 def train_model_param(settings: dict, hist: HistMulti, params: dict) -> float:
@@ -89,7 +89,7 @@ def train_model_param(settings: dict, hist: HistMulti, params: dict) -> float:
 
 
 def test_models():
-    settings = read_json('settings.json')
+    settings = read_json('../settings.json')
     print(f'settings.json: {settings}')
 
     csv_dir = settings['temp_dir']

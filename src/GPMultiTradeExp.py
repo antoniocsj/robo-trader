@@ -20,7 +20,7 @@ from scoop import futures
 
 # -------------------------------------------------------------------
 from TraderSimMultiNoPrints import TraderSimMulti
-from utils_gp import formar_entradas_multi, renameArgumentsMulti
+from src.utils.utils_gp import formar_entradas_multi, renameArgumentsMulti
 
 # configurações para a programação genética
 n_population = 500

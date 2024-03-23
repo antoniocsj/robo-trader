@@ -2,8 +2,8 @@ import numpy as np
 
 from src.HistMulti import HistMulti
 from src.prediction.SubPredictor import SubPredictor
-from src.utils_ops import denorm_output
-from src.utils_nn import split_sequences2, prepare_train_data3
+from src.utils.utils_ops import denorm_output
+from src.utils.utils_nn import split_sequences2, prepare_train_data3
 
 
 def evaluate_predictor(pred: SubPredictor):

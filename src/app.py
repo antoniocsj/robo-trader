@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from flask import Flask, request
 from datetime import datetime
-from utils_filesystem import write_json
+from src.utils.utils_filesystem import write_json
 from src.prediction.PredictorsGroup import PredictorsGroup
 
 

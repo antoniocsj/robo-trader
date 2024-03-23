@@ -1,4 +1,4 @@
-from utils_filesystem import read_json
+from src.utils.utils_filesystem import read_json
 
 _settings = read_json('settings.json')
 DETERMINISTIC = _settings['deterministic']
@@ -42,9 +42,9 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 if DETERMINISTIC:
     tf.keras.utils.set_random_seed(random_seed)
 
-from utils_nn import prepare_train_data, split_sequences2, prepare_train_data2
-from utils_filesystem import write_train_config, read_train_config
-from utils_ops import denorm_close_price
+from src.utils.utils_nn import prepare_train_data, split_sequences2, prepare_train_data2
+from src.utils.utils_filesystem import write_train_config, read_train_config
+from src.utils.utils_ops import denorm_close_price
 
 
 # Multivariate CNN Models

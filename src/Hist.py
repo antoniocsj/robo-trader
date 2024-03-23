@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from utils_filesystem import read_json
+from src.utils.utils_filesystem import read_json
 
 
 class Hist:

@@ -3,10 +3,10 @@ import multiprocessing as mp
 import os.path
 import shutil
 
-from utils_filesystem import get_list_sync_files, read_json, copy_files, reset_dir
-from utils_symbols import search_symbols_in_directory, get_symbols
+from src.utils.utils_filesystem import get_list_sync_files, read_json, copy_files, reset_dir
+from src.utils.utils_symbols import search_symbols_in_directory, get_symbols
 from DirectorySynchronizationMultiProc import DirectorySynchronization, make_synch_backup, choose_n_procs_start
-from utils_sync import *
+from src.utils.utils_sync import *
 
 
 def synchronize() -> bool:

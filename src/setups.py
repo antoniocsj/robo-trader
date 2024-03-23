@@ -5,9 +5,9 @@ import copy
 
 import pandas as pd
 from HistMulti import HistMulti
-from utils_filesystem import read_json, write_json, get_list_sync_files, load_sync_cp_file, update_settings, reset_dir
-from utils_symbols import search_symbols
-from utils_ops import transform_directory, transform_files, transform_symbols, \
+from src.utils.utils_filesystem import read_json, write_json, get_list_sync_files, load_sync_cp_file, update_settings, reset_dir
+from src.utils.utils_symbols import search_symbols
+from src.utils.utils_ops import transform_directory, transform_files, transform_symbols, \
     normalize_directory, normalize_symbols, \
     differentiate_directory, differentiate_files, differentiate_symbols
 

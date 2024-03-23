@@ -1,6 +1,6 @@
 import pickle
 from utils_filesystem import read_json
-from HistMulti import HistMulti
+from src.HistMulti import HistMulti
 
 
 def initial_compliance_checks():
@@ -11,8 +11,8 @@ def initial_compliance_checks():
     """
     print('Realizando as verificações iniciais de conformidade.')
 
-    params_rs_search = read_json('params_rs_search.json')
-    settings = read_json('settings.json')
+    params_rs_search = read_json('../params_rs_search.json')
+    settings = read_json('../settings.json')
 
     temp_dir = settings['temp_dir']
     symbol_out = settings['symbol_out']
@@ -45,7 +45,7 @@ def initial_compliance_checks():
     del hist
 
     # verifica se o conteúdo de scalers está correto.
-    with open('scalers.pkl', 'rb') as file:
+    with open('../scalers.pkl', 'rb') as file:
         scalers: dict = pickle.load(file)
 
     symbol_timeframe = f'{symbol_out}_{settings_tf}'

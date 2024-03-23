@@ -2,9 +2,9 @@ import shutil
 import math
 from datetime import datetime
 import multiprocessing as mp
-from utils_filesystem import get_list_sync_files, read_json, make_synch_backup
-from utils_symbols import search_symbols_in_directory
-from utils_sync import *
+from src.utils.utils_filesystem import get_list_sync_files, read_json, make_synch_backup
+from src.utils.utils_symbols import search_symbols_in_directory
+from src.utils.utils_sync import *
 from Sheet import Sheet
 
 

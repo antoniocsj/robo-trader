@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import ndarray
-from HistMulti import HistMulti
+from src.HistMulti import HistMulti
 
 
 # usada nas criação de amostra de treinamento das redes neurais

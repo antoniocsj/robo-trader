@@ -34,9 +34,9 @@ def read_json(filename: str) -> dict:
 
 
 def update_settings(key: str, value: Any):
-    settings = read_json('settings.json')
+    settings = read_json('../settings.json')
     settings[key] = value
-    write_json('settings.json', settings)
+    write_json('../settings.json', settings)
 
 
 def are_dir_trees_equal(dir1, dir2):

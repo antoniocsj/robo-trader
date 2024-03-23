@@ -1,5 +1,5 @@
 import os
-from src.utils_filesystem import read_json
+from src.utils.utils_filesystem import read_json
 from src.prediction.Predictors import Predictors
 import numpy as np
 from numpy import ndarray

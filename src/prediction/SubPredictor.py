@@ -4,10 +4,10 @@ import numpy as np
 from numpy import ndarray
 from datetime import datetime
 from src.HistMulti import HistMulti
-from src.utils_filesystem import read_json
-from src.utils_symbols import search_symbols_in_dict
-from src.utils_nn import prepare_data_for_prediction
-from src.utils_ops import denorm_output
+from src.utils.utils_filesystem import read_json
+from src.utils.utils_symbols import search_symbols_in_dict
+from src.utils.utils_nn import prepare_data_for_prediction
+from src.utils.utils_ops import denorm_output
 from src.setups import apply_setup_symbols
 from keras.models import load_model
 from src.prediction.SymbolsPreparation import SymbolsPreparation
