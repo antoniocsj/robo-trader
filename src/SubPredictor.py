@@ -10,7 +10,7 @@ from utils_nn import prepare_data_for_prediction
 from utils_ops import denorm_output
 from setups import apply_setup_symbols
 from keras.models import load_model
-from prediction import SymbolsPreparation
+from SymbolsPreparation import SymbolsPreparation
 
 
 def get_timeframe_in_minutes(tf: str) -> int:
