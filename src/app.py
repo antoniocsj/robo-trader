@@ -16,8 +16,8 @@ def show_tf():
 
 
 show_tf()
-predictors_groups_paths = ['../predictors_CNN_OHLC', '../predictors_CNN_OHLCV', '../predictors_LSTM']
-# predictors_groups_paths = ['../predictors']
+# predictors_groups_paths = ['../predictors_CNN_OHLC', '../predictors_CNN_OHLCV', '../predictors_LSTM']
+predictors_groups_paths = ['../predictors']
 predictors_groups = load_predictors_groups(predictors_groups_paths)
 
 app = Flask(__name__)
