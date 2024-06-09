@@ -22,26 +22,24 @@ if DETERMINISTIC:
     random.seed(random_seed)
 
 import tensorflow as tf
+import keras
 
 if DETERMINISTIC:
     tf.random.set_seed(random_seed)
-    tf.keras.utils.set_random_seed(random_seed)
+    keras.utils.set_random_seed(random_seed)
 
 import time
 import pickle
-from HistMulti import HistMulti
+
+from keras.api.models import Sequential, load_model
+from keras.api.layers import Dense, Flatten, Conv1D, MaxPooling1D
+from keras.api.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.preprocessing import MinMaxScaler
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import Flatten
-from keras.layers import Conv1D
-from keras.layers import MaxPooling1D
-from keras.models import load_model
-from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 if DETERMINISTIC:
-    tf.keras.utils.set_random_seed(random_seed)
+    keras.utils.set_random_seed(random_seed)
 
+from HistMulti import HistMulti
 from src.utils.utils_nn import prepare_train_data, split_sequences2, prepare_train_data2
 from src.utils.utils_filesystem import write_train_config, read_train_config
 from src.utils.utils_ops import denorm_close_price

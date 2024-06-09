@@ -1,14 +1,11 @@
 import os
 import time
-
 from src.utils.utils_filesystem import read_json, write_json
 
 
 def train_model(deterministic: bool = True, seed: int = 1):
     deterministic = deterministic
     random_seed = seed
-
-    # import os
 
     if deterministic:
         os.environ['PYTHONHASHSEED'] = str(1)
@@ -26,26 +23,22 @@ def train_model(deterministic: bool = True, seed: int = 1):
         random.seed(random_seed)
 
     import tensorflow as tf
+    import keras
 
     if deterministic:
         tf.random.set_seed(random_seed)
-        tf.keras.utils.set_random_seed(random_seed)
+        keras.utils.set_random_seed(random_seed)
 
-    from HistMulti import HistMulti
-    from keras.models import Sequential
-    from keras.layers import Dense
-    from keras.layers import Flatten
-    from keras.layers import Conv1D
-    from keras.layers import MaxPooling1D
-    from keras.models import load_model
-    from keras.callbacks import EarlyStopping, ModelCheckpoint
+    from keras.api.models import Sequential, load_model
+    from keras.api.layers import Dense, Flatten, Conv1D, MaxPooling1D
+    from keras.api.callbacks import EarlyStopping, ModelCheckpoint
 
     if deterministic:
-        tf.keras.utils.set_random_seed(random_seed)
+        keras.utils.set_random_seed(random_seed)
 
+    from HistMulti import HistMulti
     from src.utils.utils_nn import split_sequences2, prepare_train_data2
 
-    print(os.environ["LD_LIBRARY_PATH"])
     print(tf.__version__)
     print(tf.config.list_physical_devices('GPU'))
 

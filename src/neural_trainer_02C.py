@@ -5,8 +5,7 @@
 import os
 import shutil
 from src.utils.utils_checks import initial_compliance_checks
-from src.utils.utils_filesystem import (read_json, write_json, read_train_config, write_train_config,
-                                        copy_files, remove_files)
+from src.utils.utils_filesystem import (read_json, write_json, read_train_config, write_train_config, copy_files, remove_files)
 from neural_trainer_utils import train_model
 
 

@@ -25,31 +25,21 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
     random.seed(random_seed)
 
     import tensorflow as tf
+    import keras
 
     tf.random.set_seed(random_seed)
-    tf.keras.utils.set_random_seed(random_seed)
+    keras.utils.set_random_seed(random_seed)
 
+    from keras.api.models import Sequential, load_model
+    from keras.api.layers import Dense, Flatten, Conv1D, MaxPooling1D, LSTM
+    from keras.api.callbacks import EarlyStopping, ModelCheckpoint
     from HistMulti import HistMulti
-    from keras.models import Sequential
-    from keras.layers import Dense
-    from keras.layers import Flatten
-    from keras.layers import Conv1D
-    from keras.layers import MaxPooling1D
-    from keras.layers import LSTM
-    from keras.models import load_model
-    from keras.callbacks import EarlyStopping, ModelCheckpoint
-
-    tf.keras.utils.set_random_seed(random_seed)
-
     from src.utils.utils_nn import split_sequences2, prepare_train_data2
 
-    print(os.environ["LD_LIBRARY_PATH"])
     print(tf.__version__)
     print(tf.config.list_physical_devices('GPU'))
 
     print(f'random_seed = {seed}')
-
-    # settings = read_json('settings.json')
     print(f'settings.json: {settings}')
 
     temp_dir = settings['temp_dir']
@@ -120,7 +110,8 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
         n_filters = n_features
         kernel_size = n_steps
         pool_size = n_inputs
-        model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu', input_shape=(n_steps, n_features)))
+        model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu',
+                         input_shape=(n_steps, n_features)))
         model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
         model.add(Flatten())
     elif model_type == 'LSTM':

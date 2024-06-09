@@ -82,14 +82,16 @@ class DirectorySynchronization:
             _filepath = self.get_csv_filepath(_symbol_timeframe)
             self.sheets.append(Sheet(_filepath, _symbol, self.timeframe))
 
-    def _calc_max(self, _list: list[tuple[datetime, Sheet]]) -> tuple[datetime, Sheet]:
+    @staticmethod
+    def _calc_max(_list: list[tuple[datetime, Sheet]]) -> tuple[datetime, Sheet]:
         _max_datetime_sheet = (datetime.min, None)
         for e in _list:
             if e[0] > _max_datetime_sheet[0]:
                 _max_datetime_sheet = e
         return _max_datetime_sheet
 
-    def _calc_min(self, _list: list[tuple[datetime, Sheet]]) -> tuple[datetime, Sheet]:
+    @staticmethod
+    def _calc_min(_list: list[tuple[datetime, Sheet]]) -> tuple[datetime, Sheet]:
         _min_datetime_sheet = (datetime.max, None)
         for e in _list:
             if e[0] < _min_datetime_sheet[0]:
@@ -332,7 +334,8 @@ class DirectorySynchronization:
                 self.num_insertions_done += 1
                 s.current_row = _index_start
 
-    def insert_new_row(self, _index_new_row, _new_datetime, _previous_close, s):
+    @staticmethod
+    def insert_new_row(_index_new_row, _new_datetime, _previous_close, s):
         """
         Insere um nova linha no dataframe. insere no meio, não no final. Para adicionar no final use append_new_row.
         :param _index_new_row:
@@ -354,7 +357,8 @@ class DirectorySynchronization:
         _index_new_row = s.current_row - 0.5
         return _index_new_row
 
-    def append_new_row(self, _index_new_row, _new_datetime, _previous_close, s):
+    @staticmethod
+    def append_new_row(_index_new_row, _new_datetime, _previous_close, s):
         """
         Adiciona uma nova linha no final.
         :param _index_new_row:

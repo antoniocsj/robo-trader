@@ -53,6 +53,7 @@ def create_rs_deep_search_json():
 
         timeframe_1, timeframe_2 = params_rs_search['timeframe'], rs_basic_search['timeframe']
         candle_input_type_1, candle_input_type_2 = params_rs_search['candle_input_type'], rs_basic_search['candle_input_type']
+
         n_steps_1, n_steps_2 = params_rs_search['n_steps'], rs_basic_search['n_steps']
         n_hidden_layers_1, n_hidden_layers_2 = params_rs_search['n_hidden_layers'], rs_basic_search['n_hidden_layers']
 

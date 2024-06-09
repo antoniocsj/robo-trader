@@ -10,8 +10,10 @@ import random
 random.seed(1)
 
 import tensorflow as tf
+import keras
+
 tf.random.set_seed(1)
-tf.keras.utils.set_random_seed(1)
+keras.utils.set_random_seed(1)
 
 import array as ar
 

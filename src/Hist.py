@@ -74,4 +74,3 @@ if __name__ == '__main__':
     hist = Hist(temp_dir)
     hist.get_hist_data('XAUUSD', 'M5')
     hist.print_hist()
-
