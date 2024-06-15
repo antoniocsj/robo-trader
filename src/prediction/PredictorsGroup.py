@@ -21,10 +21,11 @@ class PredictorsGroup:
         all_subdirs = os.listdir(self.directory)
 
         for subdir in sorted(all_subdirs):
-            if subdir.startswith('_') or subdir.endswith('_'):
+            if subdir.startswith('_') or subdir.startswith('.') or subdir.endswith('_'):
                 continue
 
-            sub_pred_dir = f'{self.directory}/{subdir}'
+            # sub_pred_dir = f'{self.directory}/{subdir}'
+            sub_pred_dir = os.path.join(self.directory, subdir)
             self.predictors.append(Predictors(sub_pred_dir))
 
     def calc_total_average(self):
