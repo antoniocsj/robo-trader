@@ -1,7 +1,7 @@
 {
-    "timeframe": "M5",
+    "timeframe": "H1",
     "candle_input_type": "CV",
-    "n_steps": 1,
+    "n_steps": 2,
     "n_hidden_layers": 0,
     "max_n_epochs": 150,
     "patience_short": 5,
