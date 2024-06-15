@@ -1,9 +1,10 @@
+import os
 import pickle
-from utils_filesystem import read_json
+from src.utils.utils_filesystem import read_json
 from src.HistMulti import HistMulti
 
 
-def initial_compliance_checks():
+def initial_compliance_checks(working_dir: str):
     """
     Realiza as verificações iniciais de conformidade:
     -> o conteúdo de temp, scalers.pkl deve estar em conformidade com params_rs_search.json e settings.json
@@ -11,10 +12,13 @@ def initial_compliance_checks():
     """
     print('Realizando as verificações iniciais de conformidade.')
 
-    params_rs_search = read_json('../params_rs_search.json')
-    settings = read_json('../settings.json')
+    params_rs_search_filepath = os.path.join(working_dir, 'params_rs_search.json')
+    params_rs_search = read_json(params_rs_search_filepath)
 
-    temp_dir = settings['temp_dir']
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
+
+    temp_dir = os.path.join(working_dir, settings['temp_dir'])
     symbol_out = settings['symbol_out']
 
     params_tf = params_rs_search['timeframe']
@@ -44,13 +48,21 @@ def initial_compliance_checks():
 
     del hist
 
-    # verifica se o conteúdo de scalers está correto.
-    with open('../scalers.pkl', 'rb') as file:
-        scalers: dict = pickle.load(file)
+    # caso o histórico tenha sofrido normalização, verifica se o conteúdo de scalers está correto.
+    if settings['setup_code'] > 0:
+        scalers_filepath = os.path.join(temp_dir, 'scalers.pkl')
 
-    symbol_timeframe = f'{symbol_out}_{settings_tf}'
-    if symbol_timeframe not in scalers:
-        print(f'ERRO. symbol_timeframe ({symbol_timeframe}) not in scalers.pkl ({scalers.keys()}).')
-        exit(-1)
+        if os.path.exists(scalers_filepath):
+            with open(scalers_filepath, 'rb') as file:
+                scalers: dict = pickle.load(file)
+        else:
+            print(f'ERRO. O arquivo {scalers_filepath} não foi encontrado.')
+            print('talvez você precise rodar o script setups.py')
+            exit(-1)
+
+        symbol_timeframe = f'{symbol_out}_{settings_tf}'
+        if symbol_timeframe not in scalers:
+            print(f'ERRO. symbol_timeframe ({symbol_timeframe}) not in scalers.pkl ({scalers.keys()}).')
+            exit(-1)
 
     print('Verificações Iniciais de Conformidade: OK.')

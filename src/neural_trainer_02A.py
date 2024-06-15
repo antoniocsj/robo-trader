@@ -64,7 +64,8 @@ def update_rs_basic_search_json(_dict: dict):
 def nn_train_rs_basic_search():
     print('nn_train_rs_basic_search')
 
-    initial_compliance_checks()
+    working_dir = os.getcwd()
+    initial_compliance_checks(working_dir)
 
     settings = read_json('settings.json')
     create_rs_basic_search_json()
