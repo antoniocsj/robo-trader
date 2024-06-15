@@ -34,9 +34,11 @@ def read_json(filename: str) -> dict:
 
 
 def update_settings(key: str, value: Any):
-    settings = read_json('../settings.json')
+    working_dir = os.getcwd()
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     settings[key] = value
-    write_json('../settings.json', settings)
+    write_json(settings_filepath, settings)
 
 
 def are_dir_trees_equal(dir1, dir2):
@@ -111,6 +113,16 @@ def write_train_config(train_config: dict):
     print(f'O arquivo {train_config_filename} foi gravado com SUCESSO.')
 
 
+def write_train_config2(directory: str, train_config: dict):
+    train_config_filename = 'train_config.json'
+    filepath = os.path.join(directory, train_config_filename)
+
+    with open(filepath, 'w') as file:
+        json.dump(train_config, file, indent=4, sort_keys=False, cls=NpEncoder)
+
+    print(f'O arquivo {filepath} foi gravado com SUCESSO.')
+
+
 def read_train_config() -> dict:
     train_config_filename = 'train_config.json'
 
@@ -119,6 +131,20 @@ def read_train_config() -> dict:
             _dict = json.load(file)
     else:
         print(f'ERRO. O arquivo {train_config_filename} não foi encontrado.')
+        exit(-1)
+
+    return _dict
+
+
+def read_train_config2(directory: str) -> dict:
+    train_config_filename = 'train_config.json'
+    filepath = os.path.join(directory, train_config_filename)
+
+    if os.path.exists(filepath):
+        with open(filepath, 'r') as file:
+            _dict = json.load(file)
+    else:
+        print(f'ERRO. O arquivo {filepath} não foi encontrado.')
         exit(-1)
 
     return _dict
@@ -181,10 +207,50 @@ def remove_files(filenames: list[str], directory: str):
 
 
 def reset_dir(dirname: str):
+    print(f'o diretório {dirname} foi resetado.')
     if os.path.exists(dirname):
-        print(f'o diretório {dirname} já existe. será resetado.')
         shutil.rmtree(dirname)
     os.mkdir(dirname)
+
+
+def copy_dir(src_dir: str, dst_dir: str):
+    """
+    Realiza uma cópia do diretório src_dir dentro do diretório dst_dir.
+    Parameters
+    ----------
+    src_dir
+    dst_dir
+
+    Returns
+    -------
+
+    """
+    filenames = os.listdir(src_dir)
+
+    print(f'copiando o diretório {src_dir} para {dst_dir}:')
+
+    # verifique se os diretórios fonte e destino existem
+    if not os.path.exists(src_dir):
+        print('ERRO')
+        exit(-1)
+    if not os.path.exists(dst_dir):
+        print('ERRO')
+        exit(-1)
+
+    # verifique se src_dir já existe dentro de dst_dir, caso exista resete-o
+    inner_dir = os.path.join(dst_dir, os.path.basename(src_dir))
+    reset_dir(inner_dir)
+
+    for filename in filenames:
+        filepath_src = f'{src_dir}/{filename}'
+        filepath_dst = f'{inner_dir}/{filename}'
+        shutil.copy(filepath_src, filepath_dst)
+
+    if are_files_equal(filenames, src_dir, inner_dir):
+        print('A cópia dos arquivos foi efetuada e verificada com SUCESSO!')
+    else:
+        print('ERRO ao fazer a cópia dos arquivos.')
+        exit(-1)
 
 
 if __name__ == '__main__':

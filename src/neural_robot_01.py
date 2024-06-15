@@ -152,7 +152,7 @@ def train_model():
           f'{int(n_samples_train * validation_split)}).')
 
     callbacks = [EarlyStopping(monitor='val_loss', patience=patience, verbose=1),
-                 ModelCheckpoint(filepath='model.h5', monitor='val_loss', save_best_only=True, verbose=1)]
+                 ModelCheckpoint(filepath='model.keras', monitor='val_loss', save_best_only=True, verbose=1)]
     history = model.fit(X_train, y_train, epochs=max_n_epochs, verbose=1,
                         validation_split=validation_split, callbacks=callbacks)
 
@@ -164,7 +164,7 @@ def train_model():
               'min_val_loss': {'value': min_val_loss, 'index': i_min_val_loss, 'epoch': i_min_val_loss + 1}}
 
     print(f'avaliando o modelo no conjunto inteiro das amostras de treinamento.')
-    saved_model = load_model('model.h5')
+    saved_model = load_model('model.keras')
     whole_set_train_loss_eval = saved_model.evaluate(X_train, y_train, verbose=0)
     print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
 
@@ -179,7 +179,7 @@ def train_model():
     # n_input = X_test.shape[1] * X_test.shape[2]
     # X_test = X_test.reshape((X_test.shape[0], n_input))
 
-    saved_model = load_model('model.h5')
+    saved_model = load_model('model.keras')
     test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)
     print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
 
@@ -246,7 +246,7 @@ def evaluate_model():
 
     X_test, y_test = split_sequences2(dataset_test, n_steps, candle_output_type)
 
-    saved_model = load_model('model.h5')
+    saved_model = load_model('model.keras')
     test_acc = saved_model.evaluate(X_test, y_test, verbose=0)
     print(f'Test Loss: {test_acc} (n_samples_test = {n_samples_test})')
 
@@ -281,7 +281,7 @@ def calculate_model_bias():
 
     X, y = split_sequences2(dataset_test, n_steps, candle_output_type)
 
-    model = load_model('model.h5')
+    model = load_model('model.keras')
 
     diffs = []
     len_X_ = len(X)
@@ -343,7 +343,7 @@ def test_model_with_trader():
     dataset_test = prepare_train_data(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type)
     X, y = split_sequences2(dataset_test, n_steps, candle_output_type)
 
-    model = load_model('model.h5')
+    model = load_model('model.keras')
 
     with open('scalers.pkl', 'rb') as file:
         scalers = pickle.load(file)
@@ -467,7 +467,7 @@ def test_model_with_trader_interactive():
                                        candle_output_type)
     X, y = split_sequences2(dataset_test, n_steps, candle_output_type)
 
-    model = load_model('model.h5')
+    model = load_model('model.keras')
 
     with open('scalers.pkl', 'rb') as file:
         scalers = pickle.load(file)

@@ -131,7 +131,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
           f'{int(n_samples_train * validation_split)}).')
 
     callbacks = [EarlyStopping(monitor='val_loss', patience=patience, verbose=1),
-                 ModelCheckpoint(filepath='model.h5', monitor='val_loss', save_best_only=True, verbose=1)]
+                 ModelCheckpoint(filepath='model.keras', monitor='val_loss', save_best_only=True, verbose=1)]
     history = model.fit(X_train, y_train, epochs=max_n_epochs, verbose=1,
                         validation_split=validation_split, callbacks=callbacks)
 
@@ -143,7 +143,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
               'min_val_loss': {'value': min_val_loss, 'index': i_min_val_loss, 'epoch': i_min_val_loss + 1}}
 
     print(f'avaliando o modelo no conjunto inteiro das amostras de treinamento.')
-    saved_model = load_model('model.h5')
+    saved_model = load_model('model.keras')
     whole_set_train_loss_eval = saved_model.evaluate(X_train, y_train, verbose=0)
     print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
 
@@ -158,7 +158,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
     # n_input = X_test.shape[1] * X_test.shape[2]
     # X_test = X_test.reshape((X_test.shape[0], n_input))
 
-    saved_model = load_model('model.h5')
+    saved_model = load_model('model.keras')
     test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)
     print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
 

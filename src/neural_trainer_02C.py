@@ -129,9 +129,9 @@ def backup_subpredictor_files():
 
     # copie para o diretório ../predictors/family_name/subpredictor_name todos os arquivos relacionados
     # ao subpredictor atual
-    filenames_to_copy = ['model.h5', 'params_rs_search.json', 'rs_basic_search.json', 'rs_deep_search.json',
+    filenames_to_copy = ['model.keras', 'params_rs_search.json', 'rs_basic_search.json', 'rs_deep_search.json',
                          'scalers.pkl', 'settings.json', 'train_config.json']
-    filenames_to_remove = ['model.h5', 'rs_basic_search.json', 'rs_deep_search.json', 'train_config.json']
+    filenames_to_remove = ['model.keras', 'rs_basic_search.json', 'rs_deep_search.json', 'train_config.json']
 
     copy_files(filenames=filenames_to_copy, src_dir='.', dst_dir=subpredictor_path)
     print(f'Backup de {subpredictor_name} efetuado com sucesso.')

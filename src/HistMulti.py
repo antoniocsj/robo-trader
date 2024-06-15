@@ -50,7 +50,8 @@ class HistMulti:
         :return:
         """
         if not os.path.exists(self.directory):
-            print(f'ERRO. o diretório {self.directory} não existe.')
+            print(f'ERRO. o diretório de dados de entrada {self.directory} não existe.')
+            print('talvez você precise rodar o script setups.py')
             exit(-1)
         
         # passe por todos os arquivos csv e descubra o symbol e timeframe

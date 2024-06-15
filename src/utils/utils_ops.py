@@ -1,5 +1,5 @@
 from typing import Any
-
+import os
 from numpy import ndarray
 import numpy as np
 import pandas as pd
@@ -108,15 +108,16 @@ def denorm_output(arr: ndarray, bias: Any, candle_type: str, scaler: MinMaxScale
 
 
 def normalize_directory(directory: str):
-    setup = read_json('../settings.json')
-    timeframe = setup['timeframe']
+    working_dir = os.getcwd()
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
 
+    timeframe = settings['timeframe']
+    scaler_feature_range = tuple(settings['scaler_feature_range'])
     hist = HistMulti(directory, timeframe)
     scalers = {}
 
     for symbol in hist.symbols:
-        # print(symbol)
-
         arr: ndarray = hist.arr[symbol][timeframe]
         if arr.shape[1] == 2:
             data: ndarray = arr[:, 1]
@@ -124,7 +125,7 @@ def normalize_directory(directory: str):
         else:
             data = arr[:, 1:6]
         
-        scaler = MinMaxScaler()
+        scaler = MinMaxScaler(feature_range=scaler_feature_range)
         data = scaler.fit_transform(data)
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[:, 0], True)
@@ -134,7 +135,9 @@ def normalize_directory(directory: str):
         _symbol_timeframe = f'{symbol}_{timeframe}'
         scalers[_symbol_timeframe] = scaler
 
-    with open('../scalers.pkl', 'wb') as file:
+    # guarda scalers.pkl no próprio diretório onde estão os símbolos (ou históricos/csv)
+    scalers_filepath = os.path.join(directory, 'scalers.pkl')
+    with open(scalers_filepath, 'wb') as file:
         pickle.dump(scalers, file)
 
     print(f'todos os símbolos do diretório {directory} foram normalizados.')

@@ -1,11 +1,10 @@
 import os
 import shutil
-import json
 import copy
 
 import pandas as pd
-from HistMulti import HistMulti
-from src.utils.utils_filesystem import read_json, write_json, get_list_sync_files, load_sync_cp_file, update_settings, reset_dir
+from src.HistMulti import HistMulti
+from src.utils.utils_filesystem import read_json, get_list_sync_files, load_sync_cp_file, update_settings, reset_dir
 from src.utils.utils_symbols import search_symbols
 from src.utils.utils_ops import transform_directory, transform_files, transform_symbols, \
     normalize_directory, normalize_symbols, \
@@ -31,12 +30,11 @@ def check_base_ok():
        corretos.
     :return: True se tudo está OK, False, caso contrário.
     """
-    with open('settings.json', 'r') as file:
-        settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    temp_dir = settings['temp_dir']
-    csv_s_dir = settings['csv_s_dir']
+    temp_dir = os.path.join(working_dir, settings['temp_dir'])
+    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
+
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
 
@@ -102,6 +100,34 @@ def csv_delete_first_row(_filepath: str):
     df.to_csv(_filepath, sep='\t', index=False)
 
 
+def setup_directory_00():
+    """
+    O diretório temp terá os seguintes símbolos (arquivos CSVs):
+    -> 1) symbol_out e demais símbolos serão simplesmente copiados de csv_s para temp;
+    :return:
+    """
+    print('setup_directory_01.')
+    if not check_base_ok():
+        print('abortando setup.')
+        exit(-1)
+
+    print(f'settings.json: {settings}')
+
+    temp_dir = os.path.join(working_dir, settings['temp_dir'])
+    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
+    timeframe = settings['timeframe']
+    symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
+
+    # copiar todos os símbolos de csv_s_dir para temp_dir
+    for symbol in symbols_names:
+        _src = symbols_paths[f'{symbol}_{timeframe}']
+        _dst = f'{temp_dir}/{symbol}_{timeframe}.csv'
+        shutil.copy(_src, _dst)
+
+    update_settings('setup_code', -1)
+    update_settings('setup_uses_differentiation', False)
+
+
 def setup_directory_01():
     """
     O diretório temp terá os seguintes símbolos (arquivos CSVs):
@@ -114,12 +140,10 @@ def setup_directory_01():
         print('abortando setup.')
         exit(-1)
 
-    with open('settings.json', 'r') as file:
-        settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    temp_dir = settings['temp_dir']
-    csv_s_dir = settings['csv_s_dir']
+    temp_dir = os.path.join(working_dir, settings['temp_dir'])
+    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
@@ -129,13 +153,13 @@ def setup_directory_01():
         _dst = f'{temp_dir}/{symbol}_{timeframe}.csv'
         shutil.copy(_src, _dst)
 
-    # normaliza todos os symbolos de csv.
+    # normaliza todos os symbolos de temp.
     normalize_directory(temp_dir)
     update_settings('setup_code', 1)
     update_settings('setup_uses_differentiation', False)
 
 
-def setup_symbols_01(hist: HistMulti, settings, scalers) -> HistMulti:
+def setup_symbols_01(hist: HistMulti, scalers: dict) -> HistMulti:
     """
     O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
@@ -160,12 +184,10 @@ def setup_directory_02():
         print('abortando setup.')
         exit(-1)
 
-    with open('settings.json', 'r') as file:
-        settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    temp_dir = settings['temp_dir']
-    csv_s_dir = settings['csv_s_dir']
+    temp_dir = os.path.join(working_dir, settings['temp_dir'])
+    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
@@ -196,7 +218,7 @@ def setup_directory_02():
     update_settings('setup_uses_differentiation', True)
 
 
-def setup_symbols_02(hist: HistMulti, settings, scalers) -> HistMulti:
+def setup_symbols_02(hist: HistMulti, scalers: dict) -> HistMulti:
     """
     O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
@@ -233,12 +255,10 @@ def setup_directory_03():
         print('abortando setup.')
         exit(-1)
 
-    with open('settings.json', 'r') as file:
-        settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    temp_dir = settings['temp_dir']
-    csv_s_dir = settings['csv_s_dir']
+    temp_dir = os.path.join(working_dir, settings['temp_dir'])
+    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
@@ -268,7 +288,7 @@ def setup_directory_03():
     update_settings('setup_uses_differentiation', True)
 
 
-def setup_symbols_03(hist: HistMulti, settings, scalers) -> HistMulti:
+def setup_symbols_03(hist: HistMulti, scalers: dict) -> HistMulti:
     """
     O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
@@ -305,12 +325,10 @@ def setup_directory_04():
         print('abortando setup.')
         exit(-1)
 
-    with open('settings.json', 'r') as file:
-        settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    temp_dir = settings['temp_dir']
-    csv_s_dir = settings['csv_s_dir']
+    temp_dir = os.path.join(working_dir, settings['temp_dir'])
+    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
@@ -344,7 +362,7 @@ def setup_directory_04():
     update_settings('setup_uses_differentiation', True)
 
 
-def setup_symbols_04(hist: HistMulti, settings, scalers) -> HistMulti:
+def setup_symbols_04(hist: HistMulti, scalers: dict) -> HistMulti:
     """
     O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
@@ -379,12 +397,10 @@ def setup_directory_05():
         print('abortando setup.')
         exit(-1)
 
-    with open('settings.json', 'r') as file:
-        settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    temp_dir = settings['temp_dir']
-    csv_s_dir = settings['csv_s_dir']
+    temp_dir = os.path.join(working_dir, settings['temp_dir'])
+    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
@@ -409,7 +425,7 @@ def setup_directory_05():
     update_settings('setup_uses_differentiation', False)
 
 
-def setup_symbols_05(hist: HistMulti, settings, scalers) -> HistMulti:
+def setup_symbols_05(hist: HistMulti, scalers: dict) -> HistMulti:
     """
     O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
@@ -444,12 +460,10 @@ def setup_directory_06():
         print('abortando setup.')
         exit(-1)
 
-    with open('settings.json', 'r') as file:
-        settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    temp_dir = settings['temp_dir']
-    csv_s_dir = settings['csv_s_dir']
+    temp_dir = os.path.join(working_dir, settings['temp_dir'])
+    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
@@ -474,7 +488,7 @@ def setup_directory_06():
     update_settings('setup_uses_differentiation', False)
 
 
-def setup_symbols_06(hist: HistMulti, settings, scalers) -> HistMulti:
+def setup_symbols_06(hist: HistMulti, scalers: dict) -> HistMulti:
     """
     O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
@@ -511,12 +525,10 @@ def setup_directory_07():
         print('abortando setup.')
         exit(-1)
 
-    with open('settings.json', 'r') as file:
-        settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    temp_dir = settings['temp_dir']
-    csv_s_dir = settings['csv_s_dir']
+    temp_dir = os.path.join(working_dir, settings['temp_dir'])
+    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
@@ -565,7 +577,7 @@ def setup_directory_07():
     update_settings('setup_uses_differentiation', True)
 
 
-def setup_symbols_07(hist: HistMulti, settings, scalers) -> HistMulti:
+def setup_symbols_07(hist: HistMulti, scalers: dict) -> HistMulti:
     """
     O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
@@ -615,12 +627,10 @@ def setup_directory_08():
         print('abortando setup.')
         exit(-1)
 
-    with open('settings.json', 'r') as file:
-        settings = json.load(file)
     print(f'settings.json: {settings}')
 
-    temp_dir = settings['temp_dir']
-    csv_s_dir = settings['csv_s_dir']
+    temp_dir = os.path.join(working_dir, settings['temp_dir'])
+    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
@@ -653,7 +663,7 @@ def setup_directory_08():
     update_settings('setup_uses_differentiation', True)
 
 
-def setup_symbols_08(hist: HistMulti, settings, scalers) -> HistMulti:
+def setup_symbols_08(hist: HistMulti, scalers: dict) -> HistMulti:
     """
     O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
@@ -691,11 +701,10 @@ def setup_directory_09():
         print('abortando setup.')
         exit(-1)
 
-    settings = read_json('settings.json')
     print(f'settings.json: {settings}')
 
-    temp_dir = settings['temp_dir']
-    csv_s_dir = settings['csv_s_dir']
+    temp_dir = os.path.join(working_dir, settings['temp_dir'])
+    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
@@ -726,7 +735,7 @@ def setup_directory_09():
     update_settings('setup_uses_differentiation', True)
 
 
-def setup_symbols_09(hist: HistMulti, settings, scalers) -> HistMulti:
+def setup_symbols_09(hist: HistMulti, scalers: dict) -> HistMulti:
     """
     O histórico terá os seguintes símbolos:
     -> 1) symbol_out normalizado;
@@ -751,38 +760,62 @@ def setup_symbols_09(hist: HistMulti, settings, scalers) -> HistMulti:
     return _hist
 
 
-def apply_setup_symbols(hist: HistMulti, code: int, settings, scalers) -> HistMulti:
+def apply_setup_directory(code: int):
     if code == 1:
-        return setup_symbols_01(hist, settings, scalers)
+        return setup_directory_01()
     elif code == 2:
-        return setup_symbols_02(hist, settings, scalers)
+        return setup_directory_02()
     elif code == 3:
-        return setup_symbols_03(hist, settings, scalers)
+        return setup_directory_03()
     elif code == 4:
-        return setup_symbols_04(hist, settings, scalers)
+        return setup_directory_04()
     elif code == 5:
-        return setup_symbols_05(hist, settings, scalers)
+        return setup_directory_05()
     elif code == 6:
-        return setup_symbols_06(hist, settings, scalers)
+        return setup_directory_06()
     elif code == 7:
-        return setup_symbols_07(hist, settings, scalers)
+        return setup_directory_07()
     elif code == 8:
-        return setup_symbols_08(hist, settings, scalers)
+        return setup_directory_08()
     elif code == 9:
-        return setup_symbols_09(hist, settings, scalers)
+        return setup_directory_09()
+    else:
+        print(F'ERRO. setup_code ({code}) inválido.')
+        exit(-1)
+
+
+def apply_setup_symbols(hist: HistMulti, code: int, scalers: dict) -> HistMulti:
+    if code == 1:
+        return setup_symbols_01(hist, scalers)
+    elif code == 2:
+        return setup_symbols_02(hist, scalers)
+    elif code == 3:
+        return setup_symbols_03(hist, scalers)
+    elif code == 4:
+        return setup_symbols_04(hist, scalers)
+    elif code == 5:
+        return setup_symbols_05(hist, scalers)
+    elif code == 6:
+        return setup_symbols_06(hist, scalers)
+    elif code == 7:
+        return setup_symbols_07(hist, scalers)
+    elif code == 8:
+        return setup_symbols_08(hist, scalers)
+    elif code == 9:
+        return setup_symbols_09(hist, scalers)
     else:
         print(F'ERRO. setup_code ({code}) inválido.')
         exit(-1)
 
 
 if __name__ == '__main__':
-    params_rs_search = read_json('params_rs_search.json')
-    filename_basic = 'rs_basic_search.json'
+    working_dir = os.getcwd()
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
 
-    _settings = read_json('settings.json')
-    _settings['timeframe'] = params_rs_search['timeframe']
-    _settings['candle_input_type'] = params_rs_search['candle_input_type']
-    _settings['random_seed'] = 1
-    write_json('settings.json', _settings)
-
-    setup_directory_01()
+    setup_code = settings['setup_code']
+    if setup_code > 0:
+        apply_setup_directory(setup_code)
+    else:
+        setup_directory_00()
+        print('nenhuma normalização/transformação foi aplicada ao histórico.')
