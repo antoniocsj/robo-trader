@@ -31,7 +31,7 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
     keras.utils.set_random_seed(random_seed)
 
     from keras.api.models import Sequential, load_model
-    from keras.api.layers import Dense, Flatten, Conv1D, MaxPooling1D, LSTM
+    from keras.api.layers import Input, Dense, Flatten, Conv1D, MaxPooling1D, LSTM
     from keras.api.callbacks import EarlyStopping, ModelCheckpoint
     from HistMulti import HistMulti
     from src.utils.utils_nn import split_sequences2, prepare_train_data2
@@ -106,16 +106,19 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
     n_neurons = n_inputs
 
     # input layer
+    model.add(Input(shape=(n_steps, n_features)))
+
     if model_type == 'CNN':
         n_filters = n_features
         kernel_size = n_steps
         pool_size = n_inputs
-        model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu',
-                         input_shape=(n_steps, n_features)))
+        # model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu', input_shape=(n_steps, n_features)))
+        model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu'))
         model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
         model.add(Flatten())
     elif model_type == 'LSTM':
-        model.add(LSTM(n_inputs, activation='relu', input_shape=(n_steps, n_features)))
+        # model.add(LSTM(n_inputs, activation='relu', input_shape=(n_steps, n_features)))
+        model.add(LSTM(n_inputs, activation='relu'))
     else:
         print(f'ERRO. model_type ({model_type}) inválido.')
         exit(-1)
