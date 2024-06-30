@@ -39,12 +39,6 @@ void save_csv_1b(string file_name, MqlRates& rates[], double& buffer[]) {
         string date_time = TimeToString(rates[i].time, TIME_DATE|TIME_MINUTES);
         StringReplace(date_time, ".", "-");
         StringReplace(date_time, " ", "T");
-        /*double O = rates[i].open;
-        double H = rates[i].high;
-        double L = rates[i].low;
-        double C = rates[i].close;
-        long V = rates[i].tick_volume;*/
-        /*FileWrite(fileHandle, date_time, O, H, L, C, V, buffer[i]);*/
         FileWrite(fileHandle, date_time, buffer[i]);
     }
 
@@ -72,12 +66,6 @@ void save_csv_2b(string file_name, MqlRates& rates[], double& buffer_0[], double
         string date_time = TimeToString(rates[i].time, TIME_DATE|TIME_MINUTES);
         StringReplace(date_time, ".", "-");
         StringReplace(date_time, " ", "T");
-        /*double O = rates[i].open;
-        double H = rates[i].high;
-        double L = rates[i].low;
-        double C = rates[i].close;
-        long V = rates[i].tick_volume;*/
-        /*FileWrite(fileHandle, date_time, O, H, L, C, V, buffer[i]);*/
         FileWrite(fileHandle, date_time, buffer_0[i], buffer_1[i]);
     }
 
@@ -257,7 +245,6 @@ int Export_MACD(string symbol_name, ENUM_TIMEFRAMES timeframe,
 //+------------------------------------------------------------------+
 int Export_RSI(string symbol_name, ENUM_TIMEFRAMES timeframe, int ma_period,
                datetime start_time, datetime stop_time) {
-    ENUM_MA_METHOD    ma_method = MODE_SMA;
     int               ma_applied = PRICE_CLOSE;
     CiRSI rsi = CiRSI();
     MqlRates rates[];
@@ -298,7 +285,6 @@ int Export_RSI(string symbol_name, ENUM_TIMEFRAMES timeframe, int ma_period,
 
 int Export_OBV(string symbol_name, ENUM_TIMEFRAMES timeframe,
               datetime start_time, datetime stop_time) {
-    int               ma_shift = 0;
     ENUM_APPLIED_VOLUME applied = VOLUME_TICK;
     CiOBV obv = CiOBV();
     MqlRates rates[];
@@ -346,9 +332,13 @@ void main() {
     datetime start_time = D'2018.01.02 02:00:00';
     datetime stop_time = D'2024.06.15 00:00:00';
 
-    /*Export_MA(symbol_name, timeframe, 200, start_time, stop_time);
-    Export_MA(symbol_name, timeframe, 50, start_time, stop_time);*/
+    Export_MA(symbol_name, timeframe, 1, start_time, stop_time);
+    Export_MA(symbol_name, timeframe, 5, start_time, stop_time);
     Export_MA(symbol_name, timeframe, 10, start_time, stop_time);
+    Export_MA(symbol_name, timeframe, 25, start_time, stop_time);
+    Export_MA(symbol_name, timeframe, 50, start_time, stop_time);
+    Export_MA(symbol_name, timeframe, 100, start_time, stop_time);
+    Export_MA(symbol_name, timeframe, 200, start_time, stop_time);
 
     Export_Stochastic(symbol_name, timeframe, 5, 3, 3, start_time, stop_time);
     Export_MACD(symbol_name, timeframe, 12, 26, 9, start_time, stop_time);
