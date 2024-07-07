@@ -84,8 +84,8 @@ def nn_train_rs_basic_search():
     initial_compliance_checks(working_dir)
 
     settings = read_json('settings.json')
-    # time_break_secs: int = get_time_break_from_timeframe(settings['timeframe'])
-    time_break_secs = 0
+    time_break_secs: int = get_time_break_from_timeframe(settings['timeframe'])
+    # time_break_secs = 0
     random_seed_max: int = params_rs_search['random_seed_max']
 
     # Create save directory if not exists

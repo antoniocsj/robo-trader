@@ -128,8 +128,8 @@ def nn_train_rs_deep_search():
     initial_compliance_checks(working_dir)
 
     settings = read_json('settings.json')
-    # time_break_secs: int = get_time_break_from_timeframe(settings['timeframe']) * 3
-    time_break_secs = 0
+    time_break_secs: int = get_time_break_from_timeframe(settings['timeframe']) * 3
+    # time_break_secs = 0
 
     results_dir = os.path.join(working_dir, settings['results_dir'])
 
