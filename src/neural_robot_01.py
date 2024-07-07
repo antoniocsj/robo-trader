@@ -1,3 +1,18 @@
+# Multivariate Models
+# Multivariate time series data means data where there is more than one observation for each time step.
+# There are two main models that we may require with multivariate time series data; they are:
+#
+# Multiple Input Series.
+# Multiple Parallel Series.
+# Let’s take a look at each in turn.
+#
+# Multiple Input Series
+# A problem may have two or more parallel input time series and an output time series that is dependent
+# on the input time series.
+#
+# The input time series are parallel because each series has observations at the same time steps.
+
+
 from src.utils.utils_filesystem import read_json
 
 _settings = read_json('settings.json')
@@ -45,19 +60,6 @@ from src.utils.utils_filesystem import write_train_config, read_train_config
 from src.utils.utils_ops import denorm_close_price
 
 
-# Multivariate Models
-# Multivariate time series data means data where there is more than one observation for each time step.
-# There are two main models that we may require with multivariate time series data; they are:
-#
-# Multiple Input Series.
-# Multiple Parallel Series.
-# Let’s take a look at each in turn.
-#
-# Multiple Input Series
-# A problem may have two or more parallel input time series and an output time series that is dependent
-# on the input time series.
-#
-# The input time series are parallel because each series has observations at the same time steps.
 def train_model():
     print(f'DETERMINISTIC? = {DETERMINISTIC}')
     if DETERMINISTIC:
