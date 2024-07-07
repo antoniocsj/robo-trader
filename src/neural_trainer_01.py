@@ -1,6 +1,7 @@
 import os
 import time
 from src.utils.utils_filesystem import read_json, write_json
+from src.setups import run_setup
 
 
 def train_model(deterministic: bool = True, seed: int = 1):
@@ -37,7 +38,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
         keras.utils.set_random_seed(random_seed)
 
     from HistMulti import HistMulti
-    from src.utils.utils_nn import split_sequences2, prepare_train_data2
+    from src.utils.utils_nn import split_sequences, prepare_train_data_candles
 
     print(tf.__version__)
     print(tf.config.list_physical_devices('GPU'))
@@ -73,10 +74,10 @@ def train_model(deterministic: bool = True, seed: int = 1):
     n_samples_train = n_rows - n_samples_test  # Número de amostras usadas na fase de treinamento e validação
 
     # horizontally stack columns
-    dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
+    dataset_train = prepare_train_data_candles(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
 
     # convert into input/output samples
-    X_train, y_train = split_sequences2(dataset_train, n_steps, candle_output_type)
+    X_train, y_train = split_sequences(dataset_train, n_steps, candle_output_type)
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
     # features to expect for each input sample.
@@ -145,14 +146,10 @@ def train_model(deterministic: bool = True, seed: int = 1):
 
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
     samples_index_start = n_samples_train - 1
-    dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
-                                       candle_output_type)
+    dataset_test = prepare_train_data_candles(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
+                                              candle_output_type)
 
-    X_test, y_test = split_sequences2(dataset_test, n_steps, candle_output_type)
-
-    # for MLP model only
-    # n_input = X_test.shape[1] * X_test.shape[2]
-    # X_test = X_test.reshape((X_test.shape[0], n_input))
+    X_test, y_test = split_sequences(dataset_test, n_steps, candle_output_type)
 
     saved_model = load_model('model.keras')
     test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)
@@ -297,6 +294,7 @@ def trainer_01():
 
 
 if __name__ == '__main__':
+    run_setup()
     trainer_01()
 
 # 5 anos de histórico

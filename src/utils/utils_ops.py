@@ -5,8 +5,115 @@ import numpy as np
 import pandas as pd
 import pickle
 from src.HistMulti import HistMulti
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from src.utils.utils_filesystem import read_json
+
+
+def normalize_minmax(data: ndarray, feature_range: tuple, csv_content=None) -> tuple[ndarray, MinMaxScaler]:
+    """
+    O MinMaxScaler normaliza uma matrix considerando que cada coluna é completamente independente das outras.
+    Assim ele calcula o máximo e mínimo de cada coluna separadamente.
+    Porém, é possível adaptar o MinMaxScaler para que o seu uso seja diferente.
+
+    1) supondo que todas as colunas possuem dados da mesma variável/característca/fenômeno e com a mesma unidade de medida.
+    Nesse caso, seria mais apropriado o cálculo do máximo e mínimo globais da matriz.
+    Por exemplo, uma matrix OHLC em que todas as colunas se referem a mesma variável=preço.
+
+    2) supondo que as algumas colunas possuem dados da mesma variável/característca/fenômeno e com a mesma unidade de medida e
+    que outras coluna sejam de outras váriáveis. Porém a última, possuem uma unidade de medida diferente.
+    Nesse caso, seria mais apropriado o cálculo dos máximos e mínimos regionais da matriz.
+    Por exemplo, uma matriz OHLCV em que as 4 primeiras colunas são do preço e a 5ª coluna é do volume.
+    Assim, as colunas do preço terão um máximo/mínimo regional e a coluna do volume terá seu próprio máximo/mínimo regional.
+
+
+    Parameters
+    ----------
+    data: um array do tipo ndarray.
+    feature_range: será repassada ao MinMaxScaler
+    csv_content: 'HETEROGENEOUS_DEFAULT' ou 'HETEROGENEOUS_OHLCV' ou 'HOMOGENEOUS'.
+
+    Returns ndarray normalizado
+    -------
+
+    """
+    if not csv_content or csv_content.upper() == 'HETEROGENEOUS_DEFAULT':
+        # saída padrão do MinMaxScaler()
+        scaler = MinMaxScaler(feature_range=feature_range)
+        return scaler.fit_transform(data), scaler
+    elif csv_content.upper() == 'HOMOGENEOUS':  # solução do problema 1
+        data2 = np.array([[data.min()] * data.shape[1], [data.max()] * data.shape[1]])
+        scaler = MinMaxScaler(feature_range=feature_range)
+        scaler.fit(data2)
+        return scaler.transform(data), scaler
+    elif csv_content.upper() == 'HETEROGENEOUS_OHLCV':  # solução do problema 2
+        if data.shape[1] != 5:
+            print(f'ERRO. O array não segue o formato HETEROGENEOUS_OHLCV que exige 5 colunas. '
+                  f'data.shape[1] = {data.shape[1]}')
+            exit(-1)
+        data2a = data[:, 0:4]
+        data2b = data[:, 4]
+        min_ohlc = data2a.min()
+        max_ohlc = data2a.max()
+        min_v = data2b.min()
+        max_v = data2b.max()
+        data3 = np.array([[min_ohlc] * 4 + [min_v],
+                          [max_ohlc] * 4 + [max_v]])
+        scaler = MinMaxScaler(feature_range=feature_range)
+        scaler.fit(data3)
+        return scaler.transform(data), scaler
+    else:
+        print(f'ERRO! csv_content = {csv_content} não suportado')
+        exit(-1)
+
+
+def normalize_standard(data: ndarray, data_format=None) -> tuple[ndarray, StandardScaler]:
+    """
+    Leia o comentário da função normalize_minmax.
+    Parameters
+    ----------
+    data: um array do tipo ndarray.
+    data_format: 'HETEROGENEOUS_DEFAULT' ou 'HETEROGENEOUS_OHLCV' ou 'HOMOGENEOUS'.
+
+    Returns ndarray normalizado
+    -------
+
+    """
+    if not data_format or data_format.upper() == 'HETEROGENEOUS_DEFAULT':
+        # saída padrão do StandardScaler()
+        scaler = StandardScaler()
+        return scaler.fit_transform(data), scaler
+    elif data_format.upper() == 'HOMOGENEOUS':  # solução do problema 1
+        scaler = StandardScaler()
+        scaler.fit(data)
+        scaler.mean_ = np.array([np.mean(data)] * data.shape[1])
+        scaler.var_ = np.array([np.var(data)] * data.shape[1])
+        scaler.scale_ = np.sqrt(scaler.var_)
+        return scaler.transform(data), scaler
+
+    elif data_format.upper() == 'HETEROGENEOUS_OHLCV':  # solução do problema 2
+        if data.shape[1] != 5:
+            print(f'ERRO. O array não segue o formato HETEROGENEOUS_OHLCV que exige 5 colunas. '
+                  f'data.shape[1] = {data.shape[1]}')
+            exit(-1)
+        scaler = StandardScaler()
+        scaler.fit(data)
+        data_ohlc = data[:, 0:4]
+        data_v = data[:, 4]
+
+        mean_ohlc = data_ohlc.mean()
+        var_ohlc = data_ohlc.var()
+        mean_v = data_v.mean()
+        var_v = data_v.var()
+
+        scaler.mean_ = np.array([mean_ohlc] * 4 + [mean_v])
+        scaler.var_ = np.array([var_ohlc] * 4 + [var_v])
+        scaler.scale_ = np.sqrt(scaler.var_)
+
+        return scaler.transform(data), scaler
+
+    else:
+        print(f'ERRO! csv_content = {data_format} não suportado')
+        exit(-1)
 
 
 def denorm_close_price(_c, scaler: MinMaxScaler):
@@ -114,6 +221,11 @@ def normalize_directory(directory: str):
 
     timeframe = settings['timeframe']
     scaler_feature_range = tuple(settings['scaler_feature_range'])
+    csv_content = settings['csv_content']
+    normalization_method = settings['normalization_method']
+
+    print(f'características da normalização: csv_content = {csv_content}, normalization_method = {normalization_method}')
+
     hist = HistMulti(directory, timeframe)
     scalers = {}
 
@@ -125,8 +237,16 @@ def normalize_directory(directory: str):
         else:
             data = arr[:, 1:6]
         
-        scaler = MinMaxScaler(feature_range=scaler_feature_range)
-        data = scaler.fit_transform(data)
+        # scaler = MinMaxScaler(feature_range=scaler_feature_range)
+        # data = scaler.fit_transform(data)
+        if normalization_method == 'minmax':
+            data, scaler = normalize_minmax(data, feature_range=scaler_feature_range, csv_content=csv_content)
+        elif normalization_method == 'standard':
+            data, scaler = normalize_standard(data, data_format=csv_content)
+        else:
+            print(f'ERRO! normalization_method = {normalization_method} inválido.')
+            exit(-1)
+
         dataf = pd.DataFrame(data)
         dataf.insert(0, 0, arr[:, 0], True)
         dataf.columns = range(dataf.columns.size)

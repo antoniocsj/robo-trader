@@ -139,10 +139,10 @@ predictors:
     validation_split = 0.2
 
     # horizontally stack columns
-    dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
+    dataset_train = prepare_train_data_2(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
 
     # convert into input/output samples
-    X_train, y_train = split_sequences2(dataset_train, n_steps, candle_output_type)
+    X_train, y_train = split_sequences(dataset_train, n_steps, candle_output_type)
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
     # features to expect for each input sample.
@@ -212,10 +212,10 @@ predictors:
 
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
     samples_index_start = n_samples_train - 1
-    dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
+    dataset_test = prepare_train_data_2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
                                        candle_output_type)
 
-    X_test, y_test = split_sequences2(dataset_test, n_steps, candle_output_type)
+    X_test, y_test = split_sequences(dataset_test, n_steps, candle_output_type)
 
     # for MLP model only
     # n_input = X_test.shape[1] * X_test.shape[2]

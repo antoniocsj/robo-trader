@@ -3,7 +3,7 @@ import numpy as np
 from src.HistMulti import HistMulti
 from src.prediction.SubPredictor import SubPredictor
 from src.utils.utils_ops import denorm_output
-from src.utils.utils_nn import split_sequences2, prepare_train_data3
+from src.utils.utils_nn import split_sequences, prepare_train_data_candles
 
 
 def evaluate_predictor(pred: SubPredictor):
@@ -32,13 +32,13 @@ def evaluate_predictor(pred: SubPredictor):
     n_samples_test = 3000
     samples_index_start = n_samples_train
 
-    dataset_test = prepare_train_data3(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
-                                       candle_output_type)
-    X, y = split_sequences2(dataset_test, n_steps, candle_output_type)
+    dataset_test = prepare_train_data_candles(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
+                                              candle_output_type)
+    X, y = split_sequences(dataset_test, n_steps, candle_output_type)
 
-    dataset_test2 = prepare_train_data3(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
+    dataset_test2 = prepare_train_data_candles(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
                                         'HL')
-    X2, y_hl = split_sequences2(dataset_test2, n_steps, 'HL')
+    X2, y_hl = split_sequences(dataset_test2, n_steps, 'HL')
 
     model = pred.model
     scalers = pred.scalers

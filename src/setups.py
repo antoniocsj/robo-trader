@@ -17,7 +17,7 @@ from src.utils.utils_ops import transform_directory, transform_files, transform_
 # de treinamento e testes.
 # symbol_out é o ativo principal no qual serão feitas as negociações de compra e venda.
 
-def check_base_ok():
+def check_base_ok(working_dir):
     """
     O objetivo desta função é verificar se os diretórios temp e csv_s estão prontos para os experimentos a serem
     definidos nas funções 'setup'.
@@ -30,10 +30,12 @@ def check_base_ok():
        corretos.
     :return: True se tudo está OK, False, caso contrário.
     """
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     print(f'settings.json: {settings}')
 
-    temp_dir = os.path.join(working_dir, settings['temp_dir'])
-    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
+    temp_dir = str(os.path.join(working_dir, settings['temp_dir']))
+    csv_s_dir = str(os.path.join(working_dir, settings['csv_s_dir']))
 
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
@@ -55,12 +57,16 @@ def check_base_ok():
         else:
             print(f'o símbolo {symbol_out} não foi encontrado no diretório {csv_s_dir}')
             return False
+    else:
+        if symbol_out not in symbols_names:
+            print(f'o símbolo {symbol_out} não foi encontrado no diretório {csv_s_dir}')
+            return False
 
     _sync_files = []
     _sync_files = get_list_sync_files(csv_s_dir)
     if len(_sync_files) == 0:
         print('nenhum arquivo de checkpoint de sincronização foi encontrado.')
-        print('não há garantia de que os arquivos foram sinzronizados.')
+        print('não há garantia de que os arquivos foram sincronizados.')
         return True
     elif len(_sync_files) > 1:
         print('há mais de 1 arquivo de checkpoint de sincronização.')
@@ -107,14 +113,18 @@ def setup_directory_00():
     :return:
     """
     print('setup_directory_01.')
-    if not check_base_ok():
+
+    working_dir = os.getcwd()
+    if not check_base_ok(working_dir):
         print('abortando setup.')
         exit(-1)
 
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     print(f'settings.json: {settings}')
 
-    temp_dir = os.path.join(working_dir, settings['temp_dir'])
-    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
+    temp_dir = str(os.path.join(working_dir, settings['temp_dir']))
+    csv_s_dir = str(os.path.join(working_dir, settings['csv_s_dir']))
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
@@ -136,14 +146,18 @@ def setup_directory_01():
     :return:
     """
     print('setup_directory_01.')
-    if not check_base_ok():
+
+    working_dir = os.getcwd()
+    if not check_base_ok(working_dir):
         print('abortando setup.')
         exit(-1)
 
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     print(f'settings.json: {settings}')
 
-    temp_dir = os.path.join(working_dir, settings['temp_dir'])
-    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
+    temp_dir = str(os.path.join(working_dir, settings['temp_dir']))
+    csv_s_dir = str(os.path.join(working_dir, settings['csv_s_dir']))
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
@@ -180,14 +194,18 @@ def setup_directory_02():
     :return:
     """
     print('setup_directory_02.')
-    if not check_base_ok():
+
+    working_dir = os.getcwd()
+    if not check_base_ok(working_dir):
         print('abortando setup.')
         exit(-1)
 
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     print(f'settings.json: {settings}')
 
-    temp_dir = os.path.join(working_dir, settings['temp_dir'])
-    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
+    temp_dir = str(os.path.join(working_dir, settings['temp_dir']))
+    csv_s_dir = str(os.path.join(working_dir, settings['csv_s_dir']))
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
@@ -225,6 +243,9 @@ def setup_symbols_02(hist: HistMulti, scalers: dict) -> HistMulti:
     -> 2) demais símbolos diferenciados e normalizados.
     :return:
     """
+    working_dir = os.getcwd()
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     symbol_out = settings['symbol_out']
 
     _hist = copy.deepcopy(hist)
@@ -251,14 +272,18 @@ def setup_directory_03():
     :return:
     """
     print('setup_directory_03.')
-    if not check_base_ok():
+
+    working_dir = os.getcwd()
+    if not check_base_ok(working_dir):
         print('abortando setup.')
         exit(-1)
 
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     print(f'settings.json: {settings}')
 
-    temp_dir = os.path.join(working_dir, settings['temp_dir'])
-    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
+    temp_dir = str(os.path.join(working_dir, settings['temp_dir']))
+    csv_s_dir = str(os.path.join(working_dir, settings['csv_s_dir']))
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
@@ -296,6 +321,9 @@ def setup_symbols_03(hist: HistMulti, scalers: dict) -> HistMulti:
     -> 3) demais símbolos diferenciados e normalizados;
     :return:
     """
+    working_dir = os.getcwd()
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     symbol_out = settings['symbol_out']
 
     _hist = copy.deepcopy(hist)
@@ -305,7 +333,7 @@ def setup_symbols_03(hist: HistMulti, scalers: dict) -> HistMulti:
 
     _hist.sort_symbols()
     normalize_symbols(_hist, scalers)
-    
+
     _hist.delete_first_row_symbol(symbol_out)
 
     return _hist
@@ -321,14 +349,18 @@ def setup_directory_04():
     :return:
     """
     print('setup_directory_04.')
-    if not check_base_ok():
+
+    working_dir = os.getcwd()
+    if not check_base_ok(working_dir):
         print('abortando setup.')
         exit(-1)
 
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     print(f'settings.json: {settings}')
 
-    temp_dir = os.path.join(working_dir, settings['temp_dir'])
-    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
+    temp_dir = str(os.path.join(working_dir, settings['temp_dir']))
+    csv_s_dir = str(os.path.join(working_dir, settings['csv_s_dir']))
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
@@ -393,14 +425,18 @@ def setup_directory_05():
     :return:
     """
     print('setup_directory_05.')
-    if not check_base_ok():
+
+    working_dir = os.getcwd()
+    if not check_base_ok(working_dir):
         print('abortando setup.')
         exit(-1)
 
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     print(f'settings.json: {settings}')
 
-    temp_dir = os.path.join(working_dir, settings['temp_dir'])
-    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
+    temp_dir = str(os.path.join(working_dir, settings['temp_dir']))
+    csv_s_dir = str(os.path.join(working_dir, settings['csv_s_dir']))
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
@@ -433,6 +469,9 @@ def setup_symbols_05(hist: HistMulti, scalers: dict) -> HistMulti:
     -> 3) demais símbolos transformados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
+    working_dir = os.getcwd()
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     symbol_out = settings['symbol_out']
 
     _hist = copy.deepcopy(hist)
@@ -456,14 +495,18 @@ def setup_directory_06():
     :return:
     """
     print('setup_directory_06.')
-    if not check_base_ok():
+
+    working_dir = os.getcwd()
+    if not check_base_ok(working_dir):
         print('abortando setup.')
         exit(-1)
 
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     print(f'settings.json: {settings}')
 
-    temp_dir = os.path.join(working_dir, settings['temp_dir'])
-    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
+    temp_dir = str(os.path.join(working_dir, settings['temp_dir']))
+    csv_s_dir = str(os.path.join(working_dir, settings['csv_s_dir']))
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
@@ -521,14 +564,18 @@ def setup_directory_07():
     :return:
     """
     print('setup_directory_07.')
-    if not check_base_ok():
+
+    working_dir = os.getcwd()
+    if not check_base_ok(working_dir):
         print('abortando setup.')
         exit(-1)
 
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     print(f'settings.json: {settings}')
 
-    temp_dir = os.path.join(working_dir, settings['temp_dir'])
-    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
+    temp_dir = str(os.path.join(working_dir, settings['temp_dir']))
+    csv_s_dir = str(os.path.join(working_dir, settings['csv_s_dir']))
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
 
@@ -623,14 +670,18 @@ def setup_directory_08():
     :return:
     """
     print('setup_directory_08.')
-    if not check_base_ok():
+
+    working_dir = os.getcwd()
+    if not check_base_ok(working_dir):
         print('abortando setup.')
         exit(-1)
 
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     print(f'settings.json: {settings}')
 
-    temp_dir = os.path.join(working_dir, settings['temp_dir'])
-    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
+    temp_dir = str(os.path.join(working_dir, settings['temp_dir']))
+    csv_s_dir = str(os.path.join(working_dir, settings['csv_s_dir']))
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
@@ -671,6 +722,9 @@ def setup_symbols_08(hist: HistMulti, scalers: dict) -> HistMulti:
     -> 3) demais símbolos diferenciados, transformados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
+    working_dir = os.getcwd()
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     symbol_out = settings['symbol_out']
 
     _hist = copy.deepcopy(hist)
@@ -697,14 +751,18 @@ def setup_directory_09():
     :return:
     """
     print('setup_directory_09.')
-    if not check_base_ok():
+
+    working_dir = os.getcwd()
+    if not check_base_ok(working_dir):
         print('abortando setup.')
         exit(-1)
 
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     print(f'settings.json: {settings}')
 
-    temp_dir = os.path.join(working_dir, settings['temp_dir'])
-    csv_s_dir = os.path.join(working_dir, settings['csv_s_dir'])
+    temp_dir = str(os.path.join(working_dir, settings['temp_dir']))
+    csv_s_dir = str(os.path.join(working_dir, settings['csv_s_dir']))
     symbol_out = settings['symbol_out']
     timeframe = settings['timeframe']
     symbols_names, symbols_paths = search_symbols(csv_s_dir, timeframe)
@@ -743,6 +801,9 @@ def setup_symbols_09(hist: HistMulti, scalers: dict) -> HistMulti:
     -> 3) demais símbolos transformados, diferenciados e normalizados (1 coluna Y: (C-O)*V);
     :return:
     """
+    working_dir = os.getcwd()
+    settings_filepath = os.path.join(working_dir, 'settings.json')
+    settings = read_json(settings_filepath)
     symbol_out = settings['symbol_out']
 
     _hist = copy.deepcopy(hist)
@@ -808,7 +869,8 @@ def apply_setup_symbols(hist: HistMulti, code: int, scalers: dict) -> HistMulti:
         exit(-1)
 
 
-if __name__ == '__main__':
+def run_setup():
+    print('run_setup()')
     working_dir = os.getcwd()
     settings_filepath = os.path.join(working_dir, 'settings.json')
     settings = read_json(settings_filepath)
@@ -819,3 +881,7 @@ if __name__ == '__main__':
     else:
         setup_directory_00()
         print('nenhuma normalização/transformação foi aplicada ao histórico.')
+
+
+if __name__ == '__main__':
+    run_setup()

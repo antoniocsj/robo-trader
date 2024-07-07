@@ -38,12 +38,12 @@ class Sheet:
             print(f'Há dados faltando no arquivo {self.filepath}')
             exit(-1)
 
-        if len(self.df.columns) == 2:
-            self.df.columns = ['DATETIME', 'T']
-        else:
-            self.df.columns = ['DATETIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'TICKVOL']
+        # if len(self.df.columns) == 2:
+        #     self.df.columns = ['DATETIME', 'T']
+        # else:
+        #     self.df.columns = ['DATETIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'TICKVOL']
 
-    def create_df_from_rates(self) -> pd.DataFrame:
+    def create_df_from_rates_(self) -> pd.DataFrame:
         _df: pd.DataFrame
         _list_ = []
         for rate in self.rates:
@@ -51,6 +51,16 @@ class Sheet:
             _list_.append(_row)
         _df = pd.DataFrame(_list_)
         _df.columns = ['DATETIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'TICKVOL']
+        return _df
+
+    def create_df_from_rates(self) -> pd.DataFrame:
+        _df: pd.DataFrame
+        _list_ = []
+        for rate in self.rates:
+            _row = [i for i in rate.values()]
+            _list_.append(_row)
+        _df = pd.DataFrame(_list_)
+        _df.columns = [i for i in self.rates[0]]
         return _df
 
     def get_timedelta(self) -> timedelta:

@@ -20,16 +20,16 @@ tf.keras.utils.set_random_seed(1)
 
 import time
 from src.HistMulti import HistMulti
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import Flatten
-from keras.layers import Conv1D
-from keras.layers import MaxPooling1D
-from keras.callbacks import EarlyStopping
+from keras.api.models import Sequential
+from keras.api.layers import Dense
+from keras.api.layers import Flatten
+from keras.api.layers import Conv1D
+from keras.api.layers import MaxPooling1D
+from keras.api.callbacks import EarlyStopping
 
 tf.keras.utils.set_random_seed(1)
 
-from src.utils.utils_nn import split_sequences2, prepare_train_data2
+from src.utils.utils_nn import split_sequences, prepare_train_data_candles
 from src.utils.utils_filesystem import read_json
 
 
@@ -50,10 +50,10 @@ def train_model_param(settings: dict, hist: HistMulti, params: dict) -> float:
     validation_split = 0.2
 
     # horizontally stack columns
-    dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
+    dataset_train = prepare_train_data_candles(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
 
     # convert into input/output
-    X_train, y_train = split_sequences2(dataset_train, n_steps, candle_output_type)
+    X_train, y_train = split_sequences(dataset_train, n_steps, candle_output_type)
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
     # features to expect for each input sample.
@@ -79,9 +79,9 @@ def train_model_param(settings: dict, hist: HistMulti, params: dict) -> float:
     n_samples_test = 100
     samples_index_start = n_samples_train
 
-    dataset_test = prepare_train_data2(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
-                                       candle_output_type)
-    X_test, y_test = split_sequences2(dataset_test, n_steps, candle_output_type)
+    dataset_test = prepare_train_data_candles(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
+                                              candle_output_type)
+    X_test, y_test = split_sequences(dataset_test, n_steps, candle_output_type)
 
     test_loss_eval = model.evaluate(X_test, y_test, verbose=0)
 
