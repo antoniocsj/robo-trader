@@ -4,10 +4,12 @@
 
 import os
 import time
+import shutil
 
 from src.utils.utils_checks import initial_compliance_checks
 from src.utils.utils_filesystem import read_json, write_json
 from neural_trainer_utils import train_model, get_time_break_from_timeframe
+from src.setups import run_setup
 
 
 # tanto a pesquisa básica quanto a pesquisa profunda, usam os parâmetros definidos em params_rs_search.json
@@ -15,9 +17,11 @@ params_rs_search = read_json('params_rs_search.json')
 filename_basic = 'rs_basic_search.json'
 
 
-def create_rs_basic_search_json():
-    if not os.path.exists(filename_basic):
-        print(f'o arquivo {filename_basic} não existe ainda. será criado agora.')
+def create_rs_basic_search_json(results_dir: str):
+    filepath_basic = os.path.join(results_dir, filename_basic)
+
+    if not os.path.exists(filepath_basic):
+        print(f'o arquivo {filepath_basic} não existe ainda. será criado agora.')
         _dict = {
             'n_basic_experiments': 0,
             'symbol_out': '',
@@ -39,25 +43,37 @@ def create_rs_basic_search_json():
             'basic_experiments': [],
             'sorted_basic_experiments': []
         }
-        write_json(filename_basic, _dict)
+        write_json(filepath_basic, _dict)
     else:
-        print(f'o arquivo {filename_basic} já existe. continuando os experimentos.')
+        print(f'o arquivo {filepath_basic} já existe. continuando os experimentos.')
 
 
-def load_rs_basic_search_json() -> dict:
-    if os.path.exists(filename_basic):
-        _dict = read_json(filename_basic)
+def load_rs_basic_search_json(results_dir: str) -> dict:
+    filepath_basic = os.path.join(results_dir, filename_basic)
+    if os.path.exists(filepath_basic):
+        _dict = read_json(filepath_basic)
         return _dict
     else:
-        print(f'ERRO. o arquivo {filename_basic} não existe.')
+        print(f'ERRO. o arquivo {filepath_basic} não foi encontrado no diretório {results_dir}')
         exit(-1)
 
 
-def update_rs_basic_search_json(_dict: dict):
-    if os.path.exists(filename_basic):
-        write_json(filename_basic, _dict)
+def try_load_rs_basic_search_json(results_dir: str) -> dict or None:
+    filepath_basic = os.path.join(results_dir, filename_basic)
+    if os.path.exists(filepath_basic):
+        _dict = read_json(filepath_basic)
+        return _dict
     else:
-        print(f'ERRO. o arquivo {filename_basic} não existe.')
+        print(f'AVISO. o arquivo {filepath_basic} não foi encontrado no diretório {results_dir}')
+        return None
+
+
+def update_rs_basic_search_json(results_dir: str, _dict: dict):
+    filepath_basic = os.path.join(results_dir, filename_basic)
+    if os.path.exists(filepath_basic):
+        write_json(filepath_basic, _dict)
+    else:
+        print(f'ERRO. o arquivo {filepath_basic} não existe.')
         exit(-1)
 
 
@@ -68,12 +84,38 @@ def nn_train_rs_basic_search():
     initial_compliance_checks(working_dir)
 
     settings = read_json('settings.json')
-    create_rs_basic_search_json()
-    time_break_secs: int = get_time_break_from_timeframe(settings['timeframe'])
+    # time_break_secs: int = get_time_break_from_timeframe(settings['timeframe'])
+    time_break_secs = 0
     random_seed_max: int = params_rs_search['random_seed_max']
 
+    # Create save directory if not exists
+    results_dir = os.path.join(working_dir, settings['results_dir'])
+
+    if os.path.exists(results_dir):
+        # se o diretório 'results' já existe, verifica se a busca básica já foi concluída.
+        rs_basic_search = try_load_rs_basic_search_json(results_dir)
+        # se a busca básica ainda não foi concluída, então continua os experimentos.
+        if rs_basic_search and rs_basic_search['n_basic_experiments'] < random_seed_max:
+            print('o arquivo rs_basic_search.json já existe no diretório de resultados. continuando os experimentos.')
+        # se a busca básica já foi concluída, então apaga o diretório de resultados e reinicia a busca.
+        elif rs_basic_search and rs_basic_search['n_basic_experiments'] >= random_seed_max:
+            print(f'o arquivo rs_basic_search.json indica que a busca básica já foi concluída. '
+                  f'n_basic_experiments = {rs_basic_search["n_basic_experiments"]} == '
+                  f'params_rs_search["random_seed_max"] ({random_seed_max})')
+            shutil.rmtree(results_dir)
+            os.makedirs(results_dir)
+        else:
+            # se o arquivo rs_basic_search.json não foi encontrado, então apaga o diretório de resultados e reinicia a busca.
+            print('ERRO. o arquivo rs_basic_search.json não foi encontrado no diretório de resultados. resetando o diretório.')
+            shutil.rmtree(results_dir)
+            os.makedirs(results_dir)
+    else:
+        os.makedirs(results_dir)
+
+    create_rs_basic_search_json(results_dir)
+
     while True:
-        rs_basic_search = load_rs_basic_search_json()
+        rs_basic_search = load_rs_basic_search_json(results_dir)
         n_basic_experiments: int = rs_basic_search['n_basic_experiments']
         index = n_basic_experiments + 1
 
@@ -82,7 +124,7 @@ def nn_train_rs_basic_search():
                   f'params_rs_search["random_seed_max"] ({random_seed_max})')
             break
 
-        train_config = train_model(settings, params_rs_search=params_rs_search, seed=index, patience_style='short')
+        train_config = train_model(working_dir, settings, params_rs_search, seed=index, patience_style='short')
 
         whole_set_train_loss_eval = train_config['whole_set_train_loss_eval']
         test_loss_eval = train_config['test_loss_eval']
@@ -125,7 +167,7 @@ def nn_train_rs_basic_search():
         sorted_basic_experiments = sorted(basic_experiments, key=lambda d: d['losses_product'])
         rs_basic_search['sorted_basic_experiments'] = sorted_basic_experiments
 
-        update_rs_basic_search_json(rs_basic_search)
+        update_rs_basic_search_json(results_dir, rs_basic_search)
 
         # sempre espera alguns segundos para não superaquecer a placa de vídeo
         # o 'if' é para não precisar esperar após o último experimento
@@ -143,4 +185,5 @@ if __name__ == '__main__':
     _settings['random_seed'] = 1
     write_json('settings.json', _settings)
 
+    run_setup()
     nn_train_rs_basic_search()

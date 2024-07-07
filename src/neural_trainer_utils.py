@@ -1,13 +1,16 @@
 import os
+import shutil
+from time import time
 
 
-def train_model(settings: dict, params_rs_search: dict, seed: int, patience_style: str):
+def train_model(working_dir: str, settings: dict, params_rs_search: dict, seed: int, patience_style: str):
     """
 
     :param settings:
     :param params_rs_search:
     :param seed:
     :param patience_style: short or long
+    :param working_dir:
     :return:
     """
     random_seed = seed
@@ -31,10 +34,10 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
     keras.utils.set_random_seed(random_seed)
 
     from keras.api.models import Sequential, load_model
-    from keras.api.layers import Input, Dense, Flatten, Conv1D, MaxPooling1D, LSTM
+    from keras.api.layers import Input, Dense, Flatten, Conv1D, MaxPooling1D, AveragePooling1D, LSTM
     from keras.api.callbacks import EarlyStopping, ModelCheckpoint
     from HistMulti import HistMulti
-    from src.utils.utils_nn import split_sequences, prepare_train_data_candles
+    from src.utils.utils_nn import split_sequences
 
     print(tf.__version__)
     print(tf.config.list_physical_devices('GPU'))
@@ -47,7 +50,9 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
     timeframe = settings['timeframe']
     candle_input_type = settings['candle_input_type']
     candle_output_type = settings['candle_output_type']
-    hist = HistMulti(temp_dir, timeframe, symbols_allowed=[symbol_out])
+    csv_content = settings['csv_content']
+
+    hist = HistMulti(temp_dir, timeframe, symbolout=symbol_out)
     datetime_start = hist.arr[symbol_out][timeframe][0][0]
     datetime_end = hist.arr[symbol_out][timeframe][-1][0]
 
@@ -56,20 +61,29 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
               f'em settings.json ({timeframe})')
         exit(-1)
 
+    # Create save directory if not exists
+    results_dir = os.path.join(working_dir, settings['results_dir'])
+
+    # # se o diretório 'results' já existe, delete-o e recrie-o.
+    # if os.path.exists(results_dir):
+    #     shutil.rmtree(results_dir)
+    # os.makedirs(results_dir)
+
     n_steps: int = params_rs_search['n_steps']
     n_hidden_layers: int = params_rs_search['n_hidden_layers']
-    validation_split = 0.2
-    samples_test_ratio = 0.02
+    validation_split = settings['validation_split']
+    samples_test_ratio = settings['samples_test_ratio']
 
     n_rows = hist.arr[symbol_out][timeframe].shape[0]
+
     n_samples_test = int(n_rows * samples_test_ratio)  # Número de amostras inéditas usadas na fase de avaliação.
     n_samples_train = n_rows - n_samples_test  # Número de amostras usadas na fase de treinamento e validação
-
-    # horizontally stack columns
-    dataset_train = prepare_train_data_candles(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
+    dataset_test, dataset_train = prepare_samples(hist, symbol_out, csv_content, candle_input_type, candle_output_type,
+                                                  n_samples_train, n_samples_test)
 
     # convert into input/output samples
     X_train, y_train = split_sequences(dataset_train, n_steps, candle_output_type)
+    X_test, y_test = split_sequences(dataset_test, n_steps, candle_output_type)
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
     # features to expect for each input sample.
@@ -95,9 +109,10 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
           f'validation_split = {validation_split}, samples_test_ratio = {samples_test_ratio}\n'
           f'n_samples_train = {n_samples_train}, n_samples_test = {n_samples_test}')
 
-    model = Sequential()
+    model_type = settings['model_type']
 
-    model_type = 'LSTM'
+    # Instantiate model
+    model = Sequential()
     n_neurons = n_inputs
 
     # input layer
@@ -107,12 +122,11 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
         n_filters = n_features
         kernel_size = n_steps
         pool_size = n_inputs
-        # model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu', input_shape=(n_steps, n_features)))
         model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu'))
-        model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
+        # model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
+        model.add(AveragePooling1D(pool_size=pool_size, padding='same'))
         model.add(Flatten())
     elif model_type == 'LSTM':
-        # model.add(LSTM(n_inputs, activation='relu', input_shape=(n_steps, n_features)))
         model.add(LSTM(n_inputs, activation='relu'))
     else:
         print(f'ERRO. model_type ({model_type}) inválido.')
@@ -134,10 +148,16 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
     print(f'n_samples_train * validation_split = {n_samples_train} * {validation_split} = '
           f'{int(n_samples_train * validation_split)}).')
 
+    model_filepath = os.path.join(results_dir, 'model.keras')
+
     callbacks = [EarlyStopping(monitor='val_loss', patience=patience, verbose=1),
-                 ModelCheckpoint(filepath='model.keras', monitor='val_loss', save_best_only=True, verbose=1)]
-    history = model.fit(X_train, y_train, epochs=max_n_epochs, verbose=1,
-                        validation_split=validation_split, callbacks=callbacks)
+                 ModelCheckpoint(filepath=model_filepath, monitor='val_loss', save_best_only=True, verbose=1)]
+
+    # Fit model
+    t0 = time()
+    history = model.fit(X_train, y_train, epochs=max_n_epochs, verbose=1, validation_split=validation_split, callbacks=callbacks)
+    training_time = time() - t0
+    print('Training time: ', training_time)
 
     effective_n_epochs = len(history.history['loss'])
     loss, val_loss = history.history['loss'], history.history['val_loss']
@@ -147,18 +167,12 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
               'min_val_loss': {'value': min_val_loss, 'index': i_min_val_loss, 'epoch': i_min_val_loss + 1}}
 
     print(f'avaliando o modelo no conjunto inteiro das amostras de treinamento.')
-    saved_model = load_model('model.keras')
+    saved_model = load_model(model_filepath)
     whole_set_train_loss_eval = saved_model.evaluate(X_train, y_train, verbose=0)
     print(f'whole_set_train_loss_eval: {whole_set_train_loss_eval:} (n_samples_train = {n_samples_train})')
 
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
-    samples_index_start = n_samples_train - 1
-    dataset_test = prepare_train_data_candles(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
-                                              candle_output_type)
-
-    X_test, y_test = split_sequences(dataset_test, n_steps, candle_output_type)
-
-    saved_model = load_model('model.keras')
+    saved_model = load_model(model_filepath)
     test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)
     print(f'test_loss_eval: {test_loss_eval} (n_samples_test = {n_samples_test})')
 
@@ -184,6 +198,7 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
         'patience': patience,
         'datetime_start': datetime_start,
         'datetime_end': datetime_end,
+        'training_time': training_time,
         'whole_set_train_loss_eval': whole_set_train_loss_eval,
         'samples_test_ratio': samples_test_ratio,
         'n_samples_test': n_samples_test,
@@ -197,6 +212,36 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
     }
 
     return train_config
+
+
+def prepare_samples(hist, symbol_out, csv_content, candle_input_type, candle_output_type, n_samples_train, n_samples_test):
+    """
+    :param hist: The historical data used to prepare the samples.
+    :param symbol_out: The symbol or identifier of the output.
+    :param csv_content: The type of CSV content. It can be either 'HETEROGENEOUS_OHLCV' or 'HETEROGENEOUS_DEFAULT'.
+    :param candle_input_type: The type of input candle.
+    :param candle_output_type: The type of output candle.
+    :param n_samples_train: The number of samples for training.
+    :param n_samples_test: The number of samples for testing.
+    :return: A tuple containing the training and testing datasets.
+
+    """
+    from src.utils.utils_nn import prepare_train_data_candles, prepare_train_data_indicators
+
+    samples_index_start = n_samples_train - 1
+
+    if csv_content == 'HETEROGENEOUS_OHLCV':
+        dataset_train = prepare_train_data_candles(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
+        dataset_test = prepare_train_data_candles(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
+                                                  candle_output_type)
+    elif csv_content == 'HETEROGENEOUS_DEFAULT':
+        dataset_train = prepare_train_data_indicators(hist, symbol_out, 0, n_samples_train)
+        dataset_test = prepare_train_data_indicators(hist, symbol_out, samples_index_start, n_samples_test)
+    else:
+        print(f'ERRO. csv_content ({csv_content}) inválido.')
+        exit(-1)
+
+    return dataset_train, dataset_test
 
 
 def get_time_break_from_timeframe(tf: str):

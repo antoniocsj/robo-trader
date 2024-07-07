@@ -2,11 +2,14 @@
     "symbol_out": "XAUUSD-MA(5)",
     "timeframe": "M15",
     "deterministic": true,
-    "random_seed": 1,
+    "random_seed": 7,
     "temp_dir": "../temp",
     "csv_s_dir": "../csv_s",
     "csv_o_dir": "../csv_o",
     "root_cache_dir": "../csv_s_cache",
+    "results_dir": "../results",
+    "predictors_root_dir": "../predictors",
+    "repository_root": "/home/gotardo/PycharmProjects/robo-trader",
     "candle_input_type": "C",
     "candle_output_type": "C",
     "setup_code": 1,
@@ -16,5 +19,8 @@
     "scaler_feature_range": [
         0,
         1
-    ]
+    ],
+    "validation_split": 0.2,
+    "samples_test_ratio": 0.02,
+    "model_type": "CNN"
 }

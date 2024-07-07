@@ -9,7 +9,8 @@ import time
 from src.utils.utils_checks import initial_compliance_checks
 from src.utils.utils_filesystem import read_json, write_json
 from neural_trainer_utils import train_model, get_time_break_from_timeframe
-
+from src.setups import run_setup
+from src.neural_trainer_02A import load_rs_basic_search_json
 
 params_rs_search = read_json('params_rs_search.json')
 filename_basic = 'rs_basic_search.json'
@@ -21,22 +22,13 @@ filename_deep = 'rs_deep_search.json'
 deep_search_range = params_rs_search['deep_search_range']
 
 
-def load_rs_basic_search_json() -> dict:
-    if os.path.exists(filename_basic):
-        _dict = read_json(filename_basic)
-        return _dict
-    else:
-        print(f'ERRO. o arquivo {filename_basic} não existe.')
-        exit(-1)
-
-
 def print_list(_list: list):
     for i in range(len(_list)):
         print(f'{i:03d} {_list[i]}')
     print('')
 
 
-def create_rs_deep_search_json():
+def create_rs_deep_search_json(results_dir: str):
     """
     Cria o arquivo que guarda o status da pesquisa mais profunda do melhor random seed (rs_deeper_search.json).
     Antes de criar esse arquivo é necessário já existir um arquivo rs_basic_search.json válido contendo
@@ -45,47 +37,45 @@ def create_rs_deep_search_json():
     complexo.
     :return:
     """
-    if not os.path.exists(filename_basic):
-        print(f'ERRO. o arquivo {filename_basic} não existe.')
+    filepath_basic = os.path.join(results_dir, filename_basic)
+    filepath_deep = os.path.join(results_dir, filename_deep)
+
+    # é necessário que o arquivo rs_basic_search.json exista, pois isso indica que a busca básica já foi completada.
+    if not os.path.exists(filepath_basic):
+        print(f'ERRO. o arquivo {filepath_basic} não existe.')
         exit(-1)
-    else:
-        rs_basic_search = load_rs_basic_search_json()
 
-        timeframe_1, timeframe_2 = params_rs_search['timeframe'], rs_basic_search['timeframe']
-        candle_input_type_1, candle_input_type_2 = params_rs_search['candle_input_type'], rs_basic_search['candle_input_type']
+    rs_basic_search = load_rs_basic_search_json(results_dir)
 
-        n_steps_1, n_steps_2 = params_rs_search['n_steps'], rs_basic_search['n_steps']
-        n_hidden_layers_1, n_hidden_layers_2 = params_rs_search['n_hidden_layers'], rs_basic_search['n_hidden_layers']
+    timeframe_1, timeframe_2 = params_rs_search['timeframe'], rs_basic_search['timeframe']
+    candle_input_type_1, candle_input_type_2 = params_rs_search['candle_input_type'], rs_basic_search['candle_input_type']
 
-        # verificar se os parametros de rs_basic_search.json são idênticos aos definidos em params_rs_search.json
-        if not (timeframe_1 == timeframe_2 and candle_input_type_1 == candle_input_type_2 and
-                n_steps_1 == n_steps_2 and n_hidden_layers_1 == n_hidden_layers_2):
-            print('ERRO. os parametros de rs_basic_search.json NÃO são idênticos aos definidos em params_rs_search.json')
-            exit(-1)
+    n_steps_1, n_steps_2 = params_rs_search['n_steps'], rs_basic_search['n_steps']
+    n_hidden_layers_1, n_hidden_layers_2 = params_rs_search['n_hidden_layers'], rs_basic_search['n_hidden_layers']
 
-        n_basic_experiments: int = rs_basic_search['n_basic_experiments']
-        random_seed_max = params_rs_search['random_seed_max']
+    # verificar se os parametros de rs_basic_search.json são idênticos aos definidos em params_rs_search.json
+    if not (timeframe_1 == timeframe_2 and candle_input_type_1 == candle_input_type_2 and
+            n_steps_1 == n_steps_2 and n_hidden_layers_1 == n_hidden_layers_2):
+        print('ERRO. os parametros de rs_basic_search.json NÃO são idênticos aos definidos em params_rs_search.json')
+        exit(-1)
 
-        if n_basic_experiments < random_seed_max:
-            print(f'ERRO! o arquivo {filename_basic} indica que o scan dos random seeds não foi completado ainda.')
-            print(f'n_basic_experiments ({n_basic_experiments}) < random_seed_max ({random_seed_max})')
+    n_basic_experiments: int = rs_basic_search['n_basic_experiments']
+    random_seed_max = params_rs_search['random_seed_max']
 
-            # é possível que já exista um arquivo rs_deeper_search.json remanescente de uma busca anterior, contendo
-            # dados que você não gostaria de perder, já que foram obtidos com treinamentos longos (patience_long).
-            # isso pode acontecer, por exemplo, se você alterar algumas informações em params_rs_search.json, como
-            # 'random_seed_max' ou 'deep_search_range'.
-            # ainda deve ser implementada a lógica relacionada ao aproveitamento das informações contida no arquivo
-            # rs_deeper_search.json remanescente antes de continuar a busca aprofundada, para evitar treinar a rede
-            # de novo com os mesmos random seeds.
-            # se houver um arquivo rs_deeper_search.json, delete-o, pois ele não está valido, um vez que
-            # rs_basic_search.json indica que a busca básica ainda está incompleta.
-            if os.path.exists(filename_deep):
-                print(f'há um arquivo remanescente de busca aprofundada: {filename_deep}')
+    # aborta se a busca básica ainda não foi completada
+    if n_basic_experiments < random_seed_max:
+        print(f'ERRO! o arquivo {filename_basic} indica que o scan dos random seeds não foi completado ainda.')
+        print(f'n_basic_experiments ({n_basic_experiments}) < random_seed_max ({random_seed_max})')
+        # se houver um arquivo rs_deeper_search.json, delete-o, pois ele não está valido, um vez que
+        # rs_basic_search.json indica que a busca básica ainda está incompleta.
+        if os.path.exists(filepath_deep):
+            print(f'há um arquivo remanescente de busca aprofundada: {filepath_deep}. deletando-o.')
+            os.remove(filepath_deep)
+        exit(-1)
 
-            exit(-1)
-
-    if not os.path.exists(filename_deep):
-        print(f'o arquivo {filename_deep} não existe ainda. será criado agora.')
+    # se o arquivo rs_deeper_search.json não existe, então crie-o.
+    if not os.path.exists(filepath_deep):
+        print(f'o arquivo {filepath_deep} não existe ainda. será criado agora.')
 
         # o arquivo rs_deeper_search.json será inicialmente quase idêntico ao arquivo rs_basic_search.json, as
         # diferenças serão as seguintes
@@ -107,45 +97,56 @@ def create_rs_deep_search_json():
         _dict['deep_experiments'] = []
         _dict['sorted_deep_experiments'] = []
         _dict['best_deep_random_seed'] = -1
-        write_json(filename_deep, _dict)
+        write_json(filepath_deep, _dict)
     else:
-        print(f'o arquivo {filename_deep} já existe. continuando a pesquisa do melhor random seed.')
+        print(f'o arquivo {filepath_deep} já existe. continuando a pesquisa do melhor random seed.')
 
 
-def load_rs_deep_search_json() -> dict:
-    if os.path.exists(filename_deep):
-        _dict = read_json(filename_deep)
+def load_rs_deep_search_json(results_dir: str) -> dict:
+    filepath_deep = os.path.join(results_dir, filename_deep)
+    if os.path.exists(filepath_deep):
+        _dict = read_json(filepath_deep)
         return _dict
     else:
-        print(f'ERRO. o arquivo {filename_deep} não existe.')
+        print(f'ERRO. o arquivo {filepath_deep} não existe.')
         exit(-1)
 
 
-def update_rs_deep_search_json(_dict: dict):
-    if os.path.exists(filename_deep):
-        write_json(filename_deep, _dict)
+def update_rs_deep_search_json(results_dir: str, _dict: dict):
+    filepath_deep = os.path.join(results_dir, filename_deep)
+    if os.path.exists(filepath_deep):
+        write_json(filepath_deep, _dict)
     else:
-        print(f'ERRO. o arquivo {filename_deep} não existe.')
+        print(f'ERRO. o arquivo {filepath_deep} não existe.')
         exit(-1)
 
 
 def nn_train_rs_deep_search():
     print('nn_train_rs_deep_search')
 
-    initial_compliance_checks()
+    working_dir = os.getcwd()
+    initial_compliance_checks(working_dir)
 
     settings = read_json('settings.json')
-    time_break_secs: int = get_time_break_from_timeframe(settings['timeframe']) * 3
+    # time_break_secs: int = get_time_break_from_timeframe(settings['timeframe']) * 3
+    time_break_secs = 0
 
-    create_rs_deep_search_json()
+    results_dir = os.path.join(working_dir, settings['results_dir'])
 
-    rs_deep_search = load_rs_deep_search_json()
+    # se o diretório 'results' não já existe, então aborte, pois a busca básica ainda não foi iniciada.
+    if not os.path.exists(results_dir):
+        print('ERRO. o diretório de resultados não existe. a busca básica ainda não foi iniciada.')
+        exit(-1)
+
+    create_rs_deep_search_json(results_dir)
+    rs_deep_search = load_rs_deep_search_json(results_dir)
 
     # refaz o treinamento dos N primeiros experimentos de 'sorted_basic_experiments', onde N = deep_search_range,
     # porém, desta vez, o treinamento das redes neurais será com 'patience' = patience_long
     N = rs_deep_search['deep_search_range']
     sorted_basic_experiments = rs_deep_search['sorted_basic_experiments']
 
+    # verifica se deep_search_range é maior que o número de experimentos básicos
     if N > len(sorted_basic_experiments):
         print(f'ERRO. deep_search_range ({N}) > len(sorted_basic_experiments) ({len(sorted_basic_experiments)})')
         exit(-1)
@@ -159,7 +160,7 @@ def nn_train_rs_deep_search():
         sorted_deep_experiments = rs_deep_search['sorted_deep_experiments']
         best_deep_random_seed = sorted_deep_experiments[0]['random_seed']
         rs_deep_search['best_deep_random_seed'] = best_deep_random_seed
-        update_rs_deep_search_json(rs_deep_search)
+        update_rs_deep_search_json(results_dir, rs_deep_search)
         print(f'best_deep_random_seed = {best_deep_random_seed}')
         print(f'{sorted_deep_experiments[0]}')
         exit(0)
@@ -169,7 +170,7 @@ def nn_train_rs_deep_search():
         print(e)
         seed: int = e['random_seed']
 
-        train_config = train_model(settings, params_rs_search, seed, patience_style='long')
+        train_config = train_model(working_dir, settings, params_rs_search, seed, patience_style='long')
 
         whole_set_train_loss_eval = train_config['whole_set_train_loss_eval']
         test_loss_eval = train_config['test_loss_eval']
@@ -208,7 +209,7 @@ def nn_train_rs_deep_search():
         rs_deep_search['n_deep_experiments'] = len(rs_deep_search['deep_experiments'])
         rs_deep_search['sorted_deep_experiments'] = sorted(rs_deep_search['deep_experiments'],
                                                            key=lambda d: d['losses_product'])
-        update_rs_deep_search_json(rs_deep_search)
+        update_rs_deep_search_json(results_dir, rs_deep_search)
 
         # sempre espera alguns segundos para não superaquecer a placa de vídeo
         # o 'if' é para não precisar esperar após o último experimento
@@ -218,15 +219,16 @@ def nn_train_rs_deep_search():
         else:
             break
 
-    rs_deep_search = load_rs_deep_search_json()
+    rs_deep_search = load_rs_deep_search_json(results_dir)
     sorted_deep_experiments = rs_deep_search['sorted_deep_experiments']
     best_deep_random_seed = sorted_deep_experiments[0]['random_seed']
     rs_deep_search['best_deep_random_seed'] = best_deep_random_seed
-    update_rs_deep_search_json(rs_deep_search)
+    update_rs_deep_search_json(results_dir, rs_deep_search)
     print(f'best_deep_random_seed = {best_deep_random_seed}')
     print(f'{sorted_deep_experiments[0]}')
     pass
 
 
 if __name__ == '__main__':
+    run_setup()
     nn_train_rs_deep_search()

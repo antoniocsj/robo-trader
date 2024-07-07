@@ -4,6 +4,7 @@ from src.HistMulti import HistMulti
 
 
 # usada na criação de amostras de treinamento das redes neurais.
+# returns horizontally stack columns
 def prepare_train_data_candles(hist: HistMulti, symbol_out: str, start_index: int, num_candles: int,
                                candle_input_type: str, candle_output_type: str) -> ndarray:
     _data = []
@@ -214,6 +215,7 @@ def prepare_train_data_candles(hist: HistMulti, symbol_out: str, start_index: in
 
 # usada na criação de amostras de treinamento das redes neurais
 # esta versão deve ser usada quando os símbolos/CSVs contém dados de indicadores e não de candles.
+# returns horizontally stack columns
 def prepare_train_data_indicators(hist: HistMulti, symbol_out: str, start_index: int, num_candles: int) -> ndarray:
     _data = []
     timeframe = hist.timeframe

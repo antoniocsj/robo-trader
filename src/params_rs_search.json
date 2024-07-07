@@ -2,7 +2,7 @@
     "timeframe": "M15",
     "candle_input_type": "C",
     "n_steps": 2,
-    "n_hidden_layers": 0,
+    "n_hidden_layers": 1,
     "max_n_epochs": 150,
     "patience_short": 5,
     "patience_long": 15,

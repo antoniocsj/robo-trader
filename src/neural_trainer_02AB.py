@@ -1,4 +1,5 @@
 from src.utils.utils_filesystem import read_json, write_json
+from src.setups import run_setup
 from neural_trainer_02A import nn_train_rs_basic_search
 from neural_trainer_02B import nn_train_rs_deep_search
 
@@ -13,6 +14,7 @@ def main():
     _settings['random_seed'] = 1
     write_json('settings.json', _settings)
 
+    run_setup()
     nn_train_rs_basic_search()
     nn_train_rs_deep_search()
 

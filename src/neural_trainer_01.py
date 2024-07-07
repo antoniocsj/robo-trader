@@ -31,14 +31,14 @@ def train_model(deterministic: bool = True, seed: int = 1):
         keras.utils.set_random_seed(random_seed)
 
     from keras.api.models import Sequential, load_model
-    from keras.api.layers import Dense, Flatten, Conv1D, MaxPooling1D
+    from keras.api.layers import Dense, Flatten, Conv1D, MaxPooling1D, AveragePooling1D
     from keras.api.callbacks import EarlyStopping, ModelCheckpoint
 
     if deterministic:
         keras.utils.set_random_seed(random_seed)
 
     from HistMulti import HistMulti
-    from src.utils.utils_nn import split_sequences, prepare_train_data_candles
+    from src.utils.utils_nn import split_sequences, prepare_train_data_indicators
 
     print(tf.__version__)
     print(tf.config.list_physical_devices('GPU'))
@@ -55,7 +55,8 @@ def train_model(deterministic: bool = True, seed: int = 1):
     timeframe = settings['timeframe']
     candle_input_type = settings['candle_input_type']
     candle_output_type = settings['candle_output_type']
-    hist = HistMulti(temp_dir, timeframe, symbols_allowed=[symbol_out])
+
+    hist = HistMulti(temp_dir, timeframe, symbolout=symbol_out)
     datetime_start = hist.arr[symbol_out][timeframe][0][0]
     datetime_end = hist.arr[symbol_out][timeframe][-1][0]
 
@@ -74,7 +75,8 @@ def train_model(deterministic: bool = True, seed: int = 1):
     n_samples_train = n_rows - n_samples_test  # Número de amostras usadas na fase de treinamento e validação
 
     # horizontally stack columns
-    dataset_train = prepare_train_data_candles(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
+    # dataset_train = prepare_train_data_candles(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)
+    dataset_train = prepare_train_data_indicators(hist, symbol_out, 0, n_samples_train)
 
     # convert into input/output samples
     X_train, y_train = split_sequences(dataset_train, n_steps, candle_output_type)
@@ -104,18 +106,13 @@ def train_model(deterministic: bool = True, seed: int = 1):
     # define cnn model
     # input layer
     model.add(Conv1D(filters=n_filters, kernel_size=kernel_size, activation='relu', input_shape=(n_steps, n_features)))
-    model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
+    # model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
+    model.add(AveragePooling1D(pool_size=pool_size, padding='same'))
     model.add(Flatten())
 
     # hidden layers
     for i in range(n_hidden_layers):
         model.add(Dense(n_neurons, activation='relu'))
-
-    # define MLP model
-    # n_input = X_train.shape[1] * X_train.shape[2]
-    # X_train = X_train.reshape((X_train.shape[0], n_input))
-    # model.add(Dense(n_inputs, activation='relu', input_dim=n_input))
-    # model.add(Dense(n_inputs, activation='relu'))
 
     # output layer
     model.add(Dense(len(candle_output_type)))
@@ -146,8 +143,7 @@ def train_model(deterministic: bool = True, seed: int = 1):
 
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
     samples_index_start = n_samples_train - 1
-    dataset_test = prepare_train_data_candles(hist, symbol_out, samples_index_start, n_samples_test, candle_input_type,
-                                              candle_output_type)
+    dataset_test = prepare_train_data_indicators(hist, symbol_out, samples_index_start, n_samples_test)
 
     X_test, y_test = split_sequences(dataset_test, n_steps, candle_output_type)
 

@@ -104,16 +104,7 @@ def load_sync_cp_file(_dirname: str, _filename: str) -> dict:
     return cp
 
 
-def write_train_config(train_config: dict):
-    train_config_filename = 'train_config.json'
-
-    with open(train_config_filename, 'w') as file:
-        json.dump(train_config, file, indent=4, sort_keys=False, cls=NpEncoder)
-
-    print(f'O arquivo {train_config_filename} foi gravado com SUCESSO.')
-
-
-def write_train_config2(directory: str, train_config: dict):
+def write_train_config(directory: str, train_config: dict):
     train_config_filename = 'train_config.json'
     filepath = os.path.join(directory, train_config_filename)
 
@@ -123,20 +114,7 @@ def write_train_config2(directory: str, train_config: dict):
     print(f'O arquivo {filepath} foi gravado com SUCESSO.')
 
 
-def read_train_config() -> dict:
-    train_config_filename = 'train_config.json'
-
-    if os.path.exists(train_config_filename):
-        with open(train_config_filename, 'r') as file:
-            _dict = json.load(file)
-    else:
-        print(f'ERRO. O arquivo {train_config_filename} não foi encontrado.')
-        exit(-1)
-
-    return _dict
-
-
-def read_train_config2(directory: str) -> dict:
+def read_train_config(directory: str) -> dict:
     train_config_filename = 'train_config.json'
     filepath = os.path.join(directory, train_config_filename)
 
