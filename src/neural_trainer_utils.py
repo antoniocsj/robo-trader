@@ -251,7 +251,7 @@ def get_time_break_from_timeframe(tf: str):
     # 60        30
     :return:
     """
-    factor = 2
+    factor = 1
 
     if tf == 'M5':
         ret = 360
