@@ -45,9 +45,8 @@ from src.utils.utils_filesystem import write_train_config, read_train_config
 from src.utils.utils_ops import denorm_close_price
 
 
-# Multivariate CNN Models
+# Multivariate Models
 # Multivariate time series data means data where there is more than one observation for each time step.
-#
 # There are two main models that we may require with multivariate time series data; they are:
 #
 # Multiple Input Series.
@@ -59,9 +58,6 @@ from src.utils.utils_ops import denorm_close_price
 # on the input time series.
 #
 # The input time series are parallel because each series has observations at the same time steps.
-#
-# We can demonstrate this with a simple example of two parallel input time series where the output series
-# is the simple addition of the input series.
 def train_model():
     print(f'DETERMINISTIC? = {DETERMINISTIC}')
     if DETERMINISTIC:
@@ -134,12 +130,6 @@ def train_model():
     # hidden layers
     for i in range(n_hidden_layers):
         model.add(Dense(n_neurons, activation='relu'))
-
-    # define MLP model
-    # n_input = X_train.shape[1] * X_train.shape[2]
-    # X_train = X_train.reshape((X_train.shape[0], n_input))
-    # model.add(Dense(n_inputs, activation='relu', input_dim=n_input))
-    # model.add(Dense(n_inputs, activation='relu'))
 
     # output layer
     model.add(Dense(len(candle_output_type)))
