@@ -62,10 +62,7 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
     samples_test_ratio = 0.02
 
     n_rows = hist.arr[symbol_out][timeframe].shape[0]
-
-    # Número de amostras inéditas usadas na fase de avaliação.
-    n_samples_test = int(n_rows * samples_test_ratio)
-
+    n_samples_test = int(n_rows * samples_test_ratio)  # Número de amostras inéditas usadas na fase de avaliação.
     n_samples_train = n_rows - n_samples_test  # Número de amostras usadas na fase de treinamento e validação
 
     # horizontally stack columns
@@ -78,9 +75,7 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
     # features to expect for each input sample.
     n_features = X_train.shape[2]
     n_inputs = n_steps * n_features
-    # max_n_epochs = n_inputs * 3 * 0 + 150
     max_n_epochs = params_rs_search['max_n_epochs']
-    # patience = int(max_n_epochs / 10) * 0 + 5
 
     if patience_style.lower() == 'short':
         patience = params_rs_search['patience_short']
@@ -127,12 +122,6 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
     for i in range(n_hidden_layers):
         model.add(Dense(n_neurons, activation='relu'))
 
-    # define MLP model
-    # n_input = X_train.shape[1] * X_train.shape[2]
-    # X_train = X_train.reshape((X_train.shape[0], n_input))
-    # model.add(Dense(n_inputs, activation='relu', input_dim=n_input))
-    # model.add(Dense(n_inputs, activation='relu'))
-
     # output layer
     model.add(Dense(len(candle_output_type)))
     model.compile(optimizer='adam', loss='mse')
@@ -168,10 +157,6 @@ def train_model(settings: dict, params_rs_search: dict, seed: int, patience_styl
                                        candle_output_type)
 
     X_test, y_test = split_sequences2(dataset_test, n_steps, candle_output_type)
-
-    # for MLP model only
-    # n_input = X_test.shape[1] * X_test.shape[2]
-    # X_test = X_test.reshape((X_test.shape[0], n_input))
 
     saved_model = load_model('model.keras')
     test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)

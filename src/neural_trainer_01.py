@@ -65,16 +65,12 @@ def train_model(deterministic: bool = True, seed: int = 1):
 
     n_steps = 2
     n_hidden_layers = 1
-
+    validation_split = 0.2
     samples_test_ratio = 0.02
 
     n_rows = hist.arr[symbol_out][timeframe].shape[0]
-
-    # Número de amostras inéditas usadas na fase de avaliação.
-    n_samples_test = int(n_rows * samples_test_ratio)
-
+    n_samples_test = int(n_rows * samples_test_ratio)  # Número de amostras inéditas usadas na fase de avaliação.
     n_samples_train = n_rows - n_samples_test  # Número de amostras usadas na fase de treinamento e validação
-    validation_split = 0.2
 
     # horizontally stack columns
     dataset_train = prepare_train_data2(hist, symbol_out, 0, n_samples_train, candle_input_type, candle_output_type)

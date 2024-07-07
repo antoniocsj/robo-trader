@@ -1,6 +1,6 @@
 {
-    "timeframe": "H1",
-    "candle_input_type": "CV",
+    "timeframe": "M15",
+    "candle_input_type": "C",
     "n_steps": 2,
     "n_hidden_layers": 0,
     "max_n_epochs": 150,

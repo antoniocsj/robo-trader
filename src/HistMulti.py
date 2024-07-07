@@ -12,7 +12,7 @@ from src.utils.utils_symbols import search_symbols_in_dict
 
 
 class HistMulti:
-    def __init__(self, source: Any, timeframe: str, symbols_allowed=None):
+    def __init__(self, source: Any, timeframe: str, symbols_allowed=None, symbolout=None):
         """
         Cria um objeto que armazena os dados históricos obtidos por:
          1) a partir de um diretório contendo arquivos CSVs ou ;
@@ -34,7 +34,7 @@ class HistMulti:
             # print(f'obtendo dados históricos a partir do diretório {self.directory}')
             self.all_files = []
             self.csv_files = {}  # guarda os nomes dos arquivos csv conforme seu 'simbolo' e 'timeframe'
-            self.search_symbols(symbols_allowed)
+            self.search_symbols(symbols_allowed, symbolout)
         elif isinstance(source, dict):
             self.source_is_dir = False
             # print(f'obtendo dados históricos a partir de um dicionário de planilhas')
@@ -44,9 +44,11 @@ class HistMulti:
 
         self.load_symbols()
 
-    def search_symbols(self, symbols_allowed=None):
+    def search_symbols(self, symbols_allowed=None, symbolout=None):
         """
         Procurando pelos arquivos csv correspondentes ao 'simbolo' e ao 'timeframe'
+        symbols_allowed: lista dos símbolos que devem ser carregados. Se None, carrega todos.
+        symbolout: se for especificado, este símbolo ficará em primeiro lugar na lista dos símbolos.
         :return:
         """
         if not os.path.exists(self.directory):
@@ -82,7 +84,15 @@ class HistMulti:
                     self.csv_files[_symbol] = {}
                     self.csv_files[_symbol][_timeframe] = filename
 
-        self.symbols = sorted(self.symbols)
+        # self.symbols = sorted(self.symbols)
+        # ordena a lista dos símbolos de modo que ela fique ordenada afabeticamente,
+        # porém com symbol_out no início.
+        if len(self.symbols) > 1 and symbolout:
+            _symbols = self.symbols[:]
+            self.symbols.remove(symbolout)
+            self.symbols = [symbolout] + sorted(self.symbols)
+        else:
+            self.symbols = sorted(self.symbols)
 
     def get_csv_filepath(self, symbol: str, timeframe: str) -> str:
         _filepath = self.directory + '/' + self.csv_files[symbol][timeframe]
