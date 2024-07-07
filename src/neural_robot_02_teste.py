@@ -46,9 +46,8 @@ from src.utils.utils_filesystem import write_train_config, read_train_config
 from src.utils.utils_ops import denorm_close_price
 
 
-# Multivariate CNN Models
+# Multivariate Models
 # Multivariate time series data means data where there is more than one observation for each time step.
-#
 # There are two main models that we may require with multivariate time series data; they are:
 #
 # Multiple Input Series.
@@ -60,9 +59,6 @@ from src.utils.utils_ops import denorm_close_price
 # on the input time series.
 #
 # The input time series are parallel because each series has observations at the same time steps.
-#
-# We can demonstrate this with a simple example of two parallel input time series where the output series
-# is the simple addition of the input series.
 def train_model():
     print(f'DETERMINISTIC? = {DETERMINISTIC}')
     if DETERMINISTIC:
@@ -129,19 +125,11 @@ def train_model():
         else:
             dataset_train_big = np.vstack((dataset_train_big, ds))
 
-    # dataset_train_big = np.vstack((dataset_train, dataset_train2))
-    # dataset_train_big = np.vstack((dataset_train_big, dataset_train3))
-    # dataset_train_big = np.vstack((dataset_train_big, dataset_train4))
-    # dataset_train_big = np.vstack((dataset_train_big, dataset_train5))
-    # dataset_train_big = np.vstack((dataset_train_big, dataset_train6))
-
     # convert into input/output samples
     X_train_big, y_train_big = split_sequences2(dataset_train_big, n_steps, candle_output_type)
     n_samples_train_big = X_train_big.shape[0]
 
     # We are now ready to fit a 1D CNN model on this data, specifying the expected number of time steps and
-    # features to expect for each input sample.
-    # n_features = X_train.shape[2]
     n_features = X_train_big.shape[2]
     n_inputs = n_steps * n_features
     max_n_epochs = n_inputs * 3 * 0 + 150
@@ -172,12 +160,6 @@ def train_model():
     for i in range(n_hidden_layers):
         model.add(Dense(n_neurons, activation='relu'))
 
-    # define MLP model
-    # n_input = X_train.shape[1] * X_train.shape[2]
-    # X_train = X_train.reshape((X_train.shape[0], n_input))
-    # model.add(Dense(n_inputs, activation='relu', input_dim=n_input))
-    # model.add(Dense(n_inputs, activation='relu'))
-
     # output layer
     model.add(Dense(len(candle_output_type)))
     model.compile(optimizer='adam', loss='mse')
@@ -207,10 +189,6 @@ def train_model():
 
     print(f'avaliando o modelo num novo conjunto de amostras de teste.')
     X_test, y_test = split_sequences2(dataset_test, n_steps, candle_output_type)
-
-    # for MLP model only
-    # n_input = X_test.shape[1] * X_test.shape[2]
-    # X_test = X_test.reshape((X_test.shape[0], n_input))
 
     saved_model = load_model('model.keras')
     test_loss_eval = saved_model.evaluate(X_test, y_test, verbose=0)
