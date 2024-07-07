@@ -64,11 +64,6 @@ def train_model(working_dir: str, settings: dict, params_rs_search: dict, seed: 
     # Create save directory if not exists
     results_dir = os.path.join(working_dir, settings['results_dir'])
 
-    # # se o diretório 'results' já existe, delete-o e recrie-o.
-    # if os.path.exists(results_dir):
-    #     shutil.rmtree(results_dir)
-    # os.makedirs(results_dir)
-
     n_steps: int = params_rs_search['n_steps']
     n_hidden_layers: int = params_rs_search['n_hidden_layers']
     validation_split = settings['validation_split']
