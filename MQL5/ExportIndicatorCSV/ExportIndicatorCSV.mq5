@@ -76,6 +76,8 @@ void save_csv_2b(string file_name, MqlRates& rates[], double& buffer_0[], double
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
+// this function exports the MA indicator to a CSV file.
+// It returns the number of copied rates.
 int Export_MA(string symbol_name, ENUM_TIMEFRAMES timeframe, int ma_period,
               datetime start_time, datetime stop_time) {
     int               ma_shift = 0;
@@ -122,6 +124,8 @@ int Export_MA(string symbol_name, ENUM_TIMEFRAMES timeframe, int ma_period,
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
+// this function exports the Stochastic indicator to a CSV file.
+// It returns the number of copied rates.
 int Export_Stochastic(string symbol_name, ENUM_TIMEFRAMES timeframe, int k_period,
                       int d_period, int slowing,
                       datetime start_time, datetime stop_time) {
@@ -182,6 +186,8 @@ int Export_Stochastic(string symbol_name, ENUM_TIMEFRAMES timeframe, int k_perio
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
+// this function exports the MACD indicator to a CSV file.
+// It returns the number of copied rates.
 int Export_MACD(string symbol_name, ENUM_TIMEFRAMES timeframe,
                 int fast_ema_period, int slow_ema_period, int signal_period,
                 datetime start_time, datetime stop_time) {
@@ -243,6 +249,8 @@ int Export_MACD(string symbol_name, ENUM_TIMEFRAMES timeframe,
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
+// this function exports the RSI indicator to a CSV file.
+// It returns the number of copied rates.
 int Export_RSI(string symbol_name, ENUM_TIMEFRAMES timeframe, int ma_period,
                datetime start_time, datetime stop_time) {
     int               ma_applied = PRICE_CLOSE;
@@ -282,7 +290,8 @@ int Export_RSI(string symbol_name, ENUM_TIMEFRAMES timeframe, int ma_period,
     return n_copied_rates;
 }
 
-
+// this function exports the OBV indicator to a CSV file.
+// It returns the number of copied rates.
 int Export_OBV(string symbol_name, ENUM_TIMEFRAMES timeframe,
               datetime start_time, datetime stop_time) {
     ENUM_APPLIED_VOLUME applied = VOLUME_TICK;
@@ -326,23 +335,74 @@ int Export_OBV(string symbol_name, ENUM_TIMEFRAMES timeframe,
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
+// this function exports the indicators of a symbol to CSV files.
+int Export_Symbol_Indicators(string symbol, ENUM_TIMEFRAMES timeframe, datetime start_time, datetime stop_time) {
+    string            _symbol = symbol;
+    ENUM_TIMEFRAMES   _timeframe = timeframe;
+    /*datetime start_time = D'2018.01.02 02:00:00';
+    datetime stop_time = D'2024.06.15 00:00:00'; XAUUSD*/
+    datetime _start_time = start_time;
+    datetime _stop_time = stop_time;
+
+    // this function will return the total number of copied rates
+    int total_copied_rates = 0;
+
+    // MA
+    total_copied_rates += Export_MA(_symbol, _timeframe, 1, _start_time, _stop_time);
+    /*total_copied_rates += Export_MA(_symbol, _timeframe, 5, _start_time, _stop_time);
+    total_copied_rates += Export_MA(_symbol, _timeframe, 10, _start_time, _stop_time);
+    total_copied_rates += Export_MA(_symbol, _timeframe, 25, _start_time, _stop_time);
+    total_copied_rates += Export_MA(_symbol, _timeframe, 50, _start_time, _stop_time);
+    total_copied_rates += Export_MA(_symbol, _timeframe, 100, _start_time, _stop_time);
+    total_copied_rates += Export_MA(_symbol, _timeframe, 200, _start_time, _stop_time);*/
+
+    // Stochastic
+    //total_copied_rates += Export_Stochastic(_symbol, _timeframe, 5, 3, 3, _start_time, _stop_time);
+
+    // MACD
+    //total_copied_rates += Export_MACD(_symbol, _timeframe, 13, 26, 9, _start_time, _stop_time);
+
+    // RSI
+    //total_copied_rates += Export_RSI(_symbol, _timeframe, 13, _start_time, _stop_time);
+
+    // OBV
+    //total_copied_rates += Export_OBV(_symbol, _timeframe, _start_time, _stop_time);
+
+    Print("total_copied_rates = ", total_copied_rates);
+
+    return total_copied_rates;
+}
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 void main() {
-    string            symbol_name = "XAUUSD";
     ENUM_TIMEFRAMES   timeframe = PERIOD_M15;
     datetime start_time = D'2018.01.02 02:00:00';
     datetime stop_time = D'2024.06.15 00:00:00';
+    
+    // forex majors symbols
+    string majors_symbols[] = {
+        "AUDUSD", "EURUSD", "GBPUSD", "USDCAD", "USDCHF", "USDJPY"
+    };
 
-    Export_MA(symbol_name, timeframe, 1, start_time, stop_time);
-    Export_MA(symbol_name, timeframe, 5, start_time, stop_time);
-    Export_MA(symbol_name, timeframe, 10, start_time, stop_time);
-    Export_MA(symbol_name, timeframe, 25, start_time, stop_time);
-    Export_MA(symbol_name, timeframe, 50, start_time, stop_time);
-    Export_MA(symbol_name, timeframe, 100, start_time, stop_time);
-    Export_MA(symbol_name, timeframe, 200, start_time, stop_time);
+    CArrayString cas_symbols;
+    cas_symbols.AddArray(majors_symbols);
 
-    Export_Stochastic(symbol_name, timeframe, 5, 3, 3, start_time, stop_time);
-    Export_MACD(symbol_name, timeframe, 12, 26, 9, start_time, stop_time);
-    Export_RSI(symbol_name, timeframe, 14, start_time, stop_time);
-    Export_OBV(symbol_name, timeframe, start_time, stop_time);
+    int num_symbols = cas_symbols.Total();
+    Print("num_symbols = ", num_symbols);
+
+    cas_symbols.Sort();
+
+    int total_copied_rates = 0;
+
+    for(int i=0; i < num_symbols; i++) {
+        string symbol = cas_symbols.At(i);
+        Print("symbol = ", symbol);
+        //Export_Symbol_Indicators(symbol, timeframe, start_time, stop_time);
+        total_copied_rates += Export_Symbol_Indicators(symbol, timeframe, start_time, stop_time);
+    }
+
+    Print("total_copied_rates = ", total_copied_rates);
 }
 //+------------------------------------------------------------------+
