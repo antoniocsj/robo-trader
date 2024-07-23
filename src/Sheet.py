@@ -14,7 +14,7 @@ class Sheet:
         :param source: filepath (str) ou list[dict]
         :param symbol: ex. EURUSD
         :param timeframe: ex. M5
-        :param csv_content: conteúdo do arquivo CSV (HETEROGENEOUS_DEFAULT, HOMOGENEOUS_DEFAULT, HETEROGENEOUS_OHLCV)
+        :param csv_content: conteúdo do arquivo CSV, pode ser HETEROGENEOUS_DEFAULT, HOMOGENEOUS_DEFAULT ou HETEROGENEOUS_OHLCV.
         """
         self.symbol = symbol
         self.timeframe = timeframe
