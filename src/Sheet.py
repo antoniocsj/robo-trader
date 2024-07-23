@@ -7,16 +7,18 @@ from numpy import ndarray
 
 
 class Sheet:
-    def __init__(self, source: Any, symbol: str, timeframe: str):
+    def __init__(self, source: Any, symbol: str, timeframe: str, csv_content: str):
         """
         Cria uma planilha a partir de um arquivo CSV ou a partir de uma list de dicionários contendo os dados para
         formar as linhas e colunas da planilha.
         :param source: filepath (str) ou list[dict]
         :param symbol: ex. EURUSD
         :param timeframe: ex. M5
+        :param csv_content: conteúdo do arquivo CSV (HETEROGENEOUS_DEFAULT, HOMOGENEOUS_DEFAULT, HETEROGENEOUS_OHLCV)
         """
         self.symbol = symbol
         self.timeframe = timeframe
+        self.csv_content = csv_content
         self.timedelta: timedelta = self.get_timedelta()
         self.current_row = 0
         self.is_on_the_last_row = False
@@ -43,7 +45,23 @@ class Sheet:
         # else:
         #     self.df.columns = ['DATETIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'TICKVOL']
 
+        if csv_content == 'HETEROGENEOUS_OHLCV':
+            # a primeira coluna será DATETIME e a segunda em diante será OPEN, HIGH, LOW, CLOSE, TICKVOL
+            self.df.columns = ['DATETIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'TICK']
+        elif csv_content == 'HETEROGENEOUS_DEFAULT' or csv_content == 'HOMOGENEOUS':
+            # a primeira coluna será DATETIME e a segunda em diante será B0, B1, B2 etc.
+            self.df.columns = ['DATETIME'] + [f'B{i}' for i in range(0, len(self.df.columns) - 1)]
+        else:
+            # informe que o parâmetro csv_content é inválido e aborte
+            print(f'erro. csv_content inválido ({csv_content})')
+            exit(-1)
+
     def create_df_from_rates_(self) -> pd.DataFrame:
+        """
+        Cria um DataFrame a partir de uma lista de dicionários contendo os dados para formar as linhas e colunas da
+        planilha.
+        :return:
+        """
         _df: pd.DataFrame
         _list_ = []
         for rate in self.rates:
@@ -54,6 +72,11 @@ class Sheet:
         return _df
 
     def create_df_from_rates(self) -> pd.DataFrame:
+        """
+        Cria um DataFrame a partir de uma lista de dicionários contendo os dados para formar as linhas e colunas da
+        planilha. O nome das colunas será o nome das chaves dos dicionários.
+        :return:
+        """
         _df: pd.DataFrame
         _list_ = []
         for rate in self.rates:
@@ -140,16 +163,39 @@ class Sheet:
     def print_current_row(self):
         row = self.df.iloc[self.current_row]
         _datetime = row['DATETIME']
-        _O, _H, _L, _C, _V = row['OPEN'], row['HIGH'], row['LOW'], row['CLOSE'], row['TICKVOL']
-        print(f'{self.symbol} {_datetime} (linha = {self.current_row}) '
-              f'OHLCV = {_O} {_H} {_L} {_C} {_V}')
+
+        # imprima o conteúdo da linha atual.
+        # o que será impresso depende do conteúdo do arquivo CSV.
+        # se for HETEROGENEOUS_OHLCV, imprima DATETIME, OPEN, HIGH, LOW, CLOSE, TICK
+        # se for HETEROGENEOUS_DEFAULT, imprima DATETIME, B0, B1, B2 etc.
+        # se for HOMOGENEOUS, imprima DATETIME, B0, B1, B2 etc.
+        if self.csv_content == 'HETEROGENEOUS_OHLCV':
+            _O, _H, _L, _C, _V = row['OPEN'], row['HIGH'], row['LOW'], row['CLOSE'], row['TICK_VOL']
+            print(f'{self.symbol} {_datetime} (linha = {self.current_row}) '
+                  f'OHLCV = {_O} {_H} {_L} {_C} {_V}')
+        elif self.csv_content == 'HETEROGENEOUS_DEFAULT' or self.csv_content == 'HOMOGENEOUS':
+            _B = [row[f'B{i}'] for i in range(0, len(row) - 1)]
+            print(f'{self.symbol} {_datetime} (linha = {self.current_row}) B = {_B}')
+        else:
+            print(f'erro. csv_content inválido ({self.csv_content})')
+            exit(-1)
 
     def print_last_row(self):
-        print(f'a última linha de {self.symbol}. ({len(self.df)} linhas)')
-        row = self.df.iloc[-1]
-        _datetime = row['DATETIME']
-        _O, _H, _L, _C, _V = row['OPEN'], row['HIGH'], row['LOW'], row['CLOSE'], row['TICKVOL']
-        print(f'{self.symbol} {_datetime} OHLCV = {_O} {_H} {_L} {_C} {_V}')
+        if self.csv_content == 'HETEROGENEOUS_OHLCV':
+            print(f'a última linha de {self.symbol}. ({len(self.df)} linhas)')
+            row = self.df.iloc[-1]
+            _datetime = row['DATETIME']
+            _O, _H, _L, _C, _V = row['OPEN'], row['HIGH'], row['LOW'], row['CLOSE'], row['TICKVOL']
+            print(f'{self.symbol} {_datetime} OHLCV = {_O} {_H} {_L} {_C} {_V}')
+        elif self.csv_content == 'HETEROGENEOUS_DEFAULT' or self.csv_content == 'HOMOGENEOUS':
+            print(f'a última linha de {self.symbol}. ({len(self.df)} linhas)')
+            row = self.df.iloc[-1]
+            _datetime = row['DATETIME']
+            _B = [row[f'B{i}'] for i in range(0, len(row) - 1)]
+            print(f'{self.symbol} {_datetime} B = {_B}')
+        else:
+            print(f'erro. csv_content inválido ({self.csv_content})')
+            exit(-1)
 
     def get_datetime_last_row(self) -> datetime:
         row = self.df.iloc[-1]
