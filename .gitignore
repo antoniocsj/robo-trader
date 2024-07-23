@@ -172,4 +172,8 @@ cython_debug/
 /predictors/
 /predictors_CNN/
 /predictors_LSTM/
-/temp/sync_cp*.json
+/src/sync_cp*.json
+/temp
+/csv_o/
+/csv_s/
+
