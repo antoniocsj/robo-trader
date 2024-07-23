@@ -85,7 +85,7 @@ class DirectorySynchronization:
         for _symbol in self.symbols:
             _symbol_timeframe = f'{_symbol}_{self.timeframe}'
             _filepath = self.get_csv_filepath(_symbol_timeframe)
-            self.sheets.append(Sheet(_filepath, _symbol, self.timeframe))
+            self.sheets.append(Sheet(_filepath, _symbol, self.timeframe, self.csv_content))
 
     @staticmethod
     def _calc_max(_list: list[tuple[datetime, Sheet]]) -> tuple[datetime, Sheet]:
