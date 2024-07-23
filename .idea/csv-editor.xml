@@ -3,7 +3,21 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="/csv_s/AUDUSD-MA(1)_M15.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="&#9;" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/temp/AUDUSD-MA(1)_M15.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="&#9;" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/temp/USDJPY-MA(1)_M15.csv">
           <value>
             <Attribute>
               <option name="separator" value="&#9;" />
