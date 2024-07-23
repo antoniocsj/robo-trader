@@ -9,6 +9,8 @@ from numpy import ndarray
 class Sheet:
     def __init__(self, source: Any, symbol: str, timeframe: str, csv_content: str):
         """
+        Uma planilha (Sheet) é um objeto que contém os dados de um arquivo CSV ou de uma lista de dicionários.
+        A planilha armazena os dados em um DataFrame do Pandas.
         Cria uma planilha a partir de um arquivo CSV ou a partir de uma list de dicionários contendo os dados para
         formar as linhas e colunas da planilha.
         :param source: filepath (str) ou list[dict]

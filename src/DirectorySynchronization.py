@@ -10,8 +10,12 @@ class DirectorySynchronization:
     """
     Realiza a correção/sincronização de todos os arquivos CSVs contidos no diretório indicado.
     Quando realiza inserções de linhas, faz do seguinte modo:
-    - Obtém o valor de fechamento da última vela conhecida (C');
-    - as velas inseridas terão O=H=L=C=C' e V=0;
+    - Se o conteúdo do CSV for 'HETEROGENEOUS_OHLCV' (CSV com dados de velas):
+        - Obtém o valor de fechamento da última vela conhecida (C');
+        - as velas inseridas terão O=H=L=C=C' e V=0;
+    - Se o conteúdo do CSV for 'HETEROGENEOUS_DEFAULT' ou 'HOMOGENEOUS' (CSV com dados de indicadores):
+        - A nova linha será uma cópia da linha anterior, exceto pelo valor de 'DATETIME' que será atualizado.
+
     Todas as planilhas são sincronizadas simultaneamente em apenas 1 processo.
     """
     def __init__(self, directory: str, csv_content: str):
@@ -309,20 +313,20 @@ class DirectorySynchronization:
 
                 # faz as inserções de novas linhas até _datetime. os datetime's das linhas inseridas
                 # começam em _lower_datetime e vão até (mas não incluindo) _datetime.
-                _new_date_time = _lower_datetime
+                _new_datetime = _lower_datetime
                 _index_start = s.current_row
                 _index_new_row = s.current_row - 0.5
 
-                while _new_date_time < _datetime:
-                    is_present = self.is_present_inother_sheets(_new_date_time,
+                while _new_datetime < _datetime:
+                    is_present = self.is_present_inother_sheets(_new_datetime,
                                                                 _lower_datetime_sheet[1].current_row,
                                                                 s.current_row)
                     if not is_present:
-                        _new_date_time += s.timedelta
+                        _new_datetime += s.timedelta
                         continue
 
-                    _index_new_row = self.insert_new_row(_index_new_row, _new_date_time, _previous_row, s)
-                    _new_date_time += s.timedelta
+                    _index_new_row = self.insert_new_row(_index_new_row, _new_datetime, _previous_row, s)
+                    _new_datetime += s.timedelta
 
                 self.num_insertions_done += 1
                 s.current_row = _index_start
@@ -399,7 +403,7 @@ class DirectorySynchronization:
         s: Sheet
         _datetime_list = []
         for s in self.sheets:
-            for i in range(_nrow_start, _nrow_end+1):
+            for i in range(_nrow_start, _nrow_end + 1):
                 if i > len(s.df) - 1:
                     break
                 row = s.df.iloc[i]

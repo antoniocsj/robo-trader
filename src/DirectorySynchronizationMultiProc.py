@@ -12,8 +12,12 @@ class DirectorySynchronization:
     """
     Realiza a correção/sincronização de todos os arquivos CSVs contidos no diretório indicado.
     Quando realiza inserções de linhas, faz do seguinte modo:
-    - Obtém o valor de fechamento da última vela conhecida (C');
-    - as velas inseridas terão O=H=L=C=C' e V=0;
+    - Se o conteúdo do CSV for 'HETEROGENEOUS_OHLCV' (CSV com dados de velas):
+        - Obtém o valor de fechamento da última vela conhecida (C');
+        - as velas inseridas terão O=H=L=C=C' e V=0;
+    - Se o conteúdo do CSV for 'HETEROGENEOUS_DEFAULT' ou 'HOMOGENEOUS' (CSV com dados de indicadores):
+        - A nova linha será uma cópia da linha anterior, exceto pelo valor de 'DATETIME' que será atualizado.
+
     Esta classe utiliza MultiProcessamento para realizar suas tarefas.
     O processo de sincronização é efetuado em várias etapas nas quais vários conjuntos de planilhas são sincronizados
     separadamente em vários processos paralelos.
@@ -21,10 +25,11 @@ class DirectorySynchronization:
     No final, é feito um backup do diretório sincronizado.
     """
 
-    def __init__(self, directory: str, timeframe: str, index_proc: int, symbols_to_sync: list[str] = None):
+    def __init__(self, directory: str, csv_content: str, timeframe: str, index_proc: int, symbols_to_sync: list[str] = None):
         self.directory = directory
         self.all_files = []
         self.csv_files = {}
+        self.csv_content = csv_content
         self.symbols = []
         self.timeframe = timeframe
         self.sheets = []
@@ -310,7 +315,6 @@ class DirectorySynchronization:
                 print(f'{s.symbol} {_datetime} > {_lower_datetime} ({_lower_sheet.symbol}) '
                       f'(linha atual = {s.current_row}) (index_proc = {self.index_proc})')
                 _previous_row = s.df.iloc[s.current_row - 1]
-                _previous_close = _previous_row['CLOSE']
 
                 # faz as inserções de novas linhas até _datetime. os datetime's das linhas inseridas
                 # começam em _lower_datetime e vão até (mas não incluindo) _datetime.
@@ -326,56 +330,78 @@ class DirectorySynchronization:
                         _new_datetime += s.timedelta
                         continue
 
-                    _index_new_row = self.insert_new_row(_index_new_row, _new_datetime,
-                                                         _previous_close, s)
-
+                    _index_new_row = self.insert_new_row(_index_new_row, _new_datetime, _previous_row, s)
                     _new_datetime += s.timedelta
 
                 self.num_insertions_done += 1
                 s.current_row = _index_start
 
-    @staticmethod
-    def insert_new_row(_index_new_row, _new_datetime, _previous_close, s):
+    def insert_new_row(self, _index_new_row, _new_datetime, _previous_row, s):
         """
-        Insere um nova linha no dataframe. insere no meio, não no final. Para adicionar no final use append_new_row.
+        Insere um nova linha no dataframe. insere no meio, não no final.
+        Para adicionar no final use append_new_row.
         :param _index_new_row:
         :param _new_datetime:
-        :param _previous_close:
+        :param _previous_row:
         :param s:
         :return:
         """
         # print(f'{s.symbol} inserindo nova linha {_new_date_time}')
-        _datetime = _new_datetime.strftime('%Y-%m-%dT%H:%M')
-        _O = _H = _L = _C = _previous_close
-        # insere a nova linha. que será uma vela com O=H=L=C igual a _previous_close e V=0
-        # s.df.loc[_index_new_row] = [_date, _time, _O, _H, _L, _C, 0, 0, 0]
-        # s.df.loc[_index_new_row] = [_date, _time, _O, _H, _L, _C, 0]
-        s.df.loc[_index_new_row] = [_datetime, _O, _H, _L, _C, 0]
+        if self.csv_content == 'HETEROGENEOUS_OHLCV':
+            _datetime = _new_datetime.strftime('%Y-%m-%dT%H:%M')
+            _previous_close = _previous_row['CLOSE']
+            _O = _H = _L = _C = _previous_close
+            # insere a nova linha. que será uma vela com O=H=L=C igual a _previous_close e V=0
+            s.df.loc[_index_new_row] = [_datetime, _O, _H, _L, _C, 0]
+        elif self.csv_content == 'HETEROGENEOUS_DEFAULT' or self.csv_content == 'HOMOGENEOUS':
+            _datetime = _new_datetime.strftime('%Y-%m-%dT%H:%M')
+            _new_row = _previous_row.copy()
+            _new_row['DATETIME'] = _datetime
+            # insere a nova linha.
+            s.df.loc[_index_new_row] = _new_row
+        else:
+            print(f'ERRO! csv_content inválido ({self.csv_content})')
+            exit(-1)
+
         s.df.sort_index(ignore_index=True, inplace=True)
         s.df.reset_index(drop=True)
         s.current_row += 1
         _index_new_row = s.current_row - 0.5
+
         return _index_new_row
 
-    @staticmethod
-    def append_new_row(_index_new_row, _new_datetime, _previous_close, s):
+    def append_new_row(self, _index_new_row, _new_datetime, _previous_row, s):
         """
         Adiciona uma nova linha no final.
         :param _index_new_row:
         :param _new_datetime:
-        :param _previous_close:
+        :param _previous_row:
         :param s:
         :return:
         """
         # print(f'{s.symbol} inserindo nova linha {_new_date_time}')
-        _datetime = _new_datetime.strftime('%Y-%m-%dT%H:%M')
-        _O = _H = _L = _C = _previous_close
-        # insere a nova linha. que será uma vela com O=H=L=C igual a _previous_close e V=0
-        s.df.loc[_index_new_row] = [_datetime, _O, _H, _L, _C, 0]
+
+        if self.csv_content == 'HETEROGENEOUS_OHLCV':
+            _datetime = _new_datetime.strftime('%Y-%m-%dT%H:%M')
+            _previous_close = _previous_row['CLOSE']
+            _O = _H = _L = _C = _previous_close
+            # insere a nova linha. que será uma vela com O=H=L=C igual a _previous_close e V=0
+            s.df.loc[_index_new_row] = [_datetime, _O, _H, _L, _C, 0]
+        elif self.csv_content == 'HETEROGENEOUS_DEFAULT' or self.csv_content == 'HOMOGENEOUS':
+            _datetime = _new_datetime.strftime('%Y-%m-%dT%H:%M')
+            _new_row = _previous_row.copy()
+            _new_row['DATETIME'] = _datetime
+            # insere a nova linha.
+            s.df.loc[_index_new_row] = _new_row
+        else:
+            print(f'ERRO! csv_content inválido ({self.csv_content})')
+            exit(-1)
+
         s.df.sort_index(ignore_index=True, inplace=True)
         s.df.reset_index(drop=True)
         s.current_row += 1
         _index_new_row = s.current_row + 0.5
+
         return _index_new_row
 
     def is_present_inother_sheets(self, _new_datetime, _nrow_start, _nrow_end):
@@ -646,6 +672,7 @@ def synchronize():
     temp_dir = settings['temp_dir']
     csv_s_dir = settings['csv_s_dir']
     timeframe = settings['timeframe']
+    csv_content = settings['csv_content']
 
     # se o diretório temp não existe, então crie-o.
     if not os.path.exists(temp_dir):
@@ -680,7 +707,7 @@ def synchronize():
 
         dir_sync_l: list[DirectorySynchronization] = []
         for i in range(n_procs):
-            dir_sync = DirectorySynchronization(temp_dir, timeframe, i, symbols_to_sync_per_proc[i])
+            dir_sync = DirectorySynchronization(temp_dir, csv_content, timeframe, i, symbols_to_sync_per_proc[i])
             dir_sync_l.append(dir_sync)
 
         for i in range(n_procs):
@@ -735,7 +762,7 @@ def synchronize():
 
                 dir_sync_l: list[DirectorySynchronization] = []
                 for i in range(n_procs):
-                    dir_sync = DirectorySynchronization(temp_dir, timeframe, i, symbols_to_sync_per_proc[i])
+                    dir_sync = DirectorySynchronization(temp_dir, csv_content, timeframe, i, symbols_to_sync_per_proc[i])
                     dir_sync_l.append(dir_sync)
 
                 for i in range(n_procs):
@@ -757,7 +784,7 @@ def synchronize():
 
             dir_sync_l: list[DirectorySynchronization] = []
             for i in range(n_procs):
-                dir_sync = DirectorySynchronization(temp_dir, timeframe, i, symbols_to_sync_per_proc[i])
+                dir_sync = DirectorySynchronization(temp_dir, csv_content, timeframe, i, symbols_to_sync_per_proc[i])
                 dir_sync_l.append(dir_sync)
 
             for i in range(n_procs):
