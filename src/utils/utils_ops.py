@@ -18,12 +18,17 @@ def normalize_minmax(data: ndarray, feature_range: tuple, csv_content=None) -> t
     1) supondo que todas as colunas possuem dados da mesma variável/característca/fenômeno e com a mesma unidade de medida.
     Nesse caso, seria mais apropriado o cálculo do máximo e mínimo globais da matriz.
     Por exemplo, uma matrix OHLC em que todas as colunas se referem a mesma variável=preço.
+    Nesse caso, csv_content = 'HOMOGENEOUS'.
 
     2) supondo que as algumas colunas possuem dados da mesma variável/característca/fenômeno e com a mesma unidade de medida e
     que outras coluna sejam de outras váriáveis. Porém a última, possuem uma unidade de medida diferente.
     Nesse caso, seria mais apropriado o cálculo dos máximos e mínimos regionais da matriz.
     Por exemplo, uma matriz OHLCV em que as 4 primeiras colunas são do preço e a 5ª coluna é do volume.
     Assim, as colunas do preço terão um máximo/mínimo regional e a coluna do volume terá seu próprio máximo/mínimo regional.
+    Nestes casos, csv_content = 'HETEROGENEOUS_OHLCV'.
+
+    3) caso padrão, em que cada coluna é completamente independente das outras.
+    Nesse caso, csv_content = 'HETEROGENEOUS_DEFAULT'.
 
 
     Parameters
