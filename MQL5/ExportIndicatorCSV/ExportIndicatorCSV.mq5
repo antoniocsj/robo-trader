@@ -377,16 +377,23 @@ int Export_Symbol_Indicators(string symbol, ENUM_TIMEFRAMES timeframe, datetime 
 //|                                                                  |
 //+------------------------------------------------------------------+
 void main() {
-    ENUM_TIMEFRAMES   timeframe = PERIOD_M15;
+    // my timeframes list
+    ENUM_TIMEFRAMES timeframes[] = {
+        PERIOD_M15, PERIOD_M30, PERIOD_H1, PERIOD_H2, PERIOD_H4, PERIOD_H8, PERIOD_H12, PERIOD_D1
+    };
     datetime start_time = D'2018.01.02 02:00:00';
-    datetime stop_time = D'2024.06.15 00:00:00';
+    datetime stop_time = D'2024.08.08 00:00:00';
     
+    // my symbols
+    string my_symbols[] = {"XAUUSD"};
+
     // forex majors symbols
     string majors_symbols[] = {
         "AUDUSD", "EURUSD", "GBPUSD", "USDCAD", "USDCHF", "USDJPY"
     };
 
     CArrayString cas_symbols;
+    cas_symbols.AddArray(my_symbols);
     cas_symbols.AddArray(majors_symbols);
 
     int num_symbols = cas_symbols.Total();
@@ -399,8 +406,10 @@ void main() {
     for(int i=0; i < num_symbols; i++) {
         string symbol = cas_symbols.At(i);
         Print("symbol = ", symbol);
-        //Export_Symbol_Indicators(symbol, timeframe, start_time, stop_time);
-        total_copied_rates += Export_Symbol_Indicators(symbol, timeframe, start_time, stop_time);
+        for(int j=0; j < ArraySize(timeframes); j++) {
+            ENUM_TIMEFRAMES timeframe = timeframes[j];
+            total_copied_rates += Export_Symbol_Indicators(symbol, timeframe, start_time, stop_time);
+        }
     }
 
     Print("total_copied_rates = ", total_copied_rates);
